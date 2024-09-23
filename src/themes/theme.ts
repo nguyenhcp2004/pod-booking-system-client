@@ -211,38 +211,38 @@ export const themeSettings = (mode: 'light' | 'dark') => {
             // palette values for light mode
             primary: {
               light: colors.primary[100],
-              main: colors.primary[500],
-              dark: colors.primary[900]
+              main: colors.primary[500], // xanh nước biển
+              dark: colors.primary[700]
             },
             secondary: {
               light: colors.secondary[100],
-              main: colors.secondary[500],
-              dark: colors.secondary[900]
+              main: colors.secondary[500], // màu hồng
+              dark: colors.secondary[700]
             },
             neutral: {
               light: colors.grey[100],
-              main: colors.grey[500],
+              main: colors.grey[500], // màu xám
               dark: colors.grey[700]
             },
             success: {
               light: colors.success[100],
-              main: colors.success[500],
-              dark: colors.success[900]
+              main: colors.success[500], // màu xanh lá
+              dark: colors.success[700]
             },
             warning: {
               light: colors.warning[100],
-              main: colors.warning[500],
-              dark: colors.warning[900]
+              main: colors.warning[500], // màu vàng
+              dark: colors.warning[700]
             },
             error: {
               light: colors.error[100],
-              main: colors.error[500],
-              dark: colors.error[900]
+              main: colors.error[500], // màu đỏ
+              dark: colors.error[700]
             },
             info: {
               light: colors.info[100],
               main: colors.info[500],
-              dark: colors.info[900]
+              dark: colors.info[700]
             }
 
             // background: {
