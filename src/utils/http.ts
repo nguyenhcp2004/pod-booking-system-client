@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-
-import config from '~/constants/config'
+import envConfig from '~/constants/config'
 import { AuthResponse } from '~/types/auth'
 import {
   clearLS,
@@ -18,7 +17,7 @@ export class Http {
     this.accessToken = getAccessTokenFromLS()
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
-      baseURL: config.baseUrl,
+      baseURL: envConfig.VITE_API_ENDPOINT,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'
