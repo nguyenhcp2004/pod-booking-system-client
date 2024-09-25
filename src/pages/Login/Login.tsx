@@ -83,7 +83,9 @@ export default function Login() {
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
         <FormControl>
-          <FormLabel htmlFor='email'>Email</FormLabel>
+          <FormLabel htmlFor='email' sx={{ lineHeight: 1.5 }}>
+            Email
+          </FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
@@ -98,11 +100,14 @@ export default function Login() {
             variant='outlined'
             color={emailError ? 'error' : 'primary'}
             sx={{ ariaLabel: 'email' }}
+            size='small'
           />
         </FormControl>
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor='password'>Mật khẩu</FormLabel>
+            <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
+              Mật khẩu
+            </FormLabel>
             <Link component='button' variant='body2' sx={{ alignSelf: 'baseline' }}>
               Quên mật khẩu?
             </Link>
@@ -120,6 +125,7 @@ export default function Login() {
             fullWidth
             variant='outlined'
             color={passwordError ? 'error' : 'primary'}
+            size='small'
           />
         </FormControl>
         <Button type='submit' fullWidth variant='contained' onClick={validateInputs}>
@@ -144,7 +150,7 @@ export default function Login() {
           type='submit'
           fullWidth
           variant='outlined'
-          onClick={() => alert('Sign in with Google')}
+          href='/oauth2/authorization/google'
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google
