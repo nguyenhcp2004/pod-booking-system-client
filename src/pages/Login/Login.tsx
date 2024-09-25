@@ -9,7 +9,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 import GoogleIcon from '@mui/icons-material/Google'
-import { useState } from 'react'
+import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -29,56 +31,31 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function Login() {
-  const [emailError, setEmailError] = useState(false)
-  const [emailErrorMessage, setEmailErrorMessage] = useState('')
-  const [passwordError, setPasswordError] = useState(false)
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState('')
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    })
-  }
-
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement
-    const password = document.getElementById('password') as HTMLInputElement
-
-    let isValid = true
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true)
-      setEmailErrorMessage('Please enter a valid email address.')
-      isValid = false
-    } else {
-      setEmailError(false)
-      setEmailErrorMessage('')
+  const {
+    control,
+    formState: { errors },
+    handleSubmit
+  } = useForm<LoginBodyType>({
+    resolver: zodResolver(LoginBody),
+    defaultValues: {
+      email: '',
+      password: ''
     }
+  })
 
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true)
-      setPasswordErrorMessage('Password must be at least 6 characters long.')
-      isValid = false
-    } else {
-      setPasswordError(false)
-      setPasswordErrorMessage('')
-    }
-
-    return isValid
-  }
+  const onSubmit = handleSubmit((data) => {
+    console.log(data)
+  })
 
   return (
     <Card variant='outlined'>
-      <Box sx={{ display: { xs: 'flex', md: 'none' } }}>abc</Box>
+      {/* <Box sx={{ display: { xs: 'flex', md: 'none' } }}>abc</Box> */}
       <Typography component='h1' variant='h4' sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
         Đăng nhập
       </Typography>
       <Box
         component='form'
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         noValidate
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
@@ -86,23 +63,30 @@ export default function Login() {
           <FormLabel htmlFor='email' sx={{ lineHeight: 1.5 }}>
             Email
           </FormLabel>
-          <TextField
-            error={emailError}
-            helperText={emailErrorMessage}
-            id='email'
-            type='email'
+          <Controller
             name='email'
-            placeholder='user@email.com'
-            autoComplete='email'
-            autoFocus
-            required
-            fullWidth
-            variant='outlined'
-            color={emailError ? 'error' : 'primary'}
-            sx={{ ariaLabel: 'email' }}
-            size='small'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
+                id='email'
+                type='email'
+                placeholder='user@email.com'
+                autoComplete='email'
+                autoFocus
+                required
+                fullWidth
+                variant='outlined'
+                color={errors.email ? 'error' : 'primary'}
+                sx={{ ariaLabel: 'email' }}
+                size='small'
+                {...field}
+              />
+            )}
           />
         </FormControl>
+
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
@@ -112,23 +96,30 @@ export default function Login() {
               Quên mật khẩu?
             </Link>
           </Box>
-          <TextField
-            error={passwordError}
-            helperText={passwordErrorMessage}
+
+          <Controller
             name='password'
-            placeholder='••••••'
-            type='password'
-            id='password'
-            autoComplete='current-password'
-            autoFocus
-            required
-            fullWidth
-            variant='outlined'
-            color={passwordError ? 'error' : 'primary'}
-            size='small'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                error={Boolean(errors.password)}
+                helperText={errors.password?.message}
+                placeholder='••••••'
+                type='password'
+                id='password'
+                autoComplete='current-password'
+                autoFocus
+                required
+                fullWidth
+                variant='outlined'
+                color={errors.password ? 'error' : 'primary'}
+                size='small'
+                {...field}
+              />
+            )}
           />
         </FormControl>
-        <Button type='submit' fullWidth variant='contained' onClick={validateInputs}>
+        <Button type='submit' fullWidth variant='contained'>
           Đăng nhập
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
