@@ -12,6 +12,9 @@ import GoogleIcon from '@mui/icons-material/Google'
 import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useLoginMutation } from '~/queries/useAuth'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -42,14 +45,24 @@ export default function Login() {
       password: ''
     }
   })
+  const navigate = useNavigate()
+  const loginMutation = useLoginMutation()
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data)
+  const onSubmit = handleSubmit(async (data) => {
+    if (loginMutation.isPending) return
+    try {
+      const result = await loginMutation.mutateAsync(data)
+      toast.success(result.data.message, {
+        autoClose: 3000
+      })
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    }
   })
 
   return (
     <Card variant='outlined'>
-      {/* <Box sx={{ display: { xs: 'flex', md: 'none' } }}>abc</Box> */}
       <Typography component='h1' variant='h4' sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
         Đăng nhập
       </Typography>
