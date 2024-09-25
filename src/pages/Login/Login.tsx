@@ -154,7 +154,7 @@ export default function Login() {
           type='submit'
           fullWidth
           variant='outlined'
-          href='/oauth2/authorization/google'
+          href='http://localhost:8080/oauth2/authorization/google'
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

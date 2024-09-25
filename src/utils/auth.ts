@@ -1,14 +1,14 @@
 export const setAccessTokenToLS = (accessToken: string) => {
-  localStorage.setItem('access_token', accessToken)
+  localStorage.setItem('accessToken', accessToken)
 }
 
 export const setRefreshTokenToLS = (refreshToken: string) => {
-  localStorage.setItem('refresh_token', refreshToken)
+  localStorage.setItem('refreshToken', refreshToken)
 }
 
 export const clearLS = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
 }
 
 export const getAccessTokenFromLS = () => {
