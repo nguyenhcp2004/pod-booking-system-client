@@ -17,8 +17,10 @@ export default function Oauth() {
         setAccessTokenToLS(accessToken)
         setRefreshTokenToLS(refreshToken)
         setAuth(true)
-        toast.success('Đăng nhập google thành công', {
-          autoClose: 3000
+        setTimeout(() => {
+          toast.success('Đăng nhập google thành công', {
+            autoClose: 2000
+          })
         })
         navigate('/')
       }
@@ -27,7 +29,7 @@ export default function Oauth() {
       if (count.current === 0) {
         setTimeout(() => {
           toast.error('Có lỗi xảy ra', {
-            autoClose: 3000
+            autoClose: 2000
           })
         })
         navigate('/login')
