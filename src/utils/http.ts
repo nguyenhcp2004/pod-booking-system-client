@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import envConfig from '~/constants/config'
-import { AuthResponse } from '~/types/auth'
+import { AuthResponse } from '~/schemaValidations/auth.schema'
 import {
   clearLS,
   getAccessTokenFromLS,

@@ -2,8 +2,11 @@ import { z } from 'zod'
 
 export const LoginBody = z
   .object({
-    email: z.string().email(),
-    password: z.string().min(6).max(100)
+    email: z.string().email({ message: 'Email không hợp lệ.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Password từ 6 kí tự trở lên.' })
+      .max(30, { message: 'Password không hợp lệ.' })
   })
   .strict()
 
@@ -46,3 +49,25 @@ export const LogoutBody = z
   .strict()
 
 export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
+
+export interface ErrorResponse<Data> {
+  code: number
+  message: string
+  data?: Data
+}
+
+export interface SucccessResponse<Data> {
+  code: number
+  message: string
+  data: Data
+}
+
+//cú pháp `-? sẽ loại bỏ undefined key optional
+export type NoUndefinedField<T> = {
+  [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>>
+}
+
+export type AuthResponse = SucccessResponse<{
+  access_token: string
+  refresh_token: string
+}>
