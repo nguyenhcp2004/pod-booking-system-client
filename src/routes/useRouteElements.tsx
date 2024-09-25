@@ -5,6 +5,7 @@ import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
+import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
 import Register from '~/pages/Register'
 import RoomDetail from '~/pages/RoomDetail/RoomDetail'
@@ -52,6 +53,10 @@ export default function useRouteElements() {
             {
               path: '/register',
               element: <Register />
+            },
+            {
+              path: '/login/oauth',
+              element: <Oauth />
             }
           ]
         }

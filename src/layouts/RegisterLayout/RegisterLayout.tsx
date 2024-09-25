@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material'
 import Box from '@mui/material/Box'
 import { Outlet } from 'react-router-dom'
-import loginBanner from '/public/images/login-banner.jpg'
+import loginBanner from '~/assets/images/loginBanner.jpg'
 
 export default function RegisterLayout() {
   return (

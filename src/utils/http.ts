@@ -43,8 +43,8 @@ export class Http {
         const { url } = response.config
         if (url === '/auth/login' || url === '/auth/register') {
           const data = response.data as AuthResponse
-          this.accessToken = data.data.access_token
-          this.refreshToken = data.data.refresh_token
+          this.accessToken = data.data.accessToken
+          this.refreshToken = data.data.refreshToken
           setAccessTokenToLS(this.accessToken)
           setRefreshTokenToLS(this.refreshToken)
         } else if (url === '/auth/logout') {
