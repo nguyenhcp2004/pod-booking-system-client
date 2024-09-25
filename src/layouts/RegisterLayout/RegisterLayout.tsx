@@ -7,16 +7,6 @@ export default function RegisterLayout() {
   return (
     <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: '1 1', overflow: 'auto' }}>
-        {/* <Stack
-          direction='column'
-          component='main'
-          sx={[
-            {
-              justifyContent: 'space-between',
-              height: { xs: 'auto', md: '100%' }
-            }
-          ]}
-        > */}
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           sx={{
@@ -38,7 +28,6 @@ export default function RegisterLayout() {
           ></Box>
           <Outlet />
         </Stack>
-        {/* </Stack> */}
       </Box>
     </Box>
   )
