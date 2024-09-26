@@ -189,11 +189,7 @@ export default function Register() {
         <Typography sx={{ textAlign: 'center' }}>
           Bạn đã có tài khoản ?
           <span>
-            <Link
-              href='/material-ui/getting-started/templates/sign-in/'
-              variant='body2'
-              sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}
-            >
+            <Link href='/login' variant='body2' sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}>
               Đăng nhập
             </Link>
           </span>
