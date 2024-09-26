@@ -2,6 +2,8 @@ import { LoginBodyType, LoginResType, RefreshTokenBodyType, RefreshTokenResType 
 import http from '~/utils/http'
 
 const authApiRequest = {
+  // Ý tưởng tạo là mình sẽ tạo 1 promise để lưu request refresh token
+  // Khi đó interval vào check refresh token thì mình sẽ kiểm tra theo cái promise này
   refreshTokenRequest: null as Promise<{
     status: number
     data: RefreshTokenResType
