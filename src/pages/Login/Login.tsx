@@ -8,13 +8,13 @@ import Link from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-import GoogleIcon from '@mui/icons-material/Google'
 import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
