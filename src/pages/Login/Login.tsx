@@ -15,6 +15,8 @@ import { useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
+import { isAxiosUnprocessableEntityError } from '~/utils/utils'
+import { ErrorResponse } from '~/schemaValidations/auth.schema'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -37,7 +39,8 @@ export default function Login() {
   const {
     control,
     formState: { errors },
-    handleSubmit
+    handleSubmit,
+    setError
   } = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -57,7 +60,17 @@ export default function Login() {
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
+      if (isAxiosUnprocessableEntityError<ErrorResponse<LoginBodyType>>(error)) {
+        const formError = error.response?.data.data
+        if (formError) {
+          Object.keys(formError).forEach((key) => {
+            setError(key as keyof LoginBodyType, {
+              message: formError[key as keyof LoginBodyType],
+              type: 'Server'
+            })
+          })
+        }
+      }
     }
   })
 
@@ -138,11 +151,7 @@ export default function Login() {
         <Typography sx={{ textAlign: 'center' }}>
           Bạn mới biết đến chúng tôi ?
           <span>
-            <Link
-              href='/material-ui/getting-started/templates/sign-in/'
-              variant='body2'
-              sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}
-            >
+            <Link href='/register' variant='body2' sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}>
               Đăng kí
             </Link>
           </span>
