@@ -4,6 +4,7 @@ import { theme } from '~/themes/theme'
 import useRouteElements from '~/routes/useRouteElements'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import RefreshToken from '~/components/RefreshToken'
 
 function App() {
   const routeElements = useRouteElements()
@@ -11,6 +12,7 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         {routeElements}
+        <RefreshToken />
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
       <ToastContainer />
