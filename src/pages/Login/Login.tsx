@@ -105,7 +105,7 @@ export default function Login() {
             <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
               Mật khẩu
             </FormLabel>
-            <Link component='button' variant='body2' sx={{ alignSelf: 'baseline' }}>
+            <Link component='button' variant='body2' sx={{ alignSelf: 'baseline', textDecoration: 'none' }}>
               Quên mật khẩu?
             </Link>
           </Box>
@@ -141,7 +141,7 @@ export default function Login() {
             <Link
               href='/material-ui/getting-started/templates/sign-in/'
               variant='body2'
-              sx={{ alignSelf: 'center', marginLeft: 1 }}
+              sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}
             >
               Đăng kí
             </Link>
