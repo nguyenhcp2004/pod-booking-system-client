@@ -81,16 +81,15 @@ export default function Register() {
               <TextField
                 error={Boolean(errors.email)}
                 helperText={errors.email?.message}
-                id='email'
-                type='email'
+                id='name'
                 placeholder='Nguyen Van A'
-                autoComplete='email'
+                autoComplete='name'
                 autoFocus
                 required
                 fullWidth
                 variant='outlined'
                 color={errors.email ? 'error' : 'primary'}
-                sx={{ ariaLabel: 'email' }}
+                sx={{ ariaLabel: 'name' }}
                 size='small'
                 {...field}
               />
