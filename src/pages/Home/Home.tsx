@@ -1,7 +1,8 @@
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
-import { FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import homePageBanner from '../../assets/images/homePageBanner.png'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
 export default function Home() {
   return (
@@ -72,15 +73,12 @@ export default function Home() {
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <TextField
-              fullWidth
+            <DatePicker
+              // value={value}
+              // onChange={(newValue) => setValue(newValue)
+              sx={{ width: '100%' }}
               label='Ngày đặt'
-              type='date'
-              // value={date}
-              // onChange={(e) => setDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true
-              }}
+              format='DD/MM/YYYY'
             />
           </Grid>
           <Grid item xs={3}>
