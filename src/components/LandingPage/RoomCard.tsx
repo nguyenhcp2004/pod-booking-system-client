@@ -1,5 +1,6 @@
 import React from 'react'
-import { Card, CardContent, CardMedia, Typography, Button, Box, Grid } from '@mui/material'
+import { Card, CardMedia, Typography, Button } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 interface PODRoomCardProps {
   image: string
@@ -23,38 +24,52 @@ const PODRoomCard: React.FC<PODRoomCardProps> = ({
   onBookRoom
 }) => {
   return (
-    <Grid item xs={12}>
-      <Card sx={{ display: 'flex', borderRadius: '16px', overflow: 'hidden', mb: '40px' }}>
-        <CardMedia component='img' sx={{ width: 300 }} image={image} alt={name} />
-        <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-          <CardContent sx={{ flex: '1 0 auto', p: 2 }}>
-            <Typography component='div' variant='h5' fontWeight='bold'>
+    <>
+      <Card
+        sx={{ display: 'flex', borderRadius: '16px', mb: '40px', justifyContent: 'space-between', border: '1px solid' }}
+        elevation={0}
+      >
+        <Grid size={4}>
+          <CardMedia component='img' sx={{ width: '100%', height: '100%' }} image={image} alt={name} />
+        </Grid>
+        <Grid container size={8} sx={{ padding: '24px 24px 24px 0px' }}>
+          {/* <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}> */}
+          {/* <CardContent sx={{ flex: '1 0 auto', p: 2 }}> */}
+          <Grid size={{ xs: 10 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
+            <Typography component='div' variant='subtitle1' fontWeight='bold'>
               {name}
             </Typography>
-            <Typography variant='subtitle1' color='text.secondary' component='div'>
-              Địa chỉ: {address}
+            <Typography variant='subtitle2' color='text.secondary' component='div'>
+              <b>Địa chỉ:</b> {address}
             </Typography>
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-              Mô tả: {description}
+            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
+              <b>Mô tả:</b> {description}
             </Typography>
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-              Dung Lượng: {capacity}
+            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
+              <b>Dung Lượng:</b> {capacity}
             </Typography>
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-              Tiện ích: {amenities}
+            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
+              <b>Tiện ích:</b> {amenities}
             </Typography>
-          </CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
+          </Grid>
+          <Grid size={{ xs: 2 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'end' }}>
             <Typography variant='h6' component='div' color='primary' fontWeight='bold'>
               {price}
             </Typography>
-            <Button variant='contained' color='primary' onClick={onBookRoom}>
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={onBookRoom}
+              sx={{ borderRadius: '96px', paddingX: '22px', paddingY: '8px' }}
+            >
               ĐẶT PHÒNG
             </Button>
-          </Box>
-        </Box>
+          </Grid>
+          {/* </CardContent> */}
+          {/* </Box> */}
+        </Grid>
       </Card>
-    </Grid>
+    </>
   )
 }
 

@@ -1,4 +1,4 @@
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Grid2'
 import Box from '@mui/material/Box'
 import { FormControl, InputLabel, MenuItem, Pagination, Select, Typography } from '@mui/material'
 import homePageBanner from '../../assets/images/homePageBanner.png'
@@ -152,18 +152,18 @@ export default function Home() {
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
         sx={{ paddingX: '104px', paddingY: '24px' }}
       >
-        <Grid item xs={6} style={{ alignContent: 'center' }}>
-          <Typography variant='h2' sx={{ fontWeight: 'bold' }} color='primary'>
+        <Grid size={{ xs: 6 }} style={{ alignContent: 'center' }}>
+          <Typography variant='h3' sx={{ fontWeight: 'bold' }} color='primary'>
             FlexiPod
           </Typography>
-          <Typography variant='h2' color='secondary'>
+          <Typography variant='h3' color='secondary'>
             Tiện lợi, riêng tư
           </Typography>
           <Typography variant='subtitle1' color='neutral'>
             Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
           </Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <img src={homePageBanner} alt='' style={{ borderRadius: '8px', width: '100%' }} />
         </Grid>
       </Grid>
@@ -176,14 +176,14 @@ export default function Home() {
         sx={{ paddingX: '104px', paddingY: '24px' }}
       >
         {/* Rooms Section Title */}
-        <Grid item xs={12}>
-          <Typography variant='h2' sx={{ fontWeight: 'bold', textAlign: 'center' }} color='primary'>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant='h3' sx={{ fontWeight: 'bold', textAlign: 'center' }} color='primary'>
             Đặt phòng
           </Typography>
         </Grid>
         {/* Rooms Section Filter */}
-        <Grid container spacing={2} style={{ paddingTop: '32px', paddingBottom: '32px' }}>
-          <Grid item xs={3}>
+        <Grid container size={12} spacing={2} style={{ paddingTop: '32px', paddingBottom: '32px' }}>
+          <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='location-label'>Địa chỉ</InputLabel>
               <Select
@@ -197,7 +197,7 @@ export default function Home() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='room-type-label'>Loại phòng</InputLabel>
               <Select
@@ -211,7 +211,7 @@ export default function Home() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <DatePicker
               // value={value}
               // onChange={(newValue) => setValue(newValue)
@@ -220,7 +220,7 @@ export default function Home() {
               format='DD/MM/YYYY'
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='time-slot-label'>Slot</InputLabel>
               <Select
@@ -236,7 +236,7 @@ export default function Home() {
           </Grid>
         </Grid>
         {/* Rooms Section Card */}
-        <Grid container>
+        <Grid container size={12} spacing={0}>
           {podRooms.map((room) => (
             <PODRoomCard
               image={room.image}
@@ -251,7 +251,7 @@ export default function Home() {
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Pagination count={10} showFirstButton showLastButton />
         </Grid>
       </Grid>
