@@ -5,12 +5,16 @@ interface CommonProps {
   onBack: () => void
 }
 
-export const BookingInfo: React.FC<CommonProps> = (props) => {
+export 
+
+const BookingInfo: React.FC<CommonProps> = (props) => {
+  
+
   return (
     <Box>
       <Typography variant={'h1'}>Customer Info</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Button onClick={props.onBack} sx={{ mr: 1 }}>
+        <Button onClick={props.onBack} sx={{ marginRight: '10px'}}>
           Quay lại
         </Button>
         <Button variant='contained' onClick={props.onNext}>
@@ -20,3 +24,5 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
     </Box>
   )
 }
+
+
