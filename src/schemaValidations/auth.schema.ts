@@ -71,3 +71,9 @@ export type AuthResponse = SucccessResponse<{
   accessToken: string
   refreshToken: string
 }>
+
+export interface ErrorResponse<Data> {
+  code: number
+  message: string
+  data?: Data
+}

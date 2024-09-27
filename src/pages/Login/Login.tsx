@@ -8,13 +8,15 @@ import Link from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-import GoogleIcon from '@mui/icons-material/Google'
 import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
+import { isAxiosUnprocessableEntityError } from '~/utils/utils'
+import { ErrorResponse } from '~/schemaValidations/auth.schema'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -37,7 +39,8 @@ export default function Login() {
   const {
     control,
     formState: { errors },
-    handleSubmit
+    handleSubmit,
+    setError
   } = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -57,7 +60,17 @@ export default function Login() {
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
+      if (isAxiosUnprocessableEntityError<ErrorResponse<LoginBodyType>>(error)) {
+        const formError = error.response?.data.data
+        if (formError) {
+          Object.keys(formError).forEach((key) => {
+            setError(key as keyof LoginBodyType, {
+              message: formError[key as keyof LoginBodyType],
+              type: 'Server'
+            })
+          })
+        }
+      }
     }
   })
 
@@ -105,7 +118,7 @@ export default function Login() {
             <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
               Mật khẩu
             </FormLabel>
-            <Link component='button' variant='body2' sx={{ alignSelf: 'baseline' }}>
+            <Link component='button' variant='body2' sx={{ alignSelf: 'baseline', textDecoration: 'none' }}>
               Quên mật khẩu?
             </Link>
           </Box>
@@ -138,11 +151,7 @@ export default function Login() {
         <Typography sx={{ textAlign: 'center' }}>
           Bạn mới biết đến chúng tôi ?
           <span>
-            <Link
-              href='/material-ui/getting-started/templates/sign-in/'
-              variant='body2'
-              sx={{ alignSelf: 'center', marginLeft: 1 }}
-            >
+            <Link href='/register' variant='body2' sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}>
               Đăng kí
             </Link>
           </span>
