@@ -8,7 +8,6 @@ import PODRoomCard from '~/components/LandingPage/RoomCard'
 import { useState } from 'react'
 import { Moment } from 'moment'
 
-
 const podRooms = [
   {
     id: 1,
@@ -142,8 +141,8 @@ const podRooms = [
 ]
 
 export default function Home() {
-  const [page, setPage] = useState(1);
-  const roomsPerPage = 4;
+  const [page, setPage] = useState(1)
+  const roomsPerPage = 4
   const [location, setLocation] = useState('')
   const [roomType, setRoomType] = useState('')
   const [date, setDate] = useState<Moment | null>()
@@ -153,13 +152,13 @@ export default function Home() {
     console.log(`Booking room with ID: ${roomId}`)
   }
 
-  const handleChangePage = (_event: any, value: number) => {
-    setPage(value);
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, page: number) => {
+    setPage(page)
   }
 
-  const indexOfLastRoom = page * roomsPerPage;
-  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
-  const currentRooms = podRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const indexOfLastRoom = page * roomsPerPage
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage
+  const currentRooms = podRooms.slice(indexOfFirstRoom, indexOfLastRoom)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -261,13 +260,18 @@ export default function Home() {
               amenities={room.amenities}
               price={room.price}
               onBookRoom={() => handleBookRoom(room.id)}
-              key={room.id}
             />
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
         <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
-          <Pagination count={Math.ceil(podRooms.length / roomsPerPage)} page={page} onChange={handleChangePage} showFirstButton showLastButton />
+          <Pagination
+            count={Math.ceil(podRooms.length / roomsPerPage)}
+            page={page}
+            onChange={handleChangePage}
+            showFirstButton
+            showLastButton
+          />
         </Grid>
       </Grid>
     </Box>
