@@ -6,6 +6,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import roomCardImage from '../../assets/images/roomCardImage.jpg'
 import PODRoomCard from '~/components/LandingPage/RoomCard'
 import { useState } from 'react'
+import { Moment } from 'moment'
+
 
 const podRooms = [
   {
@@ -142,6 +144,10 @@ const podRooms = [
 export default function Home() {
   const [page, setPage] = useState(1);
   const roomsPerPage = 4;
+  const [location, setLocation] = useState('')
+  const [roomType, setRoomType] = useState('')
+  const [date, setDate] = useState<Moment | null>()
+  const [time, setTime] = useState<string>('')
 
   const handleBookRoom = (roomId: number) => {
     console.log(`Booking room with ID: ${roomId}`)
@@ -172,7 +178,7 @@ export default function Home() {
             Tiện lợi, riêng tư
           </Typography>
           <Typography variant='subtitle1' color='neutral'>
-            Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
+            Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
           </Typography>
         </Grid>
         <Grid size={{ xs: 6 }}>
@@ -200,9 +206,9 @@ export default function Home() {
               <InputLabel id='location-label'>Địa chỉ</InputLabel>
               <Select
                 labelId='location-label'
-                // value={location}
+                value={location}
                 label='Địa chỉ'
-                // onChange={(e) => setLocation(e.target.value)}
+                onChange={(e) => setLocation(e.target.value)}
               >
                 <MenuItem value='TP.Thủ Đức'>TP.Thủ Đức</MenuItem>
                 {/* Add more locations as needed */}
@@ -214,9 +220,9 @@ export default function Home() {
               <InputLabel id='room-type-label'>Loại phòng</InputLabel>
               <Select
                 labelId='room-type-label'
-                // value={roomType}
+                value={roomType}
                 label='Loại phòng'
-                // onChange={(e) => setRoomType(e.target.value)}
+                onChange={(e) => setRoomType(e.target.value)}
               >
                 <MenuItem value='Phòng 2 người'>Phòng 2 người</MenuItem>
                 {/* Add more room types as needed */}
@@ -225,8 +231,8 @@ export default function Home() {
           </Grid>
           <Grid size={3}>
             <DatePicker
-              // value={value}
-              // onChange={(newValue) => setValue(newValue)
+              value={date}
+              onChange={(newValue) => setDate(newValue)}
               sx={{ width: '100%' }}
               label='Ngày đặt'
               format='DD/MM/YYYY'
@@ -235,12 +241,7 @@ export default function Home() {
           <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='time-slot-label'>Slot</InputLabel>
-              <Select
-                labelId='time-slot-label'
-                // value={timeSlot}
-                label='Slot'
-                // onChange={(e) => setTimeSlot(e.target.value)}
-              >
+              <Select labelId='time-slot-label' value={time} label='Slot' onChange={(e) => setTime(e.target.value)}>
                 <MenuItem value='7h - 9h'>7h - 9h</MenuItem>
                 {/* Add more time slots as needed */}
               </Select>
@@ -260,6 +261,7 @@ export default function Home() {
               amenities={room.amenities}
               price={room.price}
               onBookRoom={() => handleBookRoom(room.id)}
+              key={room.id}
             />
           ))}
         </Grid>
