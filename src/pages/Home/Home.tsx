@@ -5,6 +5,7 @@ import homePageBanner from '../../assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import roomCardImage from '../../assets/images/roomCardImage.jpg'
 import PODRoomCard from '~/components/LandingPage/RoomCard'
+import { useState } from 'react'
 
 const podRooms = [
   {
@@ -139,9 +140,20 @@ const podRooms = [
 ]
 
 export default function Home() {
+  const [page, setPage] = useState(1);
+  const roomsPerPage = 4;
+
   const handleBookRoom = (roomId: number) => {
     console.log(`Booking room with ID: ${roomId}`)
   }
+
+  const handleChangePage = (_event: any, value: number) => {
+    setPage(value);
+  }
+
+  const indexOfLastRoom = page * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = podRooms.slice(indexOfFirstRoom, indexOfLastRoom);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -237,7 +249,7 @@ export default function Home() {
         </Grid>
         {/* Rooms Section Card */}
         <Grid container size={12} spacing={0}>
-          {podRooms.map((room) => (
+          {currentRooms.map((room) => (
             <PODRoomCard
               key={room.id}
               image={room.image}
@@ -253,7 +265,7 @@ export default function Home() {
         </Grid>
         {/* Rooms Section Pagination Button */}
         <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
-          <Pagination count={10} showFirstButton showLastButton />
+          <Pagination count={Math.ceil(podRooms.length / roomsPerPage)} page={page} onChange={handleChangePage} showFirstButton showLastButton />
         </Grid>
       </Grid>
     </Box>
