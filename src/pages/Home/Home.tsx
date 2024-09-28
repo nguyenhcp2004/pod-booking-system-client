@@ -239,6 +239,7 @@ export default function Home() {
         <Grid container size={12} spacing={0}>
           {podRooms.map((room) => (
             <PODRoomCard
+              key={room.id}
               image={room.image}
               name={room.name}
               address={room.address}
@@ -251,7 +252,7 @@ export default function Home() {
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
-        <Grid size={12}>
+        <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
           <Pagination count={10} showFirstButton showLastButton />
         </Grid>
       </Grid>
