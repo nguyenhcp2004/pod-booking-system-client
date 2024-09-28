@@ -8,6 +8,7 @@ import PODRoomCard from '~/components/LandingPage/RoomCard'
 import { useState } from 'react'
 import { Moment } from 'moment'
 
+
 const podRooms = [
   {
     id: 1,
@@ -141,13 +142,24 @@ const podRooms = [
 ]
 
 export default function Home() {
+  const [page, setPage] = useState(1);
+  const roomsPerPage = 4;
   const [location, setLocation] = useState('')
   const [roomType, setRoomType] = useState('')
   const [date, setDate] = useState<Moment | null>()
   const [time, setTime] = useState<string>('')
+
   const handleBookRoom = (roomId: number) => {
     console.log(`Booking room with ID: ${roomId}`)
   }
+
+  const handleChangePage = (_event: any, value: number) => {
+    setPage(value);
+  }
+
+  const indexOfLastRoom = page * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = podRooms.slice(indexOfFirstRoom, indexOfLastRoom);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -238,8 +250,9 @@ export default function Home() {
         </Grid>
         {/* Rooms Section Card */}
         <Grid container size={12} spacing={0}>
-          {podRooms.map((room) => (
+          {currentRooms.map((room) => (
             <PODRoomCard
+              key={room.id}
               image={room.image}
               name={room.name}
               address={room.address}
@@ -253,8 +266,8 @@ export default function Home() {
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
-        <Grid size={12}>
-          <Pagination count={10} showFirstButton showLastButton />
+        <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
+          <Pagination count={Math.ceil(podRooms.length / roomsPerPage)} page={page} onChange={handleChangePage} showFirstButton showLastButton />
         </Grid>
       </Grid>
     </Box>
