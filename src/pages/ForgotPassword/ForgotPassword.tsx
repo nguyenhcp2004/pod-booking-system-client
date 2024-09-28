@@ -4,7 +4,6 @@ import MuiCard from '@mui/material/Card'
 import Divider from '@mui/material/Divider'
 import FormLabel from '@mui/material/FormLabel'
 import FormControl from '@mui/material/FormControl'
-import Link from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
@@ -34,8 +33,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     boxShadow: 'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px'
   })
 }))
-
-export default function Login() {
+export default function ForgotPassword() {
   const {
     control,
     formState: { errors },
@@ -60,7 +58,6 @@ export default function Login() {
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
       if (isAxiosUnprocessableEntityError<ErrorResponse<LoginBodyType>>(error)) {
         const formError = error.response?.data.data
         if (formError) {
@@ -78,7 +75,7 @@ export default function Login() {
   return (
     <Card variant='outlined'>
       <Typography component='h1' variant='h4' sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
-        Đăng nhập
+        Quên mật khẩu
       </Typography>
       <Box
         component='form'
@@ -86,6 +83,9 @@ export default function Login() {
         noValidate
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
+        <Typography variant='subtitle1' sx={{ width: '100%' }}>
+          Nhập email đang sử dụng để hệ thống gửi mật khẩu xác nhận
+        </Typography>
         <FormControl>
           <FormLabel htmlFor='email' sx={{ lineHeight: 1.5 }}>
             Email
@@ -113,50 +113,9 @@ export default function Login() {
             )}
           />
         </FormControl>
-
-        <FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
-              Mật khẩu
-            </FormLabel>
-            <Link href='/forgot-password' variant='body2' sx={{ alignSelf: 'baseline', textDecoration: 'none' }}>
-              Quên mật khẩu?
-            </Link>
-          </Box>
-
-          <Controller
-            name='password'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                error={Boolean(errors.password)}
-                helperText={errors.password?.message}
-                placeholder='••••••'
-                type='password'
-                id='password'
-                autoComplete='current-password'
-                autoFocus
-                required
-                fullWidth
-                variant='outlined'
-                color={errors.password ? 'error' : 'primary'}
-                size='small'
-                {...field}
-              />
-            )}
-          />
-        </FormControl>
         <Button type='submit' fullWidth variant='contained'>
-          Đăng nhập
+          Gửi xác nhận
         </Button>
-        <Typography sx={{ textAlign: 'center' }}>
-          Bạn mới biết đến chúng tôi ?
-          <span>
-            <Link href='/register' variant='body2' sx={{ alignSelf: 'center', marginLeft: 1, textDecoration: 'none' }}>
-              Đăng kí
-            </Link>
-          </span>
-        </Typography>
       </Box>
       <Divider>hoặc</Divider>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

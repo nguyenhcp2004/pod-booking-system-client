@@ -3,6 +3,7 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import { AppContext } from '~/contexts/AppProvider'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
+import ForgotPassword from '~/pages/ForgotPassword'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
 import Oauth from '~/pages/OAuth/Oauth'
@@ -57,6 +58,10 @@ export default function useRouteElements() {
             {
               path: '/login/oauth',
               element: <Oauth />
+            },
+            {
+              path: '/forgot-password',
+              element: <ForgotPassword />
             }
           ]
         }
