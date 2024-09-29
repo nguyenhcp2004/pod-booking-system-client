@@ -44,7 +44,7 @@ export default function OptionsMenu() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         sx={{
           marginTop: '15px',
-          marginLeft: '42px',
+          marginLeft: '10px',
           [`& .${listClasses.root}`]: {
             width: '220px',
             borderRadius: '4px'

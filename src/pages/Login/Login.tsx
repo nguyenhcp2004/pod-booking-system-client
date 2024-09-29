@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { isAxiosUnprocessableEntityError } from '~/utils/utils'
 import { ErrorResponse } from '~/schemaValidations/auth.schema'
+import { AppContext } from '~/contexts/AppProvider'
+import { useContext } from 'react'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -36,6 +38,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function Login() {
+  const { setAuth, setAccount } = useContext(AppContext)
   const {
     control,
     formState: { errors },
@@ -55,6 +58,8 @@ export default function Login() {
     if (loginMutation.isPending) return
     try {
       const result = await loginMutation.mutateAsync(data)
+      setAuth(true)
+      setAccount(result.data.data.account)
       toast.success(result.data.message, {
         autoClose: 3000
       })

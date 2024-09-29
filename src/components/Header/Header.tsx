@@ -7,6 +7,7 @@ import { useAppContext } from '~/contexts/AppProvider'
 
 export default function Header() {
   const { account } = useAppContext()
+
   return (
     <Box
       sx={{
@@ -81,6 +82,7 @@ export default function Header() {
                 paddingY: '8px',
                 borderRadius: '96px'
               }}
+              href='/login'
             >
               Đăng nhập
             </Button>
@@ -92,6 +94,7 @@ export default function Header() {
                 paddingY: '8px',
                 borderRadius: '96px'
               }}
+              href='/register'
             >
               Đăng ký
             </Button>
