@@ -5,13 +5,18 @@ import useRouteElements from '~/routes/useRouteElements'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import RefreshToken from '~/components/RefreshToken'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/vi'
 
 function App() {
   const routeElements = useRouteElements()
   return (
     <>
       <ThemeProvider theme={theme}>
-        {routeElements}
+        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='vi'>
+          {routeElements}
+        </LocalizationProvider>
         <RefreshToken />
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
