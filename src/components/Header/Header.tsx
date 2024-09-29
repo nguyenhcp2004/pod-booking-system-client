@@ -1,8 +1,12 @@
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import { Avatar, Stack } from '@mui/material'
+import OptionsMenu from '~/components/OptionsMenu'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function Header() {
+  const { account } = useAppContext()
   return (
     <Box
       sx={{
@@ -45,28 +49,54 @@ export default function Header() {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <Button
-          variant='contained'
-          sx={{
-            textTransform: 'uppercase',
-            paddingX: '22px',
-            paddingY: '8px',
-            borderRadius: '96px'
-          }}
-        >
-          Đăng nhập
-        </Button>
-        <Button
-          variant='outlined'
-          sx={{
-            textTransform: 'uppercase',
-            paddingX: '22px',
-            paddingY: '8px',
-            borderRadius: '96px'
-          }}
-        >
-          Đăng ký
-        </Button>
+        {account ? (
+          <Stack
+            direction='row'
+            sx={{
+              p: 1.2,
+              gap: 1.2,
+              alignItems: 'center',
+              borderRadius: '8px',
+              border: '1px solid #000'
+            }}
+          >
+            <Avatar sizes='small' alt='RC' src={account?.avatar ?? undefined} sx={{ width: 36, height: 36 }}>
+              {account?.name.slice(0, 2).toUpperCase()}
+            </Avatar>
+            <Box>
+              <Typography sx={{ fontWeight: 500, fontSize: '16px', lineHeight: '120%' }}>{account?.name}</Typography>
+              <Typography sx={{ color: 'text.secondary', fontSize: '10px', lineHeight: '120%' }}>
+                {account?.email}
+              </Typography>
+            </Box>
+            <OptionsMenu />
+          </Stack>
+        ) : (
+          <>
+            <Button
+              variant='contained'
+              sx={{
+                textTransform: 'uppercase',
+                paddingX: '22px',
+                paddingY: '8px',
+                borderRadius: '96px'
+              }}
+            >
+              Đăng nhập
+            </Button>
+            <Button
+              variant='outlined'
+              sx={{
+                textTransform: 'uppercase',
+                paddingX: '22px',
+                paddingY: '8px',
+                borderRadius: '96px'
+              }}
+            >
+              Đăng ký
+            </Button>
+          </>
+        )}
       </Box>
     </Box>
   )

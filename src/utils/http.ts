@@ -6,6 +6,7 @@ import {
   getAccessTokenFromLS,
   getRefreshTokenFromLS,
   setAccessTokenToLS,
+  setAccountToLS,
   setRefreshTokenToLS
 } from '~/utils/auth'
 
@@ -47,6 +48,7 @@ export class Http {
           this.refreshToken = data.data.refreshToken
           setAccessTokenToLS(this.accessToken)
           setRefreshTokenToLS(this.refreshToken)
+          setAccountToLS(data.data.account)
         } else if (url === '/auth/logout') {
           this.accessToken = ''
           this.refreshToken = ''
