@@ -2,21 +2,18 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Icon,
-  IconButton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   Typography,
   useTheme
 } from '@mui/material'
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
-import moment from 'moment'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import moment, { Moment } from 'moment'
+import { useMemo, useState } from 'react'
 import { tokens } from '~/themes/theme'
 
 const INITIAL_COLUMNS = [
@@ -29,10 +26,10 @@ const INITIAL_COLUMNS = [
   { id: 'saturday', label: 'T7' }
 ]
 
-const MonthView = () => {
-  const [columnWidth, setColumnWidth] = useState(0)
+const MonthView = ({ selected }: { selected: Moment[] }) => {
   const [from, setFrom] = useState(moment().startOf('month').format('YYYY-MM-DD'))
   const [to, setTo] = useState(moment().endOf('month').format('YYYY-MM-DD'))
+
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const currentDay = moment().format('YYYY-MM-DD')
@@ -45,7 +42,10 @@ const MonthView = () => {
       days.push({
         id: startDate.format('YYYY-MM-DD'),
         date: startDate.format('DD'),
-        inMonth: startDate.isSameOrAfter(from) && startDate.isSameOrBefore(to)
+        inMonth: startDate.isSameOrAfter(from) && startDate.isSameOrBefore(to),
+        isSelected: selected?.find((date) => {
+          return date.format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD')
+        })
         // data: rows.find((row) => {
         //   if (row.dayOfWeek.toLowerCase() === startDate.format('dddd').toLowerCase()) {
         //     return row.classes.filter((data: any) => {
@@ -58,13 +58,6 @@ const MonthView = () => {
     }
     return days
   }, [from, to])
-  const tableRef = useRef(null)
-  useEffect(() => {
-    if (tableRef.current) {
-      const tableWidth = (tableRef.current as HTMLElement).offsetWidth
-      setColumnWidth(tableWidth / 7)
-    }
-  }, [tableRef])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))
@@ -125,7 +118,7 @@ const MonthView = () => {
           }
         }}
       >
-        <Table ref={tableRef}>
+        <Table>
           <TableHead>
             <TableRow>
               {INITIAL_COLUMNS.map((column) => (
@@ -153,13 +146,23 @@ const MonthView = () => {
                   <TableCell key={day.id} sx={{ border: 'none', opacity: day.inMonth ? 1 : 0.5 }}>
                     <Box
                       sx={{
-                        backgroundColor: currentDay === day.id ? colors.warning[100] : '',
+                        backgroundColor: day.isSelected
+                          ? colors.primary[400]
+                          : currentDay === day.id
+                            ? colors.warning[100]
+                            : '',
+                        color: day.isSelected ? colors.primary[50] : currentDay === day.id ? colors.warning[900] : '',
                         borderRadius: '100px',
                         width: '30px',
                         height: '30px',
                         display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        '&:hover': {
+                          backgroundColor: currentDay === day.id ? colors.warning[50] : colors.primary[50],
+                          color: currentDay === day.id ? colors.warning[900] : colors.primary[900],
+                          cursor: 'pointer'
+                        }
                       }}
                     >
                       {renderEventContent(day)}
@@ -170,14 +173,14 @@ const MonthView = () => {
             ))}
           </TableBody>
         </Table>
-        <Button
-          onClick={() => {
-            handleCurrentMonth()
-          }}
-        >
-          Hôm nay
-        </Button>
       </Box>
+      <Button
+        onClick={() => {
+          handleCurrentMonth()
+        }}
+      >
+        Hôm nay
+      </Button>
     </Box>
   )
 }

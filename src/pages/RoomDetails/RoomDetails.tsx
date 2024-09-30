@@ -1,13 +1,16 @@
-import { Autocomplete, Box, MenuItem, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, MenuItem, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import pod from '~/assets/images/pod.jpg'
-
+import moment from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
-// import { Calendar } from 'react-multi-date-picker'
 import { formatCurrency } from '~/utils/currency'
 import ImageView from '~/components/ImageView/ImageView'
 import MonthView from '~/components/Calendar/Calendar'
+
+import { useQuery } from '@tanstack/react-query'
+import servicePackageApiRequest from '~/apis/servicePackage'
+import { useEffect } from 'react'
 
 const podDataMock = {
   id: '103',
@@ -24,6 +27,11 @@ const podDataMock = {
   ]
 }
 export default function RoomDetail() {
+  const { data } = useQuery({
+    queryKey: ['service-package'],
+    queryFn: servicePackageApiRequest.getAll
+  })
+
   return (
     <Box
       sx={{ padding: { xs: '24px 104px', md: '24px 256px' }, display: 'flex', flexDirection: 'column', gap: '28px' }}
@@ -74,9 +82,20 @@ export default function RoomDetail() {
                   />
                 </Grid>
                 <Grid size={12}>
-                  {/* <DateCalendar sx={{ width: '100%' }} showDaysOutsideCurrentMonth fixedWeekNumber={4} /> */}
-                  {/* <Calendar multiple showOtherDays shadow weekStartDayIndex={1} /> */}
-                  <MonthView />
+                  <Button variant='contained' color='primary' fullWidth>
+                    Đặt phòng
+                  </Button>
+                </Grid>
+                <Grid size={12}>
+                  <MonthView
+                    selected={[
+                      moment(),
+                      moment().add(1, 'day'),
+                      moment().add(2, 'day'),
+                      moment().add(3, 'day'),
+                      moment().add(4, 'day')
+                    ]}
+                  />
                 </Grid>
               </Grid>
             </Box>
