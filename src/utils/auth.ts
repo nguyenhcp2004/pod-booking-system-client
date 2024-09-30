@@ -1,14 +1,22 @@
+import { jwtDecode } from 'jwt-decode'
+import { TokenPayload } from '~/constants/type'
+import { AccountType } from '~/schemaValidations/auth.schema'
 export const setAccessTokenToLS = (accessToken: string) => {
-  localStorage.setItem('access_token', accessToken)
+  localStorage.setItem('accessToken', accessToken)
 }
 
 export const setRefreshTokenToLS = (refreshToken: string) => {
-  localStorage.setItem('refresh_token', refreshToken)
+  localStorage.setItem('refreshToken', refreshToken)
+}
+
+export const setAccountToLS = (account: AccountType) => {
+  localStorage.setItem('account', JSON.stringify(account))
 }
 
 export const clearLS = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('account')
 }
 
 export const getAccessTokenFromLS = () => {
@@ -16,3 +24,12 @@ export const getAccessTokenFromLS = () => {
 }
 
 export const getRefreshTokenFromLS = () => localStorage.getItem('refreshToken') || ''
+
+export const getAccountFromLS = () => {
+  const result = localStorage.getItem('account')
+  return result ? JSON.parse(result) : null
+}
+
+export const decodeToken = (token: string) => {
+  return jwtDecode(token) as TokenPayload
+}

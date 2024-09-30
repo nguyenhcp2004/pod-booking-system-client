@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from 'axios'
-
-import config from '~/constants/config'
-import { AuthResponse } from '~/types/auth'
+import envConfig from '~/constants/config'
+import { AuthResponse } from '~/schemaValidations/auth.schema'
 import {
   clearLS,
   getAccessTokenFromLS,
   getRefreshTokenFromLS,
   setAccessTokenToLS,
+  setAccountToLS,
   setRefreshTokenToLS
 } from '~/utils/auth'
 
@@ -18,7 +18,7 @@ export class Http {
     this.accessToken = getAccessTokenFromLS()
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
-      baseURL: config.baseUrl,
+      baseURL: envConfig.VITE_API_ENDPOINT,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'
@@ -44,10 +44,11 @@ export class Http {
         const { url } = response.config
         if (url === '/auth/login' || url === '/auth/register') {
           const data = response.data as AuthResponse
-          this.accessToken = data.data.access_token
-          this.refreshToken = data.data.refresh_token
+          this.accessToken = data.data.accessToken
+          this.refreshToken = data.data.refreshToken
           setAccessTokenToLS(this.accessToken)
           setRefreshTokenToLS(this.refreshToken)
+          setAccountToLS(data.data.account)
         } else if (url === '/auth/logout') {
           this.accessToken = ''
           this.refreshToken = ''
