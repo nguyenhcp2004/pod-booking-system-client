@@ -15,8 +15,7 @@ import { useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
-import { isAxiosUnprocessableEntityError } from '~/utils/utils'
-import { ErrorResponse } from '~/schemaValidations/auth.schema'
+import { handleErrorApi } from '~/utils/utils'
 import { AppContext } from '~/contexts/AppProvider'
 import { useContext } from 'react'
 
@@ -65,18 +64,7 @@ export default function Login() {
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
-      if (isAxiosUnprocessableEntityError<ErrorResponse<LoginBodyType>>(error)) {
-        const formError = error.response?.data.data
-        if (formError) {
-          Object.keys(formError).forEach((key) => {
-            setError(key as keyof LoginBodyType, {
-              message: formError[key as keyof LoginBodyType],
-              type: 'Server'
-            })
-          })
-        }
-      }
+      handleErrorApi({ error, setError })
     }
   })
 

@@ -15,6 +15,7 @@ import { useLogoutMutation } from '~/queries/useAuth'
 import { getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
+import { handleErrorApi } from '~/utils/utils'
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0'
@@ -42,7 +43,7 @@ export default function OptionsMenu() {
       setAuth(false)
       navigate('/')
     } catch (error) {
-      console.log(error)
+      handleErrorApi({ error })
     }
   }
   return (
