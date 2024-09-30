@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+
 import axios, { AxiosError, HttpStatusCode } from 'axios'
+import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
+import { ErrorResponse } from '~/schemaValidations/auth.schema'
 import {
   clearLS,
   decodeToken,
@@ -56,5 +60,31 @@ export const checkAndRefreshToken = async (param?: {
     } catch (error) {
       param?.onError && param.onError()
     }
+  }
+}
+
+export const handleErrorApi = <T extends FieldValues>({
+  error,
+  setError,
+  duration
+}: {
+  error: unknown
+  setError?: UseFormSetError<T>
+  duration?: number
+}) => {
+  if (isAxiosUnprocessableEntityError<ErrorResponse<T>>(error) && setError) {
+    const formError = error.response?.data.data
+    if (formError) {
+      Object.keys(formError).forEach((key) => {
+        setError(key as Path<T>, {
+          message: formError[key as keyof T] as string,
+          type: 'Server'
+        })
+      })
+    }
+  } else {
+    toast.error('Lỗi không xác định', {
+      autoClose: duration ?? 3000
+    })
   }
 }
