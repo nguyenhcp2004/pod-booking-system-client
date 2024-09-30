@@ -1,4 +1,11 @@
-import { LoginBodyType, LoginResType, RefreshTokenBodyType, RefreshTokenResType } from '~/schemaValidations/auth.schema'
+import {
+  LoginBodyType,
+  LoginResType,
+  LogoutBodyType,
+  LogoutResType,
+  RefreshTokenBodyType,
+  RefreshTokenResType
+} from '~/schemaValidations/auth.schema'
 import http from '~/utils/http'
 
 const authApiRequest = {
@@ -15,7 +22,8 @@ const authApiRequest = {
     }
     this.refreshTokenRequest = http.post<RefreshTokenResType>('/auth/refresh-token', body)
     return this.refreshTokenRequest
-  }
+  },
+  logout: (body: LogoutBodyType) => http.post<LogoutResType>('/auth/logout', body)
 }
 
 export default authApiRequest

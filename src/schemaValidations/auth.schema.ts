@@ -59,6 +59,13 @@ export const LogoutBody = z
 
 export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
 
+export const LogoutRes = z.object({
+  message: z.string(),
+  code: z.number()
+})
+
+export type LogoutResType = z.TypeOf<typeof LogoutRes>
+
 export interface ErrorResponse<Data> {
   code: number
   message: string
