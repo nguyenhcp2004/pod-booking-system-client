@@ -11,6 +11,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { useState } from 'react'
 import { Button } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
+import { useLogoutMutation } from '~/queries/useAuth'
+import { getRefreshTokenFromLS } from '~/utils/auth'
+import { useAppContext } from '~/contexts/AppProvider'
+import { useNavigate } from 'react-router-dom'
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0'
@@ -19,11 +23,27 @@ const MenuItem = styled(MuiMenuItem)({
 export default function OptionsMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+  const { setAuth, setAccount } = useAppContext()
+  const navigate = useNavigate()
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const logoutMutation = useLogoutMutation()
+  const logout = async () => {
+    if (logoutMutation.isPending) return
+    try {
+      const refreshToken = getRefreshTokenFromLS()
+      await logoutMutation.mutateAsync({ refreshToken })
+      setAccount(null)
+      setAuth(false)
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    }
   }
   return (
     <>
@@ -67,7 +87,7 @@ export default function OptionsMenu() {
             Tài khoản
           </ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize='small' sx={{ color: '#000' }} />
           </ListItemIcon>
