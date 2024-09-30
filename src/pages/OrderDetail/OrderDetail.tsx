@@ -1,51 +1,32 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Step,
-  StepLabel,
-  Stepper,
-  styled
-} from '@mui/material'
+import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
 import { listSteps } from './listSteps'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { tokens } from '~/themes/theme'
 
 export default function OrderDetail() {
-  const [activeStep, setActiveStep] = useState<number>(1)
-  const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false)
+  const initialStep = Number(localStorage.getItem('activeStep')) || 1
+  const [activeStep, setActiveStep] = useState<number>(initialStep)
   const colors = tokens('light')
 
+  useEffect(() => {
+    localStorage.setItem('activeStep', activeStep.toString())
+  }, [activeStep])
+
   const handleNext = () => {
-    setOpenConfirmDialog(true)
+    if (activeStep >= listSteps.length) {
+      return
+    }
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
   }
 
   const handleBack = () => {
     if (activeStep <= 1) return
     setActiveStep((prevActiveStep) => prevActiveStep - 1)
-    console.log(activeStep)
-  }
-
-  const handleConfirm = () => {
-    setOpenConfirmDialog(false)
-    if (activeStep >= listSteps.length) {
-      return
-    }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
-    console.log(activeStep)
-  }
-
-  const handleCancel = () => {
-    setOpenConfirmDialog(false)
   }
 
   const commonProps = {
     onNext: handleNext,
-    onBack: handleBack,
+    onBack: handleBack
   }
 
   const CustomStepIcon = styled('div')<{ completed: boolean }>(({ completed }) => ({
@@ -63,7 +44,7 @@ export default function OrderDetail() {
   return (
     <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
       <Box sx={{ width: '100%', paddingX: '104px', paddingY: '48px' }}>
-        <Stepper activeStep={1}>
+        <Stepper activeStep={activeStep}>
           {listSteps.map((step) => (
             <Step key={step.index}>
               <StepLabel
@@ -78,18 +59,6 @@ export default function OrderDetail() {
         </Stepper>
       </Box>
       <Box sx={{ marginTop: '24px' }}>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
-      <Dialog open={openConfirmDialog} onClose={handleCancel}>
-        <DialogTitle>Xác nhận</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Bạn đã xác nhận thông tin?</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancel}>Hủy bỏ</Button>
-          <Button onClick={handleConfirm} variant='contained'>
-            Xác nhận{' '}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }

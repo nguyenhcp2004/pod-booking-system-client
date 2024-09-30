@@ -12,10 +12,19 @@ export const LoginBody = z
 
 export type LoginBodyType = z.TypeOf<typeof LoginBody>
 
+export const Account = z.object({
+  name: z.string(),
+  email: z.string(),
+  avatar: z.string()
+})
+
+export type AccountType = z.TypeOf<typeof Account>
+
 export const LoginRes = z.object({
   data: z.object({
     accessToken: z.string(),
-    refreshToken: z.string()
+    refreshToken: z.string(),
+    account: Account
   }),
   message: z.string(),
   code: z.number()
@@ -50,6 +59,13 @@ export const LogoutBody = z
 
 export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
 
+export const LogoutRes = z.object({
+  message: z.string(),
+  code: z.number()
+})
+
+export type LogoutResType = z.TypeOf<typeof LogoutRes>
+
 export interface ErrorResponse<Data> {
   code: number
   message: string
@@ -70,6 +86,7 @@ export type NoUndefinedField<T> = {
 export type AuthResponse = SucccessResponse<{
   accessToken: string
   refreshToken: string
+  account: AccountType
 }>
 
 export interface ErrorResponse<Data> {

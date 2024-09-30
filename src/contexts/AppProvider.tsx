@@ -1,15 +1,20 @@
 import { createContext, SetStateAction, useContext, useState } from 'react'
-import { getAccessTokenFromLS } from '~/utils/auth'
+import { AccountType } from '~/schemaValidations/auth.schema'
+import { getAccessTokenFromLS, getAccountFromLS } from '~/utils/auth'
 
 interface AppContextInterface {
   isAuth: boolean
   setAuth: React.Dispatch<SetStateAction<boolean>>
+  account: AccountType | null
+  setAccount: React.Dispatch<SetStateAction<AccountType | null>>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const getInitialAppContext: () => AppContextInterface = () => ({
   isAuth: Boolean(getAccessTokenFromLS()),
-  setAuth: () => null
+  setAuth: () => null,
+  account: getAccountFromLS(),
+  setAccount: () => null
 })
 
 const initialAppContext = getInitialAppContext()
@@ -29,6 +34,7 @@ export default function AppProvider({
   defaultValue?: AppContextInterface
 }) {
   const [isAuth, setAuth] = useState<boolean>(defaultValue.isAuth)
+  const [account, setAccount] = useState<AccountType | null>(defaultValue.account)
 
-  return <AppContext.Provider value={{ isAuth, setAuth }}>{children}</AppContext.Provider>
+  return <AppContext.Provider value={{ isAuth, setAuth, account, setAccount }}>{children}</AppContext.Provider>
 }

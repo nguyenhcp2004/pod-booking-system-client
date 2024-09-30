@@ -7,20 +7,18 @@ import 'react-toastify/dist/ReactToastify.css'
 import RefreshToken from '~/components/RefreshToken'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
-import 'moment/locale/vi'
-
 function App() {
   const routeElements = useRouteElements()
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='vi'>
+      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='en-gb'>
+        <ThemeProvider theme={theme}>
           {routeElements}
-        </LocalizationProvider>
-        <RefreshToken />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </ThemeProvider>
-      <ToastContainer />
+          <RefreshToken />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </ThemeProvider>
+        <ToastContainer />
+      </LocalizationProvider>
     </>
   )
 }
