@@ -162,7 +162,7 @@ export default function Home() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      {/* Hero Secion */}
+      {/* Hero Secion */}/
       <Grid
         container
         rowSpacing={1}
