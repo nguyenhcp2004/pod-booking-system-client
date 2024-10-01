@@ -293,27 +293,27 @@ export const themeSettings = (mode: 'light' | 'dark') => {
       fontSize: 12,
       h1: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 40
+        fontSize: 62
       },
       h2: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 32
+        fontSize: 48
       },
       h3: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 24
+        fontSize: 40
       },
       h4: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 20
+        fontSize: 32
       },
       h5: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 16
+        fontSize: 24
       },
       h6: {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
-        fontSize: 14
+        fontSize: 16
       }
     }
   }
