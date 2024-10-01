@@ -3,162 +3,43 @@ import Box from '@mui/material/Box'
 import { FormControl, InputLabel, MenuItem, Pagination, Select, Typography } from '@mui/material'
 import homePageBanner from '../../assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import roomCardImage from '../../assets/images/roomCardImage.jpg'
 import PODRoomCard from '~/components/LandingPage/RoomCard'
-import { useState } from 'react'
-import { Moment } from 'moment'
-
-const podRooms = [
-  {
-    id: 1,
-    image: roomCardImage, // Replace with actual image path
-    name: 'Phòng POD đôi A',
-    address: 'TP.Thủ Đức, Hồ Chí Minh',
-    description:
-      'Phòng làm việc tiện nghi, được trang bị đầy đủ cơ sở vật chất hiện đại để đáp ứng nhu cầu làm việc hoặc họp nhóm của bạn. Phù hợp với các freelancer, doanh nghiệp nhỏ hoặc nhóm làm việc từ xa.',
-    capacity: '2 - 4 người',
-    amenities: 'Wi-fi tốc độ cao, Điều hòa, Bàn ghế thoải mái, Ổ cắm điện',
-    price: '20.000 VND/tiếng'
-  },
-  {
-    id: 2,
-    image: roomCardImage, // Replace with actual image path
-    name: 'Phòng POD đôi B',
-    address: 'Quận 1, Hồ Chí Minh',
-    description:
-      'Không gian làm việc yên tĩnh và riêng tư, được thiết kế để tối ưu hóa sự tập trung và sáng tạo. Lý tưởng cho các cuộc họp nhỏ hoặc làm việc độc lập.',
-    capacity: '2 - 3 người',
-    amenities: 'Wi-fi tốc độ cao, Máy chiếu, Bảng trắng, Nước uống miễn phí',
-    price: '25.000 VND/tiếng'
-  },
-  {
-    id: 3,
-    image: roomCardImage,
-    name: 'Phòng POD đơn C',
-    address: 'Quận 3, Hồ Chí Minh',
-    description:
-      'Phòng làm việc nhỏ gọn, hoàn hảo cho các cuộc họp trực tuyến hoặc làm việc độc lập trong môi trường yên tĩnh.',
-    capacity: '1 người',
-    amenities: 'Wi-fi tốc độ cao, Điều hòa, Tai nghe chống ồn, Ổ cắm điện',
-    price: '15.000 VND/tiếng'
-  },
-  {
-    id: 4,
-    image: roomCardImage,
-    name: 'Phòng POD nhóm D',
-    address: 'Quận 7, Hồ Chí Minh',
-    description: 'Phòng rộng rãi, được trang bị đầy đủ tiện ích, phù hợp cho các nhóm làm việc từ 5 - 6 người.',
-    capacity: '5 - 6 người',
-    amenities: 'Wi-fi tốc độ cao, Máy chiếu, Điều hòa, Bàn ghế tiện lợi',
-    price: '30.000 VND/tiếng'
-  },
-  {
-    id: 5,
-    image: roomCardImage,
-    name: 'Phòng POD hội họp E',
-    address: 'Quận Bình Thạnh, Hồ Chí Minh',
-    description: 'Không gian lý tưởng cho các cuộc họp nhóm hoặc hội thảo nhỏ với sức chứa lên đến 10 người.',
-    capacity: '8 - 10 người',
-    amenities: 'Wi-fi tốc độ cao, Máy chiếu, Điều hòa, Nước uống miễn phí',
-    price: '50.000 VND/tiếng'
-  },
-  {
-    id: 6,
-    image: roomCardImage,
-    name: 'Phòng POD cao cấp F',
-    address: 'Quận 5, Hồ Chí Minh',
-    description:
-      'Phòng POD cao cấp với nội thất sang trọng, phục vụ cho các cuộc họp quan trọng hoặc làm việc trong môi trường chuyên nghiệp.',
-    capacity: '4 - 5 người',
-    amenities: 'Wi-fi tốc độ cao, Điều hòa, Ghế da cao cấp, Máy chiếu, Nước uống miễn phí',
-    price: '40.000 VND/tiếng'
-  },
-  {
-    id: 7,
-    image: roomCardImage,
-    name: 'Phòng POD sáng tạo G',
-    address: 'Quận Phú Nhuận, Hồ Chí Minh',
-    description:
-      'Phòng POD với thiết kế sáng tạo và tiện nghi cao cấp, lý tưởng cho các công việc đòi hỏi sự sáng tạo cao.',
-    capacity: '3 - 4 người',
-    amenities: 'Wi-fi tốc độ cao, Điều hòa, Ghế tựa thoải mái, Nước uống miễn phí',
-    price: '35.000 VND/tiếng'
-  },
-  {
-    id: 8,
-    image: roomCardImage,
-    name: 'Phòng POD công nghệ H',
-    address: 'Quận 10, Hồ Chí Minh',
-    description:
-      'Không gian làm việc công nghệ cao với các thiết bị hiện đại phục vụ cho việc họp trực tuyến hoặc làm việc nhóm.',
-    capacity: '5 - 7 người',
-    amenities: 'Wi-fi tốc độ cao, Máy chiếu 4K, Điều hòa, Tai nghe chống ồn',
-    price: '45.000 VND/tiếng'
-  },
-  {
-    id: 9,
-    image: roomCardImage,
-    name: 'Phòng POD yên tĩnh I',
-    address: 'Quận 4, Hồ Chí Minh',
-    description:
-      'Phòng POD được thiết kế để mang lại không gian yên tĩnh tối đa, giúp tăng cường sự tập trung và hiệu quả làm việc.',
-    capacity: '2 - 3 người',
-    amenities: 'Wi-fi tốc độ cao, Tai nghe chống ồn, Điều hòa, Ghế thư giãn',
-    price: '22.000 VND/tiếng'
-  },
-  {
-    id: 10,
-    image: roomCardImage,
-    name: 'Phòng POD sang trọng J',
-    address: 'TP.Thủ Đức, Hồ Chí Minh',
-    description:
-      'Phòng làm việc sang trọng, phù hợp cho các cuộc họp quan trọng hoặc làm việc trong không gian chuyên nghiệp.',
-    capacity: '3 - 5 người',
-    amenities: 'Wi-fi tốc độ cao, Máy chiếu, Điều hòa, Ghế da, Nước uống miễn phí',
-    price: '50.000 VND/tiếng'
-  },
-  {
-    id: 11,
-    image: roomCardImage,
-    name: 'Phòng POD ban công K',
-    address: 'Quận Tân Bình, Hồ Chí Minh',
-    description: 'Phòng POD với ban công và view đẹp, lý tưởng cho các cuộc họp sáng tạo hoặc làm việc ngoài trời.',
-    capacity: '4 - 6 người',
-    amenities: 'Wi-fi tốc độ cao, Bàn ngoài trời, Ghế tựa thoải mái, Điều hòa',
-    price: '28.000 VND/tiếng'
-  },
-  {
-    id: 12,
-    image: roomCardImage,
-    name: 'Phòng POD hiện đại L',
-    address: 'Quận 9, Hồ Chí Minh',
-    description:
-      'Phòng POD hiện đại với các thiết bị công nghệ tiên tiến, mang lại trải nghiệm làm việc chuyên nghiệp.',
-    capacity: '3 - 5 người',
-    amenities: 'Wi-fi tốc độ cao, Điều hòa, Máy chiếu, Ghế thư giãn',
-    price: '32.000 VND/tiếng'
-  }
-]
+import { useEffect, useState } from 'react'
+import moment, { Moment } from 'moment'
+import { useGetFilterRoom } from '~/queries/useFilterRoom'
+import { FilterRoomQueryType } from '~/schemaValidations/room.schema'
 
 export default function Home() {
   const [page, setPage] = useState(1)
-  const roomsPerPage = 4
+  const [filterQuery, setFilterQuery] = useState<FilterRoomQueryType>({
+    address: '123 Main St',
+    capacity: 10,
+    startTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+    endTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+    page: page,
+    take: 4
+  })
+  const { data, refetch } = useGetFilterRoom(filterQuery)
   const [location, setLocation] = useState('')
   const [roomType, setRoomType] = useState('')
   const [date, setDate] = useState<Moment | null>()
   const [time, setTime] = useState<string>('')
 
+  useEffect(() => {
+    setFilterQuery((prev) => ({ ...prev, page }))
+  }, [page])
+
+  useEffect(() => {
+    refetch()
+  }, [filterQuery, refetch])
+
   const handleBookRoom = (roomId: number) => {
     console.log(`Booking room with ID: ${roomId}`)
   }
 
-  const handleChangePage = (_event: React.ChangeEvent<unknown>, page: number) => {
-    setPage(page)
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
+    setPage(newPage)
   }
-
-  const indexOfLastRoom = page * roomsPerPage
-  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage
-  const currentRooms = podRooms.slice(indexOfFirstRoom, indexOfLastRoom)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -184,7 +65,6 @@ export default function Home() {
           <img src={homePageBanner} alt='' style={{ borderRadius: '8px', width: '100%' }} />
         </Grid>
       </Grid>
-
       {/* Rooms Section  */}
       <Grid
         container
@@ -249,16 +129,30 @@ export default function Home() {
         </Grid>
         {/* Rooms Section Card */}
         <Grid container size={12} spacing={0}>
-          {currentRooms.map((room) => (
+          {data?.data.data.map((room) => (
             <PODRoomCard
               key={room.id}
-              image={room.image}
-              name={room.name}
-              address={room.address}
-              description={room.description}
-              capacity={room.capacity}
-              amenities={room.amenities}
+              roomId={room.id}
+              roomName={room.name}
               price={room.price}
+              roomDescription={room.description}
+              image={room.image}
+              roomStatus={room.status}
+              roomCreatedAt={room.createdAt}
+              roomUpdatedAt={room.updatedAt}
+              roomType={room.roomType}
+              // roomTypeId={room.roomType.roomTypeId}
+              // roomTypeName={room.roomType.roomTypeName}
+              // roomTypeQuantity={room.roomType.roomTypeQuantity}
+              // capacity={room.roomType.capacity}
+              // building={room.roomType.building}
+              // buildingId={room.roomType.building.buildingId}
+              // address={room.roomType.building.address}
+              // buildingDescription={room.roomType.building.buildingDescription}
+              // hotlineNumber={room.roomType.building.hotlineNumber}
+              // buildingStatus={room.roomType.building.buildingStatus}
+              // buildingCreatedAt={room.roomType.building.buildingCreatedAt}
+              // buildingUpdatedAt={room.roomType.building.buildingUpdatedAt}
               onBookRoom={() => handleBookRoom(room.id)}
             />
           ))}
@@ -266,7 +160,7 @@ export default function Home() {
         {/* Rooms Section Pagination Button */}
         <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
           <Pagination
-            count={Math.ceil(podRooms.length / roomsPerPage)}
+            count={data?.data.totalPage || 1}
             page={page}
             onChange={handleChangePage}
             showFirstButton
