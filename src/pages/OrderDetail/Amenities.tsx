@@ -100,7 +100,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     disabled={quantity === 0}
                     sx={{ minWidth: '35px', minHeight: '40px', borderRadius: '8px 0px 0px 8px', '&:last-of-type': { borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }, borderColor: colors.grey[200] }}
                     >
-                    <RemoveIcon />
+                    <RemoveIcon sx={{ color: "black" }} />
                   </Button> 
                   <Typography variant="body1" sx={{
                                                     width: '80px',
@@ -119,7 +119,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     onClick={handleIncrement}
                     sx={{ minWidth: '35px', minHeight: '40px', borderRadius: '0px 8px 8px 0px', '&:first-of-type': { borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }, borderColor: colors.grey[200] }}
                     >
-                    <AddIcon />
+                    <AddIcon sx={{ color: "black" }} />
                   </Button>
                 </Box>
               </Box>
