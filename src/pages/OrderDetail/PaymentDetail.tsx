@@ -9,7 +9,7 @@ interface CommonProps {
 
 export const PaymentDetail: React.FC<CommonProps> = (props) => {
   return (
-    <Box sx={{ minHeight: '100%', marginX: '104px' }}>
+    <Box sx={{ height: '100%', marginX: '104px' }}>
       <Box>
         <Grid container>
           <Grid item xs={12} lg={6} sx={{ paddingRight: '12px' }}>

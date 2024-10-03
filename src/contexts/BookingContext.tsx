@@ -31,7 +31,7 @@ interface Amenity {
   quantity: number
 }
 
-interface Room {
+export interface Room {
   id: number
   name: string
   price: number
@@ -48,7 +48,7 @@ interface BookingProviderProps {
   children: ReactNode
 }
 
-interface BookingInfo {
+export interface BookingInfo {
   roomType: RoomType | null
   selectedRooms: Room[] | []
   date: string | null
