@@ -1,4 +1,4 @@
-import { ServicePackageResType } from '~/types/servicePackage'
+import { ServicePackageResType } from '~/constants/type'
 import http from '~/utils/http'
 
 const servicePackageApiRequest = {

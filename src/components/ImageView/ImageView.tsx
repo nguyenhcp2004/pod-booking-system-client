@@ -43,11 +43,16 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
     <>
       <img
         src={images[0]}
-        style={{ width: '100%', height: '400px', objectFit: 'cover', cursor: 'pointer' }}
+        style={{ width: '100%', height: '400px', objectFit: 'cover', cursor: 'pointer', borderRadius: '4px' }}
         onClick={() => handleImageClick(images[0])}
       />
 
-      <Grid container size={12} columnSpacing={2} sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <Grid
+        container
+        size={12}
+        columnSpacing={2}
+        sx={{ position: 'relative', display: 'flex', alignItems: 'center', borderRadius: '4px' }}
+      >
         <IconButton
           sx={{
             position: 'absolute',
@@ -69,7 +74,8 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
                 minWidth: `calc(100% / ${size} - ${gap / 3}px)`,
                 height: '100px',
                 objectFit: 'cover',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                borderRadius: '4px'
               }}
               onClick={() => handleImageClick(image)}
             />

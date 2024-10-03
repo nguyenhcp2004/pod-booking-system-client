@@ -26,10 +26,9 @@ const INITIAL_COLUMNS = [
   { id: 'saturday', label: 'T7' }
 ]
 
-const MonthView = ({ selected }: { selected: Moment[] }) => {
+const MonthView = ({ selected }: { selected: Moment[] | null }) => {
   const [from, setFrom] = useState(moment().startOf('month').format('YYYY-MM-DD'))
   const [to, setTo] = useState(moment().endOf('month').format('YYYY-MM-DD'))
-
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const currentDay = moment().format('YYYY-MM-DD')
@@ -41,7 +40,7 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
     while (startDate.isSameOrBefore(endDate)) {
       days.push({
         id: startDate.format('YYYY-MM-DD'),
-        date: startDate.format('DD'),
+        date: startDate.format('D'),
         inMonth: startDate.isSameOrAfter(from) && startDate.isSameOrBefore(to),
         isSelected: selected?.find((date) => {
           return date.format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD')
@@ -57,7 +56,7 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
       startDate.add(1, 'day')
     }
     return days
-  }, [from, to])
+  }, [from, to, selected])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))
@@ -146,12 +145,9 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
                   <TableCell key={day.id} sx={{ border: 'none', opacity: day.inMonth ? 1 : 0.5 }}>
                     <Box
                       sx={{
-                        backgroundColor: day.isSelected
-                          ? colors.primary[400]
-                          : currentDay === day.id
-                            ? colors.warning[100]
-                            : '',
-                        color: day.isSelected ? colors.primary[50] : currentDay === day.id ? colors.warning[900] : '',
+                        backgroundColor: day.isSelected ? colors.primary[400] : '',
+                        color: day.isSelected ? colors.primary[50] : '',
+                        border: currentDay === day.id ? `1px solid ${colors.grey[200]}` : '',
                         borderRadius: '100px',
                         width: '30px',
                         height: '30px',
@@ -159,8 +155,8 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
                         justifyContent: 'center',
                         alignItems: 'center',
                         '&:hover': {
-                          backgroundColor: currentDay === day.id ? colors.warning[50] : colors.primary[50],
-                          color: currentDay === day.id ? colors.warning[900] : colors.primary[900],
+                          backgroundColor: colors.primary[50],
+                          color: colors.primary[900],
                           cursor: 'pointer'
                         }
                       }}

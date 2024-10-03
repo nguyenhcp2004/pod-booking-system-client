@@ -1,7 +1,7 @@
-import { Autocomplete, Box, Button, MenuItem, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Checkbox, FormControl, MenuItem, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import pod from '~/assets/images/pod.jpg'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
 import { formatCurrency } from '~/utils/currency'
@@ -10,8 +10,12 @@ import MonthView from '~/components/Calendar/Calendar'
 
 import { useQuery } from '@tanstack/react-query'
 import servicePackageApiRequest from '~/apis/servicePackage'
-import { useEffect } from 'react'
-
+import { SLOT } from '~/constants/slot'
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
+import CheckBoxIcon from '@mui/icons-material/CheckBox'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { useState } from 'react'
+import { ServicePackage } from '~/constants/type'
 const podDataMock = {
   id: '103',
   name: 'Phòng POD đôi',
@@ -27,14 +31,21 @@ const podDataMock = {
   ]
 }
 export default function RoomDetail() {
-  const { data } = useQuery({
+  const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
+  const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
+  const { data, isSuccess } = useQuery({
     queryKey: ['service-package'],
     queryFn: servicePackageApiRequest.getAll
   })
 
   return (
     <Box
-      sx={{ padding: { xs: '24px 104px', md: '24px 256px' }, display: 'flex', flexDirection: 'column', gap: '28px' }}
+      sx={{
+        padding: { xs: '24px 24px', sm: '24px 104px', lg: '24px 256px' },
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '28px'
+      }}
     >
       <Grid container size={12} spacing={6}>
         <Grid container size={{ xs: 12, md: 6 }} rowSpacing={1}>
@@ -50,7 +61,7 @@ export default function RoomDetail() {
               </Typography>
               <Typography variant='h5' color='primary'>
                 {formatCurrency(podDataMock.price)}
-                <Typography variant='h5' color='neutral' display={'inline'}>
+                <Typography color='neutral' display={'inline'}>
                   /tiếng
                 </Typography>
               </Typography>
@@ -59,27 +70,77 @@ export default function RoomDetail() {
             <Box>
               <Grid container size={12} spacing={2}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <DatePicker label='Ngày đặt' slotProps={{ textField: { size: 'small', fullWidth: true } }} />
+                  <DatePicker
+                    label='Ngày đặt'
+                    value={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                    format={DEFAULT_DATE_FORMAT}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField select label='Slot' fullWidth size='small'>
-                    <MenuItem value={10}>Ten</MenuItem>
-                    <MenuItem value={20}>Twenty</MenuItem>
-                    <MenuItem value={30}>Thirty</MenuItem>
-                  </TextField>
+                  <FormControl fullWidth size='small'>
+                    <Autocomplete
+                      multiple
+                      options={SLOT}
+                      disableCloseOnSelect
+                      limitTags={2}
+                      renderOption={(props, option, { selected }) => {
+                        const { key, ...optionProps } = props
+                        return (
+                          <li key={key} {...optionProps}>
+                            <Checkbox
+                              icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                              checkedIcon={<CheckBoxIcon fontSize='small' />}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                              size='small'
+                            />
+                            {option}
+                          </li>
+                        )
+                      }}
+                      renderInput={(params) => <TextField {...params} label='Slot' size='small' />}
+                    />
+                  </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Autocomplete
-                    multiple
-                    options={[]}
-                    renderInput={(params) => <TextField {...params} label='Chọn phòng' size='small' />}
-                  />
+                  <FormControl fullWidth size='small'>
+                    <Autocomplete
+                      multiple
+                      options={[]}
+                      limitTags={2}
+                      renderOption={(props, option, { selected }) => {
+                        const { key, ...optionProps } = props
+                        return (
+                          <li key={key} {...optionProps}>
+                            <Checkbox
+                              icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                              checkedIcon={<CheckBoxIcon fontSize='small' />}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                              size='small'
+                            />
+                            {option}
+                          </li>
+                        )
+                      }}
+                      renderInput={(params) => <TextField {...params} label='Chọn phòng' size='small' />}
+                    />
+                  </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Autocomplete
-                    options={['Gói tháng 1', 'Gói tháng 2']}
-                    renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
-                  />
+                  <FormControl fullWidth size='small'>
+                    <Autocomplete
+                      value={selectedPackage}
+                      onChange={(_, servicePackage) => {
+                        setSelectedPackage(servicePackage)
+                      }}
+                      options={isSuccess ? data.data.data : []}
+                      getOptionLabel={(option) => option.name}
+                      renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
+                    />
+                  </FormControl>
                 </Grid>
                 <Grid size={12}>
                   <Button variant='contained' color='primary' fullWidth>
@@ -87,15 +148,7 @@ export default function RoomDetail() {
                   </Button>
                 </Grid>
                 <Grid size={12}>
-                  <MonthView
-                    selected={[
-                      moment(),
-                      moment().add(1, 'day'),
-                      moment().add(2, 'day'),
-                      moment().add(3, 'day'),
-                      moment().add(4, 'day')
-                    ]}
-                  />
+                  <MonthView selected={selectedDate ? [selectedDate] : []} />
                 </Grid>
               </Grid>
             </Box>
