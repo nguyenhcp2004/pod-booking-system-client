@@ -27,7 +27,7 @@ const BookingDetails = () => {
         Đơn đặt
       </Typography>
       <Box display='flex' alignItems='center'>
-        <img src='path-to-image' alt={bookingInfo.roomType} width='100' height='100' />
+        <img src={bookingInfo.imageSrc} alt={bookingInfo.roomType} width='100' height='100' />
         <Box ml={2}>
           <Typography variant='h6'>{bookingInfo.roomType}</Typography>
           <Typography variant='subtitle1' color='textSecondary'>

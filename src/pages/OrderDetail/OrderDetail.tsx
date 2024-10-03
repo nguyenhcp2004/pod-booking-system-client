@@ -2,6 +2,7 @@ import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
 import { listSteps } from './listSteps'
 import { useState, useEffect } from 'react'
 import { tokens } from '~/themes/theme'
+import { BookingProvider } from '~/contexts/BookingContext'
 
 export default function OrderDetail() {
   const initialStep = Number(localStorage.getItem('activeStep')) || 1
@@ -42,23 +43,25 @@ export default function OrderDetail() {
   }))
 
   return (
-    <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
-      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '24px', paddingTop: '48px' }}>
-        <Stepper activeStep={activeStep}>
-          {listSteps.map((step) => (
-            <Step key={step.index}>
-              <StepLabel
-                StepIconComponent={() => (
-                  <CustomStepIcon completed={step.index <= activeStep ? true : false}>{step.index}</CustomStepIcon>
-                )}
-              >
-                {step.describe}
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+    <BookingProvider>
+      <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
+        <Box sx={{ width: '100%', paddingX: '104px', paddingY: '24px', paddingTop: '48px' }}>
+          <Stepper activeStep={activeStep}>
+            {listSteps.map((step) => (
+              <Step key={step.index}>
+                <StepLabel
+                  StepIconComponent={() => (
+                    <CustomStepIcon completed={step.index <= activeStep ? true : false}>{step.index}</CustomStepIcon>
+                  )}
+                >
+                  {step.describe}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+        <Box>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
       </Box>
-      <Box>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
-    </Box>
+    </BookingProvider>
   )
 }

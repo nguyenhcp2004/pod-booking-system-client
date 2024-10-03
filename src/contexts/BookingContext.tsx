@@ -19,6 +19,7 @@ interface BookingInfo {
   date: string
   timeSlots: string
   package: string
+  imageSrc: string
   rooms: Room[]
   discountPercent: number
 }
@@ -45,6 +46,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
     date: '24/01/2024',
     timeSlots: '7h - 9h, 9h - 11h',
     package: 'Gói tuần',
+    imageSrc: '/path-to-image',
     rooms: [
       {
         name: 'Phòng 101',
