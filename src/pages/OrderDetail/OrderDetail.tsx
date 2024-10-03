@@ -3,11 +3,14 @@ import { listSteps } from './listSteps'
 import { useState, useEffect, useContext } from 'react'
 import { tokens } from '~/themes/theme'
 import { BookingContext } from '~/contexts/BookingContext'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export default function OrderDetail() {
-  const initialStep = Number(localStorage.getItem('activeStep')) || 1
+  const { step } = useParams()
+  const initialStep = step ? Number(step) : 1
   const [activeStep, setActiveStep] = useState<number>(initialStep)
   const colors = tokens('light')
+  const navigate = useNavigate()
 
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
@@ -15,8 +18,8 @@ export default function OrderDetail() {
   }
 
   useEffect(() => {
-    localStorage.setItem('activeStep', activeStep.toString())
-  }, [activeStep])
+    navigate(`/order-detail/${activeStep}`, { replace: true })
+  }, [activeStep, navigate])
 
   const handleNext = () => {
     if (activeStep >= listSteps.length) return
