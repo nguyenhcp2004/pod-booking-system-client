@@ -18,8 +18,8 @@ const QRCodePayment = () => {
         Thanh toán bằng QR Code
       </Typography>
 
-      <Box>
-        <img src='path-to-qr-code' alt='QR Code' width='200' height='200' />
+      <Box sx={{ width: '200px', height: '200px', bgcolor: 'gray' }}>
+        <img src='path-to-qr-code' alt='QR Code' />
       </Box>
 
       <Typography variant='body2' sx={{ mt: 2 }}>

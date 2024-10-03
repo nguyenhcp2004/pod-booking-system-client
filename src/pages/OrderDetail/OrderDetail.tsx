@@ -43,7 +43,7 @@ export default function OrderDetail() {
 
   return (
     <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
-      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '48px' }}>
+      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '24px', paddingTop: '48px' }}>
         <Stepper activeStep={activeStep}>
           {listSteps.map((step) => (
             <Step key={step.index}>
@@ -58,7 +58,7 @@ export default function OrderDetail() {
           ))}
         </Stepper>
       </Box>
-      <Box sx={{ marginTop: '24px' }}>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
+      <Box>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
     </Box>
   )
 }
