@@ -5,30 +5,64 @@ import { tokens } from '~/themes/theme'
 import { BookingContext } from '~/contexts/BookingContext'
 import { useParams, useNavigate } from 'react-router-dom'
 
+export interface TransactionData {
+  vnp_Amount: string | null
+  vnp_BankCode: string | null
+  vnp_OrderInfo: string | null
+  vnp_ResponseCode: string | null
+}
+
 export default function OrderDetail() {
   const { step } = useParams()
-  const initialStep = step ? Number(step) : 1
+  const initialStep = Number(step) || 1
   const [activeStep, setActiveStep] = useState<number>(initialStep)
+  const queryParams = new URLSearchParams(window.location.search)
   const colors = tokens('light')
   const navigate = useNavigate()
+  const [loading, setLoading] = useState<boolean>(false)
 
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
     throw new Error('BookingContext must be used within a BookingProvider')
   }
 
+  const vnp_Amount = queryParams.get('vnp_Amount')
+
   useEffect(() => {
-    navigate(`/order-detail/${activeStep}`, { replace: true })
-  }, [activeStep, navigate])
+    if (vnp_Amount) {
+      setActiveStep(4)
+    } else if (step) {
+      setActiveStep(initialStep)
+    }
+    setLoading(true)
+  }, [vnp_Amount, step, initialStep])
+
+  useEffect(() => {
+    if (loading) {
+      if (activeStep === 4) {
+        const transactionData: TransactionData = {
+          vnp_Amount: vnp_Amount,
+          vnp_BankCode: queryParams.get('vnp_BankCode'),
+          vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
+          vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
+        }
+        navigate('/order-detail/4', { state: { transactionData } })
+      } else if (activeStep !== initialStep) {
+        navigate(`/order-detail/${activeStep}`)
+      }
+    }
+  }, [activeStep, loading, initialStep, navigate, vnp_Amount])
 
   const handleNext = () => {
-    if (activeStep >= listSteps.length) return
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    if (activeStep < listSteps.length) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    }
   }
 
   const handleBack = () => {
-    if (activeStep <= 1) return
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+    if (activeStep > 1) {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1)
+    }
   }
 
   const commonProps = {
@@ -67,9 +101,7 @@ export default function OrderDetail() {
           ))}
         </Stepper>
       </Box>
-      <Box sx={{ paddingY: '24px' }}>
-        <CurrentStepComponent {...commonProps} />
-      </Box>
+      <Box sx={{ paddingY: '24px' }}>{loading ? <CurrentStepComponent {...commonProps} /> : ''}</Box>
     </Box>
   )
 }

@@ -1,6 +1,9 @@
-import { Avatar, Box, Button, Divider, Typography, useTheme } from '@mui/material'
+import { Avatar, Box, Button, Divider, Typography, useTheme, Backdrop, CircularProgress, Paper } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchTransactionInfo } from '~/apis/paymentApi'
+import { useState } from 'react'
 
 interface CommonProps {
   onNext: () => void
@@ -22,14 +25,71 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
     imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
   }
 
-  const theme = useTheme()
-  const navigate = useNavigate()
-
   const handleReturn = () => {
     console.log('Back to homepage')
     localStorage.setItem('activeStep', '1')
     navigate('/')
   }
+
+  const theme = useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const transactionData = location.state?.transactionData
+  const [status, setStatus] = useState<boolean | null>(null)
+
+  const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
+
+  const { isLoading } = useQuery({
+    queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
+    queryFn: async () => {
+      const transactionResponse = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
+      if (!transactionResponse) {
+        throw new Error('No response from API')
+      }
+
+      if (transactionResponse.status === 'OK') {
+        setStatus(true)
+        return transactionResponse
+      } else {
+        setStatus(false)
+        throw new Error(transactionResponse.message || 'Transaction not successful')
+      }
+    },
+    enabled: !!vnp_BankCode && !!vnp_ResponseCode
+  })
+
+  if (!transactionData) {
+    return <Box>No order data available.</Box>
+  }
+
+  if (isLoading) {
+    return (
+      <Backdrop open>
+        <CircularProgress />
+      </Backdrop>
+    )
+  }
+  if (status === null) {
+    return (
+      <Paper
+        sx={{
+          marginX: '104px',
+          height: '70vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          gap: '50px'
+        }}
+      >
+        <Typography variant='h5'>You need create an order</Typography>
+        <Button variant='contained' onClick={handleReturn}>
+          Back to homepage
+        </Button>
+      </Paper>
+    )
+  }
+
   return (
     <Box sx={{ marginX: '104px' }}>
       <Box>
@@ -45,12 +105,22 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', paddingBottom: '70px' }}>
             <Box sx={{ width: '40%' }}>
-              <Box textAlign='center'>
-                <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.success.main }} />
-                <Typography variant='h3' fontWeight='bold' gutterBottom>
-                  Đặt phòng thành công
-                </Typography>
-              </Box>
+              {status ? (
+                <Box textAlign='center'>
+                  <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.success.main }} />
+                  <Typography variant='h3' fontWeight='bold' gutterBottom>
+                    Đặt phòng thành công
+                  </Typography>
+                </Box>
+              ) : (
+                <Box textAlign='center'>
+                  <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.error.main }} />
+                  <Typography variant='h3' fontWeight='bold' gutterBottom>
+                    Đặt phòng thất bại
+                  </Typography>
+                </Box>
+              )}
+
               <Box sx={{ marginY: '32px' }} textAlign='center'>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
