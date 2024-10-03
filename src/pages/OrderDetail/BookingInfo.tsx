@@ -1,8 +1,9 @@
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, TextField, Typography } from '@mui/material'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import { useTheme } from '@emotion/react';
 import { tokens } from '~/themes/theme';
-
+import moment from 'moment'
+import MonthView from '~/components/Calendar/Calendar';
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -15,7 +16,40 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
       <Grid container spacing={2} sx={{ }}>
         <Grid item xs={12} lg={6} sx={{ paddingRight: '24px !important', paddingTop:"0px !important" }}>
           <Box>
-            <Typography variant='h5' sx={{color:colors.primary[500], fontWeight:"700px"}}>Thông tin khách hàng</Typography>
+            <Box sx={{padding:"20px 20px 20px 20px", minHeight:"253px", background:"#FFF"}}>
+              <Typography variant='h5' sx={{color:colors.primary[500], fontWeight:"700"}}>Thông tin khách hàng</Typography>
+              <Box sx={{ paddingTop: "24px" }}>
+                <Grid container spacing={2}>
+                   <Grid item xs={12} sx={{ marginBottom: "auto", paddingTop:"25px !important" }}>
+                      <TextField id="outlined-required" label="Tên" defaultValue="Phạm Thị Anh Đào" fullWidth />
+                    </Grid>
+                  <Grid item xs={12} sx={{ marginBottom: "auto",  paddingTop:"25px !important"  }}>
+                   <TextField id="outlined-required" label="Số điện thoại" defaultValue="09xxxxxxxx" fullWidth />
+                  </Grid>
+                 <Grid item xs={12} sx={{ marginBottom: "auto", paddingTop:"25px !important"}}>
+                   <TextField id="outlined-required" label="Email" defaultValue="dao@gmail.com" fullWidth />
+                 </Grid>
+                 </Grid>
+              </Box>
+            </Box>
+            <Box sx={{marginTop:"24px", background:"#FFF"}}>
+              <Box sx={{padding:"20px"}}>
+                <Typography variant='h5' sx={{color:colors.primary[500], fontWeight:"700", paddingBottom:"20px"}}>Lịch đặt</Typography>
+                <Box>
+                  <Grid xs={12}>
+                   <MonthView
+                     selected={[
+                       moment(),
+                        moment().add(1, 'day'),
+                       moment().add(2, 'day'),
+                        moment().add(3, 'day'),
+                        moment().add(4, 'day')
+                     ]}
+                   />
+                  </Grid>
+                </Box>
+              </Box>
+            </Box>
           </Box>
         </Grid>
         <Grid item xs={12} lg={6} sx={{ paddingLeft : '0px !important', paddingTop:"0px !important", background:"#FFF" }}>
