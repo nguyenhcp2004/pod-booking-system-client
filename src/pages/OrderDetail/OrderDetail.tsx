@@ -1,21 +1,28 @@
 import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
 import { listSteps } from './listSteps'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { tokens } from '~/themes/theme'
+import { BookingContext } from '~/contexts/BookingContext'
+import { useParams, useNavigate } from 'react-router-dom'
 
 export default function OrderDetail() {
-  const initialStep = Number(localStorage.getItem('activeStep')) || 1
+  const { step } = useParams()
+  const initialStep = step ? Number(step) : 1
   const [activeStep, setActiveStep] = useState<number>(initialStep)
   const colors = tokens('light')
+  const navigate = useNavigate()
+
+  const bookingContext = useContext(BookingContext)
+  if (!bookingContext) {
+    throw new Error('BookingContext must be used within a BookingProvider')
+  }
 
   useEffect(() => {
-    localStorage.setItem('activeStep', activeStep.toString())
-  }, [activeStep])
+    navigate(`/order-detail/${activeStep}`, { replace: true })
+  }, [activeStep, navigate])
 
   const handleNext = () => {
-    if (activeStep >= listSteps.length) {
-      return
-    }
+    if (activeStep >= listSteps.length) return
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
   }
 
@@ -41,15 +48,17 @@ export default function OrderDetail() {
     fontSize: 12
   }))
 
+  const CurrentStepComponent = listSteps[activeStep - 1].element
+
   return (
     <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
-      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '48px' }}>
+      <Box sx={{ width: '100%', paddingX: '104px', paddingTop: '48px' }}>
         <Stepper activeStep={activeStep}>
           {listSteps.map((step) => (
             <Step key={step.index}>
               <StepLabel
                 StepIconComponent={() => (
-                  <CustomStepIcon completed={step.index <= activeStep ? true : false}>{step.index}</CustomStepIcon>
+                  <CustomStepIcon completed={step.index <= activeStep}>{step.index}</CustomStepIcon>
                 )}
               >
                 {step.describe}
@@ -58,7 +67,9 @@ export default function OrderDetail() {
           ))}
         </Stepper>
       </Box>
-      <Box sx={{ marginTop: '24px' }}>{listSteps[activeStep - 1].element({ ...commonProps })}</Box>
+      <Box sx={{ paddingY: '24px' }}>
+        <CurrentStepComponent {...commonProps} />
+      </Box>
     </Box>
   )
 }

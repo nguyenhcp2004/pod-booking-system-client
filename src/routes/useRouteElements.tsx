@@ -76,7 +76,7 @@ export default function useRouteElements() {
           element: <MainLayout />,
           children: [
             {
-              path: '/order-detail',
+              path: '/order-detail/:step?',
               element: <OrderDetail />
             }
           ]
