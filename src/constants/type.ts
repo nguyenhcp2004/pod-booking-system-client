@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 export type AccountRoleType = (typeof AccountRole)[keyof typeof AccountRole]
 export const AccountRole = {
   Admin: 'Admin',
@@ -21,16 +19,36 @@ export type ServicePackage = {
   discountPercentage: number
 }
 
-export const ServicePackageRes = z.object({
-  data: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      discountPercentage: z.number()
-    })
-  ),
-  message: z.string(),
-  code: z.number()
-})
+export type Slot = {
+  startTime: string
+  endTime: string
+}
+export type Building = {
+  id: number
+  address: string
+  description: string
+  hotlineNumber: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
 
-export type ServicePackageResType = z.TypeOf<typeof ServicePackageRes>
+export type RoomType = {
+  id: number
+  name: string
+  quantity: number
+  capacity: number
+  building: Building
+}
+
+export type Room = {
+  id: number
+  name: string
+  price: number
+  description: string
+  image: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  roomType: RoomType
+}

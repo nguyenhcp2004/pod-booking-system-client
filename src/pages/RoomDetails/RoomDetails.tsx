@@ -14,8 +14,11 @@ import { SLOT } from '~/constants/slot'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-import { useState } from 'react'
-import { ServicePackage } from '~/constants/type'
+import { useEffect, useMemo, useState } from 'react'
+import { Room, ServicePackage } from '~/constants/type'
+import { getAllServicePackage } from '~/queries/useServicePackage'
+import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
+import { useParams } from 'react-router-dom'
 const podDataMock = {
   id: '103',
   name: 'Phòng POD đôi',
@@ -31,13 +34,42 @@ const podDataMock = {
   ]
 }
 export default function RoomDetail() {
+  const params = useParams<{ id: string }>()
   const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
-  const { data, isSuccess } = useQuery({
-    queryKey: ['service-package'],
-    queryFn: servicePackageApiRequest.getAll
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([]) // Change the type to string[]
+  const [selectedRooms, setSelectedRooms] = useState<Array<Room>>([])
+  const { data: servicePackage, isSuccess } = getAllServicePackage()
+  const slotList = useMemo(() => {
+    return selectedSlots.map((slot) => {
+      const [startTime, endTime] = slot.split('-')
+      const formattedStartTime = moment(selectedDate)
+        .set({
+          hour: parseInt(startTime.split(':')[0]),
+          minute: parseInt(startTime.split(':')[1]),
+          second: 0,
+          millisecond: 0
+        })
+        .format('YYYY-MM-DDTHH:mm:ss')
+      const formattedEndTime = moment(selectedDate)
+        .set({
+          hour: parseInt(endTime.split(':')[0]),
+          minute: parseInt(endTime.split(':')[1]),
+          second: 0,
+          millisecond: 0
+        })
+        .format('YYYY-MM-DDTHH:mm:ss')
+      return `${formattedStartTime}_${formattedEndTime}`
+    })
+  }, [selectedSlots])
+  const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndSlots({
+    typeId: Number(params.id),
+    slots: slotList
   })
 
+  useEffect(() => {
+    roomListRefetch()
+  }, [selectedSlots, selectedDate])
   return (
     <Box
       sx={{
@@ -83,6 +115,10 @@ export default function RoomDetail() {
                     <Autocomplete
                       multiple
                       options={SLOT}
+                      value={selectedSlots}
+                      onChange={(_, slots) => {
+                        setSelectedSlots(slots)
+                      }}
                       disableCloseOnSelect
                       limitTags={2}
                       renderOption={(props, option, { selected }) => {
@@ -108,8 +144,14 @@ export default function RoomDetail() {
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       multiple
-                      options={[]}
+                      options={roomList?.data.data || []}
                       limitTags={2}
+                      value={selectedRooms}
+                      onChange={(_, rooms) => {
+                        console.log(rooms)
+                        return setSelectedRooms(rooms)
+                      }}
+                      getOptionLabel={(option) => option.name}
                       renderOption={(props, option, { selected }) => {
                         const { key, ...optionProps } = props
                         return (
@@ -121,7 +163,7 @@ export default function RoomDetail() {
                               checked={selected}
                               size='small'
                             />
-                            {option}
+                            {option.name}
                           </li>
                         )
                       }}
@@ -136,7 +178,7 @@ export default function RoomDetail() {
                       onChange={(_, servicePackage) => {
                         setSelectedPackage(servicePackage)
                       }}
-                      options={isSuccess ? data.data.data : []}
+                      options={isSuccess ? servicePackage.data.data : []}
                       getOptionLabel={(option) => option.name}
                       renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
                     />

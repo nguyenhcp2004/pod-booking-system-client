@@ -1,16 +1,5 @@
 import { z } from 'zod'
 
-export const FilterRoomQuery = z.object({
-  address: z.string().optional(),
-  capacity: z.number().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  page: z.number().optional(),
-  take: z.number().optional()
-})
-
-export type FilterRoomQueryType = z.TypeOf<typeof FilterRoomQuery>
-
 const BuildingSchema = z.object({
   id: z.number(),
   address: z.string(),
@@ -41,7 +30,18 @@ const RoomSchema = z.object({
   roomType: RoomTypeSchema
 })
 
-export const FilterRoomRes = z.object({
+const FilterRoomQuery = z.object({
+  address: z.string().optional(),
+  capacity: z.number().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  page: z.number().optional(),
+  take: z.number().optional()
+})
+
+export type FilterRoomQueryType = z.TypeOf<typeof FilterRoomQuery>
+
+const FilterRoomRes = z.object({
   code: z.number(),
   data: z.array(RoomSchema),
   currentPage: z.number(),
@@ -51,3 +51,17 @@ export const FilterRoomRes = z.object({
 })
 
 export type FilterRoomResType = z.TypeOf<typeof FilterRoomRes>
+
+const FilterRoomByTypeAndSlotsQuery = z.object({
+  typeId: z.number(),
+  slots: z.array(z.string())
+})
+
+export type FilterRoomByTypeAndSlotsQueryType = z.TypeOf<typeof FilterRoomByTypeAndSlotsQuery>
+
+export const FilterRoomByTypeAndSlotsRes = z.object({
+  code: z.number(),
+  data: z.array(RoomSchema),
+  message: z.string()
+})
+export type FilterRoomByTypeAndSlotsResType = z.TypeOf<typeof FilterRoomByTypeAndSlotsRes>
