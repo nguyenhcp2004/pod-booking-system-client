@@ -1,5 +1,5 @@
 import http from '~/utils/http'
-import { PaymentReqDTO } from '~/schemaValidations/paymentSchema' // Giữ nguyên import này
+import { PaymentReqDTO } from '~/schemaValidations/paymentSchema'
 
 interface PaymentUrlResType {
   amount: number
