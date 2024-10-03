@@ -2,14 +2,20 @@ import { Paper, Typography, Box } from '@mui/material'
 import { useBookingContext } from '~/contexts/BookingContext'
 
 const QRCodePayment = () => {
-  const { bookingInfo } = useBookingContext()
+  const bookingContext = useBookingContext()
+  const bookingData = bookingContext?.bookingData
 
-  const roomTotal = bookingInfo.rooms.reduce((total, room) => total + room.price, 0)
-  const amenitiesTotal = bookingInfo.rooms.reduce(
+  if (!bookingData) return null
+
+  const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
+  const amenitiesTotal = bookingData.selectedRooms.reduce(
     (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
     0
   )
-  const discountAmount = (roomTotal + amenitiesTotal) * (bookingInfo.discountPercent / 100)
+  let discountAmount = 0
+  if (bookingData.servicePackage && bookingData.servicePackage.discountPercentage) {
+    discountAmount = (roomTotal + amenitiesTotal) * (bookingData.servicePackage.discountPercentage / 100)
+  }
   const grandTotal = roomTotal + amenitiesTotal - discountAmount
 
   return (

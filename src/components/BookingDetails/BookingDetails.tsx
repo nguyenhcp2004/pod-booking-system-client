@@ -13,10 +13,13 @@ import {
 import { useBookingContext } from '~/contexts/BookingContext'
 
 const BookingDetails = () => {
-  const { bookingInfo } = useBookingContext()
+  const bookingContext = useBookingContext()
+  const bookingData = bookingContext?.bookingData
 
-  const roomTotal = bookingInfo.rooms.reduce((total, room) => total + room.price, 0)
-  const amenitiesTotal = bookingInfo.rooms.reduce(
+  if (!bookingData) return null 
+
+  const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
+  const amenitiesTotal = bookingData.selectedRooms.reduce(
     (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
     0
   )
@@ -27,26 +30,26 @@ const BookingDetails = () => {
         Đơn đặt
       </Typography>
       <Box display='flex' alignItems='center'>
-        <img src={bookingInfo.imageSrc} alt={bookingInfo.roomType} width='100' height='100' />
+        <img src={bookingData.selectedRooms[0].image} alt={bookingData.roomType?.name} width='100' height='100' />
         <Box ml={2}>
-          <Typography variant='h6'>{bookingInfo.roomType}</Typography>
+          <Typography variant='h6'>{bookingData.roomType?.name}</Typography>
           <Typography variant='subtitle1' color='textSecondary'>
-            {bookingInfo.pricePerHour.toLocaleString()} VND/tiếng
+            {bookingData.selectedRooms[0].price.toLocaleString()} VND/tiếng
           </Typography>
-          <Typography variant='body2'>Địa chỉ: {bookingInfo.address}</Typography>
-          <Typography variant='body2'>Ngày: {bookingInfo.date}</Typography>
-          <Typography variant='body2'>Slot: {bookingInfo.timeSlots}</Typography>
-          <Typography variant='body2'>Phòng: {bookingInfo.rooms.map((room) => room.name).join(', ')}</Typography>
-          <Typography variant='body2'>Gói: {bookingInfo.package}</Typography>
+          <Typography variant='body2'>Địa chỉ: {bookingData.roomType?.building.address}</Typography>
+          <Typography variant='body2'>Ngày: {bookingData.date}</Typography>
+          <Typography variant='body2'>Slot: {bookingData.timeSlots}</Typography>
+          <Typography variant='body2'>
+            Phòng: {bookingData.selectedRooms.map((room) => room.name).join(', ')}
+          </Typography>
+          <Typography variant='body2'>Gói: {bookingData.servicePackage?.name}</Typography>
         </Box>
       </Box>
 
       <Divider sx={{ my: 2 }} />
-
       <Typography variant='h6' gutterBottom>
         Tiện ích bạn đã chọn
       </Typography>
-
       <TableContainer>
         <Table>
           <TableHead>
@@ -58,7 +61,7 @@ const BookingDetails = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookingInfo.rooms.map((room) =>
+            {bookingData.selectedRooms.map((room) =>
               room.amenities.map((amenity, index) => (
                 <TableRow key={index}>
                   {index === 0 && <TableCell rowSpan={room.amenities.length}>{room.name}</TableCell>}

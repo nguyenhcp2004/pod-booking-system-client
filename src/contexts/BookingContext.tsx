@@ -1,72 +1,118 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState } from 'react'
+import { ReactNode } from 'react'
+
+export const BookingContext = createContext<BookingContextType | undefined>(undefined)
+
+export const useBookingContext = () => {
+  return useContext(BookingContext)
+}
+
+interface RoomType {
+  id: number
+  name: string
+  building: Building
+}
+
+interface Building {
+  id: number
+  address: string
+}
+
+interface ServicePackage {
+  id: number
+  name: string
+  discountPercentage: number
+}
 
 interface Amenity {
+  id: number
   name: string
-  quantity: number
   price: number
+  quantity: number
 }
 
 interface Room {
+  id: number
   name: string
   price: number
+  image: string
   amenities: Amenity[]
 }
 
-interface BookingInfo {
-  roomType: string
-  pricePerHour: number
-  address: string
-  date: string
-  timeSlots: string
-  package: string
-  imageSrc: string
-  rooms: Room[]
-  discountPercent: number
-}
-
 interface BookingContextType {
-  bookingInfo: BookingInfo
+  bookingData: BookingInfo
+  setBookingData: React.Dispatch<React.SetStateAction<BookingInfo>>
 }
 
-const BookingContext = createContext<BookingContextType | undefined>(undefined)
+interface BookingProviderProps {
+  children: ReactNode
+}
 
-export const useBookingContext = () => {
-  const context = useContext(BookingContext)
-  if (!context) {
-    throw new Error('useBookingContext must be used within a BookingProvider')
+interface BookingInfo {
+  roomType: RoomType | null
+  selectedRooms: Room[] | []
+  date: string | null
+  timeSlots: number[] | []
+  servicePackage: ServicePackage | null
+}
+
+// export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
+//   const [bookingData, setBookingData] = useState<BookingInfo>({
+//     roomType: null,
+//     selectedRooms: [],
+//     date: null,
+//     timeSlots: [],
+//     servicePackage: null
+//   })
+
+//   return <BookingContext.Provider value={{ bookingData, setBookingData }}>{children}</BookingContext.Provider>
+// }
+const mockRoomType: RoomType = {
+  id: 1,
+  name: 'Deluxe Room',
+  building: {
+    id: 1,
+    address: '123 Main St'
   }
-  return context
 }
 
-export const BookingProvider = ({ children }: { children: ReactNode }) => {
-  const [bookingInfo] = useState<BookingInfo>({
-    roomType: 'Phòng POD đôi',
-    pricePerHour: 20000,
-    address: 'Đố m biết',
-    date: '24/01/2024',
-    timeSlots: '7h - 9h, 9h - 11h',
-    package: 'Gói tuần',
-    imageSrc: '/path-to-image',
-    rooms: [
-      {
-        name: 'Phòng 101',
-        price: 640000,
-        amenities: [
-          { name: 'Máy chiếu', quantity: 1, price: 40000 },
-          { name: 'Bạc xỉu', quantity: 2, price: 28000 }
-        ]
-      },
-      {
-        name: 'Phòng 102',
-        price: 640000,
-        amenities: [
-          { name: 'Máy chiếu', quantity: 1, price: 40000 },
-          { name: 'Bạc xỉu', quantity: 2, price: 28000 }
-        ]
-      }
-    ],
-    discountPercent: 10
+const mockServicePackage: ServicePackage = {
+  id: 1,
+  name: 'Standard Package',
+  discountPercentage: 10
+}
+
+const mockRooms: Room[] = [
+  {
+    id: 1,
+    name: 'Room A',
+    price: 100,
+    image: 'roomA.jpg',
+    amenities: [
+      { id: 1, name: 'WiFi', price: 5, quantity: 1 },
+      { id: 2, name: 'Breakfast', price: 15, quantity: 1 }
+    ]
+  },
+  {
+    id: 2,
+    name: 'Room B',
+    price: 120,
+    image: 'roomB.jpg',
+    amenities: [
+      { id: 1, name: 'WiFi', price: 5, quantity: 1 },
+      { id: 3, name: 'Parking', price: 10, quantity: 1 }
+    ]
+  }
+]
+
+export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
+  const [bookingData, setBookingData] = useState<BookingInfo>({
+    roomType: mockRoomType,
+    selectedRooms: mockRooms,
+    date: '2024-10-15',
+    timeSlots: [1, 2],
+    servicePackage: mockServicePackage
   })
 
-  return <BookingContext.Provider value={{ bookingInfo }}>{children}</BookingContext.Provider>
+  return <BookingContext.Provider value={{ bookingData, setBookingData }}>{children}</BookingContext.Provider>
 }

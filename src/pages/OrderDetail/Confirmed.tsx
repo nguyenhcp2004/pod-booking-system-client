@@ -1,5 +1,6 @@
-import { Avatar, Box, Divider, Paper, Typography, useTheme } from '@mui/material'
+import { Avatar, Box, Button, Divider, Paper, Typography, useTheme } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { useNavigate } from 'react-router-dom'
 
 export const Confirmed: React.FC = () => {
   const bookingInfo = {
@@ -16,6 +17,13 @@ export const Confirmed: React.FC = () => {
     imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
   }
   const theme = useTheme()
+  const navigate = useNavigate()
+
+  const handleReturn = () => {
+    console.log('Back to homepage')
+    localStorage.setItem('activeStep', '1')
+    navigate('/')
+  }
   return (
     <Box sx={{ marginX: '104px' }}>
       <Box>
@@ -126,6 +134,11 @@ export const Confirmed: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
+            </Box>
+            <Box display='flex' justifyContent='flex-end' gap='20px'>
+              <Button>Add amenities</Button>
+              <Button>Cancel booking</Button>
+              <Button onClick={handleReturn}>Back to homepage</Button>
             </Box>
           </Box>
         </Paper>
