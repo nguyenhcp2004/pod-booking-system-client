@@ -79,7 +79,7 @@ const BookingDetails = () => {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ marginTop: '24px', padding: '20px' }}>
+        <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
           <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
             Tiện ích bạn đã chọn
           </Typography>
