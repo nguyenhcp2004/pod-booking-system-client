@@ -86,21 +86,21 @@ const mockRooms: Room[] = [
   {
     id: 1,
     name: 'Room A',
-    price: 100,
+    price: 100000,
     image: 'roomA.jpg',
     amenities: [
-      { id: 1, name: 'WiFi', price: 5, quantity: 1 },
-      { id: 2, name: 'Breakfast', price: 15, quantity: 1 }
+      { id: 1, name: 'WiFi', price: 50000, quantity: 1 },
+      { id: 2, name: 'Breakfast', price: 15000, quantity: 1 }
     ]
   },
   {
     id: 2,
     name: 'Room B',
-    price: 120,
+    price: 120000,
     image: 'roomB.jpg',
     amenities: [
-      { id: 1, name: 'WiFi', price: 5, quantity: 1 },
-      { id: 3, name: 'Parking', price: 10, quantity: 1 }
+      { id: 1, name: 'WiFi', price: 50000, quantity: 1 },
+      { id: 3, name: 'Parking', price: 10000, quantity: 1 }
     ]
   }
 ]
