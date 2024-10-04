@@ -57,7 +57,7 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
       startDate.add(1, 'day')
     }
     return days
-  }, [from, to])
+  }, [from, to, selected])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))
@@ -75,7 +75,12 @@ const MonthView = ({ selected }: { selected: Moment[] }) => {
   const renderEventDetails = () => {
     return <Typography>test</Typography>
   }
-  const renderEventContent = (event: any) => {
+  const renderEventContent = (event: {
+    id: string
+    date: string
+    inMonth: boolean
+    isSelected: moment.Moment | undefined
+  }) => {
     return <Typography>{event.date}</Typography>
   }
 
