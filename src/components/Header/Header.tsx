@@ -4,10 +4,13 @@ import Button from '@mui/material/Button'
 import { Avatar, Stack } from '@mui/material'
 import OptionsMenu from '~/components/OptionsMenu'
 import { useAppContext } from '~/contexts/AppProvider'
+import { useGetMe } from '~/queries/useAccount'
 
 export default function Header() {
   const { account } = useAppContext()
-
+  const { data } = useGetMe()
+  const user = data?.data.data
+  console.log(user)
   return (
     <Box
       sx={{
