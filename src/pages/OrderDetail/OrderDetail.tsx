@@ -1,6 +1,6 @@
 import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
 import { listSteps } from './listSteps'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useMemo } from 'react'
 import { tokens } from '~/themes/theme'
 import { BookingContext } from '~/contexts/BookingContext'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -16,7 +16,7 @@ export default function OrderDetail() {
   const { step } = useParams()
   const initialStep = Number(step) || 1
   const [activeStep, setActiveStep] = useState<number>(initialStep)
-  const queryParams = new URLSearchParams(window.location.search)
+  const queryParams = useMemo(() => new URLSearchParams(window.location.search), [])
   const colors = tokens('light')
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(false)
@@ -51,7 +51,7 @@ export default function OrderDetail() {
         navigate(`/order-detail/${activeStep}`)
       }
     }
-  }, [activeStep, loading, initialStep, navigate, vnp_Amount])
+  }, [activeStep, loading, initialStep, navigate, vnp_Amount, queryParams])
 
   const handleNext = () => {
     if (activeStep < listSteps.length) {
