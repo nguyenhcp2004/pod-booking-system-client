@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useTheme } from '@emotion/react'
-import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography } from '@mui/material'
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
@@ -83,7 +84,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   return (
     <Box sx={{ marginX: '104px' }}>
       <Grid container spacing={2}>
-        <Grid item lg={6} sx={{ padding: '0px !important' }}>
+        <Grid size={{ lg: 6 }} sx={{ padding: '0px !important' }}>
           <Box sx={{ marginRight: '12px', background: '#FFF', paddingRight: '12px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
               <Typography variant='h5' sx={{ color: colors.primary[500], fontWeight: 700 }}>
@@ -130,7 +131,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 20px' }}>
                   {arrayAmenities.map((item, index) => (
-                    <Grid item lg={4} md={6} xs={12} key={index}>
+                    <Grid size={{ lg: 4, md: 6, xs: 12 }} key={index}>
                       <Button
                         variant='outlined'
                         fullWidth
@@ -231,12 +232,12 @@ export const Amenities: React.FC<CommonProps> = (props) => {
           </Box>
         </Grid>
 
-        <Grid item lg={6} sx={{ paddingLeft: '12px', background: '#FFF' }}>
+        <Grid size={{ lg: 6 }} sx={{ paddingLeft: '12px', background: '#FFF' }}>
           <Box>
             <BookingDetails />
           </Box>
           <Grid sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, padding: '20px' }}>
-            <Grid item lg={9}>
+            <Grid size={{ lg: 9 }}>
               <Button
                 onClick={props.onNext}
                 fullWidth
@@ -245,7 +246,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                 Hoàn tất
               </Button>
             </Grid>
-            <Grid item lg={4}>
+            <Grid size={{ lg: 4 }}>
               <Button
                 variant='text'
                 onClick={handleCancel}
