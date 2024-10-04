@@ -1,4 +1,5 @@
-import { Box, Button, Grid } from '@mui/material'
+import { Box, Button } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import QRCodePayment from '~/components/QRCodePayment/QRCodePayment'
 
@@ -12,10 +13,10 @@ export const PaymentDetail: React.FC<CommonProps> = (props) => {
     <Box sx={{ height: '100%', marginX: '104px' }}>
       <Box>
         <Grid container>
-          <Grid item xs={12} lg={6} sx={{ paddingRight: '12px' }}>
+          <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingRight: '12px' }}>
             <BookingDetails />
           </Grid>
-          <Grid item xs={12} lg={6} sx={{ paddingLeft: '12px' }}>
+          <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingLeft: '12px' }}>
             <QRCodePayment />
           </Grid>
         </Grid>
