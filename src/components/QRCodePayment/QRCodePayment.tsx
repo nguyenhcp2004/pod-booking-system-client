@@ -13,23 +13,6 @@ const QRCodePayment = () => {
   const bookingContext = useBookingContext()
   const bookingData = bookingContext?.bookingData
   const theme = useTheme()
-
-  useEffect(() => {
-    createPaymentUrl(grandTotal)
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer)
-          setShowReload(true)
-          return 0
-        }
-        return prevTime - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
   const { mutate: createPaymentUrl } = useMutation({
     mutationFn: async (amount: number) => {
       const paymentRequest = {
@@ -45,6 +28,34 @@ const QRCodePayment = () => {
       console.error('Error generating payment URL:', error)
     }
   })
+  const roomTotal = bookingData?.selectedRooms.reduce((total, room) => total + room.price, 0) || 0
+  const amenitiesTotal =
+    bookingData?.selectedRooms.reduce(
+      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+      0
+    ) || 0
+
+  let discountAmount = 0
+  if (bookingData?.servicePackage && bookingData.servicePackage.discountPercentage) {
+    discountAmount = (roomTotal + amenitiesTotal) * (bookingData.servicePackage.discountPercentage / 100)
+  }
+  const grandTotal = roomTotal + amenitiesTotal - discountAmount
+
+  useEffect(() => {
+    createPaymentUrl(grandTotal)
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer)
+          setShowReload(true)
+          return 0
+        }
+        return prevTime - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [createPaymentUrl, grandTotal])
 
   const handleReload = () => {
     const roomTotal = bookingData?.selectedRooms.reduce((total, room) => total + room.price, 0) || 0
@@ -67,25 +78,12 @@ const QRCodePayment = () => {
     }
   }
 
-  if (!bookingData) return null
-
-  const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
-  const amenitiesTotal = bookingData.selectedRooms.reduce(
-    (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-    0
-  )
-
-  let discountAmount = 0
-  if (bookingData.servicePackage && bookingData.servicePackage.discountPercentage) {
-    discountAmount = (roomTotal + amenitiesTotal) * (bookingData.servicePackage.discountPercentage / 100)
-  }
-  const grandTotal = roomTotal + amenitiesTotal - discountAmount
-
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
     const seconds = time % 60
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`
   }
+  if (!bookingData) return null
 
   return (
     <Box
