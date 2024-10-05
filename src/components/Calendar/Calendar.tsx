@@ -137,7 +137,12 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
       </Box>
     )
   }
-  const renderEventContent = (event: any) => {
+  const renderEventContent = (event: {
+    id: string
+    date: string
+    inMonth: boolean
+    isSelected: moment.Moment | undefined
+  }) => {
     return <Typography>{event.date}</Typography>
   }
 

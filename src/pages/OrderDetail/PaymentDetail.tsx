@@ -1,6 +1,7 @@
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import OrderReceipt from '~/components/OrderReceipt'
+import BookingDetails from '~/components/BookingDetails/BookingDetails'
+import QRCodePayment from '~/components/QRCodePayment/QRCodePayment'
 
 interface CommonProps {
   onNext: () => void
@@ -9,14 +10,17 @@ interface CommonProps {
 
 export const PaymentDetail: React.FC<CommonProps> = (props) => {
   return (
-    <Box sx={{ minHeight: '100%' }}>
-      <Grid container>
-        <Grid size={{ lg: 6 }}>
-          <OrderReceipt />
+    <Box sx={{ height: '100%', marginX: '104px' }}>
+      <Box>
+        <Grid container>
+          <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingRight: '12px' }}>
+            <BookingDetails />
+          </Grid>
+          <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingLeft: '12px' }}>
+            <QRCodePayment />
+          </Grid>
         </Grid>
-        <Grid size={{ lg: 6 }}></Grid>
-      </Grid>
-      <Typography variant={'h1'}>Payment</Typography>
+      </Box>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
         <Button onClick={props.onBack} sx={{ mr: 1 }}>
           Quay lại
