@@ -23,6 +23,14 @@ export type Slot = {
   startTime: string
   endTime: string
 }
+
+export type SlotAvailable = {
+  startTime: string
+  endTime: string
+
+  available: boolean
+}
+
 export type Building = {
   id: number
   address: string

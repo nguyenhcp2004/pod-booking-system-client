@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, FormControl, MenuItem, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Checkbox, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import pod from '~/assets/images/pod.jpg'
 import moment, { Moment } from 'moment'
@@ -6,10 +6,7 @@ import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
 import { formatCurrency } from '~/utils/currency'
 import ImageView from '~/components/ImageView/ImageView'
-import MonthView from '~/components/Calendar/Calendar'
-
-import { useQuery } from '@tanstack/react-query'
-import servicePackageApiRequest from '~/apis/servicePackage'
+import Calendar from '~/components/Calendar/Calendar'
 import { SLOT } from '~/constants/slot'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
@@ -19,6 +16,7 @@ import { Room, ServicePackage } from '~/constants/type'
 import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { useParams } from 'react-router-dom'
+
 const podDataMock = {
   id: '103',
   name: 'Phòng POD đôi',
@@ -36,11 +34,33 @@ const podDataMock = {
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
   const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
+  const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]) // Change the type to string[]
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
   const [selectedRooms, setSelectedRooms] = useState<Array<Room>>([])
+
   const { data: servicePackage, isSuccess } = getAllServicePackage()
-  const slotList = useMemo(() => {
+  useEffect(() => {
+    const dateList = []
+    if (selectedDate) {
+      dateList.push(selectedDate)
+
+      if (selectedPackage) {
+        if (selectedPackage.id == '1') {
+          dateList.push(moment(selectedDate).add(1, 'week'))
+          dateList.push(moment(selectedDate).add(2, 'week'))
+          dateList.push(moment(selectedDate).add(3, 'week'))
+        } else if (selectedPackage.id == '2') {
+          for (let i = 0; i < 30; i++) {
+            dateList.push(moment(selectedDate).add(i, 'days'))
+          }
+        }
+      }
+    }
+    setSelectedDates(dateList)
+  }, [selectedDate, selectedPackage])
+
+  const slotsFormmated = useMemo(() => {
     return selectedSlots.map((slot) => {
       const [startTime, endTime] = slot.split('-')
       const formattedStartTime = moment(selectedDate)
@@ -61,15 +81,17 @@ export default function RoomDetail() {
         .format('YYYY-MM-DDTHH:mm:ss')
       return `${formattedStartTime}_${formattedEndTime}`
     })
-  }, [selectedSlots])
+  }, [selectedSlots, selectedDate])
+
   const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndSlots({
     typeId: Number(params.id),
-    slots: slotList
+    slots: slotsFormmated
   })
 
   useEffect(() => {
     roomListRefetch()
   }, [selectedSlots, selectedDate])
+
   return (
     <Box
       sx={{
@@ -101,7 +123,7 @@ export default function RoomDetail() {
 
             <Box>
               <Grid container size={12} spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 5 }}>
                   <DatePicker
                     label='Ngày đặt'
                     value={selectedDate}
@@ -110,7 +132,7 @@ export default function RoomDetail() {
                     format={DEFAULT_DATE_FORMAT}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 7 }}>
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       multiple
@@ -120,7 +142,7 @@ export default function RoomDetail() {
                         setSelectedSlots(slots)
                       }}
                       disableCloseOnSelect
-                      limitTags={2}
+                      limitTags={1}
                       renderOption={(props, option, { selected }) => {
                         const { key, ...optionProps } = props
                         return (
@@ -146,9 +168,9 @@ export default function RoomDetail() {
                       multiple
                       options={roomList?.data.data || []}
                       limitTags={2}
+                      disableCloseOnSelect
                       value={selectedRooms}
                       onChange={(_, rooms) => {
-                        console.log(rooms)
                         return setSelectedRooms(rooms)
                       }}
                       getOptionLabel={(option) => option.name}
@@ -190,7 +212,7 @@ export default function RoomDetail() {
                   </Button>
                 </Grid>
                 <Grid size={12}>
-                  <MonthView selected={selectedDate ? [selectedDate] : []} />
+                  <Calendar selected={selectedDates} />
                 </Grid>
               </Grid>
             </Box>
