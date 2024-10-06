@@ -8,6 +8,8 @@ import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
+import ManageBuilding from '~/pages/ManageBuilding'
+import ManageRoom from '~/pages/ManageRoom'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
 import Register from '~/pages/Register'
@@ -48,6 +50,14 @@ export default function useRouteElements() {
         {
           path: '/admin',
           element: <DashBoard />
+        },
+        {
+          path: '/admin/rooms',
+          element: <ManageRoom />
+        },
+        {
+          path: '/admin/buildings',
+          element: <ManageBuilding />
         }
       ]
     },
