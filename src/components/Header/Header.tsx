@@ -4,13 +4,26 @@ import Button from '@mui/material/Button'
 import { Avatar, Stack } from '@mui/material'
 import OptionsMenu from '~/components/OptionsMenu'
 import { useAppContext } from '~/contexts/AppProvider'
-import { useGetMe } from '~/queries/useAccount'
+import { Link } from 'react-router-dom'
+import accountApiRequest from '~/apis/account'
+import { useEffect } from 'react'
+import { setAccountToLS } from '~/utils/auth'
 
 export default function Header() {
-  const { account } = useAppContext()
-  const { data } = useGetMe()
-  const user = data?.data.data
-  console.log(user)
+  const { account, setAccount, isAuth } = useAppContext()
+  useEffect(() => {
+    if (isAuth && !account) {
+      accountApiRequest
+        .getMe()
+        .then((response) => {
+          setAccount(response.data.data)
+          setAccountToLS(response.data.data)
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+    }
+  }, [account, setAccount, isAuth])
   return (
     <Box
       sx={{
@@ -25,7 +38,15 @@ export default function Header() {
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
         <Typography
           variant='h3'
-          sx={{ fontWeight: '700', color: 'primary.main', fontSize: '39px', lineHeight: '120%' }}
+          component={Link}
+          to='/'
+          sx={{
+            fontWeight: '700',
+            color: 'primary.main',
+            fontSize: '39px',
+            lineHeight: '120%',
+            textDecoration: 'none'
+          }}
         >
           FlexiPod
         </Typography>
