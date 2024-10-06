@@ -6,63 +6,26 @@ import { useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import ChairIcon from '@mui/icons-material/Chair'
-import LocalCafeIcon from '@mui/icons-material/LocalCafe'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import { useNavigate } from 'react-router-dom'
+import { useGetAmenities } from '~/queries/useAmenity' 
+import { AmenityListRes } from '~/schemaValidations/amenity.schema' 
 interface CommonProps {
   onNext: () => void
   onBack: () => void
-}
-
-interface AmenityItemProps {
-  name: string
-  quantity: string
-  price: string
-}
-
-interface RoomAmenitiesProps {
-  room: {
-    number: string
-    amenities: {
-      name: string
-      quantity: string
-      price: string
-    }[]
-  }
-}
-
-interface SelectedAmenitiesProps {
-  rooms: {
-    number: string
-    amenities: {
-      name: string
-      quantity: string
-      price: string
-    }[]
-  }[]
 }
 
 export const Amenities: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens('light')
   const [roomType, setRoomType] = useState('')
-  const [amenities, setAmenities] = useState('')
+  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(0) // State for quantity
+  const { data: amenities = [], isLoading, error } = useGetAmenities();
 
-  const arrayAmenities = [
-    { name: 'Cà phê sữa', price: '48.000 VND' },
-    { name: 'Ghế nằm', price: '80.000 VND' },
-    { name: 'Cà phê sữa', price: '48.000 VND' },
-    { name: 'Ghế nằm', price: '80.000 VND' },
-    { name: 'Cà phê sữa', price: '48.000 VND' },
-    { name: 'Ghế nằm', price: '80.000 VND' },
-    { name: 'Cà phê sữa', price: '48.000 VND' },
-    { name: 'Ghế nằm', price: '80.000 VND' },
-    { name: 'Cà phê sữa', price: '48.000 VND' },
-    { name: 'Ghế nằm', price: '80.000 VND' }
-    // Add more amenities here as needed
-  ]
+  const filteredAmenities = selectedAmenity
+  ? amenities.filter(item => item.type === selectedAmenity)
+  : amenities;  
 
   const arrayRoom = [{ name: 'Phòng 101' }, { name: 'Phòng 102' }]
 
@@ -115,12 +78,15 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
                   <Select
                     labelId='amenities-label'
-                    value={amenities}
+                    value={selectedAmenity || ''}
                     label='Chọn loại tiện ích'
-                    onChange={(e) => setAmenities(e.target.value)}
+                    onChange={(e) => setSelectedAmenity(e.target.value)}
                   >
-                    <MenuItem value='Thức ăn nhẹ, đồ uống'>Thức ăn nhẹ, đồ uống</MenuItem>
-                    {/* Add more amenities as needed */}
+                    {Array.from(new Set(amenities.map(amenity => amenity.type))).map((uniqueType, index) => (
+                      <MenuItem key={index} value={uniqueType}>
+                        {uniqueType}
+                     </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
@@ -130,7 +96,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 20px' }}>
-                  {arrayAmenities.map((item, index) => (
+                    {filteredAmenities.map((item, index) => (
                     <Grid size={{ lg: 4, md: 6, xs: 12 }} key={index}>
                       <Button
                         variant='outlined'
