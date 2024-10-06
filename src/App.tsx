@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import RefreshToken from '~/components/RefreshToken'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/en-gb'
 function App() {
   const routeElements = useRouteElements()
   return (
