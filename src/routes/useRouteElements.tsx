@@ -1,8 +1,10 @@
 import { useContext } from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import { AppContext } from '~/contexts/AppProvider'
+import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
+import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
@@ -36,6 +38,16 @@ export default function useRouteElements() {
         {
           path: '/room-details/:id',
           element: <RoomDetails />
+        }
+      ]
+    },
+    {
+      path: '',
+      element: <AdminLayout />,
+      children: [
+        {
+          path: '/admin',
+          element: <DashBoard />
         }
       ]
     },
