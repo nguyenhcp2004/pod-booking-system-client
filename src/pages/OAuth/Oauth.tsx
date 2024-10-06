@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppContext } from '~/contexts/AppProvider'
-import { setAccessTokenToLS, setRefreshTokenToLS } from '~/utils/auth'
+import { setAccessTokenToLS, setAccountToLS, setRefreshTokenToLS } from '~/utils/auth'
 
 export default function Oauth() {
   const { setAuth } = useAppContext()
@@ -16,13 +16,14 @@ export default function Oauth() {
       if (count.current === 0) {
         setAccessTokenToLS(accessToken)
         setRefreshTokenToLS(refreshToken)
+        setAccountToLS(null)
         setAuth(true)
         setTimeout(() => {
           toast.success('Đăng nhập google thành công', {
             autoClose: 2000
           })
         })
-        navigate('/')
+        location.href = '/'
       }
       count.current++
     } else {

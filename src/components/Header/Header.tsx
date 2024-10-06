@@ -11,13 +11,14 @@ import { setAccountToLS } from '~/utils/auth'
 
 export default function Header() {
   const { account, setAccount, isAuth } = useAppContext()
+  console.log(account)
   useEffect(() => {
     if (isAuth && !account) {
       accountApiRequest
         .getMe()
         .then((response) => {
-          setAccount(response.data.data)
-          setAccountToLS(response.data.data)
+          setAccount(response.data.data || null)
+          setAccountToLS(response.data.data || null)
         })
         .catch((error) => {
           console.error('Error:', error)
