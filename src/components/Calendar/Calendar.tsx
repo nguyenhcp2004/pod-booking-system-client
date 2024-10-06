@@ -229,7 +229,11 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
                         <Box
                           sx={{
                             backgroundColor:
-                              day.data.length !== 0 ? colors.error[500] : day.isSelected ? colors.primary[400] : '',
+                              day.data.length !== 0 && day.isSelected
+                                ? colors.error[500]
+                                : day.isSelected
+                                  ? colors.primary[400]
+                                  : '',
                             color: day.isSelected ? colors.primary[50] : '',
                             border: currentDay === day.id ? `1px solid ${colors.grey[200]}` : '',
                             borderRadius: '100px',
@@ -239,8 +243,9 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             '&:hover': {
-                              backgroundColor: day.data.length !== 0 ? colors.error[50] : colors.primary[50],
-                              color: day.data.length !== 0 ? colors.error[900] : colors.primary[900],
+                              backgroundColor:
+                                day.data.length !== 0 && day.isSelected ? colors.error[50] : colors.primary[50],
+                              color: day.data.length !== 0 && day.isSelected ? colors.error[900] : colors.primary[900],
                               cursor: 'pointer'
                             }
                           }}
