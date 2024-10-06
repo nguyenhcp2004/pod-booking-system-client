@@ -10,27 +10,71 @@ export default function NavItem() {
   const color = tokens('light')
   return (
     <>
-      <Link to='/admin' style={{ textDecoration: 'none', color: color.grey[300], padding: '8px 12px 8px 16px' }}>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box
+        to='/admin'
+        component={Link}
+        sx={{
+          textDecoration: 'none',
+          padding: '8px 12px 8px 16px',
+          color: color.primary[500],
+          transition: 'background-color 0.3s ease, color 0.3s ease',
+          borderRadius: '6px', // thêm transition
+          '&:hover': {
+            backgroundColor: color.primary[50], // Thay đổi màu nền khi hover
+            color: color.primary[500] // Thay đổi màu chữ khi hover
+          }
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2
+          }}
+        >
           <LeaderboardIcon sx={{ width: '24px', height: '24px' }} />
           <Typography variant='h6'>Dashboard</Typography>
         </Box>
-      </Link>
-      <Link to='/admin/rooms' style={{ textDecoration: 'none', color: color.grey[300], padding: '8px 12px 8px 16px' }}>
+      </Box>
+      <Box
+        component={Link}
+        to='/admin/rooms'
+        sx={{
+          textDecoration: 'none',
+          color: color.grey[300],
+          padding: '8px 12px 8px 16px',
+          transition: 'background-color 0.3s ease, color 0.3s ease',
+          borderRadius: '6px', // thêm transition
+          '&:hover': {
+            backgroundColor: color.primary[50], // Thay đổi màu nền khi hover
+            color: color.primary[500] // Thay đổi màu chữ khi hover
+          }
+        }}
+      >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <MeetingRoomIcon sx={{ width: '24px', height: '24px' }} />
           <Typography variant='h6'>Room</Typography>
         </Box>
-      </Link>
-      <Link
+      </Box>
+      <Box
+        component={Link}
         to='/admin/buildings'
-        style={{ textDecoration: 'none', color: color.grey[300], padding: '8px 12px 8px 16px' }}
+        sx={{
+          textDecoration: 'none',
+          color: color.grey[300],
+          padding: '8px 12px 8px 16px',
+          transition: 'background-color 0.3s ease, color 0.3s ease',
+          borderRadius: '6px', // thêm transition
+          '&:hover': {
+            backgroundColor: color.primary[50], // Thay đổi màu nền khi hover
+            color: color.primary[500] // Thay đổi màu chữ khi hover
+          }
+        }}
       >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <ApartmentIcon sx={{ width: '24px', height: '24px' }} />
           <Typography variant='h6'>Building</Typography>
         </Box>
-      </Link>
+      </Box>
     </>
   )
 }
