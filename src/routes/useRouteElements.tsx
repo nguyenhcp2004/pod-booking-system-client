@@ -9,7 +9,7 @@ import Login from '~/pages/Login'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
 import Register from '~/pages/Register'
-import RoomDetail from '~/pages/RoomDetail/RoomDetail'
+import RoomDetails from '~/pages/RoomDetails/RoomDetails'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -34,8 +34,8 @@ export default function useRouteElements() {
           element: <Home />
         },
         {
-          path: '/room-detail',
-          element: <RoomDetail />
+          path: '/room-details/:id',
+          element: <RoomDetails />
         }
       ]
     },
@@ -76,7 +76,7 @@ export default function useRouteElements() {
           element: <MainLayout />,
           children: [
             {
-              path: '/order-detail',
+              path: '/order-detail/:step?',
               element: <OrderDetail />
             }
           ]
