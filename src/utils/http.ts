@@ -19,16 +19,17 @@ export class Http {
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
       baseURL: envConfig.VITE_API_ENDPOINT,
-      timeout: 30000,
+      timeout: 10000,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: this.accessToken ? `Bearer ${this.accessToken}` : ''
       }
     })
 
     this.instance.interceptors.request.use(
       (config) => {
         if (this.accessToken && config.headers) {
-          config.headers.Authorization = this.accessToken
+          config.headers.Authorization = `Bearer ${this.accessToken}`
           return config
         }
         return config

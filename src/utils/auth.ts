@@ -9,7 +9,7 @@ export const setRefreshTokenToLS = (refreshToken: string) => {
   localStorage.setItem('refreshToken', refreshToken)
 }
 
-export const setAccountToLS = (account: AccountType) => {
+export const setAccountToLS = (account: AccountType | null) => {
   localStorage.setItem('account', JSON.stringify(account))
 }
 
