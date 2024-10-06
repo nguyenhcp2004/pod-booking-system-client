@@ -6,11 +6,9 @@ import { BookingProvider } from '~/contexts/BookingContext'
 export default function MainLayout() {
   return (
     <div>
-      <BookingProvider>
-        <Header />
-        <Outlet />
-        <Footer />
-      </BookingProvider>
+      <Header />
+      <Outlet />
+      <Footer />
     </div>
   )
 }

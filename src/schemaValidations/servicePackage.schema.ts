@@ -1,11 +1,4 @@
 import { z } from 'zod'
-
-export type ServicePackage = {
-  id: string
-  name: string
-  discountPercentage: number
-}
-
 export const ServicePackageRes = z.object({
   data: z.array(
     z.object({
