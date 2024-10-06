@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useTheme } from '@emotion/react'
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
+
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import { useNavigate } from 'react-router-dom'
-import { useGetAmenities } from '~/queries/useAmenity' 
-import { AmenityListRes } from '~/schemaValidations/amenity.schema' 
+import { useGetAmenities } from '~/queries/useAmenity'
+import { AmenityListRes } from '~/schemaValidations/amenity.schema'
+import { BookingContext, BookingInfo } from '~/contexts/BookingContext'
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -17,15 +18,14 @@ interface CommonProps {
 
 export const Amenities: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
-  const colors = tokens('light')
+  const colors = tokens(theme.palette.mode)
   const [roomType, setRoomType] = useState('')
-  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null);
+  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0) // State for quantity
-  const { data: amenities = [], isLoading, error } = useGetAmenities();
-
-  const filteredAmenities = selectedAmenity
-  ? amenities.filter(item => item.type === selectedAmenity)
-  : amenities;  
+  const { data: amenities = [], isLoading, error } = useGetAmenities()
+  const { bookingData }: any = useContext(BookingContext)
+  console.log(bookingData)
+  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
   const arrayRoom = [{ name: 'Phòng 101' }, { name: 'Phòng 102' }]
 
@@ -82,10 +82,10 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     label='Chọn loại tiện ích'
                     onChange={(e) => setSelectedAmenity(e.target.value)}
                   >
-                    {Array.from(new Set(amenities.map(amenity => amenity.type))).map((uniqueType, index) => (
+                    {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
                       <MenuItem key={index} value={uniqueType}>
                         {uniqueType}
-                     </MenuItem>
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -96,7 +96,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 20px' }}>
-                    {filteredAmenities.map((item, index) => (
+                  {filteredAmenities.map((item, index) => (
                     <Grid size={{ lg: 4, md: 6, xs: 12 }} key={index}>
                       <Button
                         variant='outlined'
