@@ -12,9 +12,9 @@ export default function RegisterLayout() {
           sx={{
             justifyContent: 'space-between',
             gap: 0,
-            p: 0,
+            p: { xs: 2, md: 0 },
             m: 'auto',
-            height: { xs: 'auto', md: '100%' }
+            height: { xs: '100%' }
           }}
         >
           <Box
