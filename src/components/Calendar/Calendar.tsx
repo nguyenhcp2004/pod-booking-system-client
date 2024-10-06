@@ -33,10 +33,9 @@ const INITIAL_COLUMNS = [
   { id: 'saturday', label: 'T7' }
 ]
 
-const Calendar = ({ selected }: { selected: Moment[] }) => {
+const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots: string[] }) => {
   const [from, setFrom] = useState(moment().startOf('month').format('YYYY-MM-DD'))
   const [to, setTo] = useState(moment().endOf('month').format('YYYY-MM-DD'))
-  const [conflictDates, setConflictDates] = useState<Moment[]>([])
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const currentDay = moment().format('YYYY-MM-DD')
@@ -51,7 +50,7 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
 
   useEffect(() => {
     unavailableRoomsRefetch()
-  }, [selected])
+  }, [selected, selectedSlot])
 
   const getData = ({ startDate }: { startDate: Moment }) => {
     const data: RoomCustomSchemaType[] = []
@@ -64,15 +63,25 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
         }
         unavailableRooms?.data.data.forEach((s) => {
           if (moment(s.startTime).format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD') && s.roomId === room.roomId) {
-            slot.slots.push({
-              startTime: s.startTime,
-              endTime: s.endTime,
-              available: false
+            const isAvailable = selectedSlot.find((slot) => {
+              // console.log('slot', slot)
+              // console.log('test', `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
+              // console.log(slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
+              return slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`
             })
+            console.log(isAvailable)
+            if (isAvailable) {
+              slot.slots.push({
+                startTime: s.startTime,
+                endTime: s.endTime,
+                available: false
+              })
+            }
           }
         })
-
-        data.push(slot)
+        if (slot.slots.length !== 0) {
+          data.push(slot)
+        }
       }
     })
     return data
@@ -95,7 +104,7 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
       startDate.add(1, 'day')
     }
     return days
-  }, [from, to, selected])
+  }, [from, to, selected, selectedSlot])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))

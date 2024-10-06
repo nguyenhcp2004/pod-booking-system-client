@@ -15,7 +15,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Room, ServicePackage } from '~/constants/type'
 import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 
 const podDataMock = {
   id: '103',
@@ -38,7 +39,7 @@ export default function RoomDetail() {
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
   const [selectedRooms, setSelectedRooms] = useState<Array<Room>>([])
-
+  const { bookingData, setBookingData }: any = useBookingContext()
   const { data: servicePackage, isSuccess } = getAllServicePackage()
   useEffect(() => {
     const dateList = []
@@ -91,6 +92,19 @@ export default function RoomDetail() {
   useEffect(() => {
     roomListRefetch()
   }, [selectedSlots, selectedDate])
+
+  useEffect(() => {
+    setBookingData((prev: BookingInfo) => {
+      return {
+        ...prev,
+        roomType: podDataMock,
+        selectedRooms: selectedRooms,
+        date: selectedDate?.format('YYYY-MM-DD'),
+        timeSlots: selectedSlots,
+        servicePackage: selectedPackage
+      }
+    })
+  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage])
 
   return (
     <Box
@@ -207,12 +221,14 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Button variant='contained' color='primary' fullWidth>
-                    Đặt phòng
-                  </Button>
+                  <Link to='/order-detail/1'>
+                    <Button variant='contained' color='primary' fullWidth>
+                      Đặt phòng
+                    </Button>
+                  </Link>
                 </Grid>
                 <Grid size={12}>
-                  <Calendar selected={selectedDates} />
+                  <Calendar selected={selectedDates} slots={selectedSlots} />
                 </Grid>
               </Grid>
             </Box>

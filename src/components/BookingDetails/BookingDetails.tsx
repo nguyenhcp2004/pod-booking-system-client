@@ -11,7 +11,7 @@ const BookingDetails = () => {
 
   const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
   const amenitiesTotal = bookingData.selectedRooms.reduce(
-    (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+    (total, room) => total + room?.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
     0
   )
 

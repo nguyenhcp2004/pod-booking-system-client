@@ -52,7 +52,7 @@ export interface BookingInfo {
   roomType: RoomType | null
   selectedRooms: Room[] | []
   date: string | null
-  timeSlots: number[] | []
+  timeSlots: string[] | []
   servicePackage: ServicePackage | null
 }
 
@@ -110,7 +110,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
     roomType: mockRoomType,
     selectedRooms: mockRooms,
     date: '2024-10-15',
-    timeSlots: [1, 2],
+    timeSlots: ['07:00-09:00', '09:00-11:00'],
     servicePackage: mockServicePackage
   })
 
