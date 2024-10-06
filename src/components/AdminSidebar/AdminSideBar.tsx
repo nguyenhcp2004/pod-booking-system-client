@@ -9,7 +9,7 @@ export default function AdminSideBar() {
         padding: '20px 20px 0px',
         height: '100vh',
         width: '300px',
-        borderRight: '1px solid #DFE3E8',
+        borderRight: '2px solid #DFE3E8',
         display: 'flex',
         flexDirection: 'column'
       }}
@@ -31,7 +31,7 @@ export default function AdminSideBar() {
       <Box
         sx={{
           marginY: '16px',
-          padding: '24px 12px 24px 16px',
+          paddingY: '20px',
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
