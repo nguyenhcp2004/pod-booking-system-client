@@ -89,6 +89,7 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
         isSelected: selected?.find((date) => {
           return date.format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD')
         }),
+
         data: getData({ startDate: startDate })
       })
       startDate.add(1, 'day')
@@ -219,10 +220,20 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
                 <TableRow key={index}>
                   {daysOfMonth.slice(index * 7, (index + 1) * 7).map((day) => (
                     <TableCell key={day.id} sx={{ border: 'none', opacity: day.inMonth ? 1 : 0.5 }}>
-                      <Tooltip placement='top' title={renderEventDetails(day)} sx={{ display: 'none' }}>
+                      <Tooltip
+                        placement='top'
+                        disableHoverListener={day.data.length === 0 || !day.isSelected}
+                        title={renderEventDetails(day)}
+                        sx={{ display: 'none' }}
+                      >
                         <Box
                           sx={{
-                            backgroundColor: day.isSelected ? colors.primary[400] : '',
+                            backgroundColor:
+                              day.data.length !== 0 && day.isSelected
+                                ? colors.error[500]
+                                : day.isSelected
+                                  ? colors.primary[400]
+                                  : '',
                             color: day.isSelected ? colors.primary[50] : '',
                             border: currentDay === day.id ? `1px solid ${colors.grey[200]}` : '',
                             borderRadius: '100px',
@@ -232,8 +243,9 @@ const Calendar = ({ selected }: { selected: Moment[] }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             '&:hover': {
-                              backgroundColor: colors.primary[50],
-                              color: colors.primary[900],
+                              backgroundColor:
+                                day.data.length !== 0 && day.isSelected ? colors.error[50] : colors.primary[50],
+                              color: day.data.length !== 0 && day.isSelected ? colors.error[900] : colors.primary[900],
                               cursor: 'pointer'
                             }
                           }}
