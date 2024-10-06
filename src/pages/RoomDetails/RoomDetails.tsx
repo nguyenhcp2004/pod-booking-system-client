@@ -212,7 +212,7 @@ export default function RoomDetail() {
                   </Button>
                 </Grid>
                 <Grid size={12}>
-                  <Calendar selected={selectedDates} />
+                  <Calendar selected={selectedDates} slots={selectedSlots} />
                 </Grid>
               </Grid>
             </Box>
