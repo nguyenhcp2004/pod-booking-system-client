@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchTransactionInfo } from '~/apis/paymentApi'
 import { useState } from 'react'
 import { useBookingContext } from '~/contexts/BookingContext'
+import { createOrder } from '~/apis/orderApi'
 
 export const Confirmed: React.FC = () => {
   const handleReturn = () => {
@@ -32,6 +33,12 @@ export const Confirmed: React.FC = () => {
 
       if (transactionResponse.status === 'OK') {
         setStatus(true)
+        if (!bookingContext) {
+          throw new Error('Booking context is undefined')
+        }
+        const response = await createOrder(bookingContext.bookingData)
+        console.log('Response request:', response)
+
         return transactionResponse
       } else {
         setStatus(false)

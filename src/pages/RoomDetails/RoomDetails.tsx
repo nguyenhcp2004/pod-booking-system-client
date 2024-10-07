@@ -105,20 +105,6 @@ export default function RoomDetail() {
     })
   }, [selectedRooms, selectedDate, selectedSlots, selectedPackage])
 
-  // const handleTest = () => {
-  //   setBookingData?.((prev: BookingInfo) => {
-  //     return {
-  //       ...prev,
-  //       roomType: selectedRooms[0]?.roomType || null,
-  //       selectedRooms: selectedRooms || [],
-  //       date: selectedDate?.format('YYYY-MM-DD') || null,
-  //       timeSlots: selectedSlots || [],
-  //       servicePackage: selectedPackage || null
-  //     }
-  //   })
-  //   navigate('/order-detail/1')
-  // }
-
   return (
     <Box
       sx={{

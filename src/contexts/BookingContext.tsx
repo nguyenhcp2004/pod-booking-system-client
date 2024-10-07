@@ -80,7 +80,7 @@ const mockRoomType: RoomType2 = {
   price: 100000,
   building: {
     id: 1,
-    address: '123 Main St',
+    address: 'Thủ Đức',
     description: 'This is a description',
     hotlineNumber: '123456789',
     status: 'Active',
