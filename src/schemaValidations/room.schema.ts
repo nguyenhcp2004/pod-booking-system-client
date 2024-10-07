@@ -30,28 +30,6 @@ const RoomSchema = z.object({
   roomType: RoomTypeSchema
 })
 
-const FilterRoomQuery = z.object({
-  address: z.string().optional(),
-  capacity: z.number().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  page: z.number().optional(),
-  take: z.number().optional()
-})
-
-export type FilterRoomQueryType = z.TypeOf<typeof FilterRoomQuery>
-
-const FilterRoomRes = z.object({
-  code: z.number(),
-  data: z.array(RoomSchema),
-  currentPage: z.number(),
-  totalPage: z.number(),
-  recorderPerPage: z.number(),
-  totalRecord: z.number()
-})
-
-export type FilterRoomResType = z.TypeOf<typeof FilterRoomRes>
-
 const FilterRoomByTypeAndSlotsQuery = z.object({
   typeId: z.number(),
   slots: z.array(z.string())
