@@ -1,8 +1,7 @@
-import { Box, Button, Card, Table, TableContainer, Typography } from '@mui/material'
+import { Box, Button, Card, Table, TableContainer, TablePagination, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import BuildingTableToolbar from '~/pages/ManageBuilding/BuildingTableToolbar'
 import { useCallback, useState } from 'react'
-import Scrollbar from '~/components/ScrollBar'
 import BuildingTableHead from '~/pages/ManageBuilding/BuildingTableHead'
 import BuildingTableRow, { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
 import { applyFilter, emptyRows, getComparator } from '~/utils/utils'
@@ -45,6 +44,13 @@ const _buildings = [
     status: 'Available',
     desciption: 'A luxurious building with state-of-the-art facilities.',
     hotlineNumber: '0901357924'
+  },
+  {
+    id: 6,
+    address: '202 Fifth Rd, HCM City',
+    status: 'Available',
+    desciption: 'A luxurious building with state-of-the-art facilities.',
+    hotlineNumber: '0901357924'
   }
 ]
 export default function ManageBuilding() {
@@ -60,7 +66,7 @@ export default function ManageBuilding() {
   const notFound = !dataFiltered.length && !!filterName
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
         <Typography variant='h4' fontWeight='500' flexGrow={1}>
           Các tòa nhà
@@ -69,6 +75,7 @@ export default function ManageBuilding() {
           Tạo mới
         </Button>
       </Box>
+
       <Card sx={{ borderRadius: '16px' }}>
         <BuildingTableToolbar
           numSelected={table.selected.length}
@@ -79,7 +86,7 @@ export default function ManageBuilding() {
           }}
         />
 
-        <Scrollbar>
+        <Box>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
               <BuildingTableHead
@@ -121,7 +128,17 @@ export default function ManageBuilding() {
               </TableBody>
             </Table>
           </TableContainer>
-        </Scrollbar>
+        </Box>
+
+        <TablePagination
+          component='div'
+          page={table.page}
+          count={_buildings.length}
+          rowsPerPage={table.rowsPerPage}
+          onPageChange={table.onChangePage}
+          rowsPerPageOptions={[5, 10, 25]}
+          onRowsPerPageChange={table.onChangeRowsPerPage}
+        />
       </Card>
     </Box>
   )

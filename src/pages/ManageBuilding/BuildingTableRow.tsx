@@ -53,7 +53,7 @@ export default function BuildingTableRow({ row, selected, onSelectRow }: Buildin
         <TableCell sx={{ fontSize: '14px' }}>{row.hotlineNumber}</TableCell>
 
         <TableCell>
-          <Chip label={row.status} color='success' />
+          <Chip label={row.status} color='success' sx={{ color: 'white' }} />
         </TableCell>
 
         <TableCell align='right' sx={{ fontSize: '14px' }}>

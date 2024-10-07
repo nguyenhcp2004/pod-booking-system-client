@@ -12,6 +12,7 @@ export const Scrollbar = forwardRef<HTMLDivElement, ScrollbarProps>(
       component={SimpleBar}
       scrollableNodeProps={{ ref }}
       clickOnTrack={false}
+      className='mnl__scrollbar__root'
       sx={{
         minWidth: 0,
         minHeight: 0,
