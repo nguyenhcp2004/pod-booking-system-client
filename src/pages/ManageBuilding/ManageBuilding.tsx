@@ -4,33 +4,60 @@ import BuildingTableToolbar from '~/pages/ManageBuilding/BuildingTableToolbar'
 import { useCallback, useState } from 'react'
 import Scrollbar from '~/components/ScrollBar'
 import BuildingTableHead from '~/pages/ManageBuilding/BuildingTableHead'
+import BuildingTableRow, { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
+import { applyFilter, emptyRows, getComparator } from '~/utils/utils'
+import TableBody from '@mui/material/TableBody'
+import { TableEmptyRows } from '~/pages/ManageBuilding/TableEmptyRows'
+import TableNoData from '~/pages/ManageBuilding/TableNoData'
 
-const _users = [
+const _buildings = [
   {
-    id: '1',
-    name: 'Hoàng Anh Tuấn'
+    id: 1,
+    address: '123 Main St, HCM City',
+    status: 'Available',
+    desciption: 'A modern office building with high-speed internet.',
+    hotlineNumber: '0901234567'
   },
   {
-    id: '2',
-    name: 'Hoàng Anh Tuấn'
+    id: 2,
+    address: '456 Second Ave, HCM City',
+    status: 'Under Maintenance',
+    desciption: 'A spacious building with conference rooms and amenities.',
+    hotlineNumber: '0909876543'
   },
   {
-    id: '3',
-    name: 'Hoàng Anh Tuấn'
+    id: 3,
+    address: '789 Third Blvd, HCM City',
+    status: 'Occupied',
+    desciption: 'A cozy building located in the heart of the city.',
+    hotlineNumber: '0912345678'
   },
   {
-    id: '4',
-    name: 'Hoàng Anh Tuấn'
+    id: 4,
+    address: '101 Fourth St, HCM City',
+    status: 'Available',
+    desciption: 'An eco-friendly building with green spaces.',
+    hotlineNumber: '0918765432'
   },
   {
-    id: '5',
-    name: 'Hoàng Anh Tuấn'
+    id: 5,
+    address: '202 Fifth Rd, HCM City',
+    status: 'Available',
+    desciption: 'A luxurious building with state-of-the-art facilities.',
+    hotlineNumber: '0901357924'
   }
 ]
 export default function ManageBuilding() {
   const table = useTable()
 
   const [filterName, setFilterName] = useState('')
+  const dataFiltered: BuildingProps[] = applyFilter({
+    inputData: _buildings,
+    comparator: getComparator(table.order, table.orderBy),
+    filterName
+  })
+
+  const notFound = !dataFiltered.length && !!filterName
 
   return (
     <Box>
@@ -58,22 +85,40 @@ export default function ManageBuilding() {
               <BuildingTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={_users.length}
+                rowCount={_buildings.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    _users.map((user) => user.id)
+                    _buildings.map((building) => building.id.toString())
                   )
                 }
                 headLabel={[
                   { id: 'address', label: 'Địa chỉ' },
                   { id: 'description', label: 'Mô tả' },
                   { id: 'hotlineNumber', label: 'Hotline' },
-                  { id: 'status', label: 'Trạng thái' }
+                  { id: 'status', label: 'Trạng thái' },
+                  { id: '' }
                 ]}
               />
+
+              <TableBody>
+                {dataFiltered
+                  .slice(table.page * table.rowsPerPage, table.page * table.rowsPerPage + table.rowsPerPage)
+                  .map((row) => (
+                    <BuildingTableRow
+                      key={row.id}
+                      row={row}
+                      selected={table.selected.includes(row.id.toString())}
+                      onSelectRow={() => table.onSelectRow(row.id.toString())}
+                    />
+                  ))}
+
+                <TableEmptyRows height={68} emptyRows={emptyRows(table.page, table.rowsPerPage, _buildings.length)} />
+
+                {notFound && <TableNoData searchQuery={filterName} />}
+              </TableBody>
             </Table>
           </TableContainer>
         </Scrollbar>
