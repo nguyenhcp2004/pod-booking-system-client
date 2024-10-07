@@ -8,12 +8,14 @@ const BookingDetails = () => {
   const theme = useTheme()
 
   if (!bookingData) return null
+  console.log(bookingData)
 
   const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
-  const amenitiesTotal = bookingData.selectedRooms.reduce(
-    (total, room) => total + room?.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-    0
-  )
+  const amenitiesTotal = 0
+  // bookingData.selectedRooms.reduce(
+  //   (total, room) => total + room?.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+  //   0
+  // )
 
   return (
     <Box sx={{ bgcolor: 'white' }}>
@@ -50,7 +52,12 @@ const BookingDetails = () => {
                 <Typography variant='body2' fontWeight='bold'>
                   Địa chỉ:
                 </Typography>
-                <Typography variant='body2'> {bookingData.roomType?.building.address}</Typography>
+                <Typography variant='body2'>
+                  {' '}
+                  {bookingData.roomType?.building?.address
+                    ? bookingData.roomType?.building?.address
+                    : bookingData.selectedRooms[0].roomType?.building?.address}
+                </Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>

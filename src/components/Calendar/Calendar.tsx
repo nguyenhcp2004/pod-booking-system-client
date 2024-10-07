@@ -63,7 +63,7 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
         }
         unavailableRooms?.data.data.forEach((s) => {
           if (moment(s.startTime).format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD') && s.roomId === room.roomId) {
-            const isAvailable = selectedSlot.find((slot) => {
+            const isAvailable = selectedSlot?.find((slot) => {
               // console.log('slot', slot)
               // console.log('test', `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
               // console.log(slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)

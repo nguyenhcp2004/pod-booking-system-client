@@ -2,7 +2,7 @@
 
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -21,13 +21,50 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const colors = tokens(theme.palette.mode)
   const [roomType, setRoomType] = useState('')
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
-  const [quantity, setQuantity] = useState(0) // State for quantity
+  const [quantity, setQuantity] = useState(0)
   const { data: amenities = [], isLoading, error } = useGetAmenities()
-  const { bookingData }: any = useContext(BookingContext)
-  console.log(bookingData)
-  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
+  const bookingContext = useContext(BookingContext)
+  const [detailAmenity, setDetailAmenity] = useState<string | null>(null)
 
-  const arrayRoom = [{ name: 'Phòng 101' }, { name: 'Phòng 102' }]
+  const handleAddAmentity = () => {
+    if (!detailAmenity) {
+      return
+    }
+    const newAmenity = {
+      name: detailAmenity,
+      quantity: quantity,
+      price: 48000,
+      id: 1
+    }
+    bookingContext?.setBookingData((prevData) => {
+      const updatedRooms = prevData.selectedRooms.map((room) => {
+        if (room.name === roomType) {
+          if (room.amenities) {
+            console.log('room.amenities', room.amenities)
+            room.amenities.push(newAmenity)
+            return room
+          } else {
+            console.log('room.amenities', room.amenities)
+            room.amenities = [newAmenity]
+            return room
+          }
+        }
+        return room
+      })
+      return {
+        ...prevData,
+        selectedRooms: updatedRooms
+      }
+    })
+  }
+
+  if (!bookingContext) {
+    throw new Error('BookingContext must be used within a BookingProvider')
+  }
+  const { bookingData }: { bookingData: BookingInfo } = bookingContext
+  console.log(bookingData)
+
+  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
   const handleIncrement = () => {
     setQuantity((prevQuantity) => prevQuantity + 1)
@@ -67,7 +104,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     label='Chọn Phòng'
                     onChange={(e) => setRoomType(e.target.value)}
                   >
-                    {arrayRoom.map((room, index) => (
+                    {bookingData?.selectedRooms.map((room, index) => (
                       <MenuItem key={index} value={room.name}>
                         {room.name}
                       </MenuItem>
@@ -109,6 +146,10 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                           color: 'black',
                           borderColor: 'black',
                           fontSize: '14px'
+                        }}
+                        color={detailAmenity == item.name ? 'primary' : 'inherit'}
+                        onClick={() => {
+                          setDetailAmenity(item.name)
                         }}
                       >
                         {item.name}
@@ -190,6 +231,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     fontWeight: '500px',
                     textTransform: 'uppercase'
                   }}
+                  onClick={() => handleAddAmentity()}
                 >
                   Thêm tiện ích
                 </Button>
