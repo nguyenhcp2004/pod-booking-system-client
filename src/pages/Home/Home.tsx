@@ -65,10 +65,6 @@ export default function Home() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filterQuery))
   }, [filterQuery, refetch])
 
-  const handleBookRoom = (roomId: number) => {
-    console.log(`Booking room with ID: ${roomId}`)
-  }
-
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)
   }
@@ -211,7 +207,6 @@ export default function Home() {
                 quantity={roomType.quantity}
                 capacity={roomType.capacity}
                 building={roomType.building}
-                onBookRoom={() => handleBookRoom(roomType.id)}
               />
             </Grid>
           ))}
