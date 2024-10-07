@@ -1,6 +1,7 @@
 import React from 'react'
 import { Card, CardMedia, Typography, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
+import { useNavigate } from 'react-router-dom'
 
 interface PODRoomTypeCardProps {
   id: number
@@ -17,10 +18,15 @@ interface PODRoomTypeCardProps {
     createdAt: string
     updatedAt: string
   }
-  onBookRoom: () => void
 }
 
-const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ name, price, quantity, capacity, building, onBookRoom }) => {
+const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ id, name, price, quantity, capacity, building }) => {
+  const navigate = useNavigate();
+
+  const handleBookRoom = () => {
+    navigate(`/room-details/${id}`)
+  }
+
   return (
     <Card
       sx={{ display: 'flex', borderRadius: '16px', mb: '40px', justifyContent: 'space-between', border: '1px solid' }}
@@ -80,7 +86,7 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ name, price, quantity
             <Button
               variant='contained'
               color='primary'
-              onClick={onBookRoom}
+              onClick={handleBookRoom}
               sx={{ borderRadius: '96px', paddingX: '22px', paddingY: '8px' }}
             >
               ĐẶT PHÒNG
