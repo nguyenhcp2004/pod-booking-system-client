@@ -3,16 +3,8 @@ import roomFilterApiRequest from '~/apis/room'
 import {
   AvailableSlotsQueryType,
   FilterRoomByTypeAndSlotsQueryType,
-  FilterRoomQueryType,
   UnavailableRoomsQueryType
 } from '~/schemaValidations/room.schema'
-
-export const useGetFilterRoom = (query: FilterRoomQueryType) => {
-  return useQuery({
-    queryKey: ['rooms'],
-    queryFn: () => roomFilterApiRequest.getListRoomFiltered(query)
-  })
-}
 
 export const useGetRoomsByTypeAndSlots = (query: FilterRoomByTypeAndSlotsQueryType) => {
   return useQuery({

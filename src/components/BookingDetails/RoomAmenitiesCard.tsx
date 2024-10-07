@@ -1,8 +1,8 @@
 import { Box, Typography, useTheme } from '@mui/material'
 import React from 'react'
-import { Room } from '~/contexts/BookingContext'
+import { Room2 } from '~/contexts/BookingContext'
 
-const RoomAmenitiesCard: React.FC<{ room: Room }> = ({ room }) => {
+const RoomAmenitiesCard: React.FC<{ room: Room2 }> = ({ room }) => {
   const theme = useTheme()
   return (
     <Box sx={{ width: '100%' }}>

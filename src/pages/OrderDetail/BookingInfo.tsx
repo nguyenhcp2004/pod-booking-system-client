@@ -23,13 +23,37 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
               <Box sx={{ paddingTop: '24px' }}>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
-                    <TextField id='outlined-required' label='Tên' defaultValue='Phạm Thị Anh Đào' fullWidth />
+                    <TextField
+                      id='outlined-required'
+                      label='Tên'
+                      defaultValue='Phạm Thị Anh Đào'
+                      fullWidth
+                      InputProps={{
+                        readOnly: true
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
-                    <TextField id='outlined-required' label='Số điện thoại' defaultValue='09xxxxxxxx' fullWidth />
+                    <TextField
+                      id='outlined-required'
+                      label='Số điện thoại'
+                      defaultValue='09xxxxxxxx'
+                      fullWidth
+                      InputProps={{
+                        readOnly: true
+                      }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
-                    <TextField id='outlined-required' label='Email' defaultValue='dao@gmail.com' fullWidth />
+                    <TextField
+                      id='outlined-required'
+                      label='Email'
+                      defaultValue='dao@gmail.com'
+                      fullWidth
+                      InputProps={{
+                        readOnly: true
+                      }}
+                    />
                   </Grid>
                 </Grid>
               </Box>
@@ -56,15 +80,20 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
             </Box>
           </Box>
         </Grid>
-        <Grid
-          size={{ xs: 12, lg: 6 }}
-          sx={{ paddingLeft: '0px !important', paddingTop: '0px !important', background: '#FFF' }}
-        >
+        <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingLeft: '0px !important', paddingTop: '0px !important' }}>
           <Box>
             <BookingDetails />
           </Box>
-          <Grid sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, padding: '20px' }}>
-            <Grid size={{ lg: 9 }}>
+          <Grid
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '20px',
+              paddingTop: 3,
+              backgroundColor: 'white'
+            }}
+          >
+            <Box sx={{ width: '80%' }}>
               <Button
                 onClick={props.onNext}
                 fullWidth
@@ -72,8 +101,8 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
               >
                 Hoàn tất
               </Button>
-            </Grid>
-            <Grid size={{ lg: 4 }}>
+            </Box>
+            <Box sx={{ width: '200px' }}>
               <Button
                 variant='text'
                 onClick={props.onBack}
@@ -82,7 +111,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
               >
                 Bỏ qua
               </Button>
-            </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Grid>

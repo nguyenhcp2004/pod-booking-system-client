@@ -8,7 +8,6 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import { useState } from 'react'
 import { Button } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import { useLogoutMutation } from '~/queries/useAuth'
@@ -17,21 +16,18 @@ import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
 
+interface Props {
+  anchorEl: HTMLElement | null
+}
+
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0'
 })
 
-export default function OptionsMenu() {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+export default function OptionsMenu({ anchorEl }: Props) {
   const open = Boolean(anchorEl)
   const { setAuth, setAccount } = useAppContext()
   const navigate = useNavigate()
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
   const logoutMutation = useLogoutMutation()
   const logout = async () => {
@@ -50,7 +46,6 @@ export default function OptionsMenu() {
     <>
       <Button
         aria-label='Open menu'
-        onClick={handleClick}
         sx={{ borderColor: 'transparent', justifyContent: 'flex-start', minWidth: 'auto', padding: 0 }}
       >
         <KeyboardArrowDownIcon color='action' sx={{ marginX: 0 }} />
@@ -59,13 +54,10 @@ export default function OptionsMenu() {
         anchorEl={anchorEl}
         id='menu'
         open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
         sx={{
-          marginTop: '15px',
-          marginLeft: '10px',
+          marginTop: '4px',
           [`& .${listClasses.root}`]: {
             width: '220px',
             borderRadius: '4px'
@@ -78,7 +70,7 @@ export default function OptionsMenu() {
           }
         }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem>
           <ListItemIcon>
             <PersonIcon fontSize='small' sx={{ color: '#000' }} />
           </ListItemIcon>

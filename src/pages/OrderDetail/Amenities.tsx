@@ -9,8 +9,8 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import { useNavigate } from 'react-router-dom'
 import { useGetAmenities } from '~/queries/useAmenity'
-import { AmenityListRes } from '~/schemaValidations/amenity.schema'
-import { BookingContext, BookingInfo } from '~/contexts/BookingContext'
+import { AmenityType } from '~/schemaValidations/amenity.schema'
+import { Amenity, BookingContext, BookingInfo } from '~/contexts/BookingContext'
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -19,55 +19,57 @@ interface CommonProps {
 export const Amenities: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [roomType, setRoomType] = useState('')
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0)
   const { data: amenities = [], isLoading, error } = useGetAmenities()
+  const [errorState, setErrorState] = useState<string | null>(null)
   const bookingContext = useContext(BookingContext)
-  const [detailAmenity, setDetailAmenity] = useState<string | null>(null)
+  if (!bookingContext) {
+    throw new Error('BookingContext must be used within a BookingProvider')
+  }
+  const { bookingData, setBookingData } = bookingContext
+  const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+  const [roomType, setRoomType] = useState(bookingData?.selectedRooms[0].name)
 
   const handleAddAmentity = () => {
-    if (!detailAmenity) {
-      return
+    if (!detailAmenity) return
+    const newAmenity: Amenity = {
+      id: detailAmenity?.id,
+      name: detailAmenity?.name,
+      price: detailAmenity?.price,
+      quantity: quantity
     }
-    const newAmenity = {
-      name: detailAmenity,
-      quantity: quantity,
-      price: 48000,
-      id: 1
-    }
-    bookingContext?.setBookingData((prevData) => {
-      const updatedRooms = prevData.selectedRooms.map((room) => {
+    setBookingData((prev) => ({
+      ...prev,
+      selectedRooms: prev.selectedRooms.map((room) => {
         if (room.name === roomType) {
-          if (room.amenities) {
-            console.log('room.amenities', room.amenities)
-            room.amenities.push(newAmenity)
-            return room
-          } else {
-            console.log('room.amenities', room.amenities)
-            room.amenities = [newAmenity]
-            return room
+          return {
+            ...room,
+            amenities: [...room.amenities, newAmenity]
           }
         }
         return room
       })
-      return {
-        ...prevData,
-        selectedRooms: updatedRooms
-      }
-    })
+    }))
+    setQuantity(0)
+    setDetailAmenity(null)
+    console.log(bookingData)
   }
-
-  if (!bookingContext) {
-    throw new Error('BookingContext must be used within a BookingProvider')
-  }
-  const { bookingData }: { bookingData: BookingInfo } = bookingContext
-  console.log(bookingData)
 
   const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
   const handleIncrement = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1)
+    if (!detailAmenity) {
+      setErrorState('Vui lòng chọn tiện ích')
+      return
+    } else {
+      if (detailAmenity.quantity < quantity) {
+        setErrorState('Số lượng tiện ích không đủ')
+        return
+      }
+      setErrorState(null)
+      setQuantity((prevQuantity) => prevQuantity + 1)
+    }
   }
 
   const handleDecrement = () => {
@@ -117,7 +119,9 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                     labelId='amenities-label'
                     value={selectedAmenity || ''}
                     label='Chọn loại tiện ích'
-                    onChange={(e) => setSelectedAmenity(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedAmenity(e.target.value)
+                    }}
                   >
                     {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
                       <MenuItem key={index} value={uniqueType}>
@@ -145,11 +149,13 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                           textAlign: 'center',
                           color: 'black',
                           borderColor: 'black',
-                          fontSize: '14px'
+                          fontSize: '14px',
+                          backgroundColor: detailAmenity?.name == item.name ? colors.grey[100] : 'transparent'
                         }}
-                        color={detailAmenity == item.name ? 'primary' : 'inherit'}
                         onClick={() => {
-                          setDetailAmenity(item.name)
+                          setErrorState(null)
+                          setQuantity(0)
+                          setDetailAmenity(item)
                         }}
                       >
                         {item.name}
@@ -158,7 +164,11 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   ))}
                 </Grid>
               </Box>
-
+              {errorState && (
+                <Typography variant='subtitle2' sx={{ color: 'red', paddingLeft: '20px', paddingBottom: '10px' }}>
+                  {errorState}
+                </Typography>
+              )}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px', padding: '0px 0px 20px 0px' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', padding: '0px 20px' }}>
                   <Typography

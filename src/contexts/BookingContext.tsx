@@ -8,7 +8,7 @@ export const useBookingContext = () => {
   return useContext(BookingContext)
 }
 
-interface Amenity {
+export interface Amenity {
   id: number
   name: string
   price: number
