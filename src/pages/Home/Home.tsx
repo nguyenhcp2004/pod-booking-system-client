@@ -1,19 +1,19 @@
+import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid2'
 import Box from '@mui/material/Box'
 import { FormControl, InputLabel, MenuItem, Pagination, Select, Typography, SelectChangeEvent } from '@mui/material'
 import homePageBanner from '../../assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import PODRoomCard from '~/components/LandingPage/RoomCard'
-import { useEffect, useState } from 'react'
+import PODRoomTypeCard from '~/components/LandingPage/RoomTypeCard'
 import moment, { Moment } from 'moment'
-import { useGetFilterRoom } from '~/queries/useFilterRoom'
-import { FilterRoomQueryType } from '~/schemaValidations/room.schema'
+import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
+import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
 
-const STORAGE_KEY = 'roomFilterStateLandingPage'
+const STORAGE_KEY = 'roomTypeFilterStateLandingPage'
 
 export default function Home() {
   const [page, setPage] = useState(1)
-  const [filterQuery, setFilterQuery] = useState<FilterRoomQueryType>(() => {
+  const [filterQuery, setFilterQuery] = useState<FilterRoomTypeQuery>(() => {
     const savedState = localStorage.getItem(STORAGE_KEY)
     if (savedState) {
       const parsedState = JSON.parse(savedState)
@@ -24,22 +24,22 @@ export default function Home() {
       }
     }
     return {
-      address: 'Thủ Đức',
-      capacity: 10,
-      startTime: moment().hour(9).minute(0).second(0).format('YYYY-MM-DDTHH:mm:ss'),
-      endTime: moment().hour(11).minute(0).second(0).format('YYYY-MM-DDTHH:mm:ss'),
+      address: '',
+      capacity: undefined,
+      startTime: undefined,
+      endTime: undefined,
       page: 1,
       take: 4
     }
   })
-  const { data, refetch } = useGetFilterRoom(filterQuery)
+  const { data, refetch } = useGetFilterRoomType(filterQuery)
   const [location, setLocation] = useState(() => {
     const savedState = localStorage.getItem(STORAGE_KEY)
-    return savedState ? JSON.parse(savedState).address : 'Thủ Đức'
+    return savedState ? JSON.parse(savedState).address : null
   })
   const [roomType, setRoomType] = useState(() => {
     const savedState = localStorage.getItem(STORAGE_KEY)
-    return savedState ? `Phòng ${JSON.parse(savedState).capacity} người` : 'Phòng 10 người'
+    return savedState ? `Phòng ${JSON.parse(savedState).capacity} người` : undefined
   })
   const [date, setDate] = useState<Moment | null>(() => {
     const savedState = localStorage.getItem(STORAGE_KEY)
@@ -120,7 +120,7 @@ export default function Home() {
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
         sx={{ paddingX: '104px', paddingY: '24px' }}
       >
-        <Grid size={{ xs: 6 }} style={{ alignContent: 'center' }}>
+        <Grid size={6} style={{ alignContent: 'center' }}>
           <Typography variant='h3' sx={{ fontWeight: 'bold' }} color='primary'>
             FlexiPod
           </Typography>
@@ -131,7 +131,7 @@ export default function Home() {
             Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
           </Typography>
         </Grid>
-        <Grid size={{ xs: 6 }}>
+        <Grid size={6}>
           <img src={homePageBanner} alt='' style={{ borderRadius: '8px', width: '100%' }} />
         </Grid>
       </Grid>
@@ -143,7 +143,7 @@ export default function Home() {
         sx={{ paddingX: '104px', paddingY: '24px' }}
       >
         {/* Rooms Section Title */}
-        <Grid size={{ xs: 12 }}>
+        <Grid size={12}>
           <Typography variant='h3' sx={{ fontWeight: 'bold', textAlign: 'center' }} color='primary'>
             Đặt phòng
           </Typography>
@@ -153,7 +153,7 @@ export default function Home() {
           <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='location-label'>Địa chỉ</InputLabel>
-              <Select labelId='location-label' value={location} label='Địa chỉ' onChange={handleLocationChange}>
+              <Select labelId='location-label' value={location || ''} label='Địa chỉ' onChange={handleLocationChange}>
                 <MenuItem value='Thủ Đức'>TP.Thủ Đức</MenuItem>
                 <MenuItem value='Hồ Chí Minh'>TP.Hồ Chí Minh</MenuItem>
                 <MenuItem value='Nha Trang'>TP.Nha Trang</MenuItem>
@@ -163,7 +163,12 @@ export default function Home() {
           <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='room-type-label'>Loại phòng</InputLabel>
-              <Select labelId='room-type-label' value={roomType} label='Loại phòng' onChange={handleRoomTypeChange}>
+              <Select
+                labelId='room-type-label'
+                value={roomType || ''}
+                label='Loại phòng'
+                onChange={handleRoomTypeChange}
+              >
                 <MenuItem value='Phòng 2 người'>Phòng 2 người</MenuItem>
                 <MenuItem value='Phòng 4 người'>Phòng 4 người</MenuItem>
                 <MenuItem value='Phòng 6 người'>Phòng 6 người</MenuItem>
@@ -196,25 +201,23 @@ export default function Home() {
           </Grid>
         </Grid>
         {/* Rooms Section Card */}
-        <Grid container size={12} spacing={0}>
-          {data?.data.data.map((room) => (
-            <PODRoomCard
-              key={room.id}
-              roomId={room.id}
-              roomName={room.name}
-              price={room.price}
-              roomDescription={room.description}
-              image={room.image}
-              roomStatus={room.status}
-              roomCreatedAt={room.createdAt}
-              roomUpdatedAt={room.updatedAt}
-              roomType={room.roomType}
-              onBookRoom={() => handleBookRoom(room.id)}
-            />
+        <Grid container spacing={2}>
+          {data?.data.data.map((roomType) => (
+            <Grid size={12} key={roomType.id}>
+              <PODRoomTypeCard
+                id={roomType.id}
+                name={roomType.name}
+                price={roomType.price}
+                quantity={roomType.quantity}
+                capacity={roomType.capacity}
+                building={roomType.building}
+                onBookRoom={() => handleBookRoom(roomType.id)}
+              />
+            </Grid>
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
-        <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
+        <Grid size={12} sx={{ justifyContent: 'center', display: 'flex', mt: 4 }}>
           <Pagination
             count={data?.data.totalPage || 1}
             page={page}
