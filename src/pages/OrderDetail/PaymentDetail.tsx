@@ -15,19 +15,18 @@ export const PaymentDetail: React.FC<CommonProps> = (props) => {
         <Grid container>
           <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingRight: '12px' }}>
             <BookingDetails />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, pb: 2, backgroundColor: 'white' }}>
+              <Button onClick={props.onBack} sx={{ mr: 1 }}>
+                Quay lại
+              </Button>
+            </Box>
           </Grid>
           <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingLeft: '12px' }}>
-            <QRCodePayment />
+            <Box>
+              <QRCodePayment />
+            </Box>
           </Grid>
         </Grid>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Button onClick={props.onBack} sx={{ mr: 1 }}>
-          Quay lại
-        </Button>
-        <Button variant='contained' onClick={props.onNext}>
-          Tiếp tục
-        </Button>
       </Box>
     </Box>
   )
