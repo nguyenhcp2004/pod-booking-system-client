@@ -2,8 +2,11 @@ import { Box, Button, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
 import { tokens } from '~/themes/theme'
-import moment from 'moment'
-import MonthView from '~/components/Calendar/Calendar'
+import moment, { Moment } from 'moment'
+import Calendar from '~/components/Calendar/Calendar'
+import { useEffect, useState } from 'react'
+import { slotType, useBookingContext } from '~/contexts/BookingContext'
+//import { array } from 'zod'
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -11,6 +14,16 @@ interface CommonProps {
 
 export const BookingInfo: React.FC<CommonProps> = (props) => {
   const colors = tokens('light')
+  const bookingContext = useBookingContext()
+  const [selectedDates, setSelectedDates] = useState<Moment[]>([])
+  const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
+  const bookingData = bookingContext?.bookingData
+  if (!bookingData) return null
+  useEffect(() => {
+    setSelectedDates([moment(bookingData.date)])
+    setSelectedSlots(bookingData.timeSlots)
+  }, [])
+
   return (
     <Box id='hehe' sx={{ height: '100%', marginX: '104px', paddingTop: '24px' }}>
       <Grid container spacing={2} sx={{}}>
@@ -65,15 +78,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                 </Typography>
                 <Box>
                   <Grid size={{ xs: 12 }}>
-                    <MonthView
-                      selected={[
-                        moment(),
-                        moment().add(1, 'day'),
-                        moment().add(2, 'day'),
-                        moment().add(3, 'day'),
-                        moment().add(4, 'day')
-                      ]}
-                    />
+                    <Calendar selected={selectedDates} slots={selectedSlots} />
                   </Grid>
                 </Box>
               </Box>
