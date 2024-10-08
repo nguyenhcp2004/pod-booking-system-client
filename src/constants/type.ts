@@ -44,7 +44,7 @@ export type Building = {
   updatedAt: string
 }
 
-export type RoomType2 = {
+export type RoomTypeFix = {
   id: number
   name: string
   price: number

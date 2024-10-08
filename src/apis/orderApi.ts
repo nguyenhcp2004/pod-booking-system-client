@@ -4,6 +4,7 @@ import { createBookingPayload } from '~/utils/orderUtils'
 
 export const createOrder = async (bookingInfo: BookingInfo) => {
   const payload = createBookingPayload(bookingInfo)
+  console.log('Payload:', payload)
   try {
     const response = await http.post('/order', payload)
     return response.data

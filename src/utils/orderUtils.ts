@@ -6,7 +6,6 @@ export const createDateTimeFromSlot = (date: string, slot: slotType) => {
   const startTime = new Date(`${date}T${startTimeString}:00`)
   const endTime = new Date(`${date}T${endTimeString}:00`)
 
-  // Định dạng lại thời gian theo yêu cầu (YYYY-MM-DDTHH:mm:ss)
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat('sv-SE', {
       year: 'numeric',
@@ -18,7 +17,7 @@ export const createDateTimeFromSlot = (date: string, slot: slotType) => {
       hour12: false
     })
       .format(date)
-      .replace(' ', 'T') // Thay thế khoảng trắng giữa ngày và giờ bằng ký tự T
+      .replace(' ', 'T')
   }
 
   return {
@@ -40,10 +39,6 @@ export const createBookingPayload = (bookingData: BookingInfo) => {
   }
 
   return {
-    customer: {
-      id: '0c7fe02c-d0d2-49a1-90e9-a89a8c4c81c6',
-      name: 'user789'
-    },
     building: {
       id: bookingData.roomType?.building.id,
       address: bookingData.roomType?.building.address
@@ -73,7 +68,6 @@ export const createBookingPayload = (bookingData: BookingInfo) => {
     },
     priceRoom: Math.round(bookingData.roomType?.price || 0),
     discountPercentage: bookingData.servicePackage?.discountPercentage || 0,
-    status: ['Pending', 'Process'],
     startTime,
     endTime
   }

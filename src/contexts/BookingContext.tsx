@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { ReactNode } from 'react'
-import { RoomType2, ServicePackage } from '~/constants/type'
+import { RoomTypeFix, ServicePackage } from '~/constants/type'
 
 export const BookingContext = createContext<BookingContextType | undefined>(undefined)
 
@@ -15,7 +15,7 @@ export interface Amenity {
   quantity: number
 }
 
-export interface Room2 {
+export interface RoomContextType {
   id: number
   name: string
   price: number | undefined
@@ -42,8 +42,8 @@ export type slotType =
   | '19:00 - 21:00'
 
 export interface BookingInfo {
-  roomType: RoomType2 | null
-  selectedRooms: Room2[] | []
+  roomType: RoomTypeFix | null
+  selectedRooms: RoomContextType[] | []
   date: string | null
   timeSlots: slotType[] | []
   servicePackage: ServicePackage | null
@@ -72,7 +72,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   return <BookingContext.Provider value={{ bookingData, setBookingData }}>{children}</BookingContext.Provider>
 }
 
-const mockRoomType: RoomType2 = {
+const mockRoomType: RoomTypeFix = {
   id: 1,
   name: 'Deluxe Room',
   quantity: 2,

@@ -7,7 +7,7 @@ import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext, BookingInfo } from '~/contexts/BookingContext'
@@ -23,6 +23,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const [quantity, setQuantity] = useState(0)
   const { data: amenities = [], isLoading, error } = useGetAmenities()
   const [errorState, setErrorState] = useState<string | null>(null)
+  const location = useLocation()
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
     throw new Error('BookingContext must be used within a BookingProvider')
@@ -80,7 +81,8 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
   const navigate = useNavigate()
   const handleCancel = () => {
-    navigate('/')
+    const previousPath = location.state?.from || '/'
+    navigate(previousPath)
   }
 
   return (
@@ -255,25 +257,36 @@ export const Amenities: React.FC<CommonProps> = (props) => {
             <BookingDetails />
           </Box>
           <Grid sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, padding: '20px' }}>
-            <Grid size={{ lg: 9 }}>
-              <Button
-                onClick={props.onNext}
-                fullWidth
-                sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
-              >
-                Hoàn tất
-              </Button>
-            </Grid>
-            <Grid size={{ lg: 4 }}>
+            <Box>
               <Button
                 variant='text'
                 onClick={handleCancel}
                 fullWidth
                 sx={{ background: '#FFF', color: colors.primary[500] }}
               >
-                Bỏ qua
+                Quay lại
               </Button>
-            </Grid>
+            </Box>
+            <Box>
+              <Box sx={{ width: '200px' }}>
+                <Button
+                  onClick={props.onNext}
+                  fullWidth
+                  sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
+                >
+                  Bỏ qua
+                </Button>
+              </Box>
+              <Box sx={{ width: '200px' }}>
+                <Button
+                  onClick={props.onNext}
+                  fullWidth
+                  sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
+                >
+                  Hoàn tất
+                </Button>
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </Grid>
