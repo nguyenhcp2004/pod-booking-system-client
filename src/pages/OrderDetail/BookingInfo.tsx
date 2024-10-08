@@ -18,14 +18,16 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const bookingData = bookingContext?.bookingData
-  if (!bookingData) return null
   useEffect(() => {
-    setSelectedDates([moment(bookingData.date)])
-    setSelectedSlots(bookingData.timeSlots)
+    if (bookingData) {
+      setSelectedDates([moment(bookingData.date)])
+      setSelectedSlots(bookingData.timeSlots)
+    }
   }, [])
+  if (!bookingData) return null
 
   return (
-    <Box id='hehe' sx={{ height: '100%', marginX: '104px', paddingTop: '24px' }}>
+    <Box id='hehe' sx={{ height: '100%', marginX: '104px' }}>
       <Grid container spacing={2} sx={{}}>
         <Grid size={{ xs: 12, md: 6 }} sx={{ paddingRight: '24px !important', paddingTop: '0px !important' }}>
           <Box>
@@ -98,23 +100,13 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
               backgroundColor: 'white'
             }}
           >
-            <Box sx={{ width: '80%' }}>
+            <Box sx={{ width: '100%' }}>
               <Button
                 onClick={props.onNext}
                 fullWidth
                 sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
               >
-                Hoàn tất
-              </Button>
-            </Box>
-            <Box sx={{ width: '200px' }}>
-              <Button
-                variant='text'
-                onClick={props.onBack}
-                fullWidth
-                sx={{ background: '#FFF', color: colors.primary[500] }}
-              >
-                Bỏ qua
+                Đặt phòng
               </Button>
             </Box>
           </Grid>

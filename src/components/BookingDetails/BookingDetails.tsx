@@ -5,6 +5,7 @@ import RoomAmenitiesCard from './RoomAmenitiesCard'
 const BookingDetails = () => {
   const bookingContext = useBookingContext()
   const bookingData = bookingContext?.bookingData
+  const setBookingData = bookingContext?.setBookingData
   const theme = useTheme()
 
   if (!bookingData) return null
@@ -26,6 +27,17 @@ const BookingDetails = () => {
     discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
   }
 
+  const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
+  const removeAmenity = (amenity: string) => {
+    setBookingData?.((prev) => {
+      if (!prev) return prev
+      const newSelectedRooms = prev.selectedRooms.map((room) => {
+        const newAmenities = room.amenities.filter((item) => item.name !== amenity)
+        return { ...room, amenities: newAmenities }
+      })
+      return { ...prev, selectedRooms: newSelectedRooms }
+    })
+  }
   return (
     <Box sx={{ bgcolor: 'white' }}>
       <Box sx={{ padding: '20px' }}>
@@ -96,15 +108,17 @@ const BookingDetails = () => {
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-            Tiện ích bạn đã chọn
-          </Typography>
+          {roomHaveAmenities > 0 && (
+            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
+              Tiện ích bạn đã chọn
+            </Typography>
+          )}
           {bookingData.selectedRooms.map((room, index) => {
             if (room.amenities.length === 0) return null
             return (
               <Box key={index}>
-                <RoomAmenitiesCard room={room} />
-                {index !== bookingData.selectedRooms.length - 1 && <Divider sx={{ my: '20px' }} />}
+                <RoomAmenitiesCard room={room} removeAmenity={removeAmenity} />
+                {index !== roomHaveAmenities - 1 && <Divider sx={{ my: '20px' }} />}
               </Box>
             )
           })}

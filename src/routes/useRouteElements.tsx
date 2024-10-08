@@ -9,6 +9,7 @@ import ForgotPassword from '~/pages/ForgotPassword'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
 import ManageBuilding from '~/pages/ManageBuilding'
+import ManageOrder from '~/pages/ManageOrder/ManageOrder'
 import ManageRoom from '~/pages/ManageRoom'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
@@ -63,6 +64,10 @@ export default function useRouteElements() {
         {
           path: '/admin/users',
           element: <ManageUser />
+        },
+        {
+          path: '/admin/orders',
+          element: <ManageOrder />
         }
       ]
     },
