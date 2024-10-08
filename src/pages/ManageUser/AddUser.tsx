@@ -10,9 +10,9 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
 
-export default function AddBuilding() {
-  const [open, setOpen] = useState(false);
-  
+export default function AddUser() {
+  const [open, setOpen] = useState(false)
+
   const handleClickOpen = () => {
     setOpen(true)
   }
@@ -54,7 +54,7 @@ export default function AddBuilding() {
               <Typography>Tên</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' required type={'text'}/>
+              <TextField fullWidth size='small' required type={'text'} />
             </Grid>
           </Grid>
           <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -62,7 +62,7 @@ export default function AddBuilding() {
               <Typography>Email</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' required type={'email'}/>
+              <TextField fullWidth size='small' required type={'email'} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -70,7 +70,7 @@ export default function AddBuilding() {
               <Typography>Mật khẩu</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' required type={'password'}/>
+              <TextField fullWidth size='small' required type={'password'} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
