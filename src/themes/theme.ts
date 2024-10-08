@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material'
-
+import { viVN } from '@mui/material/locale'
+import { viVN as pickersVN } from '@mui/x-date-pickers/locales'
+import { viVN as coreVN } from '@mui/material/locale'
 // Create your custom theme
 export const tokens = (mode: 'light' | 'dark') => ({
   ...(mode === 'light'
@@ -319,4 +321,4 @@ export const themeSettings = (mode: 'light' | 'dark') => {
   }
 }
 
-export const theme = createTheme(themeSettings('light'))
+export const theme = createTheme(themeSettings('light'), viVN, pickersVN, coreVN)
