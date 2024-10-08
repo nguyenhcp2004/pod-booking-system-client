@@ -3,62 +3,65 @@ import { Box, Card, Table, TableContainer, TablePagination, Typography } from '@
 import BuildingTableToolbar from '~/pages/ManageBuilding/BuildingTableToolbar'
 import { useCallback, useState } from 'react'
 import BuildingTableHead from '~/pages/ManageBuilding/BuildingTableHead'
-import BuildingTableRow, { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
+import BuildingTableRow from '~/pages/ManageBuilding/BuildingTableRow'
 import { applyFilter, emptyRows, getComparator } from '~/utils/utils'
 import TableBody from '@mui/material/TableBody'
 import { TableEmptyRows } from '~/pages/ManageBuilding/TableEmptyRows'
 import TableNoData from '~/pages/ManageBuilding/TableNoData'
 import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
+import { useGetListBuilding } from '~/queries/useBuilding'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
-const _buildings = [
-  {
-    id: 1,
-    address: '123 Main St, HCM City',
-    status: 'Available',
-    desciption: 'A modern office building with high-speed internet.',
-    hotlineNumber: '0901234567'
-  },
-  {
-    id: 2,
-    address: '456 Second Ave, HCM City',
-    status: 'Under Maintenance',
-    desciption: 'A spacious building with conference rooms and amenities.',
-    hotlineNumber: '0909876543'
-  },
-  {
-    id: 3,
-    address: '789 Third Blvd, HCM City',
-    status: 'Occupied',
-    desciption: 'A cozy building located in the heart of the city.',
-    hotlineNumber: '0912345678'
-  },
-  {
-    id: 4,
-    address: '101 Fourth St, HCM City',
-    status: 'Available',
-    desciption: 'An eco-friendly building with green spaces.',
-    hotlineNumber: '0918765432'
-  },
-  {
-    id: 5,
-    address: '202 Fifth Rd, HCM City',
-    status: 'Available',
-    desciption: 'A luxurious building with state-of-the-art facilities.',
-    hotlineNumber: '0901357924'
-  },
-  {
-    id: 6,
-    address: '202 Fifth Rd, HCM City',
-    status: 'Available',
-    desciption: 'A luxurious building with state-of-the-art facilities.',
-    hotlineNumber: '0901357924'
-  }
-]
+// const _buildings = [
+//   {
+//     id: 1,
+//     address: '123 Main St, HCM City',
+//     status: 'Available',
+//     desciption: 'A modern office building with high-speed internet.',
+//     hotlineNumber: '0901234567'
+//   },
+//   {
+//     id: 2,
+//     address: '456 Second Ave, HCM City',
+//     status: 'Under Maintenance',
+//     desciption: 'A spacious building with conference rooms and amenities.',
+//     hotlineNumber: '0909876543'
+//   },
+//   {
+//     id: 3,
+//     address: '789 Third Blvd, HCM City',
+//     status: 'Occupied',
+//     desciption: 'A cozy building located in the heart of the city.',
+//     hotlineNumber: '0912345678'
+//   },
+//   {
+//     id: 4,
+//     address: '101 Fourth St, HCM City',
+//     status: 'Available',
+//     desciption: 'An eco-friendly building with green spaces.',
+//     hotlineNumber: '0918765432'
+//   },
+//   {
+//     id: 5,
+//     address: '202 Fifth Rd, HCM City',
+//     status: 'Available',
+//     desciption: 'A luxurious building with state-of-the-art facilities.',
+//     hotlineNumber: '0901357924'
+//   },
+//   {
+//     id: 6,
+//     address: '202 Fifth Rd, HCM City',
+//     status: 'Available',
+//     desciption: 'A luxurious building with state-of-the-art facilities.',
+//     hotlineNumber: '0901357924'
+//   }
+// ]
 export default function ManageBuilding() {
   const table = useTable()
-
+  const { data } = useGetListBuilding()
+  const _buildings = data?.data.data || []
   const [filterName, setFilterName] = useState('')
-  const dataFiltered: BuildingProps[] = applyFilter({
+  const dataFiltered: GetListBuidlingResType['data'] = applyFilter({
     inputData: _buildings,
     comparator: getComparator(table.order, table.orderBy),
     filterName
@@ -135,7 +138,7 @@ export default function ManageBuilding() {
           count={_buildings.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 15, 20]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
@@ -146,7 +149,7 @@ export default function ManageBuilding() {
 export function useTable() {
   const [page, setPage] = useState(0)
   const [orderBy, setOrderBy] = useState('name')
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [selected, setSelected] = useState<string[]>([])
   const [order, setOrder] = useState<'asc' | 'desc'>('asc')
 

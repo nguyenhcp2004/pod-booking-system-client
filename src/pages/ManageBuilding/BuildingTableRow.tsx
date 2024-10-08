@@ -12,6 +12,7 @@ import { Chip } from '@mui/material'
 
 import EditBuilding from '~/pages/ManageBuilding/EditBuilding'
 import DeleteBuilding from '~/pages/ManageBuilding/DeleteBuilding'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
 export type BuildingProps = {
   id: number
@@ -19,10 +20,12 @@ export type BuildingProps = {
   status: string
   desciption: string
   hotlineNumber: string
+  createdAt: string
+  updatedAt: string
 }
 
 type BuildingTableRowProps = {
-  row: BuildingProps
+  row: GetListBuidlingResType['data'][0]
   selected: boolean
   onSelectRow: () => void
 }
@@ -49,7 +52,7 @@ export default function BuildingTableRow({ row, selected, onSelectRow }: Buildin
           {row.address}
         </TableCell>
 
-        <TableCell sx={{ fontSize: '14px' }}>{row.desciption}</TableCell>
+        <TableCell sx={{ fontSize: '14px' }}>{row.description}</TableCell>
 
         <TableCell sx={{ fontSize: '14px' }}>{row.hotlineNumber}</TableCell>
 

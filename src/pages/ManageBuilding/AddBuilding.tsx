@@ -1,4 +1,4 @@
-import { MenuItem, Select, TextareaAutosize, Typography } from '@mui/material'
+import { MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 
 import Button from '@mui/material/Button'
@@ -12,6 +12,11 @@ import { useState } from 'react'
 
 export default function AddBuilding() {
   const [open, setOpen] = useState(false)
+  const [status, setStatus] = useState('')
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setStatus(event.target.value as string)
+  }
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -20,6 +25,7 @@ export default function AddBuilding() {
   const handleClose = () => {
     setOpen(false)
   }
+
   return (
     <>
       <Button
@@ -38,11 +44,11 @@ export default function AddBuilding() {
           component: 'form',
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
+            console.log(event)
             const formData = new FormData(event.currentTarget)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formJson = Object.fromEntries((formData as any).entries())
-            const email = formJson.email
-            console.log(email)
+            console.log(formJson)
             handleClose()
           }
         }}
@@ -54,15 +60,15 @@ export default function AddBuilding() {
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' />
+              <TextField fullWidth size='small' name='address' />
             </Grid>
           </Grid>
-          <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
+          <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' />
+              <TextField fullWidth size='small' name='hotlineNumber' />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -70,7 +76,13 @@ export default function AddBuilding() {
               <Typography>Mô tả</Typography>
             </Grid>
             <Grid size={9}>
-              <TextareaAutosize style={{ width: '100%', padding: '6px' }} minRows={2} maxRows={4} maxLength={255} />
+              <TextareaAutosize
+                name='description'
+                style={{ width: '100%', padding: '6px' }}
+                minRows={2}
+                maxRows={4}
+                maxLength={255}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -78,10 +90,10 @@ export default function AddBuilding() {
               <Typography>Trạng thái</Typography>
             </Grid>
             <Grid size={9}>
-              <Select fullWidth size='small'>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+              <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
+                <MenuItem value='Available'>Available</MenuItem>
+                <MenuItem value='Unavailable'>Unavailable</MenuItem>
+                <MenuItem value='Hidden'>Hidden</MenuItem>
               </Select>
             </Grid>
           </Grid>

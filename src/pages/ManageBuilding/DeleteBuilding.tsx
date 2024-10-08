@@ -7,10 +7,10 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
 interface Props {
-  row: BuildingProps
+  row: GetListBuidlingResType['data'][0]
 }
 export default function DeleteBuilding({ row }: Props) {
   const [open, setOpen] = useState(false)

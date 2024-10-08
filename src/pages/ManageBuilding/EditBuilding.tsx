@@ -1,4 +1,4 @@
-import { MenuItem, Select, TextareaAutosize, Typography } from '@mui/material'
+import { MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 
 import Button from '@mui/material/Button'
@@ -9,13 +9,18 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
-import { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
 interface Props {
-  row: BuildingProps
+  row: GetListBuidlingResType['data'][0]
 }
 export default function EditBuilding({ row }: Props) {
   const [open, setOpen] = useState(false)
+  const [status, setStatus] = useState(row.status)
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setStatus(event.target.value as string)
+  }
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -41,8 +46,7 @@ export default function EditBuilding({ row }: Props) {
             const formData = new FormData(event.currentTarget)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formJson = Object.fromEntries((formData as any).entries())
-            const email = formJson.email
-            console.log(email)
+            console.log(formJson)
             handleClose()
           }
         }}
@@ -54,7 +58,7 @@ export default function EditBuilding({ row }: Props) {
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' value={row.address} />
+              <TextField name='address' fullWidth size='small' value={row.address} />
             </Grid>
           </Grid>
           <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -62,7 +66,7 @@ export default function EditBuilding({ row }: Props) {
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' value={row.hotlineNumber} />
+              <TextField name='hotlineNumber' fullWidth size='small' value={row.hotlineNumber} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -71,11 +75,12 @@ export default function EditBuilding({ row }: Props) {
             </Grid>
             <Grid size={9}>
               <TextareaAutosize
+                name='desciption'
                 style={{ width: '100%', padding: '8px', fontFamily: 'Roboto', fontSize: '14px' }}
                 minRows={2}
                 maxRows={5}
                 maxLength={255}
-                value={row.desciption}
+                value={row.description}
               />
             </Grid>
           </Grid>
@@ -84,10 +89,10 @@ export default function EditBuilding({ row }: Props) {
               <Typography>Trạng thái</Typography>
             </Grid>
             <Grid size={9}>
-              <Select fullWidth size='small'>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+              <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
+                <MenuItem value='Available'>Available</MenuItem>
+                <MenuItem value='Under Maintenance'>Under Maintenance</MenuItem>
+                <MenuItem value='Hidden'>Hidden</MenuItem>
               </Select>
             </Grid>
           </Grid>

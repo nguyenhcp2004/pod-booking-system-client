@@ -4,8 +4,8 @@ import axios, { AxiosError, HttpStatusCode } from 'axios'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
-import { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
 import { ErrorResponse } from '~/schemaValidations/auth.schema'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 import {
   clearLS,
   decodeToken,
@@ -103,7 +103,8 @@ export const visuallyHidden = {
 } as const
 
 type BuildingFilterProps = {
-  inputData: BuildingProps[]
+  // inputData: BuildingProps[] | []
+  inputData: GetListBuidlingResType['data']
   filterName: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   comparator: (a: any, b: any) => number
