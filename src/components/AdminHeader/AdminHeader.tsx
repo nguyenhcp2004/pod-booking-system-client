@@ -20,6 +20,7 @@ export default function AdminHeader() {
         position: 'sticky',
         backgroundColor: '#F9FAFB',
         top: 0,
+        zIndex: 999,
         transition: 'box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
