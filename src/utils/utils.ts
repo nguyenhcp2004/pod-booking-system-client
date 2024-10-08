@@ -4,6 +4,7 @@ import axios, { AxiosError, HttpStatusCode } from 'axios'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
+import { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
 import { ErrorResponse } from '~/schemaValidations/auth.schema'
 import {
   clearLS,
@@ -87,4 +88,72 @@ export const handleErrorApi = <T extends FieldValues>({
       autoClose: duration ?? 3000
     })
   }
+}
+
+export const visuallyHidden = {
+  border: 0,
+  margin: -1,
+  padding: 0,
+  width: '1px',
+  height: '1px',
+  overflow: 'hidden',
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  clip: 'rect(0 0 0 0)'
+} as const
+
+type BuildingFilterProps = {
+  inputData: BuildingProps[]
+  filterName: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  comparator: (a: any, b: any) => number
+}
+
+export function applyFilter({ inputData, comparator, filterName }: BuildingFilterProps) {
+  const stabilizedThis = inputData.map((el, index) => [el, index] as const)
+
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0])
+    if (order !== 0) return order
+    return a[1] - b[1]
+  })
+
+  inputData = stabilizedThis.map((el) => el[0])
+
+  if (filterName) {
+    inputData = inputData.filter((building) => building.address.toLowerCase().indexOf(filterName.toLowerCase()) !== -1)
+  }
+
+  return inputData
+}
+
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1
+  }
+  return 0
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getComparator<Key extends keyof any>(
+  order: 'asc' | 'desc',
+  orderBy: Key
+): (
+  a: {
+    [key in Key]: number | string
+  },
+  b: {
+    [key in Key]: number | string
+  }
+) => number {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy)
+}
+
+export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
+  return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0
 }
