@@ -1,16 +1,20 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Button, Chip, Typography, Avatar } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
+  GridRenderCellParams,
   GridRowId,
   GridRowModes,
   GridRowModesModel,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
@@ -106,6 +110,26 @@ export default function ManageUser() {
     }
   }
 
+  // const ExpandableCell = ({ value }: GridRenderCellParams) => {
+  //   const [expanded, setExpanded] = useState(false)
+
+  //   return (
+  //     <div>
+  //       {expanded ? value : value.slice(0, 20)}&nbsp;
+  //       {value.length > 20 && (
+  //         <Link
+  //           type='button'
+  //           component='button'
+  //           sx={{ fontSize: 'inherit', letterSpacing: 'inherit' }}
+  //           onClick={() => setExpanded(!expanded)}
+  //         >
+  //           {expanded ? 'view less' : 'view more'}
+  //         </Link>
+  //       )}
+  //     </div>
+  //   )
+  // }
+
   const columns: GridColDef[] = [
     {
       field: 'id',
@@ -120,8 +144,22 @@ export default function ManageUser() {
       }
     },
     { field: 'name', headerName: 'Tên', width: 150, editable: true },
-    { field: 'email', headerName: 'Email', width: 200, editable: true },
-    { field: 'avatar', headerName: 'Avatar', width: 150, editable: true },
+    {
+      field: 'email',
+      headerName: 'Email',
+      width: 200,
+      editable: true
+      // renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
+    },
+    {
+      field: 'avatar',
+      headerName: 'Avatar',
+      width: 100,
+      editable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Avatar src={params.value} alt={`Avatar of ${params.row.name}`} sx={{ width: 40, height: 40 }} />
+      )
+    },
     { field: 'point', headerName: 'Điểm', width: 100, type: 'number', editable: true },
     {
       field: 'role',
@@ -129,6 +167,20 @@ export default function ManageUser() {
       width: 120,
       type: 'singleSelect',
       valueOptions: ['Staff', 'Manager', 'Admin', 'Customer'],
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={
+            params.value === 'Admin'
+              ? 'error'
+              : params.value === 'Manager'
+                ? 'warning'
+                : params.value === 'Staff'
+                  ? 'info'
+                  : 'default'
+          }
+        />
+      ),
       editable: true
     },
     {
@@ -187,6 +239,41 @@ export default function ManageUser() {
     }
   ]
 
+  const Toolbar = () => {
+    const handleClick = () => {
+      const id = Math.max(...rows.map((row) => Number(row.id))) + 1
+      setRows((oldRows) => [
+        ...oldRows,
+        {
+          id,
+          name: '',
+          email: '',
+          avatar: '',
+          point: 0,
+          role: 'Staff',
+          balance: 0,
+          buildingNumber: 0,
+          createdAt: new Date().toISOString(),
+          rankingName: '',
+          isNew: true
+        }
+      ])
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
+      }))
+    }
+
+    return (
+      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
+          Thêm tài khoản
+        </Button>
+        <GridToolbarQuickFilter />
+      </GridToolbarContainer>
+    )
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
@@ -200,6 +287,7 @@ export default function ManageUser() {
         setRows={setRows}
         rowModesModel={rowModesModel}
         setRowModesModel={setRowModesModel}
+        toolbarComponents={Toolbar}
       />
     </Box>
   )
