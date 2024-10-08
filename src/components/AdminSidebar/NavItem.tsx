@@ -35,7 +35,7 @@ export default function NavItem() {
           }}
         >
           <LeaderboardIcon sx={{ width: '24px', height: '24px' }} />
-          <Typography variant='h6'>Dashboard</Typography>
+          <Typography variant='h6'>Tổng quan</Typography>
         </Box>
       </Box>
       <Box
@@ -55,7 +55,7 @@ export default function NavItem() {
       >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <MeetingRoomIcon sx={{ width: '24px', height: '24px' }} />
-          <Typography variant='h6'>Room</Typography>
+          <Typography variant='h6'>Phòng</Typography>
         </Box>
       </Box>
       <Box
@@ -75,7 +75,7 @@ export default function NavItem() {
       >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <ApartmentIcon sx={{ width: '24px', height: '24px' }} />
-          <Typography variant='h6'>Building</Typography>
+          <Typography variant='h6'>Chi nhánh</Typography>
         </Box>
       </Box>
       <Box
@@ -115,7 +115,7 @@ export default function NavItem() {
       >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FastfoodIcon sx={{ width: '24px', height: '24px' }} />
-          <Typography variant='h6'>Amenity</Typography>
+          <Typography variant='h6'>Tiện ích</Typography>
         </Box>
       </Box>
       <Box
@@ -135,7 +135,7 @@ export default function NavItem() {
       >
         <Box sx={{ display: 'flex', gap: 2 }}>
           <PeopleAltIcon sx={{ width: '24px', height: '24px' }} />
-          <Typography variant='h6'>User</Typography>
+          <Typography variant='h6'>Tài khoản</Typography>
         </Box>
       </Box>
     </>

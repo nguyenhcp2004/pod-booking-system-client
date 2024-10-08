@@ -1,5 +1,5 @@
-import { Box, Button, Card, Table, TableContainer, TablePagination, Typography } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
+import { Box, Card, Table, TableContainer, TablePagination, Typography } from '@mui/material'
+
 import BuildingTableToolbar from '~/pages/ManageBuilding/BuildingTableToolbar'
 import { useCallback, useState } from 'react'
 import BuildingTableHead from '~/pages/ManageBuilding/BuildingTableHead'
@@ -8,6 +8,7 @@ import { applyFilter, emptyRows, getComparator } from '~/utils/utils'
 import TableBody from '@mui/material/TableBody'
 import { TableEmptyRows } from '~/pages/ManageBuilding/TableEmptyRows'
 import TableNoData from '~/pages/ManageBuilding/TableNoData'
+import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
 
 const _buildings = [
   {
@@ -69,17 +70,15 @@ export default function ManageBuilding() {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
         <Typography variant='h4' fontWeight='500' flexGrow={1}>
-          Các tòa nhà
+          Chi nhánh
         </Typography>
-        <Button variant='contained' sx={{ backgroundColor: 'grey.900', borderRadius: '12px' }} startIcon={<AddIcon />}>
-          Tạo mới
-        </Button>
+        <AddBuilding />
       </Box>
 
       <Card sx={{ borderRadius: '16px' }}>
         <BuildingTableToolbar
           numSelected={table.selected.length}
-          filterName={filterName || ''}
+          filterName={filterName}
           onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
             setFilterName(event.target.value)
             table.onResetPage()
