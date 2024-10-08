@@ -10,7 +10,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers-pro'
+import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
