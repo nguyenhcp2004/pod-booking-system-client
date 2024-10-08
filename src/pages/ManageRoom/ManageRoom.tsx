@@ -1,33 +1,22 @@
-import { Box, Button, Link, Typography } from '@mui/material'
+import { Box, Link, Typography } from '@mui/material'
 import {
-  DataGrid,
   GridActionsCellItem,
   GridColDef,
-  GridEventListener,
   GridRenderCellParams,
-  GridRowEditStopReasons,
   GridRowId,
-  GridRowModel,
   GridRowModes,
   GridRowModesModel,
-  GridRowsProp,
-  GridSlots,
-  GridToolbar,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarQuickFilter
+  GridValidRowModel
 } from '@mui/x-data-grid'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
-import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { viVN } from '@mui/x-data-grid/locales'
-import { randomUUID } from 'crypto'
 import { useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
+import Table from '~/components/Table/Table'
 
-const initialRows: GridRowsProp = [
+const initialRows: GridValidRowModel[] = [
   {
     id: 1,
     name: 'Phòng A1',
@@ -86,45 +75,9 @@ const initialRows: GridRowsProp = [
   }
 ]
 
-interface EditToolbarProps {
-  setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void
-  setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void
-}
-
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props
-
-  const handleClick = () => {
-    const id = 1000 + Math.floor(Math.random() * 1000)
-    setRows((oldRows) => [
-      ...oldRows,
-      { id, name: '', description: '', image: '', status: '', type: '', price: 0, isNew: true }
-    ])
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
-    }))
-  }
-
-  return (
-    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-      <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
-        Thêm phòng
-      </Button>
-      <GridToolbarQuickFilter />
-    </GridToolbarContainer>
-  )
-}
-
 export default function ManageRoom() {
-  const [rows, setRows] = useState(initialRows)
+  const [rows, setRows] = useState<GridValidRowModel[]>(initialRows)
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
-
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true
-    }
-  }
 
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
@@ -150,16 +103,6 @@ export default function ManageRoom() {
     }
   }
 
-  const processRowUpdate = (newRow: GridRowModel) => {
-    const updatedRow = { ...newRow, isNew: false }
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)))
-    return updatedRow
-  }
-
-  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-    setRowModesModel(newRowModesModel)
-  }
-
   const ExpandableCell = ({ value }: GridRenderCellParams) => {
     const [expanded, setExpanded] = useState(false)
 
@@ -180,7 +123,18 @@ export default function ManageRoom() {
     )
   }
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 50 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 50,
+      valueFormatter: (params) => {
+        if (params) {
+          return `${params}`
+        } else {
+          return `${rows.length + 1}`
+        }
+      }
+    },
     { field: 'name', headerName: 'Tên', width: 150, editable: true },
     {
       field: 'description',
@@ -240,7 +194,7 @@ export default function ManageRoom() {
     {
       field: 'actions',
       type: 'actions',
-      headerName: 'Actions',
+      headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
       getActions: ({ id }) => {
@@ -287,52 +241,12 @@ export default function ManageRoom() {
           Quản lí phòng
         </Typography>
       </Box>
-
-      <DataGrid
-        rows={rows}
+      <Table
         columns={columns}
-        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
-        autoHeight
-        getRowHeight={() => 'auto'}
-        slotProps={{
-          loadingOverlay: {
-            variant: 'skeleton',
-            noRowsVariant: 'skeleton'
-          },
-          toolbar: {
-            showQuickFilter: true,
-            setRows,
-            setRowModesModel
-          }
-        }}
-        sx={{
-          '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
-            py: 1
-          },
-          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-            py: '15px'
-          },
-          '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
-            py: '22px'
-          },
-          padding: '16px 0'
-        }}
-        loading={false}
-        // slots={{ toolbar: GridToolbar
-
-        //  }}
-        disableColumnSelector
-        disableColumnFilter
-        disableDensitySelector
-        density='comfortable'
-        editMode='row'
+        rows={rows}
+        setRows={setRows}
         rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        slots={{
-          toolbar: EditToolbar as GridSlots['toolbar']
-        }}
+        setRowModesModel={setRowModesModel}
       />
     </Box>
   )
