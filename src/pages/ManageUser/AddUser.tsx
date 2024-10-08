@@ -11,8 +11,8 @@ import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
 
 export default function AddBuilding() {
-  const [open, setOpen] = useState(false)
-
+  const [open, setOpen] = useState(false);
+  
   const handleClickOpen = () => {
     setOpen(true)
   }
