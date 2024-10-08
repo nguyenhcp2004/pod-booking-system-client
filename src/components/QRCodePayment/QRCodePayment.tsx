@@ -10,7 +10,7 @@ const QRCodePayment = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
   const [showReload, setShowReload] = useState(false)
   const [paymentUrl, setPaymentUrl] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(true) 
+  const [loading, setLoading] = useState<boolean>(true)
   const bookingContext = useBookingContext()
   const bookingData = bookingContext?.bookingData
   const theme = useTheme()
@@ -87,6 +87,7 @@ const QRCodePayment = () => {
       sx={{
         bgcolor: 'white',
         padding: 2,
+        paddingY: 7,
         textAlign: 'center',
         height: '100%',
         display: 'flex',
@@ -102,7 +103,7 @@ const QRCodePayment = () => {
 
       <Box sx={{ width: '240px', height: '240px', border: '1px solid black' }}>
         {loading ? (
-          <Typography variant='body2'>Đang tải mã QR...</Typography> // Hiển thị loading khi QR đang được tạo
+          <Typography variant='body2'>Đang tải mã QR...</Typography>
         ) : showReload ? (
           <IconButton onClick={handleReload}>
             <RefreshIcon fontSize='large' />

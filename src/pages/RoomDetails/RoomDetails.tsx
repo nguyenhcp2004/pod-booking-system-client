@@ -13,7 +13,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { useEffect, useMemo, useState } from 'react'
 import { ServicePackage, Room } from '~/constants/type'
-import { Room2, slotType } from '~/contexts/BookingContext'
+import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { Link, useParams } from 'react-router-dom'
@@ -86,7 +86,7 @@ export default function RoomDetail() {
   useEffect(() => {
     setBookingData?.((prev: BookingInfo) => {
       const price = bookingData?.roomType?.price
-      const listRoom: Room2[] = selectedRooms.map((room) => {
+      const listRoom: RoomContextType[] = selectedRooms.map((room) => {
         return {
           id: room.id,
           name: room.name,
@@ -219,7 +219,7 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Link to='/order-detail/1'>
+                  <Link to='/order-detail/1' state={{ from: location.pathname }}>
                     <Button variant='contained' color='primary' fullWidth>
                       Đặt phòng
                     </Button>
