@@ -59,8 +59,9 @@ import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 export default function ManageBuilding() {
   const table = useTable()
   const { data } = useGetListBuilding()
-  const _buildings = data?.data.data || []
+  const _buildings = data?.data?.data ? [...data.data.data].reverse() : []
   const [filterName, setFilterName] = useState('')
+  console.log(_buildings)
   const dataFiltered: GetListBuidlingResType['data'] = applyFilter({
     inputData: _buildings,
     comparator: getComparator(table.order, table.orderBy),

@@ -1,8 +1,13 @@
-import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
+import {
+  CreateBuildingBodyType,
+  CreateBuildingResType,
+  GetListBuidlingResType
+} from '~/schemaValidations/building.schema'
 import http from '~/utils/http'
 
 const buildingApiRequest = {
-  getListBuidling: () => http.get<GetListBuidlingResType>('/buildings?take=50')
+  getListBuidling: () => http.get<GetListBuidlingResType>('/buildings?take=50'),
+  createBuilding: (body: CreateBuildingBodyType) => http.post<CreateBuildingResType>('/buildings', body)
 }
 
 export default buildingApiRequest

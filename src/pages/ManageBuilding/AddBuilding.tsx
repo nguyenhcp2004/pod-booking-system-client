@@ -9,10 +9,15 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
+import { useCreateBuildingMutation } from '~/queries/useBuilding'
+import { CreateBuildingBodyType } from '~/schemaValidations/building.schema'
+import { handleErrorApi } from '~/utils/utils'
+import { toast } from 'react-toastify'
 
 export default function AddBuilding() {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState('')
+  const createBuilding = useCreateBuildingMutation()
 
   const handleChange = (event: SelectChangeEvent) => {
     setStatus(event.target.value as string)
@@ -42,13 +47,20 @@ export default function AddBuilding() {
         onClose={handleClose}
         PaperProps={{
           component: 'form',
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
-            console.log(event)
+            if (createBuilding.isPending) return
             const formData = new FormData(event.currentTarget)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const formJson = Object.fromEntries((formData as any).entries())
-            console.log(formJson)
+            const formJson = Object.fromEntries((formData as any).entries()) as CreateBuildingBodyType
+            try {
+              const result = await createBuilding.mutateAsync(formJson)
+              toast.success(result.data.message, {
+                autoClose: 3000
+              })
+            } catch (error) {
+              handleErrorApi({ error })
+            }
             handleClose()
           }
         }}
@@ -91,7 +103,7 @@ export default function AddBuilding() {
             </Grid>
             <Grid size={9}>
               <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
-                <MenuItem value='Available'>Available</MenuItem>
+                <MenuItem value='Active'>Active</MenuItem>
                 <MenuItem value='Unavailable'>Unavailable</MenuItem>
                 <MenuItem value='Hidden'>Hidden</MenuItem>
               </Select>
