@@ -1,4 +1,4 @@
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Button, Chip, Link, Typography } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -6,12 +6,15 @@ import {
   GridRowId,
   GridRowModes,
   GridRowModesModel,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
@@ -162,30 +165,10 @@ export default function ManageRoom() {
       type: 'singleSelect',
       valueOptions: ['Đang hoạt động', 'Bảo trì', 'VCL'],
       renderCell: (params) => (
-        <Box
-          component='span'
-          sx={{
-            color:
-              params.value === 'Đang hoạt động'
-                ? 'success.main'
-                : params.value === 'Bảo trì'
-                  ? 'warning.main'
-                  : 'error.main',
-            bgcolor:
-              params.value === 'Đang hoạt động'
-                ? 'success.light'
-                : params.value === 'Bảo trì'
-                  ? 'warning.light'
-                  : 'error.light',
-            borderRadius: '4px',
-            padding: '4px 8px',
-            fontSize: '0.75rem',
-            fontWeight: '500',
-            textTransform: 'uppercase'
-          }}
-        >
-          {params.value}
-        </Box>
+        <Chip
+          label={params.value}
+          color={params.value === 'Đang hoạt động' ? 'success' : params.value === 'Bảo trì' ? 'warning' : 'error'}
+        />
       ),
       editable: true
     },
@@ -234,6 +217,28 @@ export default function ManageRoom() {
     }
   ]
 
+  const Toolbar = () => {
+    const handleClick = () => {
+      const id = ''
+      setRows((oldRows) => [
+        ...oldRows,
+        { id, name: '', description: '', image: '', status: '', type: '', price: 0, isNew: true }
+      ])
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
+      }))
+    }
+
+    return (
+      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
+          Thêm phòng
+        </Button>
+        <GridToolbarQuickFilter />
+      </GridToolbarContainer>
+    )
+  }
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
@@ -247,6 +252,7 @@ export default function ManageRoom() {
         setRows={setRows}
         rowModesModel={rowModesModel}
         setRowModesModel={setRowModesModel}
+        toolbarComponents={Toolbar}
       />
     </Box>
   )
