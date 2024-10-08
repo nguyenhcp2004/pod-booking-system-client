@@ -1,5 +1,5 @@
 import { MenuItem, Select, TextareaAutosize, Typography } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
 
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -9,8 +9,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
+import { BuildingProps } from '~/pages/ManageBuilding/BuildingTableRow'
 
-export default function AddBuilding() {
+interface Props {
+  row: BuildingProps
+}
+export default function EditBuilding({ row }: Props) {
   const [open, setOpen] = useState(false)
 
   const handleClickOpen = () => {
@@ -22,14 +26,10 @@ export default function AddBuilding() {
   }
   return (
     <>
-      <Button
-        onClick={handleClickOpen}
-        variant='contained'
-        sx={{ backgroundColor: 'grey.900', borderRadius: '12px' }}
-        startIcon={<AddIcon />}
-      >
-        Thêm chi nhánh
-      </Button>
+      <MenuItem onClick={handleClickOpen}>
+        <EditIcon />
+        Edit
+      </MenuItem>
       <Dialog
         fullWidth={true}
         open={open}
@@ -54,7 +54,7 @@ export default function AddBuilding() {
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' />
+              <TextField fullWidth size='small' value={row.address} />
             </Grid>
           </Grid>
           <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -62,7 +62,7 @@ export default function AddBuilding() {
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' />
+              <TextField fullWidth size='small' value={row.hotlineNumber} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -70,7 +70,13 @@ export default function AddBuilding() {
               <Typography>Mô tả</Typography>
             </Grid>
             <Grid size={9}>
-              <TextareaAutosize style={{ width: '100%', padding: '6px' }} minRows={2} maxRows={4} maxLength={255} />
+              <TextareaAutosize
+                style={{ width: '100%', padding: '8px', fontFamily: 'Roboto', fontSize: '14px' }}
+                minRows={2}
+                maxRows={5}
+                maxLength={255}
+                value={row.desciption}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
