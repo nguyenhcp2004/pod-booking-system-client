@@ -1,50 +1,15 @@
-import { Button } from '@mui/material'
 import {
   DataGrid,
   GridColDef,
   GridEventListener,
   GridRowEditStopReasons,
   GridRowModel,
-  GridRowModes,
   GridRowModesModel,
-  GridRowsProp,
   GridSlots,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import { viVN } from '@mui/x-data-grid/locales'
 import { Dispatch, SetStateAction } from 'react'
-import AddIcon from '@mui/icons-material/Add'
-interface EditToolbarProps {
-  setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void
-  setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void
-}
-
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props
-
-  const handleClick = () => {
-    const id = ''
-    setRows((oldRows) => [
-      ...oldRows,
-      { id, name: '', description: '', image: '', status: '', type: '', price: 0, isNew: true }
-    ])
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
-    }))
-  }
-
-  return (
-    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-      <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
-        Thêm phòng
-      </Button>
-      <GridToolbarQuickFilter />
-    </GridToolbarContainer>
-  )
-}
 
 const Table = ({
   columns,
@@ -52,7 +17,8 @@ const Table = ({
   setRows,
   rowModesModel,
   setRowModesModel,
-  loading = false
+  loading = false,
+  toolbarComponents
 }: {
   columns: GridColDef[]
   rows: GridValidRowModel[]
@@ -60,6 +26,7 @@ const Table = ({
   rowModesModel?: GridRowModesModel
   setRowModesModel?: Dispatch<SetStateAction<GridRowModesModel>>
   loading?: boolean
+  toolbarComponents?: any
 }) => {
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -107,6 +74,7 @@ const Table = ({
         padding: '16px 0'
       }}
       loading={loading}
+      disableRowSelectionOnClick
       disableColumnSelector
       disableColumnFilter
       disableDensitySelector
@@ -117,7 +85,7 @@ const Table = ({
       onRowEditStop={handleRowEditStop}
       processRowUpdate={processRowUpdate}
       slots={{
-        toolbar: EditToolbar as GridSlots['toolbar']
+        toolbar: toolbarComponents as GridSlots['toolbar']
       }}
     />
   )
