@@ -317,6 +317,36 @@ export const themeSettings = (mode: 'light' | 'dark') => {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
         fontSize: 16
       }
+    },
+    components: {
+      MuiChip: {
+        styleOverrides: {
+          colorSuccess: {
+            backgroundColor: colors.success[100],
+            color: colors.success[500]
+          },
+          colorError: {
+            backgroundColor: colors.error[100],
+            color: colors.error[500]
+          },
+          colorWarning: {
+            backgroundColor: colors.warning[100],
+            color: colors.warning[500]
+          },
+          colorInfo: {
+            backgroundColor: colors.info[100],
+            color: colors.info[500]
+          },
+          colorPrimary: {
+            backgroundColor: colors.primary[100],
+            color: colors.primary[500]
+          },
+          colorSecondary: {
+            backgroundColor: colors.secondary[100],
+            color: colors.secondary[500]
+          }
+        }
+      }
     }
   }
 }

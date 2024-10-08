@@ -1,4 +1,4 @@
-import { Box, Link, Typography } from '@mui/material'
+import { Box, Chip, Link, Typography } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -162,30 +162,10 @@ export default function ManageRoom() {
       type: 'singleSelect',
       valueOptions: ['Đang hoạt động', 'Bảo trì', 'VCL'],
       renderCell: (params) => (
-        <Box
-          component='span'
-          sx={{
-            color:
-              params.value === 'Đang hoạt động'
-                ? 'success.main'
-                : params.value === 'Bảo trì'
-                  ? 'warning.main'
-                  : 'error.main',
-            bgcolor:
-              params.value === 'Đang hoạt động'
-                ? 'success.light'
-                : params.value === 'Bảo trì'
-                  ? 'warning.light'
-                  : 'error.light',
-            borderRadius: '4px',
-            padding: '4px 8px',
-            fontSize: '0.75rem',
-            fontWeight: '500',
-            textTransform: 'uppercase'
-          }}
-        >
-          {params.value}
-        </Box>
+        <Chip
+          label={params.value}
+          color={params.value === 'Đang hoạt động' ? 'success' : params.value === 'Bảo trì' ? 'warning' : 'error'}
+        />
       ),
       editable: true
     },

@@ -56,9 +56,9 @@ const Table = ({
 }: {
   columns: GridColDef[]
   rows: GridValidRowModel[]
-  setRows: Dispatch<SetStateAction<GridValidRowModel[]>>
-  rowModesModel: GridRowModesModel
-  setRowModesModel: Dispatch<SetStateAction<GridRowModesModel>>
+  setRows?: Dispatch<SetStateAction<GridValidRowModel[]>>
+  rowModesModel?: GridRowModesModel
+  setRowModesModel?: Dispatch<SetStateAction<GridRowModesModel>>
   loading?: boolean
 }) => {
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -69,12 +69,12 @@ const Table = ({
 
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false }
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)))
+    if (setRows) setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)))
     return updatedRow
   }
 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-    setRowModesModel(newRowModesModel)
+    if (setRowModesModel) setRowModesModel(newRowModesModel)
   }
   return (
     <DataGrid
