@@ -3,7 +3,7 @@ import { Card, CardMedia, Typography, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useNavigate } from 'react-router-dom'
 
-interface PODRoomTypeCardProps {
+export interface PODRoomTypeCardProps {
   id: number
   name: string
   price: number
@@ -21,7 +21,7 @@ interface PODRoomTypeCardProps {
 }
 
 const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ id, name, price, quantity, capacity, building }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleBookRoom = () => {
     navigate(`/room-details/${id}`)

@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import { FormControl, InputLabel, MenuItem, Pagination, Select, Typography, SelectChangeEvent } from '@mui/material'
 import homePageBanner from '../../assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import PODRoomTypeCard from '~/components/LandingPage/RoomTypeCard'
+import PODRoomTypeCard, { PODRoomTypeCardProps } from '~/components/LandingPage/RoomTypeCard'
 import moment, { Moment } from 'moment'
 import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
 import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
@@ -57,7 +57,7 @@ export default function Home() {
   })
 
   useEffect(() => {
-    setFilterQuery((prev) => ({ ...prev, page }))
+    setFilterQuery((prev: object) => ({ ...prev, page }))
   }, [page])
 
   useEffect(() => {
@@ -83,14 +83,14 @@ export default function Home() {
   const handleLocationChange = (event: SelectChangeEvent<string>) => {
     const newLocation = event.target.value
     setLocation(newLocation)
-    setFilterQuery((prev) => ({ ...prev, address: newLocation }))
+    setFilterQuery((prev: object) => ({ ...prev, address: newLocation }))
   }
 
   const handleRoomTypeChange = (event: SelectChangeEvent<string>) => {
     const newRoomType = event.target.value
     setRoomType(newRoomType)
     const capacity = parseInt(newRoomType.split(' ')[1])
-    setFilterQuery((prev) => ({ ...prev, capacity }))
+    setFilterQuery((prev: object) => ({ ...prev, capacity }))
   }
 
   const updateFilterQuery = (selectedDate: Moment | null, selectedTimeSlot: string) => {
@@ -99,7 +99,7 @@ export default function Home() {
       const startTime = selectedDate.clone().hour(parseInt(startHour)).minute(0).second(0)
       const endTime = selectedDate.clone().hour(parseInt(endHour)).minute(0).second(0)
 
-      setFilterQuery((prev) => ({
+      setFilterQuery((prev: object) => ({
         ...prev,
         startTime: startTime.format('YYYY-MM-DDTHH:mm:ss'),
         endTime: endTime.format('YYYY-MM-DDTHH:mm:ss')
@@ -198,7 +198,7 @@ export default function Home() {
         </Grid>
         {/* Rooms Section Card */}
         <Grid container spacing={2}>
-          {data?.data.data.map((roomType) => (
+          {data?.data.data.map((roomType: PODRoomTypeCardProps) => (
             <Grid size={12} key={roomType.id}>
               <PODRoomTypeCard
                 id={roomType.id}

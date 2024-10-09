@@ -84,6 +84,10 @@ const Table = ({
       onRowModesModelChange={handleRowModesModelChange}
       onRowEditStop={handleRowEditStop}
       processRowUpdate={processRowUpdate}
+      initialState={{
+        pagination: { paginationModel: { pageSize: 5 } }
+      }}
+      pageSizeOptions={[5, 10, 25]}
       slots={{
         toolbar: toolbarComponents as GridSlots['toolbar']
       }}

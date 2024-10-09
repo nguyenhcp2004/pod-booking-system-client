@@ -120,7 +120,7 @@ export default function NavItem() {
       </Box>
       <Box
         component={Link}
-        to='/admin/buildings'
+        to='/admin/users'
         sx={{
           textDecoration: 'none',
           color: color.grey[300],
