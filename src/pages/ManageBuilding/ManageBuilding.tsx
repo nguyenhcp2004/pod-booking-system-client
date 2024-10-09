@@ -1,6 +1,6 @@
-import { useGetListBuilding } from '~/queries/useBuilding'
-import { BuildingStatus } from '~/schemaValidations/building.schema'
-import { Box, Button, Chip, Link, Typography } from '@mui/material'
+import { useEditBuildingMutation, useGetListBuilding } from '~/queries/useBuilding'
+import { BuildingStatus, EditBuildingBodyType } from '~/schemaValidations/building.schema'
+import { Box, Chip, Link, Typography } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -16,13 +16,17 @@ import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
+import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
+import { handleErrorApi } from '~/utils/utils'
+import { toast } from 'react-toastify'
 
 export default function ManageBuilding() {
   const { data } = useGetListBuilding()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
+  const [row, setRow] = useState<GridValidRowModel | null>(null)
+  const editBuildingMutation = useEditBuildingMutation()
   useEffect(() => {
     if (data) {
       setRows([...data.data.data].reverse())
@@ -30,12 +34,20 @@ export default function ManageBuilding() {
   }, [data])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
-  const handleEditClick = (id: GridRowId) => () => {
+  const handleEditClick = (id: GridRowId, rowSelected: GridValidRowModel) => async () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
+    setRow(rowSelected)
   }
 
-  const handleSaveClick = (id: GridRowId) => () => {
+  const handleSaveClick = (id: GridRowId) => async () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
+    console.log(row)
+    try {
+      const result = await editBuildingMutation.mutateAsync(row as EditBuildingBodyType)
+      toast.success(result.data.message)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   const handleDeleteClick = (id: GridRowId) => () => {
@@ -123,7 +135,7 @@ export default function ManageBuilding() {
       headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
-      getActions: ({ id }) => {
+      getActions: ({ id, row }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit
 
         if (isInEditMode) {
@@ -151,7 +163,7 @@ export default function ManageBuilding() {
             icon={<EditIcon />}
             label='Edit'
             className='textPrimary'
-            onClick={handleEditClick(id)}
+            onClick={handleEditClick(id, row)}
             color='inherit'
           />,
           <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(id)} color='inherit' />
@@ -161,23 +173,12 @@ export default function ManageBuilding() {
   ]
 
   const Toolbar = () => {
-    const handleClick = () => {
-      const id = ''
-      setRows((oldRows) => [
-        ...oldRows,
-        { id, name: '', description: '', image: '', status: '', type: '', price: 0, isNew: true }
-      ])
-      setRowModesModel((oldModel) => ({
-        ...oldModel,
-        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
-      }))
-    }
-
     return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
+      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+        {/* <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
           Thêm phòng
-        </Button>
+        </Button> */}
+        <AddBuilding />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )

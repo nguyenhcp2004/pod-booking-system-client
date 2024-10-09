@@ -104,7 +104,9 @@ export default function AddBuilding() {
             <Grid size={9}>
               <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
                 {Object.values(BuildingStatus).map((status) => (
-                  <MenuItem value={status}>{status}</MenuItem>
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
                 ))}
               </Select>
             </Grid>

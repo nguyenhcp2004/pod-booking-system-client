@@ -17,3 +17,13 @@ export const useCreateBuildingMutation = () => {
     }
   })
 }
+
+export const useEditBuildingMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: buildingApiRequest.editBuilding,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['buidlings'] })
+    }
+  })
+}

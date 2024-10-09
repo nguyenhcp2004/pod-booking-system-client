@@ -56,6 +56,7 @@ export enum BuildingStatus {
 
 export const EditBuildingBody = z
   .object({
+    id: z.number(),
     address: z.string(),
     description: z.string(),
     hotlineNumber: z.string(),
@@ -65,13 +66,18 @@ export const EditBuildingBody = z
 
 export type EditBuildingBodyType = z.TypeOf<typeof EditBuildingBody>
 
-export const EditBuildingRes = z
-  .object({
+export const EditBuildingRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
     address: z.string(),
     description: z.string(),
     hotlineNumber: z.string(),
-    status: z.string()
+    status: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string()
   })
-  .strict()
+})
 
 export type EditBuildingResType = z.TypeOf<typeof EditBuildingRes>
