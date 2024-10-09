@@ -26,6 +26,7 @@ const Table = ({
   rowModesModel?: GridRowModesModel
   setRowModesModel?: Dispatch<SetStateAction<GridRowModesModel>>
   loading?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toolbarComponents?: any
 }) => {
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {

@@ -7,10 +7,12 @@ import Checkbox from '@mui/material/Checkbox'
 import MenuList from '@mui/material/MenuList'
 import TableCell from '@mui/material/TableCell'
 import IconButton from '@mui/material/IconButton'
-import MenuItem, { menuItemClasses } from '@mui/material/MenuItem'
+import { menuItemClasses } from '@mui/material/MenuItem'
 import { Chip } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+
+import EditBuilding from '~/pages/ManageBuilding/EditBuilding'
+import DeleteBuilding from '~/pages/ManageBuilding/DeleteBuilding'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
 export type BuildingProps = {
   id: number
@@ -18,10 +20,12 @@ export type BuildingProps = {
   status: string
   desciption: string
   hotlineNumber: string
+  createdAt: string
+  updatedAt: string
 }
 
 type BuildingTableRowProps = {
-  row: BuildingProps
+  row: GetListBuidlingResType['data'][0]
   selected: boolean
   onSelectRow: () => void
 }
@@ -48,12 +52,15 @@ export default function BuildingTableRow({ row, selected, onSelectRow }: Buildin
           {row.address}
         </TableCell>
 
-        <TableCell sx={{ fontSize: '14px' }}>{row.desciption}</TableCell>
+        <TableCell sx={{ fontSize: '14px' }}>{row.description}</TableCell>
 
         <TableCell sx={{ fontSize: '14px' }}>{row.hotlineNumber}</TableCell>
 
         <TableCell>
-          <Chip label={row.status} color='success' sx={{ color: 'white' }} />
+          <Chip
+            label={row.status}
+            color={row.status === 'Active' ? 'success' : row.status === 'UnderMaintenance' ? 'warning' : 'error'}
+          />
         </TableCell>
 
         <TableCell align='right' sx={{ fontSize: '14px' }}>
@@ -86,15 +93,9 @@ export default function BuildingTableRow({ row, selected, onSelectRow }: Buildin
             }
           }}
         >
-          <MenuItem onClick={handleClosePopover}>
-            <EditIcon />
-            Edit
-          </MenuItem>
+          <EditBuilding row={row} />
 
-          <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
-            <DeleteIcon />
-            Delete
-          </MenuItem>
+          <DeleteBuilding row={row} />
         </MenuList>
       </Popover>
     </>

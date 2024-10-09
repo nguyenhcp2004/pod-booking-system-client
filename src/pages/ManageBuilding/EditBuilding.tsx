@@ -1,5 +1,5 @@
 import { MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
 
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -9,15 +9,14 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
-import { useCreateBuildingMutation } from '~/queries/useBuilding'
-import { BuildingStatus, CreateBuildingBodyType } from '~/schemaValidations/building.schema'
-import { handleErrorApi } from '~/utils/utils'
-import { toast } from 'react-toastify'
+import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
 
-export default function AddBuilding() {
+interface Props {
+  row: GetListBuidlingResType['data'][0]
+}
+export default function EditBuilding({ row }: Props) {
   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState(BuildingStatus.Active.toString())
-  const createBuilding = useCreateBuildingMutation()
+  const [status, setStatus] = useState(row.status)
 
   const handleChange = (event: SelectChangeEvent) => {
     setStatus(event.target.value as string)
@@ -30,37 +29,24 @@ export default function AddBuilding() {
   const handleClose = () => {
     setOpen(false)
   }
-
   return (
     <>
-      <Button
-        onClick={handleClickOpen}
-        variant='contained'
-        sx={{ backgroundColor: 'grey.900', borderRadius: '12px' }}
-        startIcon={<AddIcon />}
-      >
-        Thêm chi nhánh
-      </Button>
+      <MenuItem onClick={handleClickOpen}>
+        <EditIcon />
+        Edit
+      </MenuItem>
       <Dialog
         fullWidth={true}
         open={open}
         onClose={handleClose}
         PaperProps={{
           component: 'form',
-          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
-            if (createBuilding.isPending) return
             const formData = new FormData(event.currentTarget)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const formJson = Object.fromEntries((formData as any).entries()) as CreateBuildingBodyType
-            try {
-              const result = await createBuilding.mutateAsync(formJson)
-              toast.success(result.data.message, {
-                autoClose: 3000
-              })
-            } catch (error) {
-              handleErrorApi({ error })
-            }
+            const formJson = Object.fromEntries((formData as any).entries())
+            console.log(formJson)
             handleClose()
           }
         }}
@@ -72,15 +58,15 @@ export default function AddBuilding() {
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' name='address' />
+              <TextField name='address' fullWidth size='small' value={row.address} />
             </Grid>
           </Grid>
-          <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
+          <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' name='hotlineNumber' />
+              <TextField name='hotlineNumber' fullWidth size='small' value={row.hotlineNumber} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -89,11 +75,12 @@ export default function AddBuilding() {
             </Grid>
             <Grid size={9}>
               <TextareaAutosize
-                name='description'
-                style={{ width: '100%', padding: '6px' }}
+                name='desciption'
+                style={{ width: '100%', padding: '8px', fontFamily: 'Roboto', fontSize: '14px' }}
                 minRows={2}
-                maxRows={4}
+                maxRows={5}
                 maxLength={255}
+                value={row.description}
               />
             </Grid>
           </Grid>
@@ -103,11 +90,9 @@ export default function AddBuilding() {
             </Grid>
             <Grid size={9}>
               <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
-                {Object.values(BuildingStatus).map((status) => (
-                  <MenuItem key={status} value={status}>
-                    {status}
-                  </MenuItem>
-                ))}
+                <MenuItem value='Available'>Available</MenuItem>
+                <MenuItem value='Under Maintenance'>Under Maintenance</MenuItem>
+                <MenuItem value='Hidden'>Hidden</MenuItem>
               </Select>
             </Grid>
           </Grid>
