@@ -10,13 +10,13 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
 import { useCreateBuildingMutation } from '~/queries/useBuilding'
-import { CreateBuildingBodyType } from '~/schemaValidations/building.schema'
+import { BuildingStatus, CreateBuildingBodyType } from '~/schemaValidations/building.schema'
 import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
 
 export default function AddBuilding() {
   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState(BuildingStatus.Active.toString())
   const createBuilding = useCreateBuildingMutation()
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -103,9 +103,9 @@ export default function AddBuilding() {
             </Grid>
             <Grid size={9}>
               <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
-                <MenuItem value='Active'>Active</MenuItem>
-                <MenuItem value='Unavailable'>Unavailable</MenuItem>
-                <MenuItem value='Hidden'>Hidden</MenuItem>
+                {Object.values(BuildingStatus).map((status) => (
+                  <MenuItem value={status}>{status}</MenuItem>
+                ))}
               </Select>
             </Grid>
           </Grid>

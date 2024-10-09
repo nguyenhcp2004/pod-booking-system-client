@@ -1,214 +1,199 @@
-import { Box, Card, Table, TableContainer, TablePagination, Typography } from '@mui/material'
-
-import BuildingTableToolbar from '~/pages/ManageBuilding/BuildingTableToolbar'
-import { useCallback, useState } from 'react'
-import BuildingTableHead from '~/pages/ManageBuilding/BuildingTableHead'
-import BuildingTableRow from '~/pages/ManageBuilding/BuildingTableRow'
-import { applyFilter, emptyRows, getComparator } from '~/utils/utils'
-import TableBody from '@mui/material/TableBody'
-import { TableEmptyRows } from '~/pages/ManageBuilding/TableEmptyRows'
-import TableNoData from '~/pages/ManageBuilding/TableNoData'
-import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
 import { useGetListBuilding } from '~/queries/useBuilding'
-import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
+import { BuildingStatus } from '~/schemaValidations/building.schema'
+import { Box, Button, Chip, Link, Typography } from '@mui/material'
+import {
+  GridActionsCellItem,
+  GridColDef,
+  GridRenderCellParams,
+  GridRowId,
+  GridRowModes,
+  GridRowModesModel,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+  GridValidRowModel
+} from '@mui/x-data-grid'
+import SaveIcon from '@mui/icons-material/Save'
+import CancelIcon from '@mui/icons-material/Cancel'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
+import { useState } from 'react'
+import Table from '~/components/Table/Table'
 
-// const _buildings = [
-//   {
-//     id: 1,
-//     address: '123 Main St, HCM City',
-//     status: 'Available',
-//     desciption: 'A modern office building with high-speed internet.',
-//     hotlineNumber: '0901234567'
-//   },
-//   {
-//     id: 2,
-//     address: '456 Second Ave, HCM City',
-//     status: 'Under Maintenance',
-//     desciption: 'A spacious building with conference rooms and amenities.',
-//     hotlineNumber: '0909876543'
-//   },
-//   {
-//     id: 3,
-//     address: '789 Third Blvd, HCM City',
-//     status: 'Occupied',
-//     desciption: 'A cozy building located in the heart of the city.',
-//     hotlineNumber: '0912345678'
-//   },
-//   {
-//     id: 4,
-//     address: '101 Fourth St, HCM City',
-//     status: 'Available',
-//     desciption: 'An eco-friendly building with green spaces.',
-//     hotlineNumber: '0918765432'
-//   },
-//   {
-//     id: 5,
-//     address: '202 Fifth Rd, HCM City',
-//     status: 'Available',
-//     desciption: 'A luxurious building with state-of-the-art facilities.',
-//     hotlineNumber: '0901357924'
-//   },
-//   {
-//     id: 6,
-//     address: '202 Fifth Rd, HCM City',
-//     status: 'Available',
-//     desciption: 'A luxurious building with state-of-the-art facilities.',
-//     hotlineNumber: '0901357924'
-//   }
-// ]
 export default function ManageBuilding() {
-  const table = useTable()
   const { data } = useGetListBuilding()
-  const _buildings = data?.data?.data ? [...data.data.data].reverse() : []
-  const [filterName, setFilterName] = useState('')
-  console.log(_buildings)
-  const dataFiltered: GetListBuidlingResType['data'] = applyFilter({
-    inputData: _buildings,
-    comparator: getComparator(table.order, table.orderBy),
-    filterName
-  })
+  const initialRows: GridValidRowModel[] = data?.data?.data ? [...data.data.data].reverse() : []
+  console.log(initialRows)
+  const [rows, setRows] = useState<GridValidRowModel[]>(initialRows)
+  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
-  const notFound = !dataFiltered.length && !!filterName
+  const handleEditClick = (id: GridRowId) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
+  }
 
+  const handleSaveClick = (id: GridRowId) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
+  }
+
+  const handleDeleteClick = (id: GridRowId) => () => {
+    setRows(rows.filter((row) => row.id !== id))
+  }
+
+  const handleCancelClick = (id: GridRowId) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true }
+    })
+
+    const editedRow = rows.find((row) => row.id === id)
+    if (editedRow!.isNew) {
+      setRows(rows.filter((row) => row.id !== id))
+    }
+  }
+
+  const ExpandableCell = ({ value }: GridRenderCellParams) => {
+    const [expanded, setExpanded] = useState(false)
+
+    return (
+      <div>
+        {expanded ? value : value.slice(0, 200)}&nbsp;
+        {value.length > 200 && (
+          <Link
+            type='button'
+            component='button'
+            sx={{ fontSize: 'inherit', letterSpacing: 'inherit' }}
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? 'view less' : 'view more'}
+          </Link>
+        )}
+      </div>
+    )
+  }
+  const columns: GridColDef[] = [
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 50,
+      valueFormatter: (params) => {
+        if (params) {
+          return `${params}`
+        } else {
+          return `${rows.length + 1}`
+        }
+      }
+    },
+    { field: 'address', headerName: 'Chi nhánh', width: 150, editable: true },
+    {
+      field: 'description',
+      headerName: 'Mô tả',
+      width: 250,
+      editable: true,
+      renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
+    },
+    { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: true },
+    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: true },
+    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: true },
+    {
+      field: 'status',
+      headerName: 'Trạng thái',
+      width: 150,
+      type: 'singleSelect',
+      valueOptions: Object.values(BuildingStatus),
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={
+            params.value === BuildingStatus.Active
+              ? 'success'
+              : params.value === BuildingStatus.UnderMaintenance
+                ? 'warning'
+                : 'error'
+          }
+        />
+      ),
+      editable: true
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Hành động',
+      width: 100,
+      cellClassName: 'actions',
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label='Save'
+              sx={{
+                color: 'primary.main'
+              }}
+              onClick={handleSaveClick(id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label='Cancel'
+              className='textPrimary'
+              onClick={handleCancelClick(id)}
+              color='inherit'
+            />
+          ]
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label='Edit'
+            className='textPrimary'
+            onClick={handleEditClick(id)}
+            color='inherit'
+          />,
+          <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(id)} color='inherit' />
+        ]
+      }
+    }
+  ]
+
+  const Toolbar = () => {
+    const handleClick = () => {
+      const id = ''
+      setRows((oldRows) => [
+        ...oldRows,
+        { id, name: '', description: '', image: '', status: '', type: '', price: 0, isNew: true }
+      ])
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
+      }))
+    }
+
+    return (
+      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
+          Thêm phòng
+        </Button>
+        <GridToolbarQuickFilter />
+      </GridToolbarContainer>
+    )
+  }
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
         <Typography variant='h4' fontWeight='500' flexGrow={1}>
-          Chi nhánh
+          Quản lí chi nhánh
         </Typography>
-        <AddBuilding />
       </Box>
-
-      <Card sx={{ borderRadius: '16px' }}>
-        <BuildingTableToolbar
-          numSelected={table.selected.length}
-          filterName={filterName}
-          onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFilterName(event.target.value)
-            table.onResetPage()
-          }}
-        />
-
-        <Box>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <BuildingTableHead
-                order={table.order}
-                orderBy={table.orderBy}
-                rowCount={_buildings.length}
-                numSelected={table.selected.length}
-                onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    _buildings.map((building) => building.id.toString())
-                  )
-                }
-                headLabel={[
-                  { id: 'address', label: 'Địa chỉ' },
-                  { id: 'description', label: 'Mô tả' },
-                  { id: 'hotlineNumber', label: 'Hotline' },
-                  { id: 'status', label: 'Trạng thái' },
-                  { id: '' }
-                ]}
-              />
-
-              <TableBody>
-                {dataFiltered
-                  .slice(table.page * table.rowsPerPage, table.page * table.rowsPerPage + table.rowsPerPage)
-                  .map((row) => (
-                    <BuildingTableRow
-                      key={row.id}
-                      row={row}
-                      selected={table.selected.includes(row.id.toString())}
-                      onSelectRow={() => table.onSelectRow(row.id.toString())}
-                    />
-                  ))}
-
-                <TableEmptyRows height={68} emptyRows={emptyRows(table.page, table.rowsPerPage, _buildings.length)} />
-
-                {notFound && <TableNoData searchQuery={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-
-        <TablePagination
-          component='div'
-          page={table.page}
-          count={_buildings.length}
-          rowsPerPage={table.rowsPerPage}
-          onPageChange={table.onChangePage}
-          rowsPerPageOptions={[10, 15, 20]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
-        />
-      </Card>
+      <Table
+        columns={columns}
+        rows={rows}
+        setRows={setRows}
+        rowModesModel={rowModesModel}
+        setRowModesModel={setRowModesModel}
+        toolbarComponents={Toolbar}
+      />
     </Box>
   )
-}
-
-export function useTable() {
-  const [page, setPage] = useState(0)
-  const [orderBy, setOrderBy] = useState('name')
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [selected, setSelected] = useState<string[]>([])
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
-
-  const onSort = useCallback(
-    (id: string) => {
-      const isAsc = orderBy === id && order === 'asc'
-      setOrder(isAsc ? 'desc' : 'asc')
-      setOrderBy(id)
-    },
-    [order, orderBy]
-  )
-
-  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
-    if (checked) {
-      setSelected(newSelecteds)
-      return
-    }
-    setSelected([])
-  }, [])
-
-  const onSelectRow = useCallback(
-    (inputValue: string) => {
-      const newSelected = selected.includes(inputValue)
-        ? selected.filter((value) => value !== inputValue)
-        : [...selected, inputValue]
-
-      setSelected(newSelected)
-    },
-    [selected]
-  )
-
-  const onResetPage = useCallback(() => {
-    setPage(0)
-  }, [])
-
-  const onChangePage = useCallback((event: unknown, newPage: number) => {
-    setPage(newPage)
-  }, [])
-
-  const onChangeRowsPerPage = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRowsPerPage(parseInt(event.target.value, 10))
-      onResetPage()
-    },
-    [onResetPage]
-  )
-
-  return {
-    page,
-    order,
-    onSort,
-    orderBy,
-    selected,
-    rowsPerPage,
-    onSelectRow,
-    onResetPage,
-    onChangePage,
-    onSelectAllRows,
-    onChangeRowsPerPage
-  }
 }

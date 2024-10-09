@@ -59,8 +59,7 @@ export default function BuildingTableRow({ row, selected, onSelectRow }: Buildin
         <TableCell>
           <Chip
             label={row.status}
-            color='success'
-            sx={{ color: 'success.main', bgcolor: 'success.light', fontWeight: '500' }}
+            color={row.status === 'Active' ? 'success' : row.status === 'UnderMaintenance' ? 'warning' : 'error'}
           />
         </TableCell>
 

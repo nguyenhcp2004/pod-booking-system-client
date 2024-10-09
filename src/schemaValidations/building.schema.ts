@@ -47,3 +47,31 @@ export const CreateBuildingRes = z.object({
 })
 
 export type CreateBuildingResType = z.TypeOf<typeof CreateBuildingRes>
+
+export enum BuildingStatus {
+  Active = 'Active',
+  UnderMaintenance = 'UnderMaintenance',
+  Closed = 'Closed'
+}
+
+export const EditBuildingBody = z
+  .object({
+    address: z.string(),
+    description: z.string(),
+    hotlineNumber: z.string(),
+    status: z.string()
+  })
+  .strict()
+
+export type EditBuildingBodyType = z.TypeOf<typeof EditBuildingBody>
+
+export const EditBuildingRes = z
+  .object({
+    address: z.string(),
+    description: z.string(),
+    hotlineNumber: z.string(),
+    status: z.string()
+  })
+  .strict()
+
+export type EditBuildingResType = z.TypeOf<typeof EditBuildingRes>
