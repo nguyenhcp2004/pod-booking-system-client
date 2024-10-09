@@ -17,14 +17,17 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
 
 export default function ManageBuilding() {
   const { data } = useGetListBuilding()
-  const initialRows: GridValidRowModel[] = data?.data?.data ? [...data.data.data].reverse() : []
-  console.log(initialRows)
-  const [rows, setRows] = useState<GridValidRowModel[]>(initialRows)
+  const [rows, setRows] = useState<GridValidRowModel[]>([])
+  useEffect(() => {
+    if (data) {
+      setRows([...data.data.data].reverse())
+    }
+  }, [data])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
   const handleEditClick = (id: GridRowId) => () => {
