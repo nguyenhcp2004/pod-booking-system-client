@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -108,17 +108,17 @@ export default function ManageOrder() {
   const [openCreateModal, setOpenCreateModal] = useState(false)
   //const [searchTerm, setSearchTerm] = useState('')
 
-  const handleEditClick = (id: GridRowId, rowSelected: GridValidRowModel) => () => {
+  const handleEditClick = (rowSelected: GridValidRowModel) => () => {
     setSelectedOrder(rowSelected as Order)
     setOpenEditModal(true)
   }
 
-  const handleDeleteClick = (id: GridRowId, rowSelected: GridValidRowModel) => () => {
+  const handleDeleteClick = (rowSelected: GridValidRowModel) => () => {
     setSelectedOrder(rowSelected as Order)
     setOpenDeleteModal(true)
   }
 
-  const handleViewClick = (id: GridRowId, rowSelected: GridValidRowModel) => () => {
+  const handleViewClick = (rowSelected: GridValidRowModel) => () => {
     setSelectedOrder(rowSelected as Order)
     setOpenViewModal(true)
   }
@@ -148,13 +148,9 @@ export default function ManageOrder() {
       type: 'actions',
       width: 150,
       getActions: (params) => [
-        <GridActionsCellItem icon={<EditIcon />} label='Edit' onClick={handleEditClick(params.id, params.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(params.id, params.row)} />,
-        <GridActionsCellItem
-          icon={<RemoveRedEyeIcon />}
-          label='View'
-          onClick={handleViewClick(params.id, params.row)}
-        />
+        <GridActionsCellItem icon={<EditIcon />} label='Edit' onClick={handleEditClick(params.row)} />,
+        <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(params.row)} />,
+        <GridActionsCellItem icon={<RemoveRedEyeIcon />} label='View' onClick={handleViewClick(params.row)} />
       ]
     }
   ]
@@ -165,8 +161,8 @@ export default function ManageOrder() {
         <Button
           variant='contained'
           color='primary'
-          onClick={() => setOpenCreateModal(true)} // Open CreateOrderModal
-          style={{ marginTop: '20px' }} // Để có khoảng cách trên nút
+          onClick={() => setOpenCreateModal(true)}
+          style={{ marginTop: '20px' }}
         >
           Tạo đơn hàng
         </Button>
