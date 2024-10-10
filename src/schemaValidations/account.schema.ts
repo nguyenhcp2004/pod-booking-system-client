@@ -16,3 +16,34 @@ export const GetMeRes = z.object({
 })
 
 export type GetMeResType = z.TypeOf<typeof GetMeRes>
+
+const AccountSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  avatar: z.string(),
+  point: z.number(),
+  balance: z.number(),
+  buildingNumber: z.number(),
+  rankingName: z.string(),
+  createdAt: z.string(),
+  status: z.number()
+})
+
+const ManageAccountQuery = z.object({
+  page: z.number().optional(),
+  take: z.number().optional()
+})
+
+export type GetManageAccountQuery = z.TypeOf<typeof ManageAccountQuery>
+
+const ManageAccountRes = z.object({
+  code: z.number(),
+  data: z.array(AccountSchema),
+  currentPage: z.number(),
+  totalPage: z.number(),
+  recorderPerPage: z.number(),
+  totalRecord: z.number()
+})
+
+export type GetManageAccountRes = z.TypeOf<typeof ManageAccountRes>

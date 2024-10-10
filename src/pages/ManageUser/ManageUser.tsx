@@ -15,76 +15,26 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
-
-const initialRows: GridValidRowModel[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    avatar: 'https://png.pngtree.com/png-clipart/20230917/original/pngtree-user-icon-vector-png-image_12276906.png',
-    point: 100,
-    role: 'Staff',
-    balance: 1000000,
-    buildingNumber: 1,
-    createdAt: '2024-09-01 08:30',
-    rankingName: 'Silver'
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    avatar: 'https://png.pngtree.com/png-clipart/20230917/original/pngtree-user-icon-vector-png-image_12276906.png',
-    point: 200,
-    role: 'Manager',
-    balance: 2000000,
-    buildingNumber: 2,
-    createdAt: '2024-08-25 09:00',
-    rankingName: 'Gold'
-  },
-  {
-    id: 3,
-    name: 'Admin User',
-    email: 'admin@example.com',
-    avatar: 'https://png.pngtree.com/png-clipart/20230917/original/pngtree-user-icon-vector-png-image_12276906.png',
-    point: 500,
-    role: 'Admin',
-    balance: 5000000,
-    buildingNumber: 3,
-    createdAt: '2024-09-05 10:15',
-    rankingName: 'Platinum'
-  },
-  {
-    id: 4,
-    name: 'Customer One',
-    email: 'customer1@example.com',
-    avatar: 'https://png.pngtree.com/png-clipart/20230917/original/pngtree-user-icon-vector-png-image_12276906.png',
-    point: 50,
-    role: 'Customer',
-    balance: 500000,
-    buildingNumber: 4,
-    createdAt: '2024-09-10 07:45',
-    rankingName: 'Bronze'
-  },
-  {
-    id: 5,
-    name: 'Staff Member',
-    email: 'staff@example.com',
-    avatar: 'https://png.pngtree.com/png-clipart/20230917/original/pngtree-user-icon-vector-png-image_12276906.png',
-    point: 150,
-    role: 'Staff',
-    balance: 1500000,
-    buildingNumber: 5,
-    createdAt: '2024-09-15 13:00',
-    rankingName: 'Silver'
-  }
-]
+import { useGetManageAccount } from '~/queries/useAccount'
 
 export default function ManageUser() {
-  const [rows, setRows] = useState<GridValidRowModel[]>(initialRows)
+  const { data, isLoading } = useGetManageAccount({ page: 1, take: 10 })
+  const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+
+  useEffect(() => {
+    if (data?.data.data) {
+      setRows(
+        data.data.data.map((user) => ({
+          ...user,
+          status: user.status === 1 ? 'Hoạt động' : 'Không hoạt động'
+        }))
+      )
+    }
+  }, [data])
 
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
@@ -95,7 +45,7 @@ export default function ManageUser() {
   }
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id))
+    setRows(rows?.filter((row) => row.id !== id))
   }
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -104,44 +54,18 @@ export default function ManageUser() {
       [id]: { mode: GridRowModes.View, ignoreModifications: true }
     })
 
-    const editedRow = rows.find((row) => row.id === id)
+    const editedRow = rows?.find((row) => row.id === id)
     if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.id !== id))
+      setRows(rows?.filter((row) => row.id !== id))
     }
   }
-
-  // const ExpandableCell = ({ value }: GridRenderCellParams) => {
-  //   const [expanded, setExpanded] = useState(false)
-
-  //   return (
-  //     <div>
-  //       {expanded ? value : value.slice(0, 20)}&nbsp;
-  //       {value.length > 20 && (
-  //         <Link
-  //           type='button'
-  //           component='button'
-  //           sx={{ fontSize: 'inherit', letterSpacing: 'inherit' }}
-  //           onClick={() => setExpanded(!expanded)}
-  //         >
-  //           {expanded ? 'view less' : 'view more'}
-  //         </Link>
-  //       )}
-  //     </div>
-  //   )
-  // }
 
   const columns: GridColDef[] = [
     {
       field: 'id',
       headerName: 'ID',
       width: 50,
-      valueFormatter: (params) => {
-        if (params) {
-          return `${params}`
-        } else {
-          return `${rows.length + 1}`
-        }
-      }
+      editable: false
     },
     { field: 'name', headerName: 'Tên', width: 150, editable: true },
     {
@@ -149,7 +73,6 @@ export default function ManageUser() {
       headerName: 'Email',
       width: 200,
       editable: true
-      // renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
     },
     {
       field: 'avatar',
@@ -196,6 +119,17 @@ export default function ManageUser() {
     { field: 'buildingNumber', headerName: 'Số tòa nhà', width: 120, type: 'number', editable: true },
     { field: 'createdAt', headerName: 'Thời gian tạo', width: 180, editable: false },
     { field: 'rankingName', headerName: 'Xếp hạng', width: 120, editable: true },
+    {
+      field: 'status',
+      headerName: 'Trạng thái',
+      width: 150,
+      type: 'singleSelect',
+      valueOptions: ['Hoạt động', 'Không hoạt động'],
+      renderCell: (params) => (
+        <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
+      ),
+      editable: true
+    },
     {
       field: 'actions',
       type: 'actions',
@@ -255,6 +189,7 @@ export default function ManageUser() {
           buildingNumber: 0,
           createdAt: new Date().toISOString(),
           rankingName: '',
+          status: 'Hoạt động',
           isNew: true
         }
       ])
@@ -287,6 +222,7 @@ export default function ManageUser() {
         setRows={setRows}
         rowModesModel={rowModesModel}
         setRowModesModel={setRowModesModel}
+        loading={isLoading}
         toolbarComponents={Toolbar}
       />
     </Box>
