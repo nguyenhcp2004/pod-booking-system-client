@@ -16,7 +16,7 @@ const accountApiRequest = {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/${body.id}`, body)
   },
   createAccount: (body: CreateAccountBodyType) => {
-    return http.post<CreateAccountBodyType>('/accounts', body)
+    return http.post<UpdateAccountByAdminResType>('/accounts', body)
   }
 }
 

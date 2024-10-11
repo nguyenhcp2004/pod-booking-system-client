@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Typography, Avatar } from '@mui/material'
+import { Box, Chip, Typography, Avatar } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -14,7 +14,6 @@ import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import BlockIcon from '@mui/icons-material/Block'
-import AddIcon from '@mui/icons-material/Add'
 import { useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
@@ -22,6 +21,7 @@ import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccou
 import { UpdateAccountByAdminBodyType } from '~/schemaValidations/account.schema'
 import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
+import AddUser from './AddUser'
 
 export default function ManageUser() {
   const { data, isLoading } = useGetManageAccount()
@@ -262,36 +262,9 @@ export default function ManageUser() {
   ]
 
   const Toolbar = () => {
-    const handleClick = () => {
-      const id = Math.max(...rows.map((row) => Number(row.id))) + 1
-      setRows((oldRows) => [
-        ...oldRows,
-        {
-          id,
-          name: '',
-          email: '',
-          avatar: '',
-          point: 0,
-          role: 'Staff',
-          balance: 0,
-          buildingNumber: 0,
-          createdAt: new Date().toISOString(),
-          rankingName: '',
-          status: 'Hoạt động',
-          isNew: true
-        }
-      ])
-      setRowModesModel((oldModel) => ({
-        ...oldModel,
-        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' }
-      }))
-    }
-
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
-          Thêm tài khoản
-        </Button>
+        <AddUser />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )
