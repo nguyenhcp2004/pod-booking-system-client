@@ -1,5 +1,5 @@
-import { useEditBuildingMutation, useGetListBuilding } from '~/queries/useBuilding'
-import { BuildingStatus, EditBuildingBodyType } from '~/schemaValidations/building.schema'
+import { useGetListBuilding } from '~/queries/useBuilding'
+import { BuildingStatus } from '~/schemaValidations/building.schema'
 import { Box, Chip, Link, Typography } from '@mui/material'
 import {
   GridActionsCellItem,
@@ -14,19 +14,14 @@ import {
 } from '@mui/x-data-grid'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
 import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
-import { handleErrorApi } from '~/utils/utils'
-import { toast } from 'react-toastify'
+import EditBuilding from '~/pages/ManageBuilding/EditBuilding'
 
 export default function ManageBuilding() {
   const { data } = useGetListBuilding()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
-  const [row, setRow] = useState<GridValidRowModel | null>(null)
-  const editBuildingMutation = useEditBuildingMutation()
   useEffect(() => {
     if (data) {
       setRows([...data.data.data].reverse())
@@ -34,24 +29,8 @@ export default function ManageBuilding() {
   }, [data])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
-  const handleEditClick = (id: GridRowId, rowSelected: GridValidRowModel) => async () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
-    setRow(rowSelected)
-  }
-
   const handleSaveClick = (id: GridRowId) => async () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
-    console.log(row)
-    try {
-      const result = await editBuildingMutation.mutateAsync(row as EditBuildingBodyType)
-      toast.success(result.data.message)
-    } catch (error) {
-      handleErrorApi({ error })
-    }
-  }
-
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id))
   }
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -158,16 +137,7 @@ export default function ManageBuilding() {
           ]
         }
 
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label='Edit'
-            className='textPrimary'
-            onClick={handleEditClick(id, row)}
-            color='inherit'
-          />,
-          <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(id)} color='inherit' />
-        ]
+        return [<EditBuilding row={row} />]
       }
     }
   ]
