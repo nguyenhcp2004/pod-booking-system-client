@@ -13,7 +13,7 @@ import PaymentsIcon from '@mui/icons-material/Payments'
 const menuItems = [
   {
     title: 'Tổng quan',
-    to: '/admin',
+    to: '/admin/dashboard',
     icon: <LeaderboardIcon sx={{ width: '24px', height: '24px' }} />
   },
   {

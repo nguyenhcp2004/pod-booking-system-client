@@ -1,6 +1,5 @@
 import { Autocomplete, Box, Button, Checkbox, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-// import pod from '~/assets/images/pod.jpg'
 import moment, { Moment } from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
@@ -18,6 +17,8 @@ import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { Link, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
+import { client } from '~/utils/socket'
+import { toast } from 'react-toastify'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -81,7 +82,24 @@ export default function RoomDetail() {
 
   useEffect(() => {
     roomListRefetch()
-  }, [selectedSlots, selectedDate])
+  }, [selectedSlots, selectedDate, roomListRefetch])
+
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/payments', (data) => {
+        const roomId = JSON.parse(data.body)
+        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
+          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+        }
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [bookingData])
 
   useEffect(() => {
     setBookingData?.((prev: BookingInfo) => {
@@ -103,7 +121,7 @@ export default function RoomDetail() {
         servicePackage: selectedPackage || null
       }
     })
-  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage])
+  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
 
   return (
     <Box
