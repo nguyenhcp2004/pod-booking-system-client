@@ -21,7 +21,7 @@ import Table from '~/components/Table/Table'
 import { useGetManageAccount } from '~/queries/useAccount'
 
 export default function ManageUser() {
-  const { data, isLoading } = useGetManageAccount({ page: 1, take: 10 })
+  const { data, isLoading } = useGetManageAccount()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 

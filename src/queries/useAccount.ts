@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
-import { GetManageAccountQuery } from '~/schemaValidations/account.schema'
 
 export const useGetMe = () => {
   return useQuery({
@@ -9,9 +8,9 @@ export const useGetMe = () => {
   })
 }
 
-export const useGetManageAccount = (query: GetManageAccountQuery) => {
+export const useGetManageAccount = () => {
   return useQuery({
     queryKey: ['accounts'],
-    queryFn: () => accountApiRequest.getListAccounts(query)
+    queryFn: () => accountApiRequest.getListAccounts()
   })
 }

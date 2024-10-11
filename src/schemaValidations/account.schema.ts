@@ -30,13 +30,6 @@ const AccountSchema = z.object({
   status: z.number()
 })
 
-const ManageAccountQuery = z.object({
-  page: z.number().optional(),
-  take: z.number().optional()
-})
-
-export type GetManageAccountQuery = z.TypeOf<typeof ManageAccountQuery>
-
 const ManageAccountRes = z.object({
   code: z.number(),
   data: z.array(AccountSchema),
