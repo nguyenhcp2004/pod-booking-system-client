@@ -13,18 +13,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import { Order } from '~/apis/orderApi'
 
 interface EditOrderModalProps {
   open: boolean
@@ -41,10 +30,10 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
 
   useEffect(() => {
     if (order) {
-      setEditDate(moment(order.date))
-      setEditSlot(order.slot)
-      setEditServicePackage(order.servicePackage)
-      setEditStatus(order.status)
+      // setEditDate(moment(order.date))
+      // setEditSlot(order.slot)
+      // setEditServicePackage(order.servicePackage)
+      // setEditStatus(order.status)
     }
   }, [order])
 

@@ -13,22 +13,13 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import { Order } from '~/apis/orderApi'
 
 interface CreateOrderModalProps {
   open: boolean
+
   onClose: () => void
+
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>
 }
 
@@ -39,19 +30,20 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, setO
   const [status, setStatus] = useState('Active')
 
   const handleCreate = () => {
-    const newOrder = {
-      id: `ORD${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      customerName: 'Tên khách hàng',
-      date: moment(date).format(DEFAULT_DATE_FORMAT),
-      slot,
-      room: 'Room A',
-      address: 'Địa chỉ',
-      status,
-      staff: 'Nhân viên',
-      servicePackage
-    }
+    // const newOrder = {
+    //   id: `ORD${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+    //   customerName: 'Tên khách hàng',
+    //   date: moment(date).format(DEFAULT_DATE_FORMAT),
+    //   slot,
+    //   room: 'Room A',
+    //   address: 'Địa chỉ',
+    //   status,
+    //   staff: 'Nhân viên',
+    //   servicePackage
+    // }
 
-    setOrders((prevOrders) => [...prevOrders, newOrder])
+    // setOrders((prevOrders) => [...prevOrders, newOrder])
+    console.log('Create order')
     onClose()
   }
 

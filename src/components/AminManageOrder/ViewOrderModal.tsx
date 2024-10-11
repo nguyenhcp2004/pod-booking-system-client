@@ -1,18 +1,7 @@
 import React from 'react'
 import { Modal, Box, Typography, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import { Order } from '~/apis/orderApi'
 
 interface ViewOrderModalProps {
   open: boolean
@@ -45,28 +34,28 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
           <strong>ID:</strong> {order.id}
         </Typography>
         <Typography variant='body1'>
-          <strong>Khách hàng:</strong> {order.customerName}
+          <strong>Khách hàng:</strong> {order.orderDetails[0].customer.name}
         </Typography>
         <Typography variant='body1'>
-          <strong>Ngày:</strong> {order.date}
+          <strong>Ngày:</strong> {order.orderDetails[0].startTime}
         </Typography>
         <Typography variant='body1'>
-          <strong>Slot:</strong> {order.slot}
+          <strong>Slot:</strong> {order.orderDetails[0].endTime}
         </Typography>
         <Typography variant='body1'>
-          <strong>Phòng:</strong> {order.room}
+          <strong>Phòng:</strong> {order.orderDetails.map((o) => o.roomName).join(', ')}
         </Typography>
         <Typography variant='body1'>
-          <strong>Địa chỉ:</strong> {order.address}
+          <strong>Địa chỉ:</strong> {order.orderDetails[0].customer.buildingNumber}
         </Typography>
         <Typography variant='body1'>
-          <strong>Trạng thái:</strong> {order.status}
+          <strong>Trạng thái:</strong> {order.orderDetails[0].status}
         </Typography>
         <Typography variant='body1'>
-          <strong>Nhân viên:</strong> {order.staff}
+          <strong>Nhân viên:</strong> {order.orderDetails[0].orderHandler.name}
         </Typography>
         <Typography variant='body1'>
-          <strong>Gói dịch vụ:</strong> {order.servicePackage}
+          <strong>Gói dịch vụ:</strong> {order.orderDetails[0].servicePackage?.name}
         </Typography>
       </Box>
     </Modal>
