@@ -6,6 +6,8 @@ import moment, { Moment } from 'moment'
 import Calendar from '~/components/Calendar/Calendar'
 import { useEffect, useState } from 'react'
 import { slotType, useBookingContext } from '~/contexts/BookingContext'
+import { client } from '~/utils/socket'
+import { toast } from 'react-toastify'
 //import { array } from 'zod'
 interface CommonProps {
   onNext: () => void
@@ -23,7 +25,24 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
       setSelectedDates([moment(bookingData.date)])
       setSelectedSlots(bookingData.timeSlots)
     }
-  }, [])
+  }, [bookingData])
+
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/payments', (data) => {
+        const roomId = JSON.parse(data.body)
+        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
+          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+        }
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [bookingData])
   if (!bookingData) return null
 
   return (
