@@ -1,4 +1,5 @@
 import {
+  CreateAccountBodyType,
   GetManageAccountRes,
   GetMeResType,
   UpdateAccountByAdminBodyType,
@@ -13,6 +14,9 @@ const accountApiRequest = {
   },
   updateAccountByAdmin: (body: UpdateAccountByAdminBodyType) => {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/${body.id}`, body)
+  },
+  createAccount: (body: CreateAccountBodyType) => {
+    return http.post<CreateAccountBodyType>('/accounts', body)
   }
 }
 

@@ -24,3 +24,13 @@ export const useUpdateAccountByAdmin = () => {
     }
   })
 }
+
+export const useCreateAccountMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.createAccount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+    }
+  })
+}
