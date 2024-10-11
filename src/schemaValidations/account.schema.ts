@@ -45,6 +45,7 @@ export type GetManageAccountRes = z.TypeOf<typeof ManageAccountRes>
 export const UpdateAccountByAdminBody = z.object({
   id: z.string(),
   name: z.string().optional(),
+  buildingNumber: z.number(),
   role: z.string().optional(),
   status: z.number().optional()
 })

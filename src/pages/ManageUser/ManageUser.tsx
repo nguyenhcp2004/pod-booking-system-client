@@ -13,7 +13,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import BlockIcon from '@mui/icons-material/Block'
 import AddIcon from '@mui/icons-material/Add'
 import { useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
@@ -59,6 +59,7 @@ export default function ManageUser() {
         const body: UpdateAccountByAdminBodyType = {
           id: editedRow.id,
           name: editedRow.name,
+          buildingNumber: editedRow.buildingNumber,
           status: editedRow.status === 'Hoạt động' ? 1 : 0,
           role: editedRow.role
         }
@@ -72,8 +73,24 @@ export default function ManageUser() {
     }
   }
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id))
+  const handleBanClick = (id: GridRowId) => async () => {
+    const rowToBan = rows.find((row) => row.id === id)
+    if (rowToBan) {
+      try {
+        const body: UpdateAccountByAdminBodyType = {
+          id: rowToBan.id,
+          name: rowToBan.name,
+          buildingNumber: rowToBan.buildingNumber,
+          status: 0,
+          role: rowToBan.role
+        }
+        await updateAccountByAdminMutation.mutateAsync(body)
+        toast.success(`Người dùng: ${rowToBan.name} bị cấm hoạt động thành công`)
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: 'Không hoạt động' } : row)))
+      } catch (error) {
+        handleErrorApi({ error })
+      }
+    }
   }
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -238,7 +255,7 @@ export default function ManageUser() {
             onClick={handleEditClick(id)}
             color='inherit'
           />,
-          <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(id)} color='inherit' />
+          <GridActionsCellItem icon={<BlockIcon />} label='Ban' onClick={handleBanClick(id)} color='inherit' />
         ]
       }
     }
