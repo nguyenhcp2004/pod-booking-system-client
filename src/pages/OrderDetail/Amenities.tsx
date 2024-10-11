@@ -2,7 +2,7 @@
 
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -11,6 +11,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext } from '~/contexts/BookingContext'
+import { client } from '~/utils/socket'
+import { toast } from 'react-toastify'
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -31,6 +33,23 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const { bookingData, setBookingData } = bookingContext
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [roomType, setRoomType] = useState(bookingData?.selectedRooms[0].name)
+
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/payments', (data) => {
+        const roomId = JSON.parse(data.body)
+        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
+          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+        }
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [bookingData])
 
   const handleAddAmentity = () => {
     if (!detailAmenity) return

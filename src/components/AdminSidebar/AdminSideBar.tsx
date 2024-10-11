@@ -17,7 +17,7 @@ export default function AdminSideBar() {
       <Typography
         variant='h3'
         component={'a'}
-        href='/admin'
+        href='/admin/dashboard'
         sx={{
           fontWeight: '700',
           lineHeight: '120%',
