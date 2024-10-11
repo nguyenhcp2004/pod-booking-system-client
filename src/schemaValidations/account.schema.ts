@@ -23,6 +23,7 @@ const AccountSchema = z.object({
   email: z.string(),
   avatar: z.string(),
   point: z.number(),
+  role: z.string(),
   balance: z.number(),
   buildingNumber: z.number(),
   rankingName: z.string(),
@@ -40,3 +41,20 @@ const ManageAccountRes = z.object({
 })
 
 export type GetManageAccountRes = z.TypeOf<typeof ManageAccountRes>
+
+export const UpdateAccountByAdminBody = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  role: z.string().optional(),
+  status: z.number().optional()
+})
+
+export type UpdateAccountByAdminBodyType = z.TypeOf<typeof UpdateAccountByAdminBody>
+
+export const UpdateAccountByAdminRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: AccountSchema
+})
+
+export type UpdateAccountByAdminResType = z.TypeOf<typeof UpdateAccountByAdminRes>

@@ -18,12 +18,16 @@ import AddIcon from '@mui/icons-material/Add'
 import { useEffect, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
-import { useGetManageAccount } from '~/queries/useAccount'
+import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccount'
+import { UpdateAccountByAdminBodyType } from '~/schemaValidations/account.schema'
+import { toast } from 'react-toastify'
+import { handleErrorApi } from '~/utils/utils'
 
 export default function ManageUser() {
   const { data, isLoading } = useGetManageAccount()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+  const updateAccountByAdminMutation = useUpdateAccountByAdmin()
 
   useEffect(() => {
     if (data?.data.data) {
@@ -41,8 +45,21 @@ export default function ManageUser() {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
   }
 
-  const handleSaveClick = (id: GridRowId) => () => {
+  const handleSaveClick = (id: GridRowId) => async () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
+    const editedRow = rows.find((row) => row.id === id)
+    try {
+      const body: UpdateAccountByAdminBodyType = {
+        id: editedRow?.id,
+        name: editedRow?.name,
+        status: editedRow?.status === 'Hoạt động' ? 1 : 0,
+        role: editedRow?.role
+      }
+      const result = await updateAccountByAdminMutation.mutateAsync(body)
+      toast.success(result.data.message)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   const handleDeleteClick = (id: GridRowId) => () => {

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
 
 export const useGetMe = () => {
@@ -12,5 +12,15 @@ export const useGetManageAccount = () => {
   return useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountApiRequest.getListAccounts()
+  })
+}
+
+export const useUpdateAccountByAdmin = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountByAdmin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+    }
   })
 }
