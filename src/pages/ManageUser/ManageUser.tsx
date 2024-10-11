@@ -15,7 +15,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
 import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccount'
@@ -28,6 +28,7 @@ export default function ManageUser() {
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
+  const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
 
   useEffect(() => {
     if (data?.data.data) {
@@ -43,27 +44,36 @@ export default function ManageUser() {
 
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
+    // Store the current row data in editedRowRef when entering edit mode
+    const currentRow = rows.find((row) => row.id === id)
+    if (currentRow) {
+      editedRowRef.current[id] = { ...currentRow }
+    }
   }
 
   const handleSaveClick = (id: GridRowId) => async () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
-    const editedRow = rows.find((row) => row.id === id)
-    try {
-      const body: UpdateAccountByAdminBodyType = {
-        id: editedRow?.id,
-        name: editedRow?.name,
-        status: editedRow?.status === 'Hoạt động' ? 1 : 0,
-        role: editedRow?.role
+    const editedRow = editedRowRef.current[id]
+    if (editedRow) {
+      try {
+        const body: UpdateAccountByAdminBodyType = {
+          id: editedRow.id,
+          name: editedRow.name,
+          status: editedRow.status === 'Hoạt động' ? 1 : 0,
+          role: editedRow.role
+        }
+        const result = await updateAccountByAdminMutation.mutateAsync(body)
+        toast.success(result.data.message)
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, ...editedRow } : row)))
+        delete editedRowRef.current[id]
+      } catch (error) {
+        handleErrorApi({ error })
       }
-      const result = await updateAccountByAdminMutation.mutateAsync(body)
-      toast.success(result.data.message)
-    } catch (error) {
-      handleErrorApi({ error })
     }
   }
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows?.filter((row) => row.id !== id))
+    setRows(rows.filter((row) => row.id !== id))
   }
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -72,10 +82,11 @@ export default function ManageUser() {
       [id]: { mode: GridRowModes.View, ignoreModifications: true }
     })
 
-    const editedRow = rows?.find((row) => row.id === id)
+    const editedRow = rows.find((row) => row.id === id)
     if (editedRow!.isNew) {
-      setRows(rows?.filter((row) => row.id !== id))
+      setRows(rows.filter((row) => row.id !== id))
     }
+    delete editedRowRef.current[id]
   }
 
   const columns: GridColDef[] = [
@@ -85,7 +96,17 @@ export default function ManageUser() {
       width: 70,
       editable: false
     },
-    { field: 'name', headerName: 'Tên', width: 150, editable: true },
+    {
+      field: 'name',
+      headerName: 'Tên',
+      width: 150,
+      editable: true,
+      preProcessEditCellProps: (params) => {
+        const { id, props } = params
+        editedRowRef.current[id] = { ...editedRowRef.current[id], name: props.value }
+        return { ...props }
+      }
+    },
     {
       field: 'email',
       headerName: 'Email',
@@ -96,12 +117,18 @@ export default function ManageUser() {
       field: 'avatar',
       headerName: 'Avatar',
       width: 100,
-      editable: true,
+      editable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Avatar src={params.value} alt={`Avatar of ${params.row.name}`} sx={{ width: 40, height: 40 }} />
       )
     },
-    { field: 'point', headerName: 'Điểm', width: 100, type: 'number', editable: true },
+    {
+      field: 'point',
+      headerName: 'Điểm',
+      width: 100,
+      type: 'number',
+      editable: false
+    },
     {
       field: 'role',
       headerName: 'Vai trò',
@@ -122,7 +149,12 @@ export default function ManageUser() {
           }
         />
       ),
-      editable: true
+      editable: true,
+      preProcessEditCellProps: (params) => {
+        const { id, props } = params
+        editedRowRef.current[id] = { ...editedRowRef.current[id], role: props.value }
+        return { ...props }
+      }
     },
     {
       field: 'balance',
@@ -132,11 +164,27 @@ export default function ManageUser() {
         return formatCurrency(params as number)
       },
       type: 'number',
-      editable: true
+      editable: false
     },
-    { field: 'buildingNumber', headerName: 'Số tòa nhà', width: 120, type: 'number', editable: true },
+    {
+      field: 'buildingNumber',
+      headerName: 'Số tòa nhà',
+      width: 120,
+      type: 'number',
+      editable: true,
+      preProcessEditCellProps: (params) => {
+        const { id, props } = params
+        editedRowRef.current[id] = { ...editedRowRef.current[id], buildingNumber: props.value }
+        return { ...props }
+      }
+    },
     { field: 'createdAt', headerName: 'Thời gian tạo', width: 180, editable: false },
-    { field: 'rankingName', headerName: 'Xếp hạng', width: 120, editable: true },
+    {
+      field: 'rankingName',
+      headerName: 'Xếp hạng',
+      width: 120,
+      editable: false
+    },
     {
       field: 'status',
       headerName: 'Trạng thái',
@@ -146,7 +194,12 @@ export default function ManageUser() {
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
       ),
-      editable: true
+      editable: true,
+      preProcessEditCellProps: (params) => {
+        const { id, props } = params
+        editedRowRef.current[id] = { ...editedRowRef.current[id], status: props.value }
+        return { ...props }
+      }
     },
     {
       field: 'actions',
