@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
-import { GetManageAccountQuery } from '~/schemaValidations/account.schema'
 
 export const useGetMe = () => {
   return useQuery({
@@ -9,9 +8,29 @@ export const useGetMe = () => {
   })
 }
 
-export const useGetManageAccount = (query: GetManageAccountQuery) => {
+export const useGetManageAccount = () => {
   return useQuery({
     queryKey: ['accounts'],
-    queryFn: () => accountApiRequest.getListAccounts(query)
+    queryFn: () => accountApiRequest.getListAccounts()
+  })
+}
+
+export const useUpdateAccountByAdmin = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.updateAccountByAdmin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+    }
+  })
+}
+
+export const useCreateAccountMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: accountApiRequest.createAccount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+    }
   })
 }
