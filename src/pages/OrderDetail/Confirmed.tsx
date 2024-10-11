@@ -3,9 +3,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTransactionInfo } from '~/apis/paymentApi'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useBookingContext } from '~/contexts/BookingContext'
 import { createOrder } from '~/apis/orderApi'
+import { client } from '~/utils/socket'
 
 export const Confirmed: React.FC = () => {
   const handleReturn = () => {
@@ -13,14 +14,13 @@ export const Confirmed: React.FC = () => {
     localStorage.setItem('bookingData', JSON.stringify({}))
     navigate('/')
   }
-
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const transactionData = location.state?.transactionData
   const [status, setStatus] = useState<boolean | null>(null)
   const bookingContext = useBookingContext()
-
+  console.log(bookingContext)
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
 
   const { isLoading } = useQuery({
@@ -47,6 +47,22 @@ export const Confirmed: React.FC = () => {
     },
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
+
+  useEffect(() => {
+    client.connect({}, () => {
+      const roomId = bookingContext?.bookingData.selectedRooms[0].id
+      const payload = {
+        id: roomId
+      }
+      client.send('/app/payments', {}, JSON.stringify(payload))
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [bookingContext?.bookingData.selectedRooms])
 
   if (!transactionData) {
     return <Box>No order data available.</Box>

@@ -50,7 +50,7 @@ export default function useRouteElements() {
       element: <AdminLayout />,
       children: [
         {
-          path: '/admin',
+          path: '/admin/dashboard',
           element: <DashBoard />
         },
         {
