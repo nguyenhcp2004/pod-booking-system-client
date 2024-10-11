@@ -72,7 +72,7 @@ export default function ManageUser() {
       field: 'email',
       headerName: 'Email',
       width: 200,
-      editable: true
+      editable: false
     },
     {
       field: 'avatar',
