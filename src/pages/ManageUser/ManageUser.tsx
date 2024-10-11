@@ -28,8 +28,9 @@ export default function ManageUser() {
   useEffect(() => {
     if (data?.data.data) {
       setRows(
-        data.data.data.map((user) => ({
+        data.data.data.map((user, index) => ({
           ...user,
+          sequentialIndex: index + 1,
           status: user.status === 1 ? 'Hoạt động' : 'Không hoạt động'
         }))
       )
@@ -62,9 +63,9 @@ export default function ManageUser() {
 
   const columns: GridColDef[] = [
     {
-      field: 'id',
-      headerName: 'ID',
-      width: 50,
+      field: 'sequentialIndex',
+      headerName: 'STT',
+      width: 70,
       editable: false
     },
     { field: 'name', headerName: 'Tên', width: 150, editable: true },
