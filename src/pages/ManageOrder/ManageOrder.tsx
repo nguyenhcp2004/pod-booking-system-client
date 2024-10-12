@@ -14,7 +14,15 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
-import { Account, Order, OrderStatus, useOrders, useSearchOrder, useStaffAccounts } from '~/apis/orderApi'
+import {
+  Account,
+  Order,
+  OrderStatus,
+  useDeleteOrder,
+  useOrders,
+  useSearchOrder,
+  useStaffAccounts
+} from '~/apis/orderApi'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNoteIcon from '@mui/icons-material/EditNote'
@@ -23,6 +31,7 @@ import ViewOrderModal from '~/components/AminManageOrder/ViewOrderModal'
 import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
 import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
 import { mapOrderToRow } from '~/utils/orderUtils'
+import { toast } from 'react-toastify'
 
 export default function ManageOrder() {
   const today = moment()
@@ -51,8 +60,17 @@ export default function ManageOrder() {
     setSelectedOrder(order)
   }
 
+  const deleteOrderMutation = useDeleteOrder()
+
   const handleDeleteOrder = () => {
     console.log(`Deleting order with ID: ${selectedOrder?.id}`)
+    if (selectedOrder) {
+      deleteOrderMutation.mutate(selectedOrder?.id, {
+        onSuccess: (data) => {
+          toast.success('Xóa đơn hàng ' + data + ' thành công')
+        }
+      })
+    }
     setRows((prevRows) => prevRows.filter((row) => row.id !== selectedOrder?.id))
     setSelectedOrder(null)
     setDeleteMode(false)

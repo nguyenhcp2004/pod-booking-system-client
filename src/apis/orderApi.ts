@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { BookingInfo } from '~/contexts/BookingContext'
 import http from '~/utils/http'
 import { createBookingPayload } from '~/utils/orderUtils'
@@ -144,5 +144,27 @@ export const useSearchOrder = (keyword: string, page: number, size: number) => {
     queryKey: ['searchOrder', keyword, page, size],
     queryFn: () => searchOrder(keyword, page, size),
     enabled: !!keyword
+  })
+}
+
+const deleteOrder = async (orderId: string) => {
+  try {
+    const response = await http.delete(`/order/${orderId}`)
+    return response.data
+  } catch (error) {
+    console.error('Error deleting order:', error)
+    throw error
+  }
+}
+
+export const useDeleteOrder = () => {
+  return useMutation({
+    mutationFn: deleteOrder,
+    onSuccess: (data) => {
+      return data
+    },
+    onError: (error) => {
+      console.error('Error deleting order:', error)
+    }
   })
 }
