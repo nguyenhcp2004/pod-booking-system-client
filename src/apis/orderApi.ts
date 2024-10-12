@@ -39,7 +39,7 @@ interface OrderDetail {
   amenities: Amenity[] | []
 }
 
-interface Account {
+export interface Account {
   id: string
   name: string | null
   email: string
@@ -89,5 +89,60 @@ export const useOrders = (startDate: string, endDate: string, page: number, size
     queryKey: ['orders', startDate, endDate, page, size],
     queryFn: () => getPageOrder(startDate, endDate, page, size),
     enabled: !!startDate && !!endDate
+  })
+}
+
+const getStaff = async (): Promise<Account[]> => {
+  try {
+    const response = await http.get('http://localhost:8080/accounts/staff')
+    return response.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+export const useStaffAccounts = () => {
+  return useQuery({
+    queryKey: ['staffAccounts'],
+    queryFn: getStaff
+  })
+}
+
+const searchAccounts = async (keyword: string): Promise<Account[]> => {
+  try {
+    const response = await http.get(`/accounts/${keyword}/Customer`)
+    return response.data
+  } catch (error) {
+    console.error('Error searching accounts:', error)
+    throw error
+  }
+}
+
+export const useSearchAccounts = (keyword: string) => {
+  return useQuery({
+    queryKey: ['searchAccounts', keyword],
+    queryFn: () => searchAccounts(keyword),
+    enabled: !!keyword
+  })
+}
+
+const searchOrder = async (keyword: string, page: number, size: number) => {
+  try {
+    console.log(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
+    const response = await http.get(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
+    console.log('Search order:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Error searching accounts:', error)
+    throw error
+  }
+}
+
+export const useSearchOrder = (keyword: string, page: number, size: number) => {
+  return useQuery({
+    queryKey: ['searchOrder', keyword, page, size],
+    queryFn: () => searchOrder(keyword, page, size),
+    enabled: !!keyword
   })
 }
