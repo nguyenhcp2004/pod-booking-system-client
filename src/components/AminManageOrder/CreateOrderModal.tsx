@@ -13,14 +13,12 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-import { Order } from '~/apis/orderApi'
+import { GridValidRowModel } from '@mui/x-data-grid'
 
 interface CreateOrderModalProps {
   open: boolean
-
   onClose: () => void
-
-  setOrders: React.Dispatch<React.SetStateAction<Order[]>>
+  setOrders: React.Dispatch<React.SetStateAction<GridValidRowModel[]>>
 }
 
 const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, setOrders }) => {
