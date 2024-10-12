@@ -63,6 +63,8 @@ export default function Header() {
         </Typography>
         <Box sx={{ display: 'flex', gap: 3 }}>
           <Button
+            component={Link}
+            to='/'
             sx={{
               textTransform: 'uppercase',
               paddingX: '11px',
@@ -72,9 +74,15 @@ export default function Header() {
           >
             Trang chủ
           </Button>
-          <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
-            Đơn đặt
-          </Button>
+          {account && (
+            <Button
+              component={Link}
+              to='/history-orders'
+              sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}
+            >
+              Đơn đặt
+            </Button>
+          )}
           <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
             Liên hệ
           </Button>
@@ -92,7 +100,8 @@ export default function Header() {
               gap: 1.2,
               alignItems: 'center',
               borderRadius: '8px',
-              border: '1px solid #000'
+              border: '1px solid #000',
+              cursor: 'pointer'
             }}
             onClick={handleClick}
           >

@@ -6,6 +6,7 @@ import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
 import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
+import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
 import ManageBuilding from '~/pages/ManageBuilding'
@@ -110,6 +111,10 @@ export default function useRouteElements() {
             {
               path: '/order-detail/:step?',
               element: <OrderDetail />
+            },
+            {
+              path: '/history-orders',
+              element: <HistoryOrders />
             }
           ]
         }
