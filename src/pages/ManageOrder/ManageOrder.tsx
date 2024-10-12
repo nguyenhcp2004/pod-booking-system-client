@@ -1,53 +1,59 @@
 import { useEffect, useState } from 'react'
-import {
-  DataGrid,
-  GridActionsCellItem,
-  GridColDef,
-  GridRowId,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridValidRowModel
-} from '@mui/x-data-grid'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import FilterListIcon from '@mui/icons-material/FilterList'
-import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
-import DeleteOrderModal from '~/components/AminManageOrder/DeleteOrderModal'
-import ViewOrderModal from '~/components/AminManageOrder/ViewOrderModal'
-import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
-import { toast } from 'react-toastify'
-import { Chip, Button, Box, Typography, Menu, MenuItem, useTheme } from '@mui/material'
+import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { Chip, Select, MenuItem, Box, Typography, useTheme, Backdrop, CircularProgress, Button } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
-import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { Order, OrderStatus, useOrders } from '~/apis/orderApi'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditNoteIcon from '@mui/icons-material/EditNote'
+import DeleteOrderModal from '~/components/AminManageOrder/DeleteOrderModal'
+import ViewOrderModal from '~/components/AminManageOrder/ViewOrderModal'
+import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
+import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
+
+const staffList = [
+  { id: 1, name: 'Staff A' },
+  { id: 2, name: 'Staff B' },
+  { id: 3, name: 'Staff C' }
+]
 
 export default function ManageOrder() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false)
-  const [openCreateModal, setOpenCreateModal] = useState(false)
-
   const today = moment()
   const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
   const [selectedStartDate, setSelectedStartDate] = useState<Moment | null>(sevenDaysAgo)
   const formattedStartDate = selectedStartDate?.startOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
-  const [rowCount, setRowCount] = useState(0)
 
-  const { data, error, isLoading } = useOrders(formattedStartDate, formattedEndDate, currentPage + 1, pageSize)
-
+  const [currentPage, setCurrentPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [rowCount, setRowCount] = useState<number>(0)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const theme = useTheme()
+
+  const [createMode, setCreateMode] = useState<boolean>(false)
+  const [editMode, setEditMode] = useState<boolean>(false)
+  const [viewMode, setViewMode] = useState<boolean>(false)
+  const [deleteMode, setDeleteMode] = useState<boolean>(false)
+
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const handleSelectedOrder = (order: Order) => {
+    setSelectedOrder(order)
+  }
+
+  const handleDeleteOrder = () => {
+    console.log(`Deleting order with ID: ${selectedOrder?.id}`)
+    setRows((prevRows) => prevRows.filter((row) => row.id !== selectedOrder?.id))
+    setSelectedOrder(null)
+    setDeleteMode(false)
+  }
+
+  const { data, error, isLoading } = useOrders(formattedStartDate, formattedEndDate, currentPage, pageSize)
   useEffect(() => {
     if (data) {
-      console.log(data)
       const rowsData = data?.data.map((order: Order) => ({
+        order: order,
         id: order.id,
         customer: order.orderDetails?.[0]?.customer?.name || 'N/A',
         createdAt: moment(order.createdAt).format('HH:mm' + '  ' + 'DD-MM-YY') || 'N/A',
@@ -58,94 +64,30 @@ export default function ManageOrder() {
         startTime: moment(order.orderDetails?.[0]?.startTime).format('HH:mm DD-MM') || 'N/A',
         endTime: new Date(order.orderDetails?.[0]?.endTime).toLocaleString() || 'N/A',
         servicePackage: order.orderDetails?.[0]?.servicePackage?.name || 'N/A',
-        orderHandler: order.orderDetails?.[0]?.orderHandler?.name || 'N/A'
+        orderHandler: order.orderDetails[0]?.orderHandler || null,
+        staffId: order.orderDetails[0]?.orderHandler?.id || null
       }))
       setRows([...rowsData].reverse())
-      setRows(rowsData)
       setRowCount(data?.totalElements)
     }
   }, [data])
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
-  }
-
-  const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize)
-    setCurrentPage(0)
-  }
-
-  const handlePaginationChange = (newPaginationModel) => {
-    setCurrentPage(newPaginationModel.page)
-    setPageSize(newPaginationModel.pageSize)
-  }
-
-  const [filterValues, setFilterValues] = useState<{ [key: string]: string[] }>({
-    status: [],
-    room: []
-  })
-
-  if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
 
-  const handleFilterClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    setAnchorEl(event.currentTarget as unknown as HTMLElement)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
-  const handleFilterChange = (column: string, value: string) => {
-    const currentValues = filterValues[column]
-    if (currentValues.includes(value)) {
-      setFilterValues({ ...filterValues, [column]: currentValues.filter((v) => v !== value) })
-    } else {
-      setFilterValues({ ...filterValues, [column]: [...currentValues, value] })
-    }
-  }
-
-  const filteredRows = rows.filter(() => {
-    return true
-  })
-
-  const handleEditClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenEditModal(true)
-  }
-
-  const handleDeleteClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenDeleteModal(true)
-  }
-
-  const handleViewClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenViewModal(true)
-  }
-
-  const handleDeleteOrder = (id: GridRowId) => {
-    setRows(rows.filter((row) => row.id !== id))
-    toast.success('Đơn hàng đã được xóa thành công')
+  const handleStaffChange = (orderId: string, newStaffId: number) => {
+    console.log(`Order ID: ${orderId}, New Staff ID: ${newStaffId}`)
+    setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
   }
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'customer', headerName: 'Khách hàng', width: 200 },
-    { field: 'roomName', headerName: 'Danh sách phòng', width: 150 },
-    { field: 'address', headerName: 'Chi nhánh', width: 200 },
+    { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
+    { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
       headerName: 'Trạng thái',
       width: 150,
-      renderHeader: (params) => (
-        <Box display='flex' alignItems='center'>
-          <span>{params.colDef.headerName}</span>
-          <FilterListIcon onClick={(e) => handleFilterClick(e)} style={{ cursor: 'pointer', marginLeft: 8 }} />
-        </Box>
-      ),
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -159,14 +101,48 @@ export default function ManageOrder() {
         />
       )
     },
-    { field: 'orderHandler', headerName: 'Nhân viên', width: 150 },
+    {
+      field: 'orderHandler',
+      headerName: 'Nhân viên',
+      width: 200,
+      renderCell: (params) => {
+        const staffId = params.row?.staffId || null
+        return (
+          <Select
+            sx={{
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
+            }}
+            value={staffId}
+            onChange={(e) => handleStaffChange(params.row.id, e.target.value as number)}
+            fullWidth
+            displayEmpty
+            renderValue={(selected) => {
+              let selectedStaff = staffList.find((staff) => staff.id === selected)
+              if (!selectedStaff) selectedStaff = params.row.orderHandler
+              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+            }}
+          >
+            <MenuItem value='' disabled>
+              Chọn nhân viên
+            </MenuItem>
+            {staffList.map((staff) => (
+              <MenuItem key={staff.id} value={staff.id}>
+                {staff.name}
+              </MenuItem>
+            ))}
+          </Select>
+        )
+      }
+    },
     { field: 'servicePackage', headerName: 'Gói dịch vụ', width: 150 },
     {
       field: 'updatedAt',
       headerName: 'Thời gian cập nhật',
       width: 150,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
           <Typography variant='body2' color={theme.palette.grey[700]}>
             {params.value.substr(0, 5)}
           </Typography>
@@ -181,7 +157,7 @@ export default function ManageOrder() {
       headerName: 'Thời gian tạo',
       width: 150,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
           <Typography variant='body2' color={theme.palette.grey[700]}>
             {params.value.substr(0, 5)}
           </Typography>
@@ -192,69 +168,118 @@ export default function ManageOrder() {
       )
     },
     {
-      field: 'actions',
-      type: 'actions',
+      field: 'action',
+      headerName: 'Thao tác',
       width: 150,
-      getActions: (params) => [
-        <GridActionsCellItem icon={<EditIcon />} label='Edit' onClick={handleEditClick(params.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(params.row)} />,
-        <GridActionsCellItem icon={<RemoveRedEyeIcon />} label='View' onClick={handleViewClick(params.row)} />
-      ]
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setViewMode(true)
+            }}
+          >
+            <VisibilityIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setEditMode(true)
+            }}
+          >
+            <EditNoteIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setDeleteMode(true)
+            }}
+          >
+            <DeleteIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+        </Box>
+      )
     }
   ]
 
-  const Toolbar = () => {
-    return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
-        <Box display='flex' gap={2}>
-          <GridToolbarQuickFilter />
-          <Button variant='contained' color='primary' onClick={() => setOpenCreateModal(true)}>
-            Thêm đơn hàng
-          </Button>
-        </Box>
-        <Box display='flex' gap={2}>
-          <DatePicker
-            label='Từ'
-            value={selectedStartDate}
-            onChange={(newValue) => setSelectedStartDate(newValue)}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-          <DatePicker
-            label='Đến'
-            value={selectedEndDate}
-            onChange={(newValue) => setSelectedEndDate(newValue)}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-        </Box>
-      </GridToolbarContainer>
-    )
-  }
+  const Toolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+      <Box display='flex' gap={2} sx={{ marginTop: '5px' }}>
+        <DatePicker
+          label='Từ'
+          value={selectedStartDate}
+          onChange={(newValue) => setSelectedStartDate(newValue)}
+          slotProps={{ textField: { fullWidth: true } }}
+        />
+        <DatePicker
+          label='Đến'
+          value={selectedEndDate}
+          onChange={(newValue) => setSelectedEndDate(newValue)}
+          slotProps={{ textField: { fullWidth: true } }}
+        />
+      </Box>
+      <Box display='flex' gap={2}>
+        <GridToolbarQuickFilter />
+        <Button variant='contained' color='primary' onClick={() => setCreateMode(true)}>
+          Thêm đơn hàng
+        </Button>
+      </Box>
+    </GridToolbarContainer>
+  )
 
   return (
     <Box sx={{ width: '100%', height: 600 }}>
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
+      <Typography variant='h5' sx={{ marginBottom: '10px' }}>
+        Quản lý đơn hàng
+      </Typography>
       <DataGrid
-        rows={filteredRows}
+        rows={rows}
         columns={columns}
-        paginationModel={{ page: currentPage, pageSize: pageSize }} // Sử dụng paginationModel để quản lý trạng thái
+        paginationModel={{ page: currentPage, pageSize: pageSize }}
         pageSizeOptions={[5, 10, 20]}
         pagination
         paginationMode='server'
         rowCount={rowCount}
         onPaginationModelChange={(newPaginationModel) => {
-          setCurrentPage(newPaginationModel.page) // Cập nhật trang hiện tại
-          setPageSize(newPaginationModel.pageSize) // Cập nhật kích thước trang
+          setCurrentPage(newPaginationModel.page)
+          setPageSize(newPaginationModel.pageSize)
         }}
+        slots={{ toolbar: Toolbar }}
       />
-      {/* components={{ Toolbar }} */}
-      {/* <EditOrderModal open={openEditModal} setOpen={setOpenEditModal} selectedOrder={selectedOrder} />
-      <DeleteOrderModal
-        open={openDeleteModal}
-        setOpen={setOpenDeleteModal}
-        selectedOrder={selectedOrder}
-        onDelete={handleDeleteOrder}
-      />
-      <ViewOrderModal open={openViewModal} setOpen={setOpenViewModal} selectedOrder={selectedOrder} />
-      <CreateOrderModal open={openCreateModal} setOpen={setOpenCreateModal} /> */}
+      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} setOrders={setRows} />
+      <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
+      <EditOrderModal open={editMode} onClose={() => setEditMode(false)} order={selectedOrder} setOrders={setRows} />
+      <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>
   )
 }

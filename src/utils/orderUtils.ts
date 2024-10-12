@@ -27,15 +27,20 @@ export const createDateTimeFromSlot = (date: string, slot: slotType) => {
 }
 
 export const createBookingPayload = (bookingData: BookingInfo) => {
-  const selectedSlot = bookingData.timeSlots[0]
+  let selectedSlot = null
+  const startTime = []
+  const endTime = []
+  for (let i = 0; i < bookingData.timeSlots.length; i++) {
+    selectedSlot = bookingData.timeSlots[i]
+    if (bookingData.date && selectedSlot) {
+      const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
+      startTime.push(dateTime.startTime)
+      endTime.push(dateTime.endTime)
+    }
+  }
 
-  let startTime = null
-  let endTime = null
-
-  if (bookingData.date && selectedSlot) {
-    const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
-    startTime = dateTime.startTime
-    endTime = dateTime.endTime
+  if (startTime.length === 0 || endTime.length === 0) {
+    return null
   }
 
   return {
@@ -62,10 +67,6 @@ export const createBookingPayload = (bookingData: BookingInfo) => {
           discountPercentage: bookingData.servicePackage.discountPercentage
         }
       : null,
-    orderHandler: {
-      id: '55513f59-b2e9-41be-a989-0aa692df827a',
-      name: 'Admin'
-    },
     priceRoom: Math.round(bookingData.roomType?.price || 0),
     discountPercentage: bookingData.servicePackage?.discountPercentage || 0,
     startTime,
