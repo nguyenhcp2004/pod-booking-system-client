@@ -21,7 +21,8 @@ import {
   useDeleteOrder,
   useOrders,
   useSearchOrder,
-  useStaffAccounts
+  useStaffAccounts,
+  useUpdateStaff
 } from '~/apis/orderApi'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -83,7 +84,7 @@ export default function ManageOrder() {
   } = useOrders(formattedStartDate, formattedEndDate, currentPage, pageSize)
   const { data: searchData, isLoading: isSearchLoading } = useSearchOrder(searchKeyword, currentPage, pageSize)
   const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
-
+  const { mutate: updateStaff } = useUpdateStaff()
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.map(mapOrderToRow)
@@ -114,8 +115,17 @@ export default function ManageOrder() {
 
   if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
 
-  const handleStaffChange = (orderId: string, newStaffId: number) => {
-    console.log(`Order ID: ${orderId}, New Staff ID: ${newStaffId}`)
+  const handleStaffChange = (orderId: string, newStaffId: string) => {
+    const selectedStaff = staffList.find((s) => s.id === newStaffId)
+    const request = {
+      id: orderId,
+      orderHandler: {
+        id: newStaffId,
+        name: selectedStaff?.name || '',
+        orderHandler: selectedStaff
+      }
+    }
+    updateStaff({ orderId, request })
     setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
   }
 
@@ -155,7 +165,7 @@ export default function ManageOrder() {
               '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
             }}
             value={staffId}
-            onChange={(e) => handleStaffChange(params.row.id, e.target.value as number)}
+            onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
             fullWidth
             displayEmpty
             renderValue={(selected) => {
@@ -304,7 +314,7 @@ export default function ManageOrder() {
           onChange={(event) => handleSearchChange(event)}
           sx={{
             '& .MuiInputBase-input': {
-              color: 'white' // Đặt màu chữ thành trắng
+              color: 'white'
             }
           }}
         />
@@ -371,7 +381,7 @@ export default function ManageOrder() {
         }}
         slots={{ toolbar: Toolbar }}
       />
-      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} setOrders={setRows} />
+      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
       <EditOrderModal
         open={editMode}

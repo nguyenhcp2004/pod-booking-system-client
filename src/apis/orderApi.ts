@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { Building, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
 import http from '~/utils/http'
 import { createBookingPayload } from '~/utils/orderUtils'
@@ -96,7 +97,7 @@ export const useOrders = (startDate: string, endDate: string, page: number, size
 
 const getStaff = async (): Promise<Account[]> => {
   try {
-    const response = await http.get('http://localhost:8080/accounts/staff')
+    const response = await http.get('/accounts/staff')
     return response.data
   } catch (error) {
     console.error('Error getting staff:', error)
@@ -111,9 +112,103 @@ export const useStaffAccounts = () => {
   })
 }
 
+const getBuilding = async (): Promise<Building[]> => {
+  try {
+    const response = await http.get('/buildings/all')
+    return response.data.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+export const useBuilding = () => {
+  return useQuery({
+    queryKey: ['building'],
+    queryFn: getBuilding
+  })
+}
+
+const getRoomType = async (keyword: string): Promise<RoomTypeFix[]> => {
+  try {
+    const response = await http.get(`/room-types/filtered-room-type?address=${keyword}`)
+    return response.data.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+export const useRoomType = (keyword: string) => {
+  return useQuery({
+    queryKey: ['roomType', keyword],
+    queryFn: () => getRoomType(keyword),
+    enabled: !!keyword
+  })
+}
+
+const searchBuilding = async (keyword: string): Promise<Building[]> => {
+  try {
+    const response = await http.get(`/buildings/search?keyword=${keyword}`)
+    return response.data.data
+  } catch (error) {
+    console.error('Error searching accounts:', error)
+    throw error
+  }
+}
+
+export const useSearchBuilding = (keyword: string) => {
+  return useQuery({
+    queryKey: ['searchBuilding', keyword],
+    queryFn: () => searchBuilding(keyword),
+    enabled: !!keyword
+  })
+}
+
+interface orderHandler {
+  id: string
+  name: string
+}
+
+interface OrderUpdateStaffRequest {
+  id: string
+  orderHandler: orderHandler
+}
+
+interface OrderResponse {
+  id: string
+  accountId: string
+  createdAt: string
+  updatedAt: string
+}
+
+const updateStaff = async (orderId: string, request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
+  try {
+    const response = await http.put(`http://localhost:8080/order/${orderId}`, request)
+    return response.data
+  } catch (error) {
+    console.error('Error updating staff:', error)
+    throw error
+  }
+}
+
+export const useUpdateStaff = () => {
+  return useMutation({
+    mutationFn: ({ orderId, request }: { orderId: string; request: OrderUpdateStaffRequest }) =>
+      updateStaff(orderId, request),
+    onSuccess: () => {
+      console.log('Staff updated successfully')
+    },
+    onError: (error) => {
+      console.error('Error updating staff:', error)
+    }
+  })
+}
+
 const searchAccounts = async (keyword: string): Promise<Account[]> => {
   try {
     const response = await http.get(`/accounts/${keyword}/Customer`)
+    console.log('Search accounts:', response.data)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)

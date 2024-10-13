@@ -76,11 +76,14 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
     listSlotFull.push(slot)
   })
   const listSlot = [...new Set(listSlotFull)]
+
   const handleStaffChange = (orderId: string, newStaffId: string) => {
     console.log(`Order ID: ${orderId}, New Staff ID: ${newStaffId}`)
     setStaffId(newStaffId)
     setOrders((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
   }
+
+  const handleUpdateOrder = () => {}
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -319,7 +322,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
           </Grid>
         </Grid>
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <Button variant='contained'>Cập nhật đơn hàng</Button>
+          <Button variant='contained' onClick={handleUpdateOrder}>
+            Cập nhật đơn hàng
+          </Button>
         </Box>
       </Box>
     </Modal>
