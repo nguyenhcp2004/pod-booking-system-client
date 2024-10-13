@@ -14,6 +14,7 @@ import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import BlockIcon from '@mui/icons-material/Block'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
@@ -86,20 +87,21 @@ export default function ManageUser() {
     }
   }
 
-  const handleBanClick = (id: GridRowId) => async () => {
-    const rowToBan = rows.find((row) => row.id === id)
-    if (rowToBan) {
+  const handleToggleStatus = (id: GridRowId) => async () => {
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
+      const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
       try {
         const body: UpdateAccountByAdminBodyType = {
-          id: rowToBan.id,
-          name: rowToBan.name,
-          buildingNumber: rowToBan.buildingNumber,
-          status: 0,
-          role: rowToBan.role
+          id: rowToToggle.id,
+          name: rowToToggle.name,
+          buildingNumber: rowToToggle.buildingNumber,
+          status: newStatus === 'Hoạt động' ? 1 : 0,
+          role: rowToToggle.role
         }
         await updateAccountByAdminMutation.mutateAsync(body)
-        toast.success(`Người dùng: ${rowToBan.name} bị cấm hoạt động thành công`)
-        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: 'Không hoạt động' } : row)))
+        toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`)
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
       } catch (error) {
         handleErrorApi({ error })
       }
@@ -239,6 +241,7 @@ export default function ManageUser() {
       cellClassName: 'actions',
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit
+        const currentRow = rows.find((row) => row.id === id)
 
         if (isInEditMode) {
           return [
@@ -268,7 +271,12 @@ export default function ManageUser() {
             onClick={handleEditClick(id)}
             color='inherit'
           />,
-          <GridActionsCellItem icon={<BlockIcon />} label='Ban' onClick={handleBanClick(id)} color='inherit' />
+          <GridActionsCellItem
+            icon={currentRow?.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
+            label={currentRow?.status === 'Hoạt động' ? 'Ban' : 'Unban'}
+            onClick={handleToggleStatus(id)}
+            color={currentRow?.status === 'Hoạt động' ? 'error' : 'success'}
+          />
         ]
       }
     }
