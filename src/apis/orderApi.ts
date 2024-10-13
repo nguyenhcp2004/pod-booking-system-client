@@ -9,6 +9,8 @@ export enum OrderStatus {
   Rejected = 'Rejected'
 }
 
+export const orderStatus: OrderStatus[] = [OrderStatus.Pending, OrderStatus.Successfully, OrderStatus.Rejected]
+
 enum Role {
   Admin = 'Admin',
   Staff = 'Staff',

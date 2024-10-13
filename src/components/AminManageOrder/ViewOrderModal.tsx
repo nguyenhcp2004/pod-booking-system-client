@@ -75,6 +75,19 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                 InputProps={{
                   readOnly: true
                 }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '52px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    lineHeight: '52px',
+                    top: '-10px'
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '52px',
+                    padding: '0 14px'
+                  }
+                }}
                 fullWidth
               />
             </Box>
@@ -86,6 +99,19 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                 value={order.orderDetails[0].orderHandler.name}
                 InputProps={{
                   readOnly: true
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '52px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    lineHeight: '52px',
+                    top: '-10px'
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '52px',
+                    padding: '0 14px'
+                  }
                 }}
                 fullWidth
               />
@@ -100,6 +126,19 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                   readOnly: true
                 }}
                 fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '52px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    lineHeight: '52px',
+                    top: '-10px'
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '52px',
+                    padding: '0 14px'
+                  }
+                }}
               />
             </Box>
           </Box>
@@ -111,10 +150,12 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                   options={listSlot}
                   value={listSlot}
                   disableCloseOnSelect
+                  limitTags={1}
                   sx={{
                     '.MuiAutocomplete-inputRoot': {
                       opacity: 1,
-                      pointerEvents: 'none'
+                      pointerEvents: 'none',
+                      height: '52px'
                     },
                     '.MuiAutocomplete-endAdornment': {
                       display: 'none'
@@ -139,10 +180,19 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
               <DatePicker
                 label='Ngày đặt'
                 value={selectedDate}
+                onChange={() => {}}
                 slotProps={{
                   textField: {
                     size: 'small',
                     fullWidth: true,
+                    sx: {
+                      '& .MuiInputBase-root': {
+                        height: '52px'
+                      },
+                      '& .MuiInputBase-input': {
+                        padding: '10px 14px'
+                      }
+                    },
                     InputProps: {
                       readOnly: true,
                       endAdornment: <IconButton onMouseDown={(e) => e.preventDefault()} edge='end' />
@@ -154,34 +204,29 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
               />
             </Box>
             <Box sx={{ flex: 1, paddingLeft: 2 }}>
-              <FormControl fullWidth size='small'>
-                <Autocomplete
-                  value={order.orderDetails[0].servicePackage}
-                  options={order.orderDetails[0].servicePackage ? [order.orderDetails[0].servicePackage] : []}
-                  getOptionLabel={(option) => option.name}
-                  disableCloseOnSelect
-                  sx={{
-                    '.MuiAutocomplete-inputRoot': {
-                      opacity: 1,
-                      pointerEvents: 'none'
-                    },
-                    '.MuiAutocomplete-endAdornment': {
-                      display: 'none'
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      InputProps={{
-                        ...params.InputProps,
-                        readOnly: true
-                      }}
-                      label='Gói dịch vụ'
-                      size='small'
-                    />
-                  )}
-                />
-              </FormControl>
+              <TextField
+                label='Gói dịch vụ'
+                size='small'
+                variant='outlined'
+                value={order.orderDetails[0].servicePackage?.name}
+                InputProps={{
+                  readOnly: true
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '52px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    lineHeight: '52px',
+                    top: '-10px'
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '52px',
+                    padding: '0 14px'
+                  }
+                }}
+                fullWidth
+              />
             </Box>
           </Box>
         </Card>

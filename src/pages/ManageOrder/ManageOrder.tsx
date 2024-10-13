@@ -148,32 +148,31 @@ export default function ManageOrder() {
       renderCell: (params) => {
         const staffId = params.row?.staffId || null
         return (
-          // <Select
-          //   sx={{
-          //     '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          //     '.MuiOutlinedInput-notchedOutline': { border: 'none' },
-          //     '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
-          //   }}
-          //   value={staffId}
-          //   onChange={(e) => handleStaffChange(params.row.id, e.target.value as number)}
-          //   fullWidth
-          //   displayEmpty
-          //   renderValue={(selected) => {
-          //     let selectedStaff = staffList.find((staff) => staff.id === selected)
-          //     if (!selectedStaff) selectedStaff = params.row.orderHandler
-          //     return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
-          //   }}
-          // >
-          //   <MenuItem value='' disabled>
-          //     Chọn nhân viên
-          //   </MenuItem>
-          //   {staffList.map((staff) => (
-          //     <MenuItem key={staff.id} value={staff.id}>
-          //       {staff.name}
-          //     </MenuItem>
-          //   ))}
-          // </Select>
-          <></>
+          <Select
+            sx={{
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
+            }}
+            value={staffId}
+            onChange={(e) => handleStaffChange(params.row.id, e.target.value as number)}
+            fullWidth
+            displayEmpty
+            renderValue={(selected) => {
+              let selectedStaff = staffList.find((staff) => staff.id === selected)
+              if (!selectedStaff) selectedStaff = params.row.orderHandler
+              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+            }}
+          >
+            <MenuItem value='' disabled>
+              Chọn nhân viên
+            </MenuItem>
+            {staffList.map((staff) => (
+              <MenuItem key={staff.id} value={staff.id}>
+                {staff.name}
+              </MenuItem>
+            ))}
+          </Select>
         )
       }
     },
@@ -345,13 +344,13 @@ export default function ManageOrder() {
               zIndex: 2,
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
-                  border: 'none' // Xóa viền
+                  border: 'none'
                 },
                 '&:hover fieldset': {
-                  border: 'none' // Xóa viền khi hover
+                  border: 'none'
                 },
                 '&.Mui-focused fieldset': {
-                  border: 'none' // Xóa viền khi focus
+                  border: 'none'
                 }
               }
             }}
@@ -374,7 +373,13 @@ export default function ManageOrder() {
       />
       <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} setOrders={setRows} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
-      <EditOrderModal open={editMode} onClose={() => setEditMode(false)} order={selectedOrder} setOrders={setRows} />
+      <EditOrderModal
+        open={editMode}
+        onClose={() => setEditMode(false)}
+        order={selectedOrder}
+        setOrders={setRows}
+        staffList={staffList}
+      />
       <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>
   )
