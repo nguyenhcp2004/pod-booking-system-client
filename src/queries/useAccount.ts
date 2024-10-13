@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
+import { Pagination } from '~/constants/type'
 
 export const useGetMe = () => {
   return useQuery({
@@ -8,10 +9,10 @@ export const useGetMe = () => {
   })
 }
 
-export const useGetManageAccount = () => {
+export const useGetManageAccount = (query: Pagination) => {
   return useQuery({
     queryKey: ['accounts'],
-    queryFn: () => accountApiRequest.getListAccounts()
+    queryFn: () => accountApiRequest.getListAccounts(query)
   })
 }
 

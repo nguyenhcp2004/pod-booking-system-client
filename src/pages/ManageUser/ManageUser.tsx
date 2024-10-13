@@ -24,8 +24,16 @@ import { handleErrorApi } from '~/utils/utils'
 import AddUser from './AddUser'
 
 export default function ManageUser() {
-  const { data, isLoading } = useGetManageAccount()
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 5,
+    page: 0
+  })
+  const { data, refetch, isLoading } = useGetManageAccount({
+    page: paginationModel.page + 1,
+    take: paginationModel.pageSize
+  })
   const [rows, setRows] = useState<GridValidRowModel[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>()
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
@@ -39,8 +47,13 @@ export default function ManageUser() {
           status: user.status === 1 ? 'Hoạt động' : 'Không hoạt động'
         }))
       )
+      setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
+
+  useEffect(() => {
+    refetch()
+  }, [paginationModel])
 
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
@@ -281,10 +294,11 @@ export default function ManageUser() {
         columns={columns}
         rows={rows}
         setRows={setRows}
-        rowModesModel={rowModesModel}
-        setRowModesModel={setRowModesModel}
         loading={isLoading}
         toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={totalRowCount}
       />
     </Box>
   )

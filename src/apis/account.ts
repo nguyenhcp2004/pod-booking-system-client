@@ -1,3 +1,5 @@
+import queryString from 'query-string'
+import { Pagination } from '~/constants/type'
 import {
   CreateAccountBodyType,
   GetManageAccountRes,
@@ -9,8 +11,9 @@ import http from '~/utils/http'
 
 const accountApiRequest = {
   getMe: () => http.get<GetMeResType>('/accounts/me'),
-  getListAccounts: () => {
-    return http.get<GetManageAccountRes>(`/accounts?take=25`)
+  getListAccounts: (query: Pagination) => {
+    const stringified = queryString.stringify(query)
+    return http.get<GetManageAccountRes>(`/accounts?${stringified}`)
   },
   updateAccountByAdmin: (body: UpdateAccountByAdminBodyType) => {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/${body.id}`, body)
