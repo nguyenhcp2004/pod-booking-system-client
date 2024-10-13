@@ -9,17 +9,14 @@ import {
   TextField,
   FormControl,
   Autocomplete,
-  Checkbox,
   Divider
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { Order } from '~/apis/orderApi'
-import { SLOT } from '~/constants/slot'
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
-import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { slotType } from '~/contexts/BookingContext'
 
 interface ViewOrderModalProps {
   open: boolean
@@ -28,10 +25,18 @@ interface ViewOrderModalProps {
 }
 
 const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order }) => {
-  const today = moment()
-  const [selectedDate, setSelectedDate] = useState<Moment>(today)
+  const date = moment(order?.orderDetails[0].endTime)
+  const [selectedDate] = useState<Moment>(moment(date, 'DD/MM/YYYY'))
   const theme = useTheme()
   if (!order) return null
+  const listSlotFull: slotType[] = []
+  order.orderDetails.map((orderDetail) => {
+    const slot: slotType = (moment(orderDetail.startTime).format('HH:mm').toString() +
+      ' - ' +
+      moment(orderDetail.endTime).format('HH:mm').toString()) as slotType
+    listSlotFull.push(slot)
+  })
+  const listSlot = [...new Set(listSlotFull)]
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -103,28 +108,30 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
               <FormControl fullWidth size='small'>
                 <Autocomplete
                   multiple
-                  options={SLOT}
-                  value={['09:00 - 10:00']}
-                  onChange={() => {}}
-                  //(_, slots) => {setSelectedSlots(slots as slotType[])}}
+                  options={listSlot}
+                  value={listSlot}
                   disableCloseOnSelect
-                  limitTags={1}
-                  renderOption={(props, option, { selected }) => {
-                    const { key, ...optionProps } = props
-                    return (
-                      <li key={key} {...optionProps}>
-                        <Checkbox
-                          icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
-                          checkedIcon={<CheckBoxIcon fontSize='small' />}
-                          style={{ marginRight: 8 }}
-                          checked={selected}
-                          size='small'
-                        />
-                        {option}
-                      </li>
-                    )
+                  sx={{
+                    '.MuiAutocomplete-inputRoot': {
+                      opacity: 1,
+                      pointerEvents: 'none'
+                    },
+                    '.MuiAutocomplete-endAdornment': {
+                      display: 'none'
+                    }
                   }}
-                  renderInput={(params) => <TextField {...params} label='Slot' size='small' />}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        readOnly: true
+                      }}
+                      label='Slot'
+                      size='small'
+                      disabled
+                    />
+                  )}
                 />
               </FormControl>
             </Box>
@@ -132,8 +139,17 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
               <DatePicker
                 label='Ngày đặt'
                 value={selectedDate}
-                onChange={(date) => date && setSelectedDate(date)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                slotProps={{
+                  textField: {
+                    size: 'small',
+                    fullWidth: true,
+                    InputProps: {
+                      readOnly: true,
+                      endAdornment: <IconButton onMouseDown={(e) => e.preventDefault()} edge='end' />
+                    }
+                  }
+                }}
+                onOpen={() => {}}
                 format={DEFAULT_DATE_FORMAT}
               />
             </Box>
@@ -141,11 +157,29 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
               <FormControl fullWidth size='small'>
                 <Autocomplete
                   value={order.orderDetails[0].servicePackage}
-                  onChange={() => {}}
-                  //(_, servicePackage) => {setSelectedPackage(servicePackage)}
                   options={order.orderDetails[0].servicePackage ? [order.orderDetails[0].servicePackage] : []}
                   getOptionLabel={(option) => option.name}
-                  renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
+                  disableCloseOnSelect
+                  sx={{
+                    '.MuiAutocomplete-inputRoot': {
+                      opacity: 1,
+                      pointerEvents: 'none'
+                    },
+                    '.MuiAutocomplete-endAdornment': {
+                      display: 'none'
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        readOnly: true
+                      }}
+                      label='Gói dịch vụ'
+                      size='small'
+                    />
+                  )}
                 />
               </FormControl>
             </Box>
