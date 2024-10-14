@@ -1,11 +1,12 @@
 import { Box, Typography, Divider, useTheme, Avatar } from '@mui/material'
 import { BookingInfo } from '~/contexts/BookingContext'
-import RoomAmenitiesCard from './RoomAmenitiesCard'
+import RoomAmenitiesCard from '~/components/BookingDetails/RoomAmenitiesCard'
+import { Dispatch, SetStateAction } from 'react'
 
 interface BookingDetailsCustomProps {
   bookingData: BookingInfo
 
-  setBookingData: React.Dispatch<React.SetStateAction<BookingInfo>>
+  setBookingData: Dispatch<SetStateAction<BookingInfo>>
 }
 
 const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
@@ -47,8 +48,8 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
         </Typography>
         <Box display='flex' alignItems='center' sx={{ marginTop: '24px' }} gap='20px'>
           <Avatar
-            src={bookingData.selectedRooms[0].image}
-            alt={bookingData.roomType?.name}
+            src={bookingData?.selectedRooms[0]?.image}
+            alt={bookingData?.roomType?.name}
             sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
             variant='rounded'
           />

@@ -124,36 +124,109 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     roomListRefetch()
   }, [selectedSlots, selectedDate, roomListRefetch])
 
-  useEffect(() => {
-    setBookingData?.((prev: BookingInfo) => {
-      const price = bookingData?.roomType?.price
-      const listRoom: RoomContextType[] = selectedRooms.map((room) => {
-        return {
-          id: room.id,
-          name: room.name,
-          price: price,
-          image: room.image,
-          amenities: []
-        }
-      })
-      return {
-        ...prev,
-        selectedRooms: listRoom || [],
-        date: selectedDate?.format('YYYY-MM-DD') || null,
-        timeSlots: selectedSlots || [],
-        servicePackage: selectedPackage || null
-      }
-    })
-  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
-
-  const handleAddRoomType = (e: SelectChangeEvent<number | null>) => {
-    const value = e.target.value ? Number(e.target.value) : ''
-    const selectedRoomType = roomTypeList.find((roomT) => roomT.id === Number(value)) || null
-    setBookingData((prev) => {
-      return { ...prev, roomType: selectedRoomType }
-    })
-    setRoomTypeID(value === '' ? null : Number(value))
+  // useEffect(() => {
+  //   setBookingData?.((prev: BookingInfo) => {
+  //     const price = bookingData?.roomType?.price
+  //     const listRoom: RoomContextType[] = selectedRooms.map((room) => {
+  //       return {
+  //         id: room.id,
+  //         name: room.name,
+  //         price: price,
+  //         image: room.image,
+  //         amenities: []
+  //       }
+  //     })
+  //     return {
+  //       ...prev,
+  //       selectedRooms: listRoom || [],
+  //       date: selectedDate?.format('YYYY-MM-DD') || null,
+  //       timeSlots: selectedSlots || [],
+  //       servicePackage: selectedPackage || null
+  //     }
+  //   })
+  // }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
+  const handleBuildingSearch = (query: string) => {
+    setSearchBuilding(query)
+    const buildings = query.trim() ? searchBuildingData || [] : allBuilding || []
+    setListBuilding(buildings)
   }
+
+  const handleSelectBuilding = (b: Building) => {
+    setBuilding(b)
+    setSearchBuilding(b.address)
+    setRoomTypeList(roomType || [])
+  }
+
+  const handleSelectRoomType = (e: SelectChangeEvent<number | null>) => {
+    const value = Number(e.target.value) || null
+    setRoomTypeID(value)
+    const selectedRoomType = roomTypeList.find((room) => room.id === value) || null
+    setBookingData((prev) => ({ ...prev, roomType: selectedRoomType }))
+  }
+
+  const handleSelectDate = (date: Moment | null) => {
+    setSelectedDate(date)
+    updateBookingData({ date: date ? date.format('YYYY-MM-DD') : null })
+    updateSelectedDates(date, selectedPackage)
+  }
+
+  // const formatSlots = (slots: slotType[]) => {
+  //   return slots.map((slot) => {
+  //     const [start, end] = slot.split('-')
+  //     const startTime = moment(selectedDate).set(parseTime(start)).format('YYYY-MM-DDTHH:mm:ss')
+  //     const endTime = moment(selectedDate).set(parseTime(end)).format('YYYY-MM-DDTHH:mm:ss')
+  //     return `${startTime}_${endTime}`
+  //   })
+  // }
+
+  // const parseTime = (time: string) => {
+  //   const [hour, minute] = time.split(':').map(Number)
+  //   return { hour, minute, second: 0, millisecond: 0 }
+  // }
+
+  const updateBookingData = (updates: Partial<BookingInfo>) => {
+    setBookingData((prev) => ({ ...prev, ...updates }))
+  }
+
+  const handleSelectPackage = (pkg: ServicePackage | null) => {
+    setSelectedPackage(pkg)
+    updateSelectedDates(selectedDate, pkg)
+  }
+
+  const handleSelectRooms = (rooms: Room[]) => {
+    setSelectedRooms(rooms)
+    const listRoom: RoomContextType[] = rooms.map((room) => ({
+      id: room.id,
+      name: room.name,
+      price: bookingData.roomType?.price,
+      image: room.image,
+      amenities: []
+    }))
+    setBookingData((prev) => ({ ...prev, selectedRooms: listRoom }))
+  }
+
+  const updateSelectedDates = (date: Moment | null, pkg: ServicePackage | null) => {
+    const dateList: Moment[] = date ? [date] : []
+
+    if (pkg?.id === '1') {
+      for (let i = 1; i <= 3; i++) {
+        dateList.push(moment(date).add(i, 'week'))
+      }
+    } else if (pkg?.id === '2') {
+      for (let i = 0; i < 30; i++) {
+        dateList.push(moment(date).add(i, 'days'))
+      }
+    }
+    setSelectedDates(dateList)
+  }
+  // const handleAddRoomType = (e: SelectChangeEvent<number | null>) => {
+  //   const value = e.target.value ? Number(e.target.value) : ''
+  //   const selectedRoomType = roomTypeList.find((roomT) => roomT.id === Number(value)) || null
+  //   setBookingData((prev) => {
+  //     return { ...prev, roomType: selectedRoomType }
+  //   })
+  //   setRoomTypeID(value === '' ? null : Number(value))
+  // }
 
   return (
     <Box sx={{ padding: 3, marginY: 2, bgcolor: 'white', borderRadius: '5px' }}>
@@ -164,7 +237,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             variant='outlined'
             label='Địa chỉ'
             value={building?.address || searchBuilding || ''}
-            onChange={(e) => setSearchBuilding(e.target.value)}
+            onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
             fullWidth
             sx={{
@@ -199,11 +272,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               {listBuilding.map((b, index) => (
                 <Box
                   key={index}
-                  onClick={() => {
-                    setSearchBuilding(b.address)
-                    setBuilding(b)
-                    setShowBuildingList(false)
-                  }}
+                  onClick={() => handleSelectBuilding(b)}
                   sx={{ '&:hover': { backgroundColor: theme.palette.grey[200] }, cursor: 'pointer' }}
                 >
                   <Typography variant='body1' sx={{ paddingX: 2, paddingY: 2 }}>
@@ -222,7 +291,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               labelId='staff-select-label'
               label='Room type'
               value={roomTypeID || ''}
-              onChange={handleAddRoomType}
+              onChange={(e) => handleSelectRoomType(e)}
               fullWidth
               renderValue={(selected) => {
                 const selectedRoomType = roomTypeList.find((roomT) => roomT.id == selected)
@@ -244,7 +313,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <DatePicker
             label='Ngày đặt'
             value={selectedDate || moment()}
-            onChange={(date) => setSelectedDate(date)}
+            onChange={(date) => handleSelectDate(date)}
             format={DEFAULT_DATE_FORMAT}
             slotProps={{
               textField: {
@@ -303,7 +372,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               disableCloseOnSelect
               value={selectedRooms}
               onChange={(_, rooms) => {
-                return setSelectedRooms(rooms)
+                handleSelectRooms(rooms as Room[])
               }}
               getOptionLabel={(option) => option.name}
               renderOption={(props, option, { selected }) => {
@@ -330,7 +399,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             <Autocomplete
               value={selectedPackage}
               onChange={(_, servicePackage) => {
-                setSelectedPackage(servicePackage)
+                handleSelectPackage(servicePackage)
               }}
               options={isSuccess ? servicePackage.data.data : []}
               getOptionLabel={(option) => option.name}

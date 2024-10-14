@@ -8,6 +8,7 @@ import Calendar from '../Calendar/Calendar'
 import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
 import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
 import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
+import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
 
 interface CreateOrderModalProps {
   open: boolean
@@ -85,12 +86,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
                   marginTop: '10px'
                 }}
               >
-                <CustomerOrderCard
-                  customer={customer}
-                  setCustomer={setCustomer}
-                  bookingData={bookingData}
-                  selectedSlots={selectedSlots}
-                />
+                <CustomerOrderCard customer={customer} setCustomer={setCustomer} bookingData={bookingData} />
               </Grid>
             </Grid>
             <Divider sx={{ marginTop: 2, marginBottom: 1 }} />
@@ -99,9 +95,9 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
                 <AddAmenityOrder bookingData={bookingData} setBookingData={setBookingData} />
               </Grid>
               <Grid item lg={6} md={6}>
-                <Box
-                  sx={{ marginLeft: '12px', marginTop: '10px', bgcolor: 'white', padding: 2, borderRadius: '5px' }}
-                ></Box>
+                <Box sx={{ marginLeft: '12px', marginTop: '10px', bgcolor: 'white', padding: 2, borderRadius: '5px' }}>
+                  <BookingDetailsCustom bookingData={bookingData} setBookingData={setBookingData} />
+                </Box>
               </Grid>
             </Grid>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>

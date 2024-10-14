@@ -1,22 +1,22 @@
 import { Box, Divider, TextField, Typography, useTheme } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Account, useSearchAccounts } from '~/apis/orderApi'
-import { BookingInfo, RoomContextType, slotType } from '~/contexts/BookingContext'
+import { BookingInfo, RoomContextType } from '~/contexts/BookingContext'
 
 interface CustomerOrderCardProps {
   customer: Account | null
   setCustomer: React.Dispatch<React.SetStateAction<Account | null>>
   bookingData: BookingInfo
-  selectedSlots: slotType[]
 }
 
-const CustomerOrderCard = ({ customer, setCustomer, bookingData, selectedSlots }: CustomerOrderCardProps) => {
+const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrderCardProps) => {
   const [searchCustomer, setSearchCustomer] = useState<string>('')
   const [listCustomer, setListCustomer] = useState<Account[]>([])
   const [showCustomerList, setShowCustomerList] = useState(false)
 
   const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
   const theme = useTheme()
+
   useEffect(() => {
     setListCustomer(searchCustomer.trim() ? searchCustomerData || [] : [])
   }, [searchCustomer, searchCustomerData])
@@ -113,7 +113,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData, selectedSlots }
               Slot:
             </Typography>
             <Typography variant='body2' sx={{ marginBottom: 1 }}>
-              {selectedSlots.length > 0 ? selectedSlots.join(', ') : 'Chưa chọn slot'}
+              {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn slot'}
             </Typography>
           </Box>
         </Box>
