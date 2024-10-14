@@ -17,8 +17,6 @@ import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { Link, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
-import { client } from '~/utils/socket'
-import { toast } from 'react-toastify'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -90,23 +88,6 @@ export default function RoomDetail() {
   useEffect(() => {
     roomListRefetch()
   }, [selectedSlots, selectedDate, roomListRefetch])
-
-  useEffect(() => {
-    client.connect({}, () => {
-      client.subscribe('/topic/payments', (data) => {
-        const roomId = JSON.parse(data.body)
-        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
-        }
-      })
-    })
-
-    return () => {
-      if (client.connected) {
-        client.disconnect(() => {})
-      }
-    }
-  }, [bookingData])
 
   useEffect(() => {
     setBookingData?.((prev: BookingInfo) => {

@@ -4,12 +4,11 @@ import RoomAmenitiesCard from './RoomAmenitiesCard'
 
 const BookingDetails = () => {
   const bookingContext = useBookingContext()
-  const bookingData = bookingContext?.bookingData
+  const bookingData = bookingContext!.bookingData
   const setBookingData = bookingContext?.setBookingData
   const theme = useTheme()
 
   if (!bookingData) return null
-  console.log(bookingData)
 
   const roomTotal = Math.round(
     bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
