@@ -6,7 +6,8 @@ import { fetchTransactionInfo } from '~/apis/paymentApi'
 import { useEffect, useState } from 'react'
 import { useBookingContext } from '~/contexts/BookingContext'
 import { createOrder } from '~/apis/orderApi'
-import { client } from '~/utils/socket'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 
 export const Confirmed: React.FC = () => {
   const handleReturn = () => {
@@ -47,10 +48,12 @@ export const Confirmed: React.FC = () => {
     },
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
 
   useEffect(() => {
     client.connect({}, () => {
-      const roomId = bookingContext?.bookingData.selectedRooms[0].id
+      const roomId = bookingContext!.bookingData.selectedRooms[0].id
       const payload = {
         id: roomId
       }
@@ -62,7 +65,8 @@ export const Confirmed: React.FC = () => {
         client.disconnect(() => {})
       }
     }
-  }, [bookingContext?.bookingData.selectedRooms])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingContext])
 
   if (!transactionData) {
     return <Box>No order data available.</Box>

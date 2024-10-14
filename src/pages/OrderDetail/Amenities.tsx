@@ -11,8 +11,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext } from '~/contexts/BookingContext'
-import { client } from '~/utils/socket'
 import { toast } from 'react-toastify'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+
 interface CommonProps {
   onNext: () => void
   onBack: () => void
@@ -33,12 +35,14 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const { bookingData, setBookingData } = bookingContext
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [roomType, setRoomType] = useState(bookingData?.selectedRooms[0].name)
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
 
   useEffect(() => {
     client.connect({}, () => {
       client.subscribe('/topic/payments', (data) => {
         const roomId = JSON.parse(data.body)
-        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
+        if (bookingData.selectedRooms.some((room) => room.id == roomId.id)) {
           toast.success(`Phòng ${roomId.id} vừa được đặt`)
         }
       })
@@ -49,6 +53,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
         client.disconnect(() => {})
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingData])
 
   const handleAddAmentity = () => {
