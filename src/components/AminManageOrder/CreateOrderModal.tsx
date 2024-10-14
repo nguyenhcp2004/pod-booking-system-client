@@ -248,12 +248,11 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
               <FormControl fullWidth>
                 <InputLabel id='staff-select-label'>Room type</InputLabel>
                 <Select
-                  label='Room type'
                   labelId='staff-select-label'
+                  label='Room type'
                   value={roomTypeID}
                   onChange={(e) => setRoomTypeID(e.target.value as number)}
                   fullWidth
-                  displayEmpty
                   renderValue={(selected) => {
                     const selectedRoomType = roomTypeList.find((roomT) => roomT.id == selected)
                     return selectedRoomType ? selectedRoomType.name : 'Room type'
@@ -382,7 +381,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
           </Grid>
           <Grid item lg={6} md={6} xs={12} sx={{ paddingLeft: '12px', marginTop: '10px' }}>
             <Box sx={{ padding: 3, bgcolor: 'white', borderRadius: '5px' }}>
-              <Box>
+              <Box sx={{ position: 'relative' }}>
                 <TextField
                   size='small'
                   variant='standard'
@@ -391,24 +390,11 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
                   onChange={(e) => setSearchCustomer(e.target.value)}
                   onFocus={() => setShowCustomerList(true)}
                   fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      height: '52px'
-                    },
-                    '& .MuiInputLabel-root': {
-                      lineHeight: '52px',
-                      top: '-10px'
-                    },
-                    '& .MuiInputBase-input': {
-                      height: '52px',
-                      padding: '0 14px'
-                    }
-                  }}
                 />
                 {showCustomerList && (
                   <Box
                     sx={{
-                      width: '95%',
+                      width: '100%',
                       position: 'absolute',
                       zIndex: 5,
                       maxHeight: '150px',
@@ -471,6 +457,12 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
               ))} */}
             </Box>
           </Grid>
+        </Grid>
+        <Grid container>
+          <Grid item lg={6} md={6}> 
+            {/* Amenity */}
+          </Grid>
+          <Grid item lg={6} md={6}></Grid>
         </Grid>
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button variant='contained' onClick={handleCreateOrder}>
