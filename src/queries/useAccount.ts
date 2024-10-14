@@ -21,7 +21,7 @@ export const useUpdateAccountByAdmin = () => {
   return useMutation({
     mutationFn: accountApiRequest.updateAccountByAdmin,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['update-accounts'] })
     }
   })
 }
@@ -31,7 +31,7 @@ export const useCreateAccountMutation = () => {
   return useMutation({
     mutationFn: accountApiRequest.createAccount,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['create-accounts'] })
     }
   })
 }
