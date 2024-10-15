@@ -20,11 +20,20 @@ import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
 import EditBuilding from '~/pages/ManageBuilding/EditBuilding'
 
 export default function ManageBuilding() {
-  const { data } = useGetListBuilding()
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 5,
+    page: 0
+  })
+  const { data, isLoading } = useGetListBuilding({
+    page: paginationModel.page + 1,
+    take: paginationModel.pageSize
+  })
   const [rows, setRows] = useState<GridValidRowModel[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
     if (data) {
       setRows([...data.data.data].reverse())
+      setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
@@ -164,9 +173,11 @@ export default function ManageBuilding() {
         columns={columns}
         rows={rows}
         setRows={setRows}
-        rowModesModel={rowModesModel}
-        setRowModesModel={setRowModesModel}
+        loading={isLoading}
         toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={totalRowCount}
       />
     </Box>
   )

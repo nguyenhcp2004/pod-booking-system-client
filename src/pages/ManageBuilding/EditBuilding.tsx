@@ -106,7 +106,7 @@ export default function EditBuilding({ row }: Props) {
               <Select name='status' fullWidth size='small' defaultValue={status} onChange={handleChange}>
                 <MenuItem value='Active'>Active</MenuItem>
                 <MenuItem value='Under Maintenance'>Under Maintenance</MenuItem>
-                <MenuItem value='Hidden'>Hidden</MenuItem>
+                <MenuItem value='Closed'>Closed</MenuItem>
               </Select>
             </Grid>
           </Grid>

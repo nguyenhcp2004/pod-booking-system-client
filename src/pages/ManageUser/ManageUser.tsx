@@ -47,6 +47,7 @@ export default function ManageUser() {
     }
   }, [data])
 
+  //Có thể viết refetch trong folder queries để gọn code
   useEffect(() => {
     refetch()
   }, [paginationModel])
