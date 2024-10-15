@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import buildingApiRequest from '~/apis/building'
+import { Pagination } from '~/constants/type'
 
-export const useGetListBuilding = () => {
+export const useGetListBuilding = (query: Pagination) => {
   return useQuery({
-    queryKey: ['buidlings'],
-    queryFn: buildingApiRequest.getListBuidling
+    queryKey: ['buidlings', { query }],
+    queryFn: () => buildingApiRequest.getListBuidling(query)
   })
 }
 

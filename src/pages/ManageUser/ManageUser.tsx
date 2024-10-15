@@ -4,16 +4,12 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridRowId,
-  GridRowModes,
-  GridRowModesModel,
   GridToolbarContainer,
   GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
-import SaveIcon from '@mui/icons-material/Save'
-import CancelIcon from '@mui/icons-material/Cancel'
-import EditIcon from '@mui/icons-material/Edit'
 import BlockIcon from '@mui/icons-material/Block'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
@@ -21,12 +17,20 @@ import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccou
 import { UpdateAccountByAdminBodyType } from '~/schemaValidations/account.schema'
 import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
-import AddUser from './AddUser'
+import UserModal from './UserModal'
+import { ACTION } from '~/constants/mock'
 
 export default function ManageUser() {
-  const { data, isLoading } = useGetManageAccount()
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 5,
+    page: 0
+  })
+  const { data, refetch, isLoading } = useGetManageAccount({
+    page: paginationModel.page + 1,
+    take: paginationModel.pageSize
+  })
   const [rows, setRows] = useState<GridValidRowModel[]>([])
-  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+  const [totalRowCount, setTotalRowCount] = useState<number>()
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
 
@@ -39,71 +43,34 @@ export default function ManageUser() {
           status: user.status === 1 ? 'Hoạt động' : 'Không hoạt động'
         }))
       )
+      setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
 
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
-    // Store the current row data in editedRowRef when entering edit mode
-    const currentRow = rows.find((row) => row.id === id)
-    if (currentRow) {
-      editedRowRef.current[id] = { ...currentRow }
-    }
-  }
+  //TODO: Có thể viết refetch trong folder queries để gọn code
+  useEffect(() => {
+    refetch()
+  }, [paginationModel])
 
-  const handleSaveClick = (id: GridRowId) => async () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
-    const editedRow = editedRowRef.current[id]
-    if (editedRow) {
+  const handleToggleStatus = (id: GridRowId) => async () => {
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
+      const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
       try {
         const body: UpdateAccountByAdminBodyType = {
-          id: editedRow.id,
-          name: editedRow.name,
-          buildingNumber: editedRow.buildingNumber,
-          status: editedRow.status === 'Hoạt động' ? 1 : 0,
-          role: editedRow.role
-        }
-        const result = await updateAccountByAdminMutation.mutateAsync(body)
-        toast.success(result.data.message)
-        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, ...editedRow } : row)))
-        delete editedRowRef.current[id]
-      } catch (error) {
-        handleErrorApi({ error })
-      }
-    }
-  }
-
-  const handleBanClick = (id: GridRowId) => async () => {
-    const rowToBan = rows.find((row) => row.id === id)
-    if (rowToBan) {
-      try {
-        const body: UpdateAccountByAdminBodyType = {
-          id: rowToBan.id,
-          name: rowToBan.name,
-          buildingNumber: rowToBan.buildingNumber,
-          status: 0,
-          role: rowToBan.role
+          id: rowToToggle.id,
+          name: rowToToggle.name,
+          buildingNumber: rowToToggle.buildingNumber,
+          status: newStatus === 'Hoạt động' ? 1 : 0,
+          role: rowToToggle.role
         }
         await updateAccountByAdminMutation.mutateAsync(body)
-        toast.success(`Người dùng: ${rowToBan.name} bị cấm hoạt động thành công`)
-        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: 'Không hoạt động' } : row)))
+        toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`)
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
       } catch (error) {
         handleErrorApi({ error })
       }
     }
-  }
-
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true }
-    })
-
-    const editedRow = rows.find((row) => row.id === id)
-    if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.id !== id))
-    }
-    delete editedRowRef.current[id]
   }
 
   const columns: GridColDef[] = [
@@ -224,38 +191,15 @@ export default function ManageUser() {
       headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit
-
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label='Save'
-              sx={{
-                color: 'primary.main'
-              }}
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label='Cancel'
-              className='textPrimary'
-              onClick={handleCancelClick(id)}
-              color='inherit'
-            />
-          ]
-        }
-
+      getActions: ({ row }) => {
         return [
+          <UserModal row={row} refetch={refetch} action={ACTION.UPDATE} />,
           <GridActionsCellItem
-            icon={<EditIcon />}
-            label='Edit'
-            className='textPrimary'
-            onClick={handleEditClick(id)}
-            color='inherit'
-          />,
-          <GridActionsCellItem icon={<BlockIcon />} label='Ban' onClick={handleBanClick(id)} color='inherit' />
+            icon={row.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
+            label={row.status === 'Hoạt động' ? 'Ban' : 'Unban'}
+            onClick={handleToggleStatus(row.id)}
+            color={row.status === 'Hoạt động' ? 'error' : 'success'}
+          />
         ]
       }
     }
@@ -264,7 +208,23 @@ export default function ManageUser() {
   const Toolbar = () => {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <AddUser />
+        <UserModal
+          row={{
+            id: '',
+            name: '',
+            email: '',
+            avatar: '',
+            point: 0,
+            role: '',
+            balance: 0,
+            buildingNumber: 0,
+            rankingName: '',
+            createdAt: '2021-09-01',
+            status: 1
+          }}
+          refetch={refetch}
+          action={ACTION.CREATE}
+        />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )
@@ -281,10 +241,11 @@ export default function ManageUser() {
         columns={columns}
         rows={rows}
         setRows={setRows}
-        rowModesModel={rowModesModel}
-        setRowModesModel={setRowModesModel}
         loading={isLoading}
         toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={totalRowCount}
       />
     </Box>
   )

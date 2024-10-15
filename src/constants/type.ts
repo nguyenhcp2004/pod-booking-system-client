@@ -83,3 +83,8 @@ export type ScrollbarProps = SimplebarProps & {
     content?: Partial<SxProps<Theme>>
   }
 }
+
+export type Pagination = {
+  page: number
+  take: number
+}

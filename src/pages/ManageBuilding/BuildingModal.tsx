@@ -1,6 +1,9 @@
-import { MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-
+import { Edit } from '@mui/icons-material'
+import { IconButton, MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
+import { useState } from 'react'
+import { ACTION } from '~/constants/mock'
+import { Building } from '~/constants/type'
+import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Dialog from '@mui/material/Dialog'
@@ -8,18 +11,15 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
-import { useState } from 'react'
-import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
-import { useEditBuildingMutation } from '~/queries/useBuilding'
+import { useCreateBuildingMutation, useEditBuildingMutation } from '~/queries/useBuilding'
+import { BuildingStatus, CreateBuildingBodyType, EditBuildingBodyType } from '~/schemaValidations/building.schema'
 import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
 
-interface Props {
-  row: GetListBuidlingResType['data'][0]
-}
-export default function EditBuilding({ row }: Props) {
+export default function BuildingModal({ row, action }: { row?: Building; action: string }) {
   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState(row.status)
+  const [status, setStatus] = useState(row?.status || BuildingStatus.Active)
+  const createBuilding = useCreateBuildingMutation()
   const editBuildingMutation = useEditBuildingMutation()
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -35,9 +35,15 @@ export default function EditBuilding({ row }: Props) {
   }
   return (
     <>
-      <MenuItem onClick={handleClickOpen} sx={{ borderRadius: '50%', width: '22px', height: '22px', padding: '0' }}>
-        <EditIcon sx={{ width: '22px', height: '22px' }} />
-      </MenuItem>
+      {action === ACTION.UPDATE ? (
+        <IconButton onClick={handleClickOpen}>
+          <Edit />
+        </IconButton>
+      ) : (
+        <Button color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
+          Thêm chi nhánh
+        </Button>
+      )}
       <Dialog
         fullWidth={true}
         open={open}
@@ -46,6 +52,7 @@ export default function EditBuilding({ row }: Props) {
           component: 'form',
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
+            if (createBuilding.isPending) return
             const formData = new FormData(event.currentTarget)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formJson = Object.fromEntries((formData as any).entries())
@@ -54,7 +61,10 @@ export default function EditBuilding({ row }: Props) {
               ...formJson
             }
             try {
-              const result = await editBuildingMutation.mutateAsync(payload)
+              const result =
+                ACTION.CREATE === action
+                  ? await createBuilding.mutateAsync(formJson as CreateBuildingBodyType)
+                  : await editBuildingMutation.mutateAsync(payload as EditBuildingBodyType)
               toast.success(result.data.message, {
                 autoClose: 3000
               })
@@ -65,22 +75,24 @@ export default function EditBuilding({ row }: Props) {
           }
         }}
       >
-        <DialogTitle sx={{ fontSize: '20px', fontWeight: '500' }}>Cập nhật chi nhánh</DialogTitle>
+        <DialogTitle sx={{ fontSize: '20px', fontWeight: '500' }}>
+          {action === ACTION.CREATE ? 'Tạo chi nhánh' : 'Chỉnh sửa chi nhánh'}
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField name='address' fullWidth size='small' defaultValue={row.address} />
+              <TextField fullWidth size='small' name='address' defaultValue={row?.address} />
             </Grid>
           </Grid>
-          <Grid container spacing={1} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
+          <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField name='hotlineNumber' fullWidth size='small' defaultValue={row.hotlineNumber} />
+              <TextField fullWidth size='small' name='hotlineNumber' defaultValue={row?.hotlineNumber} />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -90,11 +102,11 @@ export default function EditBuilding({ row }: Props) {
             <Grid size={9}>
               <TextareaAutosize
                 name='description'
-                style={{ width: '100%', padding: '8px', fontFamily: 'Roboto', fontSize: '14px' }}
+                style={{ width: '100%', padding: '6px' }}
                 minRows={2}
-                maxRows={5}
+                maxRows={4}
                 maxLength={255}
-                defaultValue={row.description}
+                defaultValue={row?.description}
               />
             </Grid>
           </Grid>
@@ -103,10 +115,12 @@ export default function EditBuilding({ row }: Props) {
               <Typography>Trạng thái</Typography>
             </Grid>
             <Grid size={9}>
-              <Select name='status' fullWidth size='small' defaultValue={status} onChange={handleChange}>
-                <MenuItem value='Active'>Active</MenuItem>
-                <MenuItem value='Under Maintenance'>Under Maintenance</MenuItem>
-                <MenuItem value='Hidden'>Hidden</MenuItem>
+              <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
+                {Object.values(BuildingStatus).map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
               </Select>
             </Grid>
           </Grid>
@@ -121,7 +135,7 @@ export default function EditBuilding({ row }: Props) {
             variant='contained'
             sx={{ backgroundColor: 'grey.900', borderRadius: '12px' }}
           >
-            Cập nhật
+            Lưu
           </Button>
         </DialogActions>
       </Dialog>

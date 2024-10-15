@@ -4,7 +4,7 @@ import RoomAmenitiesCard from './RoomAmenitiesCard'
 
 const BookingDetails = () => {
   const bookingContext = useBookingContext()
-  const bookingData = bookingContext?.bookingData
+  const bookingData = bookingContext!.bookingData
   const setBookingData = bookingContext?.setBookingData
   const theme = useTheme()
 
