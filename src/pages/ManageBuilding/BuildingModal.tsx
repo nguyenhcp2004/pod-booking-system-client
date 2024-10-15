@@ -61,9 +61,10 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
               ...formJson
             }
             try {
-              const result = ACTION.CREATE
-                ? await createBuilding.mutateAsync(formJson as CreateBuildingBodyType)
-                : await editBuildingMutation.mutateAsync(payload as EditBuildingBodyType)
+              const result =
+                ACTION.CREATE === action
+                  ? await createBuilding.mutateAsync(formJson as CreateBuildingBodyType)
+                  : await editBuildingMutation.mutateAsync(payload as EditBuildingBodyType)
               toast.success(result.data.message, {
                 autoClose: 3000
               })
