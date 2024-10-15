@@ -1,116 +1,114 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
-import moment, { Moment } from 'moment'
-import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import { Button, Modal, Box, Typography, useTheme, IconButton, Grid, Divider } from '@mui/material'
+import { Moment } from 'moment'
+import { BookingInfo, slotType } from '~/contexts/BookingContext'
+import CloseIcon from '@mui/icons-material/Close'
+import { Account, createOrder } from '~/apis/orderApi'
+import Calendar from '../Calendar/Calendar'
+import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
+import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
+import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
+import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
 
 interface CreateOrderModalProps {
   open: boolean
   onClose: () => void
-  setOrders: React.Dispatch<React.SetStateAction<Order[]>>
 }
 
-const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, setOrders }) => {
-  const [date, setDate] = useState<Moment | null>(null)
-  const [slot, setSlot] = useState('')
-  const [servicePackage, setServicePackage] = useState('')
-  const [status, setStatus] = useState('Active')
+const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) => {
+  const [selectedDates, setSelectedDates] = useState<Moment[]>([])
+  const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
+  const theme = useTheme()
+  const [customer, setCustomer] = useState<Account | null>(null)
+  const [bookingData, setBookingData] = useState<BookingInfo>({
+    roomType: null,
+    selectedRooms: [],
+    date: null,
+    timeSlots: [],
+    servicePackage: null
+  })
 
-  const handleCreate = () => {
-    const newOrder = {
-      id: `ORD${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      customerName: 'Tên khách hàng',
-      date: moment(date).format(DEFAULT_DATE_FORMAT),
-      slot,
-      room: 'Room A',
-      address: 'Địa chỉ',
-      status,
-      staff: 'Nhân viên',
-      servicePackage
-    }
-
-    setOrders((prevOrders) => [...prevOrders, newOrder])
-    onClose()
+  const handleCreateOrder = () => {
+    createOrder(bookingData)
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Tạo đơn hàng</DialogTitle>
-      <DialogContent>
-        <DatePicker
-          label='Ngày'
-          value={date}
-          onChange={(newDate) => setDate(newDate)}
-          slotProps={{ textField: { size: 'small', fullWidth: true } }}
-          format={DEFAULT_DATE_FORMAT}
-        />
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Slot</InputLabel>
-          <Select value={slot} onChange={(e) => setSlot(e.target.value)}>
-            {Array.from({ length: 6 }, (_, i) => {
-              const startTime = moment()
-                .startOf('day')
-                .add(i * 2, 'hours')
-                .format('HH:mm')
-              const endTime = moment()
-                .startOf('day')
-                .add(i * 2 + 2, 'hours')
-                .format('HH:mm')
-              return (
-                <MenuItem key={startTime} value={`${startTime} - ${endTime}`}>
-                  {`${startTime} - ${endTime}`}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Gói dịch vụ</InputLabel>
-          <Select value={servicePackage} onChange={(e) => setServicePackage(e.target.value)}>
-            <MenuItem value='Basic'>Cơ bản</MenuItem>
-            <MenuItem value='Premium'>Nâng cao</MenuItem>
-            <MenuItem value='Deluxe'>Deluxe</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Status</InputLabel>
-          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <MenuItem value='Hoạt động'>Hoạt động</MenuItem>
-            <MenuItem value='Hủy bỏ'>Hủy bỏ</MenuItem>
-            <MenuItem value='Hoàn thành'>Hoàn thành</MenuItem>
-            <MenuItem value='Đang chờ'>Đang chờ</MenuItem>
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleCreate} color='primary'>
-          Tạo
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Box>
+      {open == true ? (
+        <Modal open={open} onClose={onClose}>
+          <Box
+            sx={{
+              width: '70vw',
+              height: '90vh',
+              padding: 3,
+              margin: 'auto',
+              bgcolor: theme.palette.grey[100],
+              borderRadius: 2,
+              marginTop: '40px',
+              overflowY: 'auto'
+            }}
+          >
+            <Box display='flex' justifyContent='space-between' alignItems='center'>
+              <Box display='flex' gap='10px'>
+                <Typography variant='h5' sx={{ marginTop: '20px' }} fontWeight='500'>
+                  Tạo đơn hàng
+                </Typography>
+              </Box>
+              <IconButton onClick={onClose}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <HeaderOrderComponent
+              bookingData={bookingData}
+              setBookingData={setBookingData}
+              setSelectedDates={setSelectedDates}
+              selectedSlots={selectedSlots}
+              setSelectedSlots={setSelectedSlots}
+            />
+            <Grid container sx={{ width: '100%' }}>
+              <Grid
+                item
+                lg={6}
+                md={6}
+                sx={{ paddingRight: '12px', marginTop: '10px', bgcolor: 'white', padding: 2, borderRadius: '5px' }}
+              >
+                <Calendar selected={selectedDates} slots={selectedSlots} />
+              </Grid>
+              <Grid
+                item
+                lg={6}
+                md={6}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  paddingLeft: '12px',
+                  marginTop: '10px'
+                }}
+              >
+                <CustomerOrderCard customer={customer} setCustomer={setCustomer} bookingData={bookingData} />
+              </Grid>
+            </Grid>
+            <Divider sx={{ marginTop: 2, marginBottom: 1 }} />
+            <Grid container sx={{ width: '100%' }}>
+              <Grid item lg={6} md={6}>
+                <AddAmenityOrder bookingData={bookingData} setBookingData={setBookingData} />
+              </Grid>
+              <Grid item lg={6} md={6}>
+                <Box sx={{ marginLeft: '12px', marginTop: '10px', bgcolor: 'white', padding: 2, borderRadius: '5px' }}>
+                  <BookingDetailsCustom bookingData={bookingData} setBookingData={setBookingData} />
+                </Box>
+              </Grid>
+            </Grid>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <Button variant='contained' onClick={handleCreateOrder}>
+                Tạo đơn hàng
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
+      ) : null}
+    </Box>
   )
 }
 

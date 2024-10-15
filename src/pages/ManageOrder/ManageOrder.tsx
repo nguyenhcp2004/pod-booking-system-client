@@ -1,276 +1,396 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
 import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRowId,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridValidRowModel
-} from '@mui/x-data-grid'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import FilterListIcon from '@mui/icons-material/FilterList'
-import Table from '~/components/Table/Table'
-import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
-import DeleteOrderModal from '~/components/AminManageOrder/DeleteOrderModal'
-import ViewOrderModal from '~/components/AminManageOrder/ViewOrderModal'
-import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
-import { toast } from 'react-toastify'
-import { Chip, Button, Box, Typography, Menu, MenuItem } from '@mui/material'
+  Chip,
+  Select,
+  MenuItem,
+  Box,
+  Typography,
+  useTheme,
+  Backdrop,
+  CircularProgress,
+  Button,
+  TextField
+} from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
-import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import {
+  Account,
+  Order,
+  OrderStatus,
+  useDeleteOrder,
+  useOrders,
+  useSearchOrder,
+  useStaffAccounts,
+  useUpdateStaff
+} from '~/apis/orderApi'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditNoteIcon from '@mui/icons-material/EditNote'
+import DeleteOrderModal from '~/components/AminManageOrder/DeleteOrderModal'
+import ViewOrderModal from '~/components/AminManageOrder/ViewOrderModal'
+import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
+import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
+import { mapOrderToRow } from '~/utils/orderUtils'
+import { toast } from 'react-toastify'
 
 export default function ManageOrder() {
-  const sampleOrders: Order[] = [
-    {
-      id: 'ORD12345',
-      customerName: 'Nguyễn Văn A',
-      date: '2024-10-01',
-      slot: '09:00 - 11:00',
-      room: 'Room A',
-      address: '123 Main St.',
-      status: 'Active',
-      staff: 'John Doe',
-      servicePackage: 'Cơ bản'
-    },
-    {
-      id: 'ORD12345',
-      customerName: 'Nguyễn Văn A',
-      date: '2024-10-01',
-      slot: '09:00 - 11:00',
-      room: 'Room A',
-      address: '123 Main St.',
-      status: 'Active',
-      staff: 'John Doe',
-      servicePackage: 'Cơ bản'
-    },
-    {
-      id: 'ORD12346',
-      customerName: 'Trần Thị B',
-      date: '2024-10-02',
-      slot: '13:00 - 15:00',
-      room: 'Room B',
-      address: '456 Elm St.',
-      status: 'Hủy bỏ',
-      staff: 'Jane Smith',
-      servicePackage: 'Nâng cao'
-    },
-    {
-      id: 'ORD12347',
-      customerName: 'Lê Văn C',
-      date: '2024-10-03',
-      slot: '11:00 - 13:00',
-      room: 'Room C',
-      address: '789 Pine St.',
-      status: 'Active',
-      staff: 'Alice Johnson',
-      servicePackage: 'Tiêu chuẩn'
-    },
-    {
-      id: 'ORD12348',
-      customerName: 'Phạm Thị D',
-      date: '2024-10-04',
-      slot: '15:00 - 17:00',
-      room: 'Room D',
-      address: '321 Maple St.',
-      status: 'Canceled',
-      staff: 'Bob Brown',
-      servicePackage: 'Nâng cao'
-    },
-    {
-      id: 'ORD12349',
-      customerName: 'Nguyễn Thị E',
-      date: '2024-10-05',
-      slot: '10:00 - 12:00',
-      room: 'Room E',
-      address: '654 Oak St.',
-      status: 'Active',
-      staff: 'Eve White',
-      servicePackage: 'Cơ bản'
-    }
-  ]
-
-  const [rows, setRows] = useState<Order[]>(sampleOrders)
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false)
-  const [openCreateModal, setOpenCreateModal] = useState(false)
   const today = moment()
   const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
   const [selectedStartDate, setSelectedStartDate] = useState<Moment | null>(sevenDaysAgo)
+  const formattedStartDate = selectedStartDate?.startOf('day').format('YYYY-MM-DDTHH:mm') || ''
+  const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [filterValues, setFilterValues] = useState<{ [key: string]: string[] }>({
-    status: [],
-    room: []
-  })
+  const [currentPage, setCurrentPage] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [rowCount, setRowCount] = useState<number>(0)
+  const [rows, setRows] = useState<GridValidRowModel[]>([])
+  const [staffList, setStaffList] = useState<Account[]>([])
+  const [searchKeyword, setSearchKeyword] = useState<string>('')
+  const [searchProcess, setSearchProcess] = useState<string>('')
+  const theme = useTheme()
 
-  const handleFilterClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    //column: string
-    setAnchorEl(event.currentTarget as unknown as HTMLElement)
+  const [createMode, setCreateMode] = useState<boolean>(false)
+  const [editMode, setEditMode] = useState<boolean>(false)
+  const [viewMode, setViewMode] = useState<boolean>(false)
+  const [deleteMode, setDeleteMode] = useState<boolean>(false)
+
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const handleSelectedOrder = (order: Order) => {
+    setSelectedOrder(order)
   }
 
-  const handleClose = () => {
-    setAnchorEl(null)
+  const deleteOrderMutation = useDeleteOrder()
+
+  const handleDeleteOrder = () => {
+    console.log(`Deleting order with ID: ${selectedOrder?.id}`)
+    if (selectedOrder) {
+      deleteOrderMutation.mutate(selectedOrder?.id, {
+        onSuccess: (data) => {
+          toast.success('Xóa đơn hàng ' + data + ' thành công')
+        }
+      })
+    }
+    setRows((prevRows) => prevRows.filter((row) => row.id !== selectedOrder?.id))
+    setSelectedOrder(null)
+    setDeleteMode(false)
   }
 
-  const handleFilterChange = (column: string, value: string) => {
-    const currentValues = filterValues[column]
-    if (currentValues.includes(value)) {
-      setFilterValues({ ...filterValues, [column]: currentValues.filter((v) => v !== value) })
+  const {
+    data: orderData,
+    isLoading: isOrderLoading,
+    error: orderError
+  } = useOrders(formattedStartDate, formattedEndDate, currentPage, pageSize)
+  const { data: searchData, isLoading: isSearchLoading } = useSearchOrder(searchKeyword, currentPage, pageSize)
+  const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
+  const { mutate: updateStaff } = useUpdateStaff()
+  useEffect(() => {
+    if (orderData) {
+      const rowsData = orderData.data.map(mapOrderToRow)
+      setRows([...rowsData].reverse())
+      setRowCount(orderData.totalElements)
+    }
+  }, [orderData])
+
+  useEffect(() => {
+    if (searchKeyword.trim().length > 0) {
+      if (searchData) {
+        const searchRowsData = searchData.data.map(mapOrderToRow)
+        setRows([...searchRowsData].reverse())
+        setRowCount(searchRowsData.length)
+      }
     } else {
-      setFilterValues({ ...filterValues, [column]: [...currentValues, value] })
+      if (orderData) {
+        const rowsData = orderData.data.map(mapOrderToRow)
+        setRows([...rowsData].reverse())
+        setRowCount(orderData.totalElements)
+      }
     }
-  }
+  }, [searchKeyword, orderData, searchData])
 
-  const filteredRows = rows.filter((row) => {
-    if (filterValues.status.length > 0 && !filterValues.status.includes(row.status)) {
-      return false
+  useEffect(() => {
+    if (staffData) setStaffList(staffData)
+  }, [staffData])
+
+  if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
+
+  const handleStaffChange = (orderId: string, newStaffId: string) => {
+    const selectedStaff = staffList.find((s) => s.id === newStaffId)
+    const request = {
+      id: orderId,
+      orderHandler: {
+        id: newStaffId,
+        name: selectedStaff?.name || '',
+        orderHandler: selectedStaff
+      }
     }
-    if (filterValues.room.length > 0 && !filterValues.room.includes(row.room)) {
-      return false
-    }
-    return true
-  })
-
-  const handleEditClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenEditModal(true)
-  }
-
-  const handleDeleteClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenDeleteModal(true)
-  }
-
-  const handleViewClick = (rowSelected: GridValidRowModel) => () => {
-    setSelectedOrder(rowSelected as Order)
-    setOpenViewModal(true)
-  }
-
-  const handleDeleteOrder = (id: GridRowId) => {
-    setRows(rows.filter((row) => row.id !== id))
-    toast.success('Đơn hàng đã được xóa thành công')
+    updateStaff({ orderId, request })
+    setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
   }
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 150 },
-    { field: 'customerName', headerName: 'Khách hàng', width: 200 },
-    { field: 'date', headerName: 'Ngày', width: 150 },
-    { field: 'slot', headerName: 'Thời gian', width: 150 },
-    { field: 'room', headerName: 'Phòng', width: 150 },
-    { field: 'address', headerName: 'Địa chỉ', width: 200 },
+    { field: 'id', headerName: 'ID', width: 250 },
+    { field: 'customer', headerName: 'Khách hàng', width: 200 },
+    { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
+    { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
       headerName: 'Trạng thái',
       width: 150,
-      renderHeader: (params) => (
-        <Box display='flex' alignItems='center'>
-          <span>{params.colDef.headerName}</span>
-          <FilterListIcon
-            onClick={(e) => handleFilterClick(e)} // 'status'
-            style={{ cursor: 'pointer', marginLeft: 8 }}
-          />
-        </Box>
-      ),
       renderCell: (params) => (
         <Chip
           label={params.value}
-          color={params.value === 'Active' ? 'success' : params.value === 'Bảo trì' ? 'warning' : 'error'}
+          color={
+            params.value === OrderStatus.Pending
+              ? 'primary'
+              : params.value === OrderStatus.Successfully
+                ? 'success'
+                : 'error'
+          }
         />
       )
     },
-    { field: 'staff', headerName: 'Nhân viên', width: 150 },
+    {
+      field: 'orderHandler',
+      headerName: 'Nhân viên',
+      width: 200,
+      renderCell: (params) => {
+        const staffId = params.row?.staffId || null
+        return (
+          <Select
+            sx={{
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
+            }}
+            value={staffId}
+            onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
+            fullWidth
+            displayEmpty
+            renderValue={(selected) => {
+              let selectedStaff = staffList.find((staff) => staff.id === selected)
+              if (!selectedStaff) selectedStaff = params.row.orderHandler
+              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+            }}
+          >
+            <MenuItem value='' disabled>
+              Chọn nhân viên
+            </MenuItem>
+            {staffList.map((staff) => (
+              <MenuItem key={staff.id} value={staff.id}>
+                {staff.name}
+              </MenuItem>
+            ))}
+          </Select>
+        )
+      }
+    },
     { field: 'servicePackage', headerName: 'Gói dịch vụ', width: 150 },
     {
-      field: 'actions',
-      type: 'actions',
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
       width: 150,
-      getActions: (params) => [
-        <GridActionsCellItem icon={<EditIcon />} label='Edit' onClick={handleEditClick(params.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={handleDeleteClick(params.row)} />,
-        <GridActionsCellItem icon={<RemoveRedEyeIcon />} label='View' onClick={handleViewClick(params.row)} />
-      ]
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+          <Typography variant='body2' color={theme.palette.grey[700]}>
+            {params.value.substr(0, 5)}
+          </Typography>
+          <Typography variant='body2' color={theme.palette.grey[500]}>
+            | {params.value.substr(6)}
+          </Typography>
+        </Box>
+      )
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+          <Typography variant='body2' color={theme.palette.grey[700]}>
+            {params.value.substr(0, 5)}
+          </Typography>
+          <Typography variant='body2' color={theme.palette.grey[500]}>
+            | {params.value.substr(6)}
+          </Typography>
+        </Box>
+      )
+    },
+    {
+      field: 'action',
+      headerName: 'Thao tác',
+      width: 150,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setViewMode(true)
+            }}
+          >
+            <VisibilityIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setEditMode(true)
+            }}
+          >
+            <EditNoteIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', height: '100%' }}
+            onClick={() => {
+              handleSelectedOrder(params.row.order)
+              setDeleteMode(true)
+            }}
+          >
+            <DeleteIcon
+              sx={{
+                color: theme.palette.grey[500],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.text.primary
+                }
+              }}
+            />
+          </Box>
+        </Box>
+      )
     }
   ]
 
-  const Toolbar = () => {
-    return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
-        <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
-          <DatePicker
-            label='Ngày bắt đầu'
-            value={selectedStartDate}
-            onChange={(date) => setSelectedStartDate(date)}
-            slotProps={{ textField: { size: 'small' } }}
-            format={DEFAULT_DATE_FORMAT}
-          />
-          <DatePicker
-            label='Ngày kết thúc'
-            value={selectedEndDate}
-            onChange={(date) => setSelectedEndDate(date)}
-            slotProps={{ textField: { size: 'small' } }}
-            format={DEFAULT_DATE_FORMAT}
-          />
-        </Box>
-        <GridToolbarQuickFilter />
-      </GridToolbarContainer>
-    )
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setSearchProcess(event.target.value)
+    if (event.target.value.trim().length === 0) {
+      setSearchKeyword('')
+    }
   }
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
-      <Box display='flex' alignItems='flex-end' mb={5}>
-        <Typography variant='h4' fontWeight='500' flexGrow={1}>
-          Quản lí đơn hàng
-        </Typography>
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={() => setOpenCreateModal(true)}
-          style={{ marginTop: '20px' }}
-        >
-          Tạo đơn hàng
+  const handleSearchKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      setSearchKeyword((event.target as HTMLInputElement).value)
+    }
+  }
+
+  const Toolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+      <Box display='flex' gap={2} sx={{ marginTop: '5px' }}>
+        <DatePicker
+          label='Từ'
+          value={selectedStartDate}
+          onChange={(newValue) => setSelectedStartDate(newValue)}
+          slotProps={{ textField: { fullWidth: true } }}
+        />
+        <DatePicker
+          label='Đến'
+          value={selectedEndDate}
+          onChange={(newValue) => setSelectedEndDate(newValue)}
+          slotProps={{ textField: { fullWidth: true } }}
+        />
+      </Box>
+      <Box display='flex' gap={2}>
+        <GridToolbarQuickFilter
+          value={searchProcess}
+          onChange={(event) => handleSearchChange(event)}
+          sx={{
+            '& .MuiInputBase-input': {
+              color: 'white'
+            }
+          }}
+        />
+        <Button variant='contained' color='primary' onClick={() => setCreateMode(true)}>
+          Thêm đơn hàng
         </Button>
       </Box>
-      <Table columns={columns} rows={filteredRows} toolbarComponents={Toolbar} />
+    </GridToolbarContainer>
+  )
 
-      {/* Thêm menu lọc */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem onClick={() => handleFilterChange('status', 'Active')}>Active</MenuItem>
-        <MenuItem onClick={() => handleFilterChange('status', 'Hủy bỏ')}>Hủy bỏ</MenuItem>
-        <MenuItem onClick={() => handleFilterChange('status', 'Canceled')}>Canceled</MenuItem>
-      </Menu>
-
+  return (
+    <Box sx={{ width: '100%', height: 600 }}>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isOrderLoading || isStaffLoading || isSearchLoading}
+      >
+        <CircularProgress color='inherit' />
+      </Backdrop>
+      <Typography variant='h5' sx={{ marginBottom: '10px' }}>
+        Quản lý đơn hàng
+      </Typography>
+      <Box display='flex' justifyContent='flex-end' sx={{ width: '100%' }}>
+        <Box sx={{ position: 'relative', width: '250px' }}>
+          <TextField
+            label=''
+            size='small'
+            onKeyDown={(event) =>
+              handleSearchKeyDown(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
+            }
+            value={searchProcess}
+            onChange={(event) => handleSearchChange(event)}
+            sx={{
+              position: 'absolute',
+              top: '20px',
+              right: '170px',
+              width: '180px',
+              zIndex: 2,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  border: 'none'
+                },
+                '&:hover fieldset': {
+                  border: 'none'
+                },
+                '&.Mui-focused fieldset': {
+                  border: 'none'
+                }
+              }
+            }}
+          />
+        </Box>
+      </Box>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        paginationModel={{ page: currentPage, pageSize: pageSize }}
+        pageSizeOptions={[5, 10, 20]}
+        pagination
+        paginationMode='server'
+        rowCount={rowCount}
+        onPaginationModelChange={(newPaginationModel) => {
+          setCurrentPage(newPaginationModel.page)
+          setPageSize(newPaginationModel.pageSize)
+        }}
+        slots={{ toolbar: Toolbar }}
+      />
+      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} />
+      <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
       <EditOrderModal
-        open={openEditModal}
-        onClose={() => setOpenEditModal(false)}
+        open={editMode}
+        onClose={() => setEditMode(false)}
         order={selectedOrder}
         setOrders={setRows}
+        staffList={staffList}
       />
-      <DeleteOrderModal
-        open={openDeleteModal}
-        onClose={() => setOpenDeleteModal(false)}
-        onDelete={() => selectedOrder && handleDeleteOrder(selectedOrder.id)}
-      />
-      <ViewOrderModal open={openViewModal} onClose={() => setOpenViewModal(false)} order={selectedOrder} />
-      <CreateOrderModal open={openCreateModal} onClose={() => setOpenCreateModal(false)} setOrders={setRows} />
+      <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>
   )
 }
