@@ -6,10 +6,13 @@ import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
 import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
+import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
 import ManageBuilding from '~/pages/ManageBuilding'
+import ManageOrder from '~/pages/ManageOrder/ManageOrder'
 import ManageRoom from '~/pages/ManageRoom'
+import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
 import Register from '~/pages/Register'
@@ -48,7 +51,7 @@ export default function useRouteElements() {
       element: <AdminLayout />,
       children: [
         {
-          path: '/admin',
+          path: '/admin/dashboard',
           element: <DashBoard />
         },
         {
@@ -58,6 +61,14 @@ export default function useRouteElements() {
         {
           path: '/admin/buildings',
           element: <ManageBuilding />
+        },
+        {
+          path: '/admin/users',
+          element: <ManageUser />
+        },
+        {
+          path: '/admin/orders',
+          element: <ManageOrder />
         }
       ]
     },
@@ -100,6 +111,10 @@ export default function useRouteElements() {
             {
               path: '/order-detail/:step?',
               element: <OrderDetail />
+            },
+            {
+              path: '/history-orders',
+              element: <HistoryOrders />
             }
           ]
         }

@@ -3,40 +3,25 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTransactionInfo } from '~/apis/paymentApi'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useBookingContext } from '~/contexts/BookingContext'
+import { createOrder } from '~/apis/orderApi'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 
-interface CommonProps {
-  onNext: () => void
-  onBack: () => void
-}
-
-export const Confirmed: React.FC<CommonProps> = (props) => {
-  const bookingInfo = {
-    orderId: '#ABCXYZ',
-    customerName: 'Phạm Thị Anh Đào',
-    totalPrice: 1374000,
-    roomType: 'Phòng POD đôi',
-    pricePerHour: 20000,
-    address: 'Đố m biết',
-    date: '24/01/2024',
-    timeSlots: '7h - 9h, 9h - 11h',
-    rooms: ['Phòng 101', 'Phòng 102'],
-    package: 'Gói tuần',
-    imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
-  }
-
+export const Confirmed: React.FC = () => {
   const handleReturn = () => {
     console.log('Back to homepage')
-    localStorage.setItem('activeStep', '1')
+    localStorage.setItem('bookingData', JSON.stringify({}))
     navigate('/')
   }
-
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const transactionData = location.state?.transactionData
   const [status, setStatus] = useState<boolean | null>(null)
-
+  const bookingContext = useBookingContext()
+  console.log(bookingContext)
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
 
   const { isLoading } = useQuery({
@@ -49,6 +34,12 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
 
       if (transactionResponse.status === 'OK') {
         setStatus(true)
+        if (!bookingContext) {
+          throw new Error('Booking context is undefined')
+        }
+        const response = await createOrder(bookingContext.bookingData)
+        console.log('Response request:', response)
+
         return transactionResponse
       } else {
         setStatus(false)
@@ -57,6 +48,25 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
     },
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
+
+  useEffect(() => {
+    client.connect({}, () => {
+      const roomId = bookingContext!.bookingData.selectedRooms[0].id
+      const payload = {
+        id: roomId
+      }
+      client.send('/app/payments', {}, JSON.stringify(payload))
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingContext])
 
   if (!transactionData) {
     return <Box>No order data available.</Box>
@@ -88,6 +98,40 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
         </Button>
       </Paper>
     )
+  }
+
+  const bookingData = bookingContext?.bookingData
+
+  if (!bookingData) return null
+
+  const roomTotal = Math.round(
+    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
+  )
+
+  const amenitiesTotal = Math.round(
+    bookingData?.selectedRooms?.reduce(
+      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+      0
+    ) || 0
+  )
+
+  let discount = 0
+  if (bookingData?.servicePackage?.discountPercentage) {
+    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
+  }
+
+  const bookingInfo = {
+    orderId: '#ABCXYZ',
+    customerName: 'Phạm Thị Anh Đào',
+    totalPrice: roomTotal + amenitiesTotal - discount,
+    roomType: bookingData.roomType?.name || '',
+    pricePerHour: bookingData.roomType?.price || 0,
+    address: bookingData.roomType?.building?.address || '',
+    date: bookingData.date || '',
+    timeSlots: bookingData.timeSlots.join(', '),
+    rooms: bookingData.selectedRooms.map((room) => room.name),
+    package: bookingData.servicePackage?.name || '',
+    imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
   }
 
   return (
@@ -221,14 +265,6 @@ export const Confirmed: React.FC<CommonProps> = (props) => {
             </Button>
           </Box>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Button onClick={props.onBack} sx={{ mr: 1 }}>
-          Quay lại
-        </Button>
-        <Button variant='contained' onClick={props.onNext}>
-          Tiếp tục
-        </Button>
       </Box>
     </Box>
   )

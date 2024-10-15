@@ -9,7 +9,7 @@ export default function AdminLayout() {
       <Box>
         <AdminSideBar />
       </Box>
-      <Box sx={{ flex: 1, height: '100vh', overflow: 'auto' }}>
+      <Box sx={{ flex: 1, height: '100vh', overflow: 'auto', backgroundColor: '#F9FAFB' }}>
         <AdminHeader />
         <Box padding={'8px 40px 64px'} height={'100%'}>
           <Outlet />

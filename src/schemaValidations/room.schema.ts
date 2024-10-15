@@ -21,7 +21,6 @@ const RoomTypeSchema = z.object({
 const RoomSchema = z.object({
   id: z.number(),
   name: z.string(),
-  price: z.number(),
   description: z.string(),
   image: z.string(),
   status: z.string(),
@@ -30,27 +29,7 @@ const RoomSchema = z.object({
   roomType: RoomTypeSchema
 })
 
-const FilterRoomQuery = z.object({
-  address: z.string().optional(),
-  capacity: z.number().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  page: z.number().optional(),
-  take: z.number().optional()
-})
-
-export type FilterRoomQueryType = z.TypeOf<typeof FilterRoomQuery>
-
-const FilterRoomRes = z.object({
-  code: z.number(),
-  data: z.array(RoomSchema),
-  currentPage: z.number(),
-  totalPage: z.number(),
-  recorderPerPage: z.number(),
-  totalRecord: z.number()
-})
-
-export type FilterRoomResType = z.TypeOf<typeof FilterRoomRes>
+export type RoomSchemaType = z.TypeOf<typeof RoomSchema>
 
 const FilterRoomByTypeAndSlotsQuery = z.object({
   typeId: z.number(),
@@ -120,3 +99,51 @@ export const UnavailableRoomsRes = z.object({
 })
 
 export type UnavailableRoomsResType = z.TypeOf<typeof UnavailableRoomsRes>
+
+export const GetListRoomsRes = z.object({
+  code: z.number(),
+  currentPage: z.number(),
+  totalPage: z.number(),
+  recordPerPage: z.number(),
+  totalRecord: z.number(),
+  data: z.array(RoomSchema)
+})
+
+export type GetListRoomsResType = z.TypeOf<typeof GetListRoomsRes>
+
+export const CreateRoomBody = z.object({
+  name: z.string(),
+  description: z.string(),
+  image: z.string(),
+  status: z.string(),
+  roomTypeId: z.string()
+})
+
+export type CreateRoomBodyType = z.TypeOf<typeof CreateRoomBody>
+
+export const CreateRoomRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: RoomSchema
+})
+
+export type CreateRoomResType = z.TypeOf<typeof CreateRoomRes>
+
+export const EditRoomBody = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  image: z.string(),
+  status: z.string(),
+  roomTypeId: z.string()
+})
+
+export type EditRoomBodyType = z.TypeOf<typeof EditRoomBody>
+
+export const EditRoomRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: RoomSchema
+})
+
+export type EditRoomResType = z.TypeOf<typeof EditRoomRes>

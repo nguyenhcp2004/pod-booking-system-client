@@ -1,6 +1,5 @@
 import { Autocomplete, Box, Button, Checkbox, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import pod from '~/assets/images/pod.jpg'
 import moment, { Moment } from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
@@ -12,35 +11,32 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { useEffect, useMemo, useState } from 'react'
-import { Room, ServicePackage } from '~/constants/type'
+import { ServicePackage, Room } from '~/constants/type'
+import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { Link, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 
-const podDataMock = {
-  id: '103',
-  name: 'Phòng POD đôi',
-  description:
-    'Pod 103 is a 4-person pod with a 55-inch screen, a whiteboard, and a video camera. It is perfect for team meetings.',
-  price: 100000,
-  images: [
-    pod,
-    homePageBanner,
-    'https://picsum.photos/id/237/200/300',
-    'https://picsum.photos/id/238/200/300',
-    'https://picsum.photos/id/239/200/300'
-  ]
-}
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
   const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([])
-  const [selectedRooms, setSelectedRooms] = useState<Array<Room>>([])
-  const { bookingData, setBookingData }: any = useBookingContext()
+  const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
+  const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
+  const BookingContext = useBookingContext()
+  const bookingData = BookingContext?.bookingData
+  const setBookingData = BookingContext?.setBookingData
   const { data: servicePackage, isSuccess } = getAllServicePackage()
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }, [])
+
   useEffect(() => {
     const dateList = []
     if (selectedDate) {
@@ -91,20 +87,29 @@ export default function RoomDetail() {
 
   useEffect(() => {
     roomListRefetch()
-  }, [selectedSlots, selectedDate])
+  }, [selectedSlots, selectedDate, roomListRefetch])
 
   useEffect(() => {
-    setBookingData((prev: BookingInfo) => {
+    setBookingData?.((prev: BookingInfo) => {
+      const price = bookingData?.roomType?.price
+      const listRoom: RoomContextType[] = selectedRooms.map((room) => {
+        return {
+          id: room.id,
+          name: room.name,
+          price: price,
+          image: room.image,
+          amenities: []
+        }
+      })
       return {
         ...prev,
-        roomType: podDataMock,
-        selectedRooms: selectedRooms,
-        date: selectedDate?.format('YYYY-MM-DD'),
-        timeSlots: selectedSlots,
-        servicePackage: selectedPackage
+        selectedRooms: listRoom || [],
+        date: selectedDate?.format('YYYY-MM-DD') || null,
+        timeSlots: selectedSlots || [],
+        servicePackage: selectedPackage || null
       }
     })
-  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage])
+  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
 
   return (
     <Box
@@ -118,23 +123,22 @@ export default function RoomDetail() {
       <Grid container size={12} spacing={6}>
         <Grid container size={{ xs: 12, md: 6 }} rowSpacing={1}>
           <Box sx={{ width: '100%' }}>
-            <ImageView images={podDataMock.images} />
+            <ImageView images={selectedRooms[0]?.image ? [selectedRooms[0]?.image] : [homePageBanner]} />
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ gap: '40px', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <Typography variant='h3' sx={{ fontWeight: 'bold' }}>
-                {podDataMock.name}
+                {bookingData?.roomType?.name}
               </Typography>
               <Typography variant='h5' color='primary'>
-                {formatCurrency(podDataMock.price)}
+                {formatCurrency(bookingData?.roomType?.price ?? 0)}
                 <Typography color='neutral' display={'inline'}>
                   /tiếng
                 </Typography>
               </Typography>
             </Box>
-
             <Box>
               <Grid container size={12} spacing={2}>
                 <Grid size={{ xs: 12, md: 5 }}>
@@ -153,7 +157,7 @@ export default function RoomDetail() {
                       options={SLOT}
                       value={selectedSlots}
                       onChange={(_, slots) => {
-                        setSelectedSlots(slots)
+                        setSelectedSlots(slots as slotType[])
                       }}
                       disableCloseOnSelect
                       limitTags={1}
@@ -221,7 +225,7 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Link to='/order-detail/1'>
+                  <Link to='/order-detail/1' state={{ from: location.pathname }}>
                     <Button variant='contained' color='primary' fullWidth>
                       Đặt phòng
                     </Button>
@@ -239,7 +243,7 @@ export default function RoomDetail() {
         <Typography variant='h4' color='primary' fontWeight={'bold'}>
           Chi tiết
         </Typography>
-        <Typography variant='subtitle2'>{podDataMock.description}</Typography>
+        <Typography variant='subtitle2'>{bookingData?.roomType?.building?.address}</Typography>
       </Box>
     </Box>
   )

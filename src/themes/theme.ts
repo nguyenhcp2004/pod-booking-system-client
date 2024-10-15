@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material'
-
+import { viVN } from '@mui/material/locale'
+import { viVN as pickersVN } from '@mui/x-date-pickers/locales'
+import { viVN as coreVN } from '@mui/material/locale'
 // Create your custom theme
 export const tokens = (mode: 'light' | 'dark') => ({
   ...(mode === 'light'
@@ -315,8 +317,38 @@ export const themeSettings = (mode: 'light' | 'dark') => {
         fontFamily: ['Roboto', 'sans-serif'].join(','),
         fontSize: 16
       }
+    },
+    components: {
+      MuiChip: {
+        styleOverrides: {
+          colorSuccess: {
+            backgroundColor: colors.success[100],
+            color: colors.success[500]
+          },
+          colorError: {
+            backgroundColor: colors.error[100],
+            color: colors.error[500]
+          },
+          colorWarning: {
+            backgroundColor: colors.warning[100],
+            color: colors.warning[500]
+          },
+          colorInfo: {
+            backgroundColor: colors.info[100],
+            color: colors.info[500]
+          },
+          colorPrimary: {
+            backgroundColor: colors.primary[100],
+            color: colors.primary[500]
+          },
+          colorSecondary: {
+            backgroundColor: colors.secondary[100],
+            color: colors.secondary[500]
+          }
+        }
+      }
     }
   }
 }
 
-export const theme = createTheme(themeSettings('light'))
+export const theme = createTheme(themeSettings('light'), viVN, pickersVN, coreVN)

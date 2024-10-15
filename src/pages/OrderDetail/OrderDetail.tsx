@@ -3,7 +3,8 @@ import { listSteps } from './listSteps'
 import { useState, useEffect, useContext, useMemo } from 'react'
 import { tokens } from '~/themes/theme'
 import { BookingContext } from '~/contexts/BookingContext'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 export interface TransactionData {
   vnp_Amount: string | null
@@ -14,7 +15,9 @@ export interface TransactionData {
 
 export default function OrderDetail() {
   const { step } = useParams()
+  const location = useLocation()
   const initialStep = Number(step) || 1
+  console.log('initialStep', initialStep)
   const [activeStep, setActiveStep] = useState<number>(initialStep)
   const queryParams = useMemo(() => new URLSearchParams(window.location.search), [])
   const colors = tokens('light')
@@ -38,20 +41,31 @@ export default function OrderDetail() {
   }, [vnp_Amount, step, initialStep])
 
   useEffect(() => {
-    if (loading) {
-      if (activeStep === 4) {
-        const transactionData: TransactionData = {
-          vnp_Amount: vnp_Amount,
-          vnp_BankCode: queryParams.get('vnp_BankCode'),
-          vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
-          vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
-        }
-        navigate('/order-detail/4', { state: { transactionData } })
-      } else if (activeStep !== initialStep) {
-        navigate(`/order-detail/${activeStep}`)
-      }
+    window.onpopstate = () => {
+      const pathStep = location.pathname.split('/').pop()
+      const currentStep = Number(pathStep) || 1
+      setActiveStep(currentStep - 1)
     }
-  }, [activeStep, loading, initialStep, navigate, vnp_Amount, queryParams])
+  }, [location.pathname])
+
+  useEffect(() => {
+    const currentPath = location.pathname
+    const targetPath = `/order-detail/${activeStep}`
+
+    if (activeStep === 4) {
+      const transactionData: TransactionData = {
+        vnp_Amount: vnp_Amount,
+        vnp_BankCode: queryParams.get('vnp_BankCode'),
+        vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
+        vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
+      }
+      if (currentPath !== '/order-detail/4') {
+        navigate('/order-detail/4', { state: { transactionData } })
+      }
+    } else if (activeStep !== initialStep && currentPath !== targetPath) {
+      navigate(targetPath)
+    }
+  }, [activeStep, loading, initialStep, navigate, vnp_Amount, queryParams, location.pathname])
 
   const handleNext = () => {
     if (activeStep < listSteps.length) {
@@ -61,6 +75,7 @@ export default function OrderDetail() {
 
   const handleBack = () => {
     if (activeStep > 1) {
+      navigate(`/order-detail/${activeStep - 1}`)
       setActiveStep((prevActiveStep) => prevActiveStep - 1)
     }
   }
@@ -86,7 +101,7 @@ export default function OrderDetail() {
 
   return (
     <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
-      <Box sx={{ width: '100%', paddingX: '104px', paddingTop: '48px' }}>
+      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '30px' }}>
         <Stepper activeStep={activeStep}>
           {listSteps.map((step) => (
             <Step key={step.index}>
@@ -100,8 +115,13 @@ export default function OrderDetail() {
             </Step>
           ))}
         </Stepper>
+        {activeStep < listSteps.length && (
+          <Box sx={{ position: 'relative', cursor: 'pointer' }} onClick={handleBack}>
+            <KeyboardBackspaceIcon sx={{ position: 'absolute', top: '55px', left: '-40px' }} />
+          </Box>
+        )}
       </Box>
-      <Box sx={{ paddingY: '24px' }}>{loading ? <CurrentStepComponent {...commonProps} /> : ''}</Box>
+      <Box sx={{ paddingBottom: '30px' }}>{loading ? <CurrentStepComponent {...commonProps} /> : ''}</Box>
     </Box>
   )
 }

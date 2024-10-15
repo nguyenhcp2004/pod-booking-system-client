@@ -1,3 +1,3 @@
-import RoomCard from '~/components/LandingPage/RoomCard'
+import RoomTypeCard from '~/components/LandingPage/RoomTypeCard'
 
-export default RoomCard
+export default RoomTypeCard

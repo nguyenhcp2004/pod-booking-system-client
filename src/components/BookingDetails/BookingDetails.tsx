@@ -4,17 +4,39 @@ import RoomAmenitiesCard from './RoomAmenitiesCard'
 
 const BookingDetails = () => {
   const bookingContext = useBookingContext()
-  const bookingData = bookingContext?.bookingData
+  const bookingData = bookingContext!.bookingData
+  const setBookingData = bookingContext?.setBookingData
   const theme = useTheme()
 
   if (!bookingData) return null
 
-  const roomTotal = bookingData.selectedRooms.reduce((total, room) => total + room.price, 0)
-  const amenitiesTotal = bookingData.selectedRooms.reduce(
-    (total, room) => total + room?.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-    0
+  const roomTotal = Math.round(
+    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
   )
 
+  const amenitiesTotal = Math.round(
+    bookingData?.selectedRooms?.reduce(
+      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+      0
+    ) || 0
+  )
+
+  let discount = 0
+  if (bookingData?.servicePackage?.discountPercentage) {
+    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
+  }
+
+  const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
+  const removeAmenity = (amenity: string) => {
+    setBookingData?.((prev) => {
+      if (!prev) return prev
+      const newSelectedRooms = prev.selectedRooms.map((room) => {
+        const newAmenities = room.amenities.filter((item) => item.name !== amenity)
+        return { ...room, amenities: newAmenities }
+      })
+      return { ...prev, selectedRooms: newSelectedRooms }
+    })
+  }
   return (
     <Box sx={{ bgcolor: 'white' }}>
       <Box sx={{ padding: '20px' }}>
@@ -41,7 +63,7 @@ const BookingDetails = () => {
             </Typography>
             <Box display='flex' sx={{ marginTop: '4px' }}>
               <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                {bookingData.selectedRooms[0].price} VND
+                {bookingData.roomType?.price.toLocaleString()} VND
               </Typography>
               <Typography variant='subtitle2'>/tiếng</Typography>
             </Box>
@@ -50,7 +72,12 @@ const BookingDetails = () => {
                 <Typography variant='body2' fontWeight='bold'>
                   Địa chỉ:
                 </Typography>
-                <Typography variant='body2'> {bookingData.roomType?.building.address}</Typography>
+                <Typography variant='body2'>
+                  {' '}
+                  {bookingData.roomType?.building?.address
+                    ? bookingData?.roomType?.building?.address
+                    : bookingData?.roomType?.building?.address}
+                </Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
@@ -62,7 +89,7 @@ const BookingDetails = () => {
                 <Typography variant='body2' fontWeight='bold'>
                   Slot:
                 </Typography>
-                <Typography variant='body2'>{bookingData.timeSlots}</Typography>
+                <Typography variant='body2'>{bookingData.timeSlots.join(', ')}</Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
@@ -80,15 +107,20 @@ const BookingDetails = () => {
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-            Tiện ích bạn đã chọn
-          </Typography>
-          {bookingData.selectedRooms.map((room, index) => (
-            <Box key={index}>
-              <RoomAmenitiesCard room={room} />
-              {index !== bookingData.selectedRooms.length - 1 && <Divider sx={{ my: '20px' }} />}
-            </Box>
-          ))}
+          {roomHaveAmenities > 0 && (
+            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
+              Tiện ích bạn đã chọn
+            </Typography>
+          )}
+          {bookingData.selectedRooms.map((room, index) => {
+            if (room.amenities.length === 0) return null
+            return (
+              <Box key={index}>
+                <RoomAmenitiesCard room={room} removeAmenity={removeAmenity} />
+                {index !== roomHaveAmenities - 1 && <Divider sx={{ my: '20px' }} />}
+              </Box>
+            )
+          })}
         </Box>
       </Box>
       <Divider />
@@ -109,6 +141,14 @@ const BookingDetails = () => {
             {amenitiesTotal.toLocaleString()} VND
           </Typography>
         </Box>
+        <Box display='flex' justifyContent='space-between'>
+          <Typography variant='subtitle2' color={theme.palette.grey[500]}>
+            Điscount:
+          </Typography>
+          <Typography variant='subtitle2' fontWeight='bold'>
+            {discount.toLocaleString()} VND
+          </Typography>
+        </Box>
       </Box>
       <Divider />
       <Box sx={{ padding: '20px' }} display='flex' justifyContent='space-between'>
@@ -116,7 +156,7 @@ const BookingDetails = () => {
           Tổng đơn:
         </Typography>
         <Typography variant='subtitle2' fontWeight='bold'>
-          {roomTotal.toLocaleString()} VND
+          {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
         </Typography>
       </Box>
     </Box>

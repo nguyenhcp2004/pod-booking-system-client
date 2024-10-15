@@ -6,12 +6,13 @@ import OptionsMenu from '~/components/OptionsMenu'
 import { useAppContext } from '~/contexts/AppProvider'
 import { Link } from 'react-router-dom'
 import accountApiRequest from '~/apis/account'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { setAccountToLS } from '~/utils/auth'
 
 export default function Header() {
   const { account, setAccount, isAuth } = useAppContext()
-  console.log(account)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
   useEffect(() => {
     if (isAuth && !account) {
       accountApiRequest
@@ -25,6 +26,15 @@ export default function Header() {
         })
     }
   }, [account, setAccount, isAuth])
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (anchorEl) {
+      setAnchorEl(null)
+    } else {
+      setAnchorEl(event.currentTarget)
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -53,6 +63,8 @@ export default function Header() {
         </Typography>
         <Box sx={{ display: 'flex', gap: 3 }}>
           <Button
+            component={Link}
+            to='/'
             sx={{
               textTransform: 'uppercase',
               paddingX: '11px',
@@ -62,9 +74,15 @@ export default function Header() {
           >
             Trang chủ
           </Button>
-          <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
-            Đơn đặt
-          </Button>
+          {account && (
+            <Button
+              component={Link}
+              to='/history-orders'
+              sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}
+            >
+              Đơn đặt
+            </Button>
+          )}
           <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
             Liên hệ
           </Button>
@@ -82,8 +100,10 @@ export default function Header() {
               gap: 1.2,
               alignItems: 'center',
               borderRadius: '8px',
-              border: '1px solid #000'
+              border: '1px solid #000',
+              cursor: 'pointer'
             }}
+            onClick={handleClick}
           >
             <Avatar sizes='small' alt='RC' src={account?.avatar ?? undefined} sx={{ width: 36, height: 36 }}>
               {account?.name.slice(0, 2).toUpperCase()}
@@ -94,7 +114,7 @@ export default function Header() {
                 {account?.email}
               </Typography>
             </Box>
-            <OptionsMenu />
+            <OptionsMenu anchorEl={anchorEl} />
           </Stack>
         ) : (
           <>
