@@ -4,6 +4,7 @@ import { PaymentReqDTO } from '~/schemaValidations/paymentSchema'
 interface PaymentUrlResType {
   amount: number
   orderId: string
+  returnUrl: string
 }
 
 export const generatePaymentUrl = async (paymentRequest: PaymentUrlResType) => {

@@ -9,6 +9,8 @@ import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
 import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
 import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
 import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
+import { useNavigate } from 'react-router-dom'
+import PaymentBox from './CreateOrderComponents/PaymentBox'
 
 interface CreateOrderModalProps {
   open: boolean
@@ -19,6 +21,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const theme = useTheme()
+  const navigate = useNavigate()
   const [customer, setCustomer] = useState<Account | null>(null)
   const [bookingData, setBookingData] = useState<BookingInfo>({
     roomType: null,
@@ -27,8 +30,16 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
     timeSlots: [],
     servicePackage: null
   })
+  const [openPayment, setOpenPayment] = useState<boolean>(false)
 
   const handleCreateOrder = () => {
+    setOpenPayment(false)
+    createOrder(bookingData)
+    navigate('/admin/orders')
+  }
+
+  const handlePayment = () => {
+    setOpenPayment(true)
     createOrder(bookingData)
   }
 
@@ -100,11 +111,18 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
                 </Box>
               </Grid>
             </Grid>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-              <Button variant='contained' onClick={handleCreateOrder}>
-                Tạo đơn hàng
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px' }}>
+              <Button variant='text' onClick={onClose}>
+                Hủy
+              </Button>
+              <Button variant='outlined' onClick={handleCreateOrder}>
+                Thanh toán tiền mặt
+              </Button>
+              <Button variant='outlined' onClick={handlePayment}>
+                Thanh toán qua thẻ
               </Button>
             </Box>
+            <Box sx={{ marginTop: '20px' }}>{openPayment == true && <PaymentBox bookingData={bookingData} />}</Box>
           </Box>
         </Modal>
       ) : null}
