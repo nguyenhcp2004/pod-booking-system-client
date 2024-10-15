@@ -1,23 +1,11 @@
 import { useGetListBuilding } from '~/queries/useBuilding'
 import { BuildingStatus } from '~/schemaValidations/building.schema'
-import { Box, Chip, Link, Typography } from '@mui/material'
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams,
-  GridRowId,
-  GridRowModes,
-  GridRowModesModel,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridValidRowModel
-} from '@mui/x-data-grid'
-import SaveIcon from '@mui/icons-material/Save'
-import CancelIcon from '@mui/icons-material/Cancel'
+import { Box, Chip, Typography } from '@mui/material'
+import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
-import AddBuilding from '~/pages/ManageBuilding/AddBuilding'
-import EditBuilding from '~/pages/ManageBuilding/EditBuilding'
+import BuildingModal from '~/pages/ManageBuilding/BuildingModal'
+import { ACTION } from '~/constants/mock'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -36,43 +24,7 @@ export default function ManageBuilding() {
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
-  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
-  const handleSaveClick = (id: GridRowId) => async () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
-  }
-
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true }
-    })
-
-    const editedRow = rows.find((row) => row.id === id)
-    if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.id !== id))
-    }
-  }
-
-  const ExpandableCell = ({ value }: GridRenderCellParams) => {
-    const [expanded, setExpanded] = useState(false)
-
-    return (
-      <div>
-        {expanded ? value : value.slice(0, 200)}&nbsp;
-        {value.length > 200 && (
-          <Link
-            type='button'
-            component='button'
-            sx={{ fontSize: 'inherit', letterSpacing: 'inherit' }}
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? 'view less' : 'view more'}
-          </Link>
-        )}
-      </div>
-    )
-  }
   const columns: GridColDef[] = [
     {
       field: 'id',
@@ -86,13 +38,12 @@ export default function ManageBuilding() {
         }
       }
     },
-    { field: 'address', headerName: 'Chi nhánh', width: 150, editable: true },
+    { field: 'address', headerName: 'Chi nhánh', width: 350, editable: true },
     {
       field: 'description',
       headerName: 'Mô tả',
-      width: 250,
-      editable: true,
-      renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
+      width: 350,
+      editable: true
     },
     { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: true },
     { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: true },
@@ -123,30 +74,8 @@ export default function ManageBuilding() {
       headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
-      getActions: ({ id, row }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit
-
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label='Save'
-              sx={{
-                color: 'primary.main'
-              }}
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label='Cancel'
-              className='textPrimary'
-              onClick={handleCancelClick(id)}
-              color='inherit'
-            />
-          ]
-        }
-
-        return [<EditBuilding row={row} />]
+      getActions: ({ row }) => {
+        return [<BuildingModal row={row} action={ACTION.UPDATE} />]
       }
     }
   ]
@@ -154,10 +83,7 @@ export default function ManageBuilding() {
   const Toolbar = () => {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
-        {/* <Button color='primary' startIcon={<AddIcon />} onClick={handleClick}>
-          Thêm phòng
-        </Button> */}
-        <AddBuilding />
+        <BuildingModal action={ACTION.CREATE} />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )
