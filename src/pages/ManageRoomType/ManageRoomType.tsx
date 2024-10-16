@@ -99,7 +99,7 @@ export default function RoomType() {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
         <Typography variant='h4' fontWeight='500' flexGrow={1}>
-          Quản lí phòng
+          Quản lí loại phòng
         </Typography>
       </Box>
 

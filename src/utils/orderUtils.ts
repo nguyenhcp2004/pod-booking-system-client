@@ -29,19 +29,29 @@ export const createDateTimeFromSlot = (date: string, slot: slotType) => {
 }
 
 export const createBookingPayload = (bookingData: BookingInfo) => {
-  let selectedSlot = null
-  const startTime = []
-  const endTime = []
-  for (let i = 0; i < bookingData.timeSlots.length; i++) {
-    selectedSlot = bookingData.timeSlots[i]
-    if (bookingData.date && selectedSlot) {
-      const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
-      startTime.push(dateTime.startTime)
-      endTime.push(dateTime.endTime)
-    }
+  //let selectedSlot = null
+  // const startTime = []
+  // const endTime = []
+  // for (let i = 0; i < bookingData.timeSlots.length; i++) {
+  //   selectedSlot = bookingData.timeSlots[i]
+  //   if (bookingData.date && selectedSlot) {
+  //     const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
+  //     startTime.push(dateTime.startTime)
+  //     endTime.push(dateTime.endTime)
+  //   }
+  // }
+  const selectedSlot = bookingData.timeSlots[0]
+
+  let startTime = null
+  let endTime = null
+
+  if (bookingData.date && selectedSlot) {
+    const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
+    startTime = dateTime.startTime
+    endTime = dateTime.endTime
   }
 
-  if (startTime.length === 0 || endTime.length === 0) {
+  if (!startTime || !endTime || startTime.length === 0 || endTime.length === 0) {
     return null
   }
 
