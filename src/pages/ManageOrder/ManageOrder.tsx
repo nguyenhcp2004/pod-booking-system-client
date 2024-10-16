@@ -57,6 +57,7 @@ export default function ManageOrder() {
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
   const handleSelectedOrder = (order: Order) => {
     setSelectedOrder(order)
   }
