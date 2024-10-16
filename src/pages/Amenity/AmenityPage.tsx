@@ -1,4 +1,14 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+  useTheme
+} from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useContext, useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
@@ -11,11 +21,16 @@ import { Amenity, BookingContext } from '~/contexts/BookingContext'
 import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import moment, { Moment } from 'moment'
+import { DatePicker } from '@mui/x-date-pickers'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
+  const [timeSlot, setTimeSlot] = useState<string>()
   const [quantity, setQuantity] = useState(0)
   const { data: amenities = [] } = useGetAmenities()
   const [errorState, setErrorState] = useState<string | null>(null)
@@ -143,6 +158,11 @@ export default function AmenityPage() {
     setDetailAmenity(item)
   }
 
+  const handleTimeSlotChange = (event: SelectChangeEvent<string>) => {
+    const newTimeSlot = event.target.value
+    setTimeSlot(newTimeSlot)
+  }
+
   // const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
 
   return (
@@ -156,40 +176,66 @@ export default function AmenityPage() {
               </Typography>
             </Box>
             <Box sx={{ padding: '0px 20px 20px 20px' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px 20px 0px 0px', gap: '24px' }}>
-                <FormControl fullWidth>
-                  <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
-                  <Select
-                    labelId='room-type-label'
-                    value={roomType || ''}
-                    label='Chọn Phòng đã đặt'
-                    onChange={(e) => setRoomType(e.target.value)}
-                  >
-                    {bookingData?.selectedRooms.map((room, index) => (
-                      <MenuItem key={index} value={room.name}>
-                        {room.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
-                  <Select
-                    labelId='amenities-label'
-                    value={selectedAmenity || ''}
-                    label='Chọn loại tiện ích'
-                    onChange={(e) => {
-                      setSelectedAmenity(e.target.value)
-                    }}
-                  >
-                    {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
-                      <MenuItem key={index} value={uniqueType}>
-                        {uniqueType}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
+              <Grid container spacing={2} sx={{ marginBottom: '20px' }}>
+                <Grid size={12}>
+                  <DatePicker
+                    label='Ngày đã đặt'
+                    value={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                    format={DEFAULT_DATE_FORMAT}
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='time-slot-label'>Slot</InputLabel>
+                    <Select labelId='time-slot-label' value={timeSlot} label='Slot' onChange={handleTimeSlotChange}>
+                      <MenuItem value='7 - 9'>7h - 9h</MenuItem>
+                      <MenuItem value='9 - 11'>9h - 11h</MenuItem>
+                      <MenuItem value='13 - 15'>13h - 15h</MenuItem>
+                      <MenuItem value='15 - 17'>15h - 17h</MenuItem>
+                      <MenuItem value='17 - 19'>17h - 19h</MenuItem>
+                      <MenuItem value='19 - 21'>19h - 21h</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
+                    <Select
+                      labelId='room-type-label'
+                      value={roomType || ''}
+                      label='Chọn Phòng đã đặt'
+                      onChange={(e) => setRoomType(e.target.value)}
+                    >
+                      {bookingData?.selectedRooms.map((room, index) => (
+                        <MenuItem key={index} value={room.name}>
+                          {room.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+                    <Select
+                      labelId='amenities-label'
+                      value={selectedAmenity || ''}
+                      label='Chọn loại tiện ích'
+                      onChange={(e) => {
+                        setSelectedAmenity(e.target.value)
+                      }}
+                    >
+                      {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
+                        <MenuItem key={index} value={uniqueType}>
+                          {uniqueType}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
 
               <Box sx={{ padding: '49px 0px 29px 0px' }}>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
