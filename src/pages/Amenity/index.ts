@@ -1,3 +1,3 @@
-import Amenity from '~/pages/Amenity/Amenity'
+import AmenityPage from '~/pages/Amenity/AmenityPage'
 
-export default Amenity
+export default AmenityPage
