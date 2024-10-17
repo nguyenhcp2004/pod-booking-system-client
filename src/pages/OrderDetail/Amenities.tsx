@@ -7,7 +7,6 @@ import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext } from '~/contexts/BookingContext'
@@ -25,9 +24,8 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const colors = tokens(theme.palette.mode)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0)
-  const { data: amenities = [], isLoading, error } = useGetAmenities()
+  const { data: amenities = [] } = useGetAmenities()
   const [errorState, setErrorState] = useState<string | null>(null)
-  const location = useLocation()
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
     throw new Error('BookingContext must be used within a BookingProvider')
@@ -98,7 +96,6 @@ export const Amenities: React.FC<CommonProps> = (props) => {
     setErrorState(null)
     setQuantity(0)
     setDetailAmenity(null)
-    console.log(bookingData)
   }
 
   const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
@@ -108,7 +105,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
       setErrorState('Vui lòng chọn tiện ích')
       return
     } else {
-      if (detailAmenity.quantity < quantity) {
+      if (detailAmenity.quantity < quantity + 1) {
         setErrorState('Số lượng tiện ích không đủ')
         return
       }
@@ -150,12 +147,6 @@ export const Amenities: React.FC<CommonProps> = (props) => {
       return
     }
     setDetailAmenity(item)
-  }
-
-  const navigate = useNavigate()
-  const handleCancel = () => {
-    const previousPath = location.state?.from || '/'
-    navigate(previousPath)
   }
 
   const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
