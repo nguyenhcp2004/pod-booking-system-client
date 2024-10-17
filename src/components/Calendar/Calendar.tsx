@@ -69,7 +69,6 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
               // console.log(slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
               return slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`
             })
-            console.log(isAvailable)
             if (isAvailable) {
               slot.slots.push({
                 startTime: s.startTime,
@@ -122,13 +121,13 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
   const renderEventDetails = (event: any) => {
     return (
       <Box>
-        {event.data.map((slot: RoomCustomSchemaType) => (
-          <Box key={slot.roomId}>
+        {event.data.map((slot: RoomCustomSchemaType, index: number) => (
+          <Box key={index}>
             <Divider sx={{ opacity: 0.6 }} />
             <Typography variant='h6'>Phòng {slot.roomName}</Typography>
             <Grid container sx={{ width: '200px' }}>
-              {slot.slots.map((s: SlotAvailable) => (
-                <>
+              {slot.slots.map((s: SlotAvailable, index: number) => (
+                <Box key={index}>
                   <Grid size={6}>
                     <Typography>
                       {moment(s.startTime).format('HH:mm')} - {moment(s.endTime).format('HH:mm')}
@@ -139,7 +138,7 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
                       {s.available ? 'Còn chỗ' : 'Hết chỗ'}
                     </Typography>
                   </Grid>
-                </>
+                </Box>
               ))}
             </Grid>
           </Box>

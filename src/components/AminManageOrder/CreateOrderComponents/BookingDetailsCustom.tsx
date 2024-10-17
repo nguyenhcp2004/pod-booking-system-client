@@ -1,13 +1,16 @@
 import { Box, Typography, Divider, useTheme, Avatar } from '@mui/material'
-import { useBookingContext } from '~/contexts/BookingContext'
-import RoomAmenitiesCard from './RoomAmenitiesCard'
+import { BookingInfo } from '~/contexts/BookingContext'
+import RoomAmenitiesCard from '~/components/BookingDetails/RoomAmenitiesCard'
+import { Dispatch, SetStateAction } from 'react'
 
-const BookingDetails = () => {
-  const bookingContext = useBookingContext()
-  const bookingData = bookingContext!.bookingData
-  const setBookingData = bookingContext?.setBookingData
+interface BookingDetailsCustomProps {
+  bookingData: BookingInfo
+
+  setBookingData: Dispatch<SetStateAction<BookingInfo>>
+}
+
+const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
-
   if (!bookingData) return null
 
   const roomTotal = Math.round(
@@ -45,8 +48,8 @@ const BookingDetails = () => {
         </Typography>
         <Box display='flex' alignItems='center' sx={{ marginTop: '24px' }} gap='20px'>
           <Avatar
-            src={bookingData?.selectedRooms[0]?.image || ''}
-            alt={bookingData?.roomType?.name || ''}
+            src={bookingData?.selectedRooms[0]?.image}
+            alt={bookingData?.roomType?.name}
             sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
             variant='rounded'
           />
@@ -59,7 +62,7 @@ const BookingDetails = () => {
             }}
           >
             <Typography variant='h5' fontWeight='bold'>
-              {bookingData?.roomType?.name || 'Chưa chọn loại phòng'}
+              {bookingData.roomType?.name}
             </Typography>
             <Box display='flex' sx={{ marginTop: '4px' }}>
               <Typography variant='subtitle2' color={theme.palette.primary.main}>
@@ -163,4 +166,4 @@ const BookingDetails = () => {
   )
 }
 
-export default BookingDetails
+export default BookingDetailsCustom
