@@ -1,4 +1,15 @@
+import { useCreateRoomMutation, useEditRoomMutation } from '~/queries/useRoom'
+import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
+import { RoomSchemaType } from '~/schemaValidations/room.schema'
+import UploadImage from '~/components/UploadImage/UploadImage'
+import BackdropCustom from '~/components/Progress/Backdrop'
+import { ACTION, ROOM_STATUS } from '~/constants/mock'
+import { handleErrorApi } from '~/utils/utils'
+import AddIcon from '@mui/icons-material/Add'
 import Edit from '@mui/icons-material/Edit'
+import { toast } from 'react-toastify'
+import Grid from '@mui/material/Grid2'
+import { useState } from 'react'
 import {
   Button,
   Dialog,
@@ -13,17 +24,6 @@ import {
   SelectChangeEvent,
   TextField
 } from '@mui/material'
-import Grid from '@mui/material/Grid2'
-import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
-import { toast } from 'react-toastify'
-import BackdropCustom from '~/components/Progress/Backdrop'
-import UploadImage from '~/components/UploadImage/UploadImage'
-import { ACTION, ROOM_STATUS } from '~/constants/mock'
-import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
-import { useCreateRoomMutation, useEditRoomMutation } from '~/queries/useRoom'
-import { RoomSchemaType } from '~/schemaValidations/room.schema'
-import { handleErrorApi } from '~/utils/utils'
 
 const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () => void; action: string }) => {
   const [open, setOpen] = useState(false)
@@ -157,7 +157,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
             Hủy
           </Button>
           <Button type='submit' color='success'>
-            Lưu
+            {action === ACTION.CREATE ? 'Tạo' : 'Lưu'}
           </Button>
         </DialogActions>
       </Dialog>
