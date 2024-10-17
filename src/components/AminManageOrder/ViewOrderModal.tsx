@@ -96,7 +96,7 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                 label='Nhân viên phụ trách'
                 size='small'
                 variant='outlined'
-                value={order.orderDetails[0].orderHandler.name}
+                value={order.orderDetails[0]?.orderHandler?.name || 'N/A'}
                 InputProps={{
                   readOnly: true
                 }}

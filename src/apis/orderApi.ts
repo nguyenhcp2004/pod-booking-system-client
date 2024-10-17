@@ -182,9 +182,9 @@ interface OrderResponse {
   updatedAt: string
 }
 
-const updateStaff = async (orderId: string, request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
+const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
   try {
-    const response = await http.put(`http://localhost:8080/order/${orderId}`, request)
+    const response = await http.put(`http://localhost:8080/order`, request)
     return response.data
   } catch (error) {
     console.error('Error updating staff:', error)
@@ -194,8 +194,7 @@ const updateStaff = async (orderId: string, request: OrderUpdateStaffRequest): P
 
 export const useUpdateStaff = () => {
   return useMutation({
-    mutationFn: ({ orderId, request }: { orderId: string; request: OrderUpdateStaffRequest }) =>
-      updateStaff(orderId, request),
+    mutationFn: ({ request }: { request: OrderUpdateStaffRequest }) => updateStaff(request),
     onSuccess: () => {
       console.log('Staff updated successfully')
     },

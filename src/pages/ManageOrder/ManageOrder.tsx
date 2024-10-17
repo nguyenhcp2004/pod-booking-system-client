@@ -145,8 +145,9 @@ export default function ManageOrder() {
         orderHandler: selectedStaff
       }
     }
-    updateStaff({ orderId, request })
+    updateStaff({ request })
     setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
+    toast.success('Cập nhật nhân viên thành công')
   }
 
   const columns: GridColDef[] = [
@@ -185,13 +186,13 @@ export default function ManageOrder() {
               '.MuiOutlinedInput-notchedOutline': { border: 'none' },
               '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
             }}
-            value={staffId}
+            value={staffId || ''}
             onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
             fullWidth
             displayEmpty
             renderValue={(selected) => {
               let selectedStaff = staffList.find((staff) => staff.id === selected)
-              if (!selectedStaff) selectedStaff = params.row.orderHandler
+              if (!selectedStaff) selectedStaff = params.row?.orderHandler
               return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
             }}
           >
