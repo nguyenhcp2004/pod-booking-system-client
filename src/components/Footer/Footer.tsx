@@ -10,7 +10,6 @@ export default function Footer() {
         height: '120px',
         padding: '10px',
         alignItems: 'flex-start',
-        gap: '10px',
         alignSelf: 'stretch',
         backgroundColor: (theme) => theme.palette.primary.main
       }}
@@ -57,8 +56,8 @@ export default function Footer() {
           </Typography>
         </Box>
         <Box
+          display={{ xs: 'none', md: 'flex' }}
           sx={{
-            display: 'flex',
             width: '500px',
             justifyContent: 'space-between',
             alignItems: 'flex-end',
