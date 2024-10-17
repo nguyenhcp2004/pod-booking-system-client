@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import { useGetAmenitiesByType } from '~/queries/useAmenity'
+import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import moment, { Moment } from 'moment'
 import { DatePicker } from '@mui/x-date-pickers'
@@ -23,14 +23,16 @@ import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
+  const [errorState, setErrorState] = useState<string | null>(null)
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
   const [timeSlot, setTimeSlot] = useState<string>()
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
+  const { data: responseAllAmenities } = useGetAmenities()
   const amenities: AmenityType[] = response?.data.data ?? []
+  const allAmenities: AmenityType[] = responseAllAmenities ?? []
 
   useEffect(() => {
     if (selectedAmenityType) {
@@ -124,14 +126,27 @@ export default function AmenityPage() {
       setQuantity((prevQuantity) => prevQuantity - 1)
     }
   }
+  const handleIncrement = () => {
+    if (!detailAmenity) {
+      setErrorState('Vui lòng chọn tiện ích')
+      return
+    } else {
+      if (detailAmenity.quantity < quantity) {
+        setErrorState('Số lượng tiện ích không đủ')
+        return
+      }
+      setErrorState(null)
+      setQuantity((prevQuantity) => prevQuantity + 1)
+    }
+  }
 
   const handleSelectAmenity = (item: AmenityType) => {
     setQuantity(0)
-    if (detailAmenity?.id === item.id) {
+    if (detailAmenity?.name === item.name) {
       setDetailAmenity(null)
-    } else {
-      setDetailAmenity(item)
+      return
     }
+    setDetailAmenity(item)
   }
 
   const handleAmenityTypeChange = (event: SelectChangeEvent<string>) => {
@@ -217,31 +232,49 @@ export default function AmenityPage() {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-                  {selectedAmenityType !== '' ? (
-                    amenities.map((item) => (
-                      <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
-                        <Button
-                          variant='outlined'
-                          fullWidth
-                          sx={{
-                            padding: '10px 0px',
-                            minHeight: '50px',
-                            borderRadius: '4px',
-                            textAlign: 'center',
-                            color: 'black',
-                            borderColor: 'black',
-                            fontSize: '14px',
-                            backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                          }}
-                          onClick={() => handleSelectAmenity(item)}
-                        >
-                          {item.name}
-                        </Button>
-                      </Grid>
-                    ))
-                  ) : (
-                    <></>
-                  )}
+                  {selectedAmenityType !== ''
+                    ? amenities.map((item) => (
+                        <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                          <Button
+                            variant='outlined'
+                            fullWidth
+                            sx={{
+                              padding: '10px 0px',
+                              minHeight: '50px',
+                              borderRadius: '4px',
+                              textAlign: 'center',
+                              color: 'black',
+                              borderColor: 'black',
+                              fontSize: '14px',
+                              backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                            }}
+                            onClick={() => handleSelectAmenity(item)}
+                          >
+                            {item.name}
+                          </Button>
+                        </Grid>
+                      ))
+                    : allAmenities.map((item) => (
+                        <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                          <Button
+                            variant='outlined'
+                            fullWidth
+                            sx={{
+                              padding: '10px 0px',
+                              minHeight: '50px',
+                              borderRadius: '4px',
+                              textAlign: 'center',
+                              color: 'black',
+                              borderColor: 'black',
+                              fontSize: '14px',
+                              backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                            }}
+                            onClick={() => handleSelectAmenity(item)}
+                          >
+                            {item.name}
+                          </Button>
+                        </Grid>
+                      ))}
                 </Grid>
               </Box>
               <Box
@@ -254,14 +287,14 @@ export default function AmenityPage() {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                  {/* {errorState && (
+                  {errorState && (
                     <Typography
                       variant='subtitle2'
                       sx={{ color: 'red', paddingBottom: '10px', position: 'absolute', bottom: '40px' }}
                     >
                       {errorState}
                     </Typography>
-                  )} */}
+                  )}
                   <Typography
                     variant='subtitle2'
                     sx={{ fontWeight: 700, fontSize: '16px', padding: '0px 20px 0px 0px', color: colors.grey[200] }}
@@ -303,7 +336,7 @@ export default function AmenityPage() {
                     </Typography>
                     <Button
                       variant='outlined'
-                      // onClick={handleIncrement}
+                      onClick={handleIncrement}
                       sx={{
                         minWidth: '35px',
                         height: '40px',
