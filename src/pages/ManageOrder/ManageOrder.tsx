@@ -107,7 +107,7 @@ export default function ManageOrder() {
   }, [client])
   useEffect(() => {
     if (orderData) {
-      const rowsData = orderData.data.map(mapOrderToRow)
+      const rowsData = orderData.data.data.map(mapOrderToRow)
       setRows([...rowsData].reverse())
       setRowCount(orderData.totalElements)
     }
@@ -122,7 +122,7 @@ export default function ManageOrder() {
       }
     } else {
       if (orderData) {
-        const rowsData = orderData.data.map(mapOrderToRow)
+        const rowsData = orderData.data.data.map(mapOrderToRow)
         setRows([...rowsData].reverse())
         setRowCount(orderData.totalElements)
       }
