@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react'
-import { Typography, Box, useTheme, IconButton, Link } from '@mui/material'
-import { useBookingContext } from '~/contexts/BookingContext'
-import RefreshIcon from '@mui/icons-material/Refresh'
+import { Box, IconButton, Typography, useTheme } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { generatePaymentUrl } from '~/apis/paymentApi'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import { QRCodeSVG } from 'qrcode.react'
-import SockJS from 'sockjs-client'
-import { toast } from 'react-toastify'
-import Stomp from 'stompjs'
+import { Link } from 'react-router-dom'
+import { BookingInfo } from '~/contexts/BookingContext'
 
-const QRCodePayment = () => {
+interface PaymentBoxProps {
+  bookingData: BookingInfo
+}
+
+const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
   const [showReload, setShowReload] = useState(false)
   const [paymentUrl, setPaymentUrl] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
-  const bookingContext = useBookingContext()
-  const bookingData = bookingContext?.bookingData
   const theme = useTheme()
-
   const roomTotal = Math.round(
     bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
   )
@@ -54,26 +53,6 @@ const QRCodePayment = () => {
       setLoading(false)
     }
   })
-  const socketCL = new SockJS('http://localhost:8080/ws')
-  const client = Stomp.over(socketCL)
-
-  useEffect(() => {
-    client.connect({}, () => {
-      client.subscribe('/topic/payments', (data) => {
-        const roomId = JSON.parse(data.body)
-        if (bookingData!.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
-        }
-      })
-    })
-
-    return () => {
-      if (client.connected) {
-        client.disconnect(() => {})
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingData])
 
   useEffect(() => {
     setLoading(true)
@@ -143,11 +122,10 @@ const QRCodePayment = () => {
         !loading && (
           <Box>
             <Link
-              href={paymentUrl}
+              to={paymentUrl}
               target='_blank'
               rel='noopener'
-              color={theme.palette.primary.main}
-              sx={{ fontSize: '16px' }}
+              style={{ color: theme.palette.primary.main, fontSize: '16px' }}
             >
               Thanh toán ngay
             </Link>
@@ -165,4 +143,4 @@ const QRCodePayment = () => {
   )
 }
 
-export default QRCodePayment
+export default PaymentBox
