@@ -21,6 +21,7 @@ export const Confirmed: React.FC = () => {
   const transactionData = location.state?.transactionData
   const [status, setStatus] = useState<boolean | null>(null)
   const bookingContext = useBookingContext()
+  const [orderCreated, setOrderCreated] = useState(0)
   console.log(bookingContext)
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
 
@@ -32,7 +33,9 @@ export const Confirmed: React.FC = () => {
         throw new Error('No response from API')
       }
 
-      if (transactionResponse.status === 'OK') {
+      if (transactionResponse.status === 'OK' && orderCreated == 0) {
+        console.log('Order created:', orderCreated)
+        setOrderCreated(orderCreated + 1)
         setStatus(true)
         if (!bookingContext) {
           throw new Error('Booking context is undefined')
@@ -42,7 +45,9 @@ export const Confirmed: React.FC = () => {
 
         return transactionResponse
       } else {
-        setStatus(false)
+        if (orderCreated == 1) {
+          setStatus(false)
+        }
         throw new Error(transactionResponse.message || 'Transaction not successful')
       }
     },
