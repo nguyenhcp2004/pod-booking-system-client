@@ -33,6 +33,8 @@ import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
 import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
 import { mapOrderToRow } from '~/utils/orderUtils'
 import { toast } from 'react-toastify'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 
 export default function ManageOrder() {
   const today = moment()
@@ -57,6 +59,8 @@ export default function ManageOrder() {
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
 
   const handleSelectedOrder = (order: Order) => {
     setSelectedOrder(order)
@@ -86,6 +90,21 @@ export default function ManageOrder() {
   const { data: searchData, isLoading: isSearchLoading } = useSearchOrder(searchKeyword, currentPage, pageSize)
   const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
+
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/payments', (data) => {
+        const room = JSON.parse(data.body)
+        toast.success(`Phòng ${room.name} vừa được đặt`)
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [client])
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.map(mapOrderToRow)

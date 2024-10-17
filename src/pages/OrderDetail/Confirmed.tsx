@@ -58,9 +58,11 @@ export const Confirmed: React.FC = () => {
 
   useEffect(() => {
     client.connect({}, () => {
-      const roomId = bookingContext!.bookingData.selectedRooms[0].id
+      const room = bookingContext!.bookingData.selectedRooms[0]
+      const building = bookingContext!.bookingData.roomType?.building
       const payload = {
-        id: roomId
+        id: room.id,
+        buildingNumber: building?.id
       }
       client.send('/app/payments', {}, JSON.stringify(payload))
     })

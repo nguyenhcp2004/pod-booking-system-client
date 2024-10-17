@@ -5,29 +5,15 @@ import {
   CardContent,
   CardMedia,
   Chip,
-  Avatar,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Divider,
-  Rating,
-  Button,
   Grow,
   Zoom
 } from '@mui/material'
-import {
-  Wifi,
-  RoomService,
-  Pool,
-  LocalCafe,
-  BusinessCenter,
-  Security,
-  CalendarToday,
-  AttachMoney,
-  Hotel,
-  Person
-} from '@mui/icons-material'
+import { Wifi, RoomService, Pool, LocalCafe, BusinessCenter, Security, Hotel } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
 
 const bookings = [
@@ -40,7 +26,7 @@ const bookings = [
     room: {
       name: 'room test 1',
       price: 259.99,
-      image: '/placeholder.svg?height=200&width=300'
+      image: 'https://i.pinimg.com/enabled_lo/564x/a0/a3/57/a0a357281197e7c7bea13028eb461695.jpg'
     },
     amenities: [
       { name: 'Wi-Fi', price: 0 },
@@ -58,7 +44,7 @@ const bookings = [
     room: {
       name: 'room test 2',
       price: 449.99,
-      image: '/placeholder.svg?height=200&width=300'
+      image: 'https://i.pinimg.com/enabled_lo/564x/a0/a3/57/a0a357281197e7c7bea13028eb461695.jpg'
     },
     amenities: [
       { name: 'Wi-Fi', price: 0 },
@@ -76,7 +62,7 @@ const bookings = [
     room: {
       name: 'room test 3',
       price: 799.99,
-      image: '/placeholder.svg?height=200&width=300'
+      image: 'https://i.pinimg.com/enabled_lo/564x/a0/a3/57/a0a357281197e7c7bea13028eb461695.jpg'
     },
     amenities: [
       { name: 'Wi-Fi', price: 0 },
@@ -124,9 +110,11 @@ function BookingCard({ booking, index }) {
     <Grow in={true} timeout={500 + index * 250}>
       <Card
         sx={{
-          height: 'fit-content',
+          height: 'auto',
           mb: 4,
           overflow: 'visible',
+          borderRadius: '16px',
+          border: '1px solid',
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
             transform: 'translateY(-5px)',
@@ -138,11 +126,12 @@ function BookingCard({ booking, index }) {
           <Grid size={{ xs: 12, md: 4 }}>
             <CardMedia
               component='img'
-              image='https://i.pinimg.com/enabled_lo/564x/b9/05/ee/b905ee4c20c628207dd7f607f03fa556.jpg'
+              image={booking.room.image}
               alt={booking.room.name}
               sx={{
                 height: '100%',
                 objectFit: 'cover',
+                borderRadius: '16px',
                 transition: 'transform 0.3s ease-in-out',
                 '&:hover': {
                   transform: 'scale(1.05)'
@@ -208,21 +197,6 @@ function BookingCard({ booking, index }) {
                   </Grid>
                 </Grid>
               </Box>
-              {/* <List dense>
-                {booking.amenities.map((amenity, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemIcon>
-                      <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }}>
-                        {getAmenityIcon(amenity.name)}
-                      </Zoom>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={amenity.name}
-                      secondary={amenity.price === 0 ? 'Complimentary' : `$${amenity.price.toFixed(2)}`}
-                    />
-                  </ListItem>
-                ))}
-              </List> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                 <Box />
                 <Box sx={{ fontWeight: 'bold' }}>Tổng tiền: 100K</Box>
@@ -236,103 +210,11 @@ function BookingCard({ booking, index }) {
 }
 
 export default function HistoryOrders() {
-  const totalBookings = bookings.length
-  const totalSpent = bookings.reduce((sum, booking) => sum + booking.total, 0)
-  const upcomingBookings = bookings.filter((booking) => booking.status === 'Upcoming').length
-
   return (
     <Box sx={{ width: '100%', padding: '24px 104px', backgroundColor: '#F9FAFB' }}>
       <Typography variant='h4' gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', mb: 4 }}>
         Lịch sử đặt phòng
       </Typography>
-
-      {/* <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={4}>
-          <Zoom in={true} style={{ transitionDelay: '250ms' }}>
-            <Card
-              sx={{
-                backgroundColor: '#e3f2fd',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
-                }
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant='h6' component='div'>
-                    Total Bookings
-                  </Typography>
-                  <Avatar sx={{ bgcolor: '#1976d2' }}>
-                    <CalendarToday />
-                  </Avatar>
-                </Box>
-                <Typography variant='h4' component='div' sx={{ mt: 2 }}>
-                  {totalBookings}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Zoom>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Zoom in={true} style={{ transitionDelay: '500ms' }}>
-            <Card
-              sx={{
-                backgroundColor: '#e8f5e9',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
-                }
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant='h6' component='div'>
-                    Total Spent
-                  </Typography>
-                  <Avatar sx={{ bgcolor: '#388e3c' }}>
-                    <AttachMoney />
-                  </Avatar>
-                </Box>
-                <Typography variant='h4' component='div' sx={{ mt: 2 }}>
-                  ${totalSpent.toFixed(2)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Zoom>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Zoom in={true} style={{ transitionDelay: '750ms' }}>
-            <Card
-              sx={{
-                backgroundColor: '#fff3e0',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)'
-                }
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant='h6' component='div'>
-                    Upcoming Bookings
-                  </Typography>
-                  <Avatar sx={{ bgcolor: '#f57c00' }}>
-                    <Hotel />
-                  </Avatar>
-                </Box>
-                <Typography variant='h4' component='div' sx={{ mt: 2 }}>
-                  {upcomingBookings}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Zoom>
-        </Grid>
-      </Grid> */}
-
       {bookings.map((booking, index) => (
         <BookingCard key={booking.id} booking={booking} index={index} />
       ))}
