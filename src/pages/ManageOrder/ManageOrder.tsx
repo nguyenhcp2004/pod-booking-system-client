@@ -108,23 +108,23 @@ export default function ManageOrder() {
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.data.map(mapOrderToRow)
-      setRows([...rowsData].reverse())
-      setRowCount(orderData.totalElements)
+      setRows([...rowsData])
+      setRowCount(orderData.data.totalRecord)
     }
   }, [orderData])
 
   useEffect(() => {
     if (searchKeyword.trim().length > 0) {
       if (searchData) {
-        const searchRowsData = searchData.data.map(mapOrderToRow)
-        setRows([...searchRowsData].reverse())
-        setRowCount(searchRowsData.length)
+        const searchRowsData = searchData.data.data.map(mapOrderToRow)
+        setRows([...searchRowsData])
+        setRowCount(searchRowsData.data.totalRecord)
       }
     } else {
       if (orderData) {
         const rowsData = orderData.data.data.map(mapOrderToRow)
-        setRows([...rowsData].reverse())
-        setRowCount(orderData.totalElements)
+        setRows([...rowsData])
+        setRowCount(orderData.data.totalRecord)
       }
     }
   }, [searchKeyword, orderData, searchData])
@@ -153,6 +153,7 @@ export default function ManageOrder() {
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'customer', headerName: 'Khách hàng', width: 200 },
     { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
+    { field: 'slots', headerName: 'Khung giờ', width: 200 },
     { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
