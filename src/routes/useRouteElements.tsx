@@ -74,6 +74,10 @@ export default function useRouteElements() {
         {
           path: '/admin/amenities',
           element: <ManageAmenity />
+        },
+        {
+          path: '/admin/room-types',
+          element: <ManageRoomType />
         }
       ]
     },
