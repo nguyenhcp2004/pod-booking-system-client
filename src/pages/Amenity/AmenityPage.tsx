@@ -10,17 +10,12 @@ import {
   useTheme
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-// import BookingDetails from '~/components/BookingDetails/BookingDetails'
-import { useGetAmenities } from '~/queries/useAmenity'
+import { useGetAmenitiesByType } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
-import { Amenity, BookingContext } from '~/contexts/BookingContext'
-import { toast } from 'react-toastify'
-import SockJS from 'sockjs-client'
-import Stomp from 'stompjs'
 import moment, { Moment } from 'moment'
 import { DatePicker } from '@mui/x-date-pickers'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
@@ -29,133 +24,118 @@ export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
+  const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
   const [timeSlot, setTimeSlot] = useState<string>()
   const [quantity, setQuantity] = useState(0)
-  const { data: amenities = [] } = useGetAmenities()
-  const [errorState, setErrorState] = useState<string | null>(null)
-  const bookingContext = useContext(BookingContext)
-  if (!bookingContext) {
-    throw new Error('BookingContext must be used within a BookingProvider')
-  }
-  const { bookingData, setBookingData } = bookingContext
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
-  const [roomType, setRoomType] = useState(bookingData?.selectedRooms[0].name)
-  const socketCL = new SockJS('http://localhost:8080/ws')
-  const client = Stomp.over(socketCL)
+  const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
+  const amenities: AmenityType[] = response?.data.data ?? []
 
   useEffect(() => {
-    client.connect({}, () => {
-      client.subscribe('/topic/payments', (data) => {
-        const roomId = JSON.parse(data.body)
-        if (bookingData.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
-        }
-      })
-    })
-
-    return () => {
-      if (client.connected) {
-        client.disconnect(() => {})
-      }
+    if (selectedAmenityType) {
+      refetch()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingData])
+    setDetailAmenity(null)
+    setQuantity(0)
+  }, [selectedAmenityType, refetch])
 
   const handleAddAmentity = () => {
     if (!detailAmenity) return
     if (quantity === 0) {
-      setErrorState('Vui lòng chọn số lượng')
       return
     }
-    const newAmenity: Amenity = {
-      id: detailAmenity?.id,
-      name: detailAmenity?.name,
-      price: detailAmenity?.price,
-      quantity: quantity
-    }
-    setBookingData((prev) => ({
-      ...prev,
-      selectedRooms: prev.selectedRooms.map((room) => {
-        if (room.name === roomType) {
-          if (room.amenities.find((item) => item.name === newAmenity.name)) {
-            return {
-              ...room,
-              amenities: room.amenities.map((item) => {
-                if (item.name === newAmenity.name) {
-                  return {
-                    ...item,
-                    quantity: item.quantity + newAmenity.quantity
-                  }
-                }
-                return item
-              })
-            }
-          } else {
-            return {
-              ...room,
-              amenities: [...room.amenities, newAmenity]
-            }
-          }
-        }
-        return room
-      })
-    }))
-    setErrorState(null)
-    setQuantity(0)
-    setDetailAmenity(null)
-    console.log(bookingData)
-  }
+    // const newAmenity: Amenity = {
+    //   id: detailAmenity?.id,
+    //   name: detailAmenity?.name,
+    //   price: detailAmenity?.price,
+    //   quantity: quantity
+    // }
+    //   setBookingData((prev) => ({
+    //     ...prev,
+    //     selectedRooms: prev.selectedRooms.map((room) => {
+    //       if (room.name === roomType) {
+    //         if (room.amenities.find((item) => item.name === newAmenity.name)) {
+    //           return {
+    //             ...room,
+    //             amenities: room.amenities.map((item) => {
+    //               if (item.name === newAmenity.name) {
+    //                 return {
+    //                   ...item,
+    //                   quantity: item.quantity + newAmenity.quantity
+    //                 }
+    //               }
+    //               return item
+    //             })
+    //           }
+    //         } else {
+    //           return {
+    //             ...room,
+    //             amenities: [...room.amenities, newAmenity]
+    //           }
+    //         }
+    //       }
+    //       return room
+    //     })
+    //   }))
+    //   setErrorState(null)
+    //   setQuantity(0)
+    //   setDetailAmenity(null)
+    //   console.log(bookingData)
+    // }
 
-  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
+    //   const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
-  const handleIncrement = () => {
-    if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
-      return
-    } else {
-      if (detailAmenity.quantity < quantity) {
-        setErrorState('Số lượng tiện ích không đủ')
-        return
-      }
-      if (detailAmenity.type === 'Office') {
-        const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
-        const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
-        console.log(preAmennity)
-        if (preAmennity.length > 0) {
-          if (preAmennity[0].quantity + quantity >= 2) {
-            setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-            return
-          }
-          setErrorState(null)
-          setQuantity((prevQuantity) => prevQuantity + 1)
-          return
-        }
-        if (quantity >= 2) {
-          setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-          return
-        }
-      }
-      setErrorState(null)
-      setQuantity((prevQuantity) => prevQuantity + 1)
-    }
+    //   const handleIncrement = () => {
+    //     if (!detailAmenity) {
+    //       setErrorState('Vui lòng chọn tiện ích')
+    //       return
+    //     } else {
+    //       if (detailAmenity.quantity < quantity) {
+    //         setErrorState('Số lượng tiện ích không đủ')
+    //         return
+    //       }
+    //       if (detailAmenity.type === 'Office') {
+    //         const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
+    //         const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
+    //         console.log(preAmennity)
+    //         if (preAmennity.length > 0) {
+    //           if (preAmennity[0].quantity + quantity >= 2) {
+    //             setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+    //             return
+    //           }
+    //         setErrorState(null)
+    //         setQuantity((prevQuantity) => prevQuantity + 1)
+    //         return
+    //       }
+    //       if (quantity >= 2) {
+    //         setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+    //         return
+    //       }
+    //     }
+    //     setErrorState(null)
+    //     setQuantity((prevQuantity) => prevQuantity + 1)
+    //   }
   }
 
   const handleDecrement = () => {
     if (quantity > 0) {
-      setErrorState(null)
+      // setErrorState(null)
       setQuantity((prevQuantity) => prevQuantity - 1)
     }
   }
 
   const handleSelectAmenity = (item: AmenityType) => {
-    setErrorState(null)
     setQuantity(0)
-    if (detailAmenity?.name == item.name) {
+    if (detailAmenity?.id === item.id) {
       setDetailAmenity(null)
-      return
+    } else {
+      setDetailAmenity(item)
     }
-    setDetailAmenity(item)
+  }
+
+  const handleAmenityTypeChange = (event: SelectChangeEvent<string>) => {
+    setSelectedAmenityType(event.target.value)
   }
 
   const handleTimeSlotChange = (event: SelectChangeEvent<string>) => {
@@ -204,15 +184,15 @@ export default function AmenityPage() {
                     <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
                     <Select
                       labelId='room-type-label'
-                      value={roomType || ''}
+                      value={''}
                       label='Chọn Phòng đã đặt'
-                      onChange={(e) => setRoomType(e.target.value)}
+                      // onChange={(e) => setRoomType(e.target.value)}
                     >
-                      {bookingData?.selectedRooms.map((room, index) => (
+                      {/* {bookingData?.selectedRooms.map((room, index) => (
                         <MenuItem key={index} value={room.name}>
                           {room.name}
                         </MenuItem>
-                      ))}
+                      ))} */}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -221,17 +201,12 @@ export default function AmenityPage() {
                     <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
                     <Select
                       labelId='amenities-label'
-                      value={selectedAmenity || ''}
+                      value={selectedAmenityType}
                       label='Chọn loại tiện ích'
-                      onChange={(e) => {
-                        setSelectedAmenity(e.target.value)
-                      }}
+                      onChange={handleAmenityTypeChange}
                     >
-                      {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
-                        <MenuItem key={index} value={uniqueType}>
-                          {uniqueType}
-                        </MenuItem>
-                      ))}
+                      <MenuItem value='Food'>Food</MenuItem>
+                      <MenuItem value='Office'>Office</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -242,29 +217,31 @@ export default function AmenityPage() {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-                  {filteredAmenities.map((item, index) => (
-                    <Grid size={{ lg: 4, md: 6, xs: 12 }} key={index}>
-                      <Button
-                        variant='outlined'
-                        fullWidth
-                        sx={{
-                          padding: '10px 0px',
-                          minHeight: '50px',
-                          borderRadius: '4px',
-                          textAlign: 'center',
-                          color: 'black',
-                          borderColor: 'black',
-                          fontSize: '14px',
-                          backgroundColor: detailAmenity?.name == item.name ? colors.grey[100] : 'transparent'
-                        }}
-                        onClick={() => {
-                          handleSelectAmenity(item)
-                        }}
-                      >
-                        {item.name}
-                      </Button>
-                    </Grid>
-                  ))}
+                  {selectedAmenityType !== '' ? (
+                    amenities.map((item) => (
+                      <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                        <Button
+                          variant='outlined'
+                          fullWidth
+                          sx={{
+                            padding: '10px 0px',
+                            minHeight: '50px',
+                            borderRadius: '4px',
+                            textAlign: 'center',
+                            color: 'black',
+                            borderColor: 'black',
+                            fontSize: '14px',
+                            backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                          }}
+                          onClick={() => handleSelectAmenity(item)}
+                        >
+                          {item.name}
+                        </Button>
+                      </Grid>
+                    ))
+                  ) : (
+                    <></>
+                  )}
                 </Grid>
               </Box>
               <Box
@@ -277,14 +254,14 @@ export default function AmenityPage() {
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                  {errorState && (
+                  {/* {errorState && (
                     <Typography
                       variant='subtitle2'
                       sx={{ color: 'red', paddingBottom: '10px', position: 'absolute', bottom: '40px' }}
                     >
                       {errorState}
                     </Typography>
-                  )}
+                  )} */}
                   <Typography
                     variant='subtitle2'
                     sx={{ fontWeight: 700, fontSize: '16px', padding: '0px 20px 0px 0px', color: colors.grey[200] }}
@@ -326,7 +303,7 @@ export default function AmenityPage() {
                     </Typography>
                     <Button
                       variant='outlined'
-                      onClick={handleIncrement}
+                      // onClick={handleIncrement}
                       sx={{
                         minWidth: '35px',
                         height: '40px',
