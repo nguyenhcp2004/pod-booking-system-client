@@ -19,6 +19,8 @@ const RoomTypeSchema = z.object({
   building: BuildingSchema
 })
 
+export type RoomTypeSchemaType = z.TypeOf<typeof RoomTypeSchema>
+
 const FilterRoomTypeQuery = z.object({
   address: z.string().optional(),
   capacity: z.number().optional(),
