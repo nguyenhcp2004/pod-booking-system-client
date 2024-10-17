@@ -9,42 +9,53 @@ import FastfoodIcon from '@mui/icons-material/Fastfood'
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
+
+const iconSx = {
+  width: '24px',
+  height: '24px'
+}
 
 const menuItems = [
   {
     title: 'Tổng quan',
     to: '/admin/dashboard',
-    icon: <LeaderboardIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <LeaderboardIcon sx={iconSx} />
   },
   {
     title: 'Hóa đơn',
     to: '/admin/orders',
-    icon: <PaymentsIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <PaymentsIcon sx={iconSx} />
+  },
+  {
+    title: 'Hóa đơn tiện ích',
+    to: '/admin/amenity-orders',
+    icon: <ShoppingCartCheckoutIcon sx={iconSx} />
   },
   {
     title: 'Phòng',
     to: '/admin/rooms',
-    icon: <MeetingRoomIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <MeetingRoomIcon sx={iconSx} />
   },
   {
     title: 'Chi nhánh',
     to: '/admin/buildings',
-    icon: <ApartmentIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <ApartmentIcon sx={iconSx} />
   },
   {
     title: 'Slot',
     to: '/admin/slots',
-    icon: <AccessTimeFilledIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <AccessTimeFilledIcon sx={iconSx} />
   },
   {
     title: 'Tiện ích',
     to: '/admin/amenities',
-    icon: <FastfoodIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <FastfoodIcon sx={iconSx} />
   },
   {
     title: 'Tài khoản',
     to: '/admin/users',
-    icon: <PeopleAltIcon sx={{ width: '24px', height: '24px' }} />
+    icon: <PeopleAltIcon sx={iconSx} />
   }
 ]
 
