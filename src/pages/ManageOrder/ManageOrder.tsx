@@ -33,6 +33,8 @@ import EditOrderModal from '~/components/AminManageOrder/EditOrderModal'
 import CreateOrderModal from '~/components/AminManageOrder/CreateOrderModal'
 import { mapOrderToRow } from '~/utils/orderUtils'
 import { toast } from 'react-toastify'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 
 export default function ManageOrder() {
   const today = moment()
@@ -57,6 +59,8 @@ export default function ManageOrder() {
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
 
   const handleSelectedOrder = (order: Order) => {
     setSelectedOrder(order)
@@ -86,26 +90,41 @@ export default function ManageOrder() {
   const { data: searchData, isLoading: isSearchLoading } = useSearchOrder(searchKeyword, currentPage, pageSize)
   const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
+
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/payments', (data) => {
+        const room = JSON.parse(data.body)
+        toast.success(`Phòng ${room.name} vừa được đặt`)
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [client])
   useEffect(() => {
     if (orderData) {
-      const rowsData = orderData.data.map(mapOrderToRow)
-      setRows([...rowsData].reverse())
-      setRowCount(orderData.totalElements)
+      const rowsData = orderData.data.data.map(mapOrderToRow)
+      setRows([...rowsData])
+      setRowCount(orderData.data.totalRecord)
     }
   }, [orderData])
 
   useEffect(() => {
     if (searchKeyword.trim().length > 0) {
       if (searchData) {
-        const searchRowsData = searchData.data.map(mapOrderToRow)
-        setRows([...searchRowsData].reverse())
-        setRowCount(searchRowsData.length)
+        const searchRowsData = searchData.data.data.map(mapOrderToRow)
+        setRows([...searchRowsData])
+        setRowCount(searchRowsData.data.totalRecord)
       }
     } else {
       if (orderData) {
-        const rowsData = orderData.data.map(mapOrderToRow)
-        setRows([...rowsData].reverse())
-        setRowCount(orderData.totalElements)
+        const rowsData = orderData.data.data.map(mapOrderToRow)
+        setRows([...rowsData])
+        setRowCount(orderData.data.totalRecord)
       }
     }
   }, [searchKeyword, orderData, searchData])
@@ -134,6 +153,7 @@ export default function ManageOrder() {
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'customer', headerName: 'Khách hàng', width: 200 },
     { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
+    { field: 'slots', headerName: 'Khung giờ', width: 200 },
     { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',

@@ -29,19 +29,29 @@ export const createDateTimeFromSlot = (date: string, slot: slotType) => {
 }
 
 export const createBookingPayload = (bookingData: BookingInfo) => {
-  let selectedSlot = null
-  const startTime = []
-  const endTime = []
-  for (let i = 0; i < bookingData.timeSlots.length; i++) {
-    selectedSlot = bookingData.timeSlots[i]
-    if (bookingData.date && selectedSlot) {
-      const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
-      startTime.push(dateTime.startTime)
-      endTime.push(dateTime.endTime)
-    }
+  //let selectedSlot = null
+  // const startTime = []
+  // const endTime = []
+  // for (let i = 0; i < bookingData.timeSlots.length; i++) {
+  //   selectedSlot = bookingData.timeSlots[i]
+  //   if (bookingData.date && selectedSlot) {
+  //     const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
+  //     startTime.push(dateTime.startTime)
+  //     endTime.push(dateTime.endTime)
+  //   }
+  // }
+  const selectedSlot = bookingData.timeSlots[0]
+
+  let startTime = null
+  let endTime = null
+
+  if (bookingData.date && selectedSlot) {
+    const dateTime = createDateTimeFromSlot(bookingData.date, selectedSlot)
+    startTime = dateTime.startTime
+    endTime = dateTime.endTime
   }
 
-  if (startTime.length === 0 || endTime.length === 0) {
+  if (!startTime || !endTime || startTime.length === 0 || endTime.length === 0) {
     return null
   }
 
@@ -70,7 +80,6 @@ export const createBookingPayload = (bookingData: BookingInfo) => {
         }
       : null,
     priceRoom: Math.round(bookingData.roomType?.price || 0),
-    discountPercentage: bookingData.servicePackage?.discountPercentage || 0,
     startTime,
     endTime
   }
@@ -82,12 +91,21 @@ export const mapOrderToRow = (order: Order) => ({
   customer: order.orderDetails?.[0]?.customer?.name || 'N/A',
   createdAt: moment(order.createdAt).format('HH:mm DD-MM-YY') || 'N/A',
   updatedAt: moment(order.updatedAt).format('HH:mm DD-MM-YY') || 'N/A',
-  roomName: order.orderDetails.map((o) => o.roomName).join(', ') || 'N/A',
+  roomName: [...new Set(order.orderDetails.map((o) => o.roomName))].join(', ') || 'N/A',
   address: order.orderDetails?.[0]?.buildingAddress || 'N/A',
   status: order.orderDetails?.[0]?.status || 'N/A',
   startTime: moment(order.orderDetails?.[0]?.startTime).format('HH:mm DD-MM') || 'N/A',
   endTime: new Date(order.orderDetails?.[0]?.endTime).toLocaleString() || 'N/A',
   servicePackage: order.orderDetails?.[0]?.servicePackage?.name || 'N/A',
   orderHandler: order.orderDetails[0]?.orderHandler || null,
-  staffId: order.orderDetails[0]?.orderHandler?.id || null
+  staffId: order.orderDetails[0]?.orderHandler?.id || null,
+  slots:
+    [
+      ...new Set(
+        order.orderDetails.map(
+          (orderDetail) =>
+            `${moment(orderDetail.startTime).format('HH:mm')} - ${moment(orderDetail.endTime).format('HH:mm')}`
+        )
+      )
+    ].join(', ') || 'N/A'
 })

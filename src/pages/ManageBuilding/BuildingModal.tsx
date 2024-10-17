@@ -40,7 +40,7 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
           <Edit />
         </IconButton>
       ) : (
-        <Button color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
+        <Button variant='contained' color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
           Thêm chi nhánh
         </Button>
       )}
@@ -102,9 +102,9 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
             <Grid size={9}>
               <TextareaAutosize
                 name='description'
-                style={{ width: '100%', padding: '6px' }}
+                style={{ width: '100%', padding: '6px', fontFamily: 'inherit', fontSize: 'inherit' }}
                 minRows={2}
-                maxRows={4}
+                maxRows={6}
                 maxLength={255}
                 defaultValue={row?.description}
               />
@@ -129,12 +129,7 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
           <Button onClick={handleClose} sx={{ color: 'grey.900', borderRadius: '12px' }}>
             Hủy
           </Button>
-          <Button
-            size='medium'
-            type='submit'
-            variant='contained'
-            sx={{ backgroundColor: 'grey.900', borderRadius: '12px' }}
-          >
+          <Button size='medium' type='submit' variant='contained' color='primary' sx={{ borderRadius: '12px' }}>
             Lưu
           </Button>
         </DialogActions>

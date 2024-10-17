@@ -61,7 +61,7 @@ export default function Header() {
         >
           FlexiPod
         </Typography>
-        <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ gap: 3 }} display={{ xs: 'none', md: 'flex' }}>
           <Button
             component={Link}
             to='/'
