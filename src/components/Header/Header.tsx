@@ -83,6 +83,18 @@ export default function Header() {
               Đơn đặt
             </Button>
           )}
+          <Button
+            component={Link}
+            to='/amenity'
+            sx={{
+              textTransform: 'uppercase',
+              paddingX: '11px',
+              paddingY: '8px',
+              lineHeight: '26px'
+            }}
+          >
+            Tiện Ích
+          </Button>
           <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
             Liên hệ
           </Button>
