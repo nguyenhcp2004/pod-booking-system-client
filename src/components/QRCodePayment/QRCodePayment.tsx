@@ -62,7 +62,7 @@ const QRCodePayment = () => {
       client.subscribe('/topic/payments', (data) => {
         const roomId = JSON.parse(data.body)
         if (bookingData!.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+          toast.success(`Phòng ${roomId.name} vừa được đặt`)
         }
       })
     })

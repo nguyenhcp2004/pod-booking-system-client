@@ -62,6 +62,7 @@ export const Confirmed: React.FC = () => {
       const building = bookingContext!.bookingData.roomType?.building
       const payload = {
         id: room.id,
+        name: room.name,
         buildingNumber: building?.id
       }
       client.send('/app/payments', {}, JSON.stringify(payload))
