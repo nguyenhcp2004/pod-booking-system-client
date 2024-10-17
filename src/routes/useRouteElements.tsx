@@ -13,6 +13,7 @@ import ManageAmenity from '~/pages/ManageAmenity'
 import ManageBuilding from '~/pages/ManageBuilding'
 import ManageOrder from '~/pages/ManageOrder/ManageOrder'
 import ManageRoom from '~/pages/ManageRoom'
+import ManageRoomType from '~/pages/ManageRoomType'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
@@ -74,6 +75,10 @@ export default function useRouteElements() {
         {
           path: '/admin/amenities',
           element: <ManageAmenity />
+        },
+         {
+          path: '/admin/room-types',
+          element: <ManageRoomType />
         }
       ]
     },
