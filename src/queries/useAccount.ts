@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
+import { Pagination } from '~/constants/type'
 
 export const useGetMe = () => {
   return useQuery({
@@ -8,10 +9,10 @@ export const useGetMe = () => {
   })
 }
 
-export const useGetManageAccount = () => {
+export const useGetManageAccount = (query: Pagination) => {
   return useQuery({
     queryKey: ['accounts'],
-    queryFn: () => accountApiRequest.getListAccounts()
+    queryFn: () => accountApiRequest.getListAccounts(query)
   })
 }
 
@@ -20,7 +21,7 @@ export const useUpdateAccountByAdmin = () => {
   return useMutation({
     mutationFn: accountApiRequest.updateAccountByAdmin,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['update-accounts'] })
     }
   })
 }
@@ -30,7 +31,7 @@ export const useCreateAccountMutation = () => {
   return useMutation({
     mutationFn: accountApiRequest.createAccount,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['create-accounts'] })
     }
   })
 }

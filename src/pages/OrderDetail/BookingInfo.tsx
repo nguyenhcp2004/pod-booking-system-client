@@ -6,8 +6,10 @@ import moment, { Moment } from 'moment'
 import Calendar from '~/components/Calendar/Calendar'
 import { useEffect, useState } from 'react'
 import { slotType, useBookingContext } from '~/contexts/BookingContext'
-import { client } from '~/utils/socket'
 import { toast } from 'react-toastify'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+
 //import { array } from 'zod'
 interface CommonProps {
   onNext: () => void
@@ -19,7 +21,9 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const bookingContext = useBookingContext()
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
-  const bookingData = bookingContext?.bookingData
+  const bookingData = bookingContext!.bookingData
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
   useEffect(() => {
     if (bookingData) {
       setSelectedDates([moment(bookingData.date)])
@@ -31,7 +35,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
     client.connect({}, () => {
       client.subscribe('/topic/payments', (data) => {
         const roomId = JSON.parse(data.body)
-        if (bookingData?.selectedRooms.some((room) => room.id == roomId.id)) {
+        if (bookingData.selectedRooms.some((room) => room.id == roomId.id)) {
           toast.success(`Phòng ${roomId.id} vừa được đặt`)
         }
       })
@@ -42,7 +46,10 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
         client.disconnect(() => {})
       }
     }
-  }, [bookingData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingData]) // Không nên thêm client vào dependency này vì thằng stomp nó vào đây lại tạo lại 1 client mới
+  // Dẫn đến thông báo 2 lần
+  // Đồng thời thì thằng stompjs nó khó chịu là vào mỗi page thì mình sẽ phải tạo 1 socket mới luôn, tức dù mình navigate nó cũng disconnect
   if (!bookingData) return null
 
   return (
