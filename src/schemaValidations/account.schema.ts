@@ -33,7 +33,7 @@ const AccountSchema = z.object({
 
 export type AccountSchemaType = z.TypeOf<typeof AccountSchema>
 
-const ManageAccountRes = z.object({
+export const ManageAccountRes = z.object({
   code: z.number(),
   data: z.array(AccountSchema),
   currentPage: z.number(),

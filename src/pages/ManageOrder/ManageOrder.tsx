@@ -35,8 +35,11 @@ import { mapOrderToRow } from '~/utils/orderUtils'
 import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageOrder() {
+  const { account } = useAppContext()
+  console.log(account)
   const today = moment()
   const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -91,11 +94,17 @@ export default function ManageOrder() {
   const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
 
+  //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
   useEffect(() => {
     client.connect({}, () => {
       client.subscribe('/topic/payments', (data) => {
         const room = JSON.parse(data.body)
-        toast.success(`Phòng ${room.name} vừa được đặt`)
+        const isAdminRole = account?.role === 'Admin'
+        const isManagerOfBuilding =
+          (account?.role === 'Manager' || account?.role === 'Staff') && account?.buildingNumber === room.buildingNumber
+        if (isAdminRole || isManagerOfBuilding) {
+          toast.success(`Phòng ${room.name} vừa được đặt`)
+        }
       })
     })
 
@@ -104,7 +113,8 @@ export default function ManageOrder() {
         client.disconnect(() => {})
       }
     }
-  }, [client])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.data.map(mapOrderToRow)
