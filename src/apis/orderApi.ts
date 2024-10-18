@@ -67,7 +67,6 @@ interface Amenity {
 
 export const createOrder = async (bookingInfo: BookingInfo) => {
   const payload = createBookingPayload(bookingInfo)
-  console.log('Payload:', payload)
   try {
     const response = await http.post('/order', payload)
     return response.data
@@ -79,10 +78,8 @@ export const createOrder = async (bookingInfo: BookingInfo) => {
 
 export const createOrderAD = async (bookingInfo: BookingInfo, customer: Account) => {
   const payload = createBookingPayloadAD(bookingInfo, customer)
-  console.log('Payload:', payload)
   try {
     const response = await http.post('/order', payload)
-    console.log('Response:', response.data)
     return response.data
   } catch (error) {
     console.error('Error create order admin side:', error)
@@ -94,7 +91,6 @@ export const updateOrderApi = async (order: Order, updateOrder: Order | null) =>
   if (updateOrder != null) {
     const updateRequest = createOrderUpdateRequest(order, updateOrder)
     if (updateRequest) {
-      console.log('Update Request:', updateRequest)
       try {
         const response = await http.put('/order', updateRequest)
         return response.data
@@ -227,9 +223,7 @@ const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderRespo
 export const useUpdateStaff = () => {
   return useMutation({
     mutationFn: ({ request }: { request: OrderUpdateStaffRequest }) => updateStaff(request),
-    onSuccess: () => {
-      console.log('Staff updated successfully')
-    },
+    onSuccess: () => {},
     onError: (error) => {
       console.error('Error updating staff:', error)
     }
@@ -239,7 +233,6 @@ export const useUpdateStaff = () => {
 const searchAccounts = async (keyword: string): Promise<Account[]> => {
   try {
     const response = await http.get(`/accounts/${keyword}/Customer`)
-    console.log('Search accounts:', response.data)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)
@@ -257,9 +250,7 @@ export const useSearchAccounts = (keyword: string) => {
 
 const searchOrder = async (keyword: string, page: number, size: number) => {
   try {
-    console.log(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
     const response = await http.get(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
-    console.log('Search order:', response.data)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)
@@ -300,7 +291,6 @@ export const useDeleteOrder = () => {
 const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<Room[]> => {
   try {
     const response = await http.get(`/rooms/type/${roomId}`)
-    console.log('room: ' + response.data)
     return response.data
   } catch (error) {
     console.error('Error getting staff:', error)
