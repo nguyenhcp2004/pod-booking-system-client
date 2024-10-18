@@ -57,7 +57,9 @@ const Table = ({
         '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
           py: '22px'
         },
-        padding: '16px 0'
+        borderRadius: '16px',
+        backgroundColor: 'white',
+        padding: '16px 10px'
       }}
       paginationModel={paginationModel}
       onPaginationModelChange={setPaginationModel}
