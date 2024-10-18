@@ -1,9 +1,20 @@
-import React, { useState } from 'react'
-import { Button, Modal, Box, Typography, useTheme, IconButton, Grid, Divider } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  useTheme,
+  IconButton,
+  Grid,
+  Divider,
+  Backdrop,
+  CircularProgress
+} from '@mui/material'
 import { Moment } from 'moment'
 import { BookingInfo, slotType } from '~/contexts/BookingContext'
 import CloseIcon from '@mui/icons-material/Close'
-import { Account, createOrder } from '~/apis/orderApi'
+import { Account, createOrderAD } from '~/apis/orderApi'
 import Calendar from '../Calendar/Calendar'
 import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
 import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
@@ -11,6 +22,7 @@ import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
 import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
 import { useNavigate } from 'react-router-dom'
 import PaymentBox from './CreateOrderComponents/PaymentBox'
+import { toast } from 'react-toastify'
 
 interface CreateOrderModalProps {
   open: boolean
@@ -31,16 +43,49 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
     servicePackage: null
   })
   const [openPayment, setOpenPayment] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
-  const handleCreateOrder = () => {
+  useEffect(() => {
+    setBookingData({
+      roomType: null,
+      selectedRooms: [],
+      date: null,
+      timeSlots: [],
+      servicePackage: null
+    })
+    setCustomer(null)
     setOpenPayment(false)
-    createOrder(bookingData)
-    navigate('/admin/orders')
+    setLoading(false)
+    setSelectedSlots([])
+  }, [open])
+
+  const handleCreateOrder = async () => {
+    setLoading(true)
+    setOpenPayment(false)
+    console.log(bookingData)
+    console.log(customer)
+    if (customer) {
+      const response = await createOrderAD(bookingData, customer)
+      if (response.code == 201) {
+        setLoading(false)
+        toast.success('Tạo đơn hàng thành công')
+        onClose()
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
+    }
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setOpenPayment(true)
-    createOrder(bookingData)
+    if (customer) {
+      const response = await createOrderAD(bookingData, customer)
+      if (response.code == 201) {
+        toast.success('Tạo đơn hàng thành công')
+        navigate('/admin/orders')
+      }
+    }
   }
 
   return (
@@ -123,6 +168,9 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
               </Button>
             </Box>
             <Box sx={{ marginTop: '20px' }}>{openPayment == true && <PaymentBox bookingData={bookingData} />}</Box>
+            <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+              <CircularProgress color='inherit' />
+            </Backdrop>
           </Box>
         </Modal>
       ) : null}

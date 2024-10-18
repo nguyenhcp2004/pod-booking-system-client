@@ -70,7 +70,10 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
         </Box>
         <Box>
           <Typography variant='h6' sx={{ marginBottom: 1 }}>
-            Khách hàng: {customer?.name || 'Chưa chọn'}
+            Khách hàng:
+            <span style={{ color: customer ? 'inherit' : 'red', fontWeight: customer ? 'normal' : 'bold' }}>
+              {customer?.name || 'Chưa chọn'}
+            </span>
           </Typography>
           <Typography variant='body1' sx={{ marginBottom: 1 }}>
             Email: {customer?.email || 'Chưa có'}
@@ -104,7 +107,14 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
               Date:
             </Typography>
-            <Typography variant='body2' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body2'
+              sx={{
+                marginBottom: 1,
+                fontWeight: bookingData?.date ? 'normal' : 'bold',
+                color: bookingData?.date ? 'inherit' : 'red'
+              }}
+            >
               {bookingData?.date || 'Chưa chọn ngày'}
             </Typography>
           </Box>
@@ -112,7 +122,14 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
               Slot:
             </Typography>
-            <Typography variant='body2' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body2'
+              sx={{
+                marginBottom: 1,
+                fontWeight: bookingData?.timeSlots.length > 0 ? 'normal' : 'bold',
+                color: bookingData?.timeSlots.length > 0 ? 'inherit' : 'red'
+              }}
+            >
               {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn slot'}
             </Typography>
           </Box>

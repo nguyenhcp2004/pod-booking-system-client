@@ -82,6 +82,7 @@ export const createOrderAD = async (bookingInfo: BookingInfo, customer: Account)
   console.log('Payload:', payload)
   try {
     const response = await http.post('/order', payload)
+    console.log('Response:', response.data)
     return response.data
   } catch (error) {
     console.error('Error create order admin side:', error)

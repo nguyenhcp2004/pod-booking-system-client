@@ -88,6 +88,8 @@ export const createBookingPayloadAD = (bookingData: BookingInfo, customer: Accou
     }
   }
 
+  console.log('startTime:', startTime)
+  console.log('endTime:', endTime)
   if (!startTime || !endTime || startTime.length === 0 || endTime.length === 0) {
     return null
   }
