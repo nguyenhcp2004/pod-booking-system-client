@@ -40,7 +40,7 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
       const paymentRequest = {
         amount: amount,
         orderId: bookingData?.roomType?.id?.toString() || '',
-        returnUrl: import.meta.env.VITE_VNPAY_RETURN_URL as string
+        returnUrl: import.meta.env.VITE_VNPAY_RETURN_ADMIN_URL as string
       }
       return await generatePaymentUrl(paymentRequest)
     },
