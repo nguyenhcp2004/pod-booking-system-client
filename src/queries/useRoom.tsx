@@ -27,3 +27,10 @@ export const useEditRoomMutation = () => {
     }
   })
 }
+
+export const useGetBookedRooms = () => {
+  return useQuery({
+    queryKey: ['booked-rooms'],
+    queryFn: () => roomApiRequest.getBookedRooms()
+  })
+}
