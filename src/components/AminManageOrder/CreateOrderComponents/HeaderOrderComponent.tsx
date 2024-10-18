@@ -362,7 +362,6 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             <Autocomplete
               value={selectedPackage}
               onChange={(_, servicePackage) => {
-                console.log(servicePackage)
                 handleSelectPackage(servicePackage)
               }}
               options={isSuccess ? servicePackage?.data?.data : []}

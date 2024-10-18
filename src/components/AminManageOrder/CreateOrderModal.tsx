@@ -62,8 +62,6 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
   const handleCreateOrder = async () => {
     setLoading(true)
     setOpenPayment(false)
-    console.log(bookingData)
-    console.log(customer)
     if (customer) {
       const response = await createOrderAD(bookingData, customer)
       if (response.code == 201) {
