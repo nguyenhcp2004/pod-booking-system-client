@@ -29,7 +29,27 @@ const RoomSchema = z.object({
   roomType: RoomTypeSchema
 })
 
+const ServicePackage = z.object({
+  id: z.number(),
+  name: z.string(),
+  discountPercentage: z.number()
+})
+
+const BookedRoomSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  image: z.string(),
+  status: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
+  servicePackage: ServicePackage,
+  roomType: RoomTypeSchema
+})
+
 export type RoomSchemaType = z.TypeOf<typeof RoomSchema>
+
+export type BookedRoomSchemaType = z.TypeOf<typeof BookedRoomSchema>
 
 const FilterRoomByTypeAndSlotsQuery = z.object({
   typeId: z.number(),

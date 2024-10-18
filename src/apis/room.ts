@@ -1,6 +1,7 @@
 import {
   AvailableSlotsQueryType,
   AvailableSlotsResType,
+  BookedRoomSchemaType,
   CreateRoomBodyType,
   CreateRoomResType,
   EditRoomBodyType,
@@ -33,7 +34,8 @@ export const roomApiRequest = {
     return http.get<GetListRoomsResType>(`/rooms?${stringified}`)
   },
   createRoom: (body: CreateRoomBodyType) => http.post<CreateRoomResType>('/rooms', body),
-  editRoom: (body: EditRoomBodyType) => http.put<EditRoomResType>(`/rooms/${body.id}`, body)
+  editRoom: (body: EditRoomBodyType) => http.put<EditRoomResType>(`/rooms/${body.id}`, body),
+  getBookedRooms: () => http.get<BookedRoomSchemaType>(`/rooms/booked-rooms`)
 }
 
 export default roomApiRequest
