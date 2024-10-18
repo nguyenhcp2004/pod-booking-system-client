@@ -118,7 +118,7 @@ export default function ManageOrder() {
       if (searchData) {
         const searchRowsData = searchData.data.data.map(mapOrderToRow)
         setRows([...searchRowsData])
-        setRowCount(searchRowsData.data.totalRecord)
+        setRowCount(searchData?.data?.totalRecord || 0)
       }
     } else {
       if (orderData) {
@@ -393,7 +393,7 @@ export default function ManageOrder() {
         rows={rows}
         columns={columns}
         paginationModel={{ page: currentPage, pageSize: pageSize }}
-        pageSizeOptions={[5, 10, 20]}
+        pageSizeOptions={[5, 10]}
         pagination
         paginationMode='server'
         rowCount={rowCount}
