@@ -73,7 +73,8 @@ export default function RoomType() {
       width: 150,
       valueGetter: (params: number) => {
         if (params == 0) {
-          return '0 VND'
+          const price = 0
+          return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
         }
         return params ? params.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'N/A'
       }

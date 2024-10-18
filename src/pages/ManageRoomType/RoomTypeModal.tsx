@@ -1,6 +1,5 @@
 import Edit from '@mui/icons-material/Edit'
 import {
-  Autocomplete,
   Backdrop,
   Button,
   CircularProgress,
@@ -10,6 +9,9 @@ import {
   DialogTitle,
   FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
@@ -31,7 +33,7 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
   const [capacity, setCapacity] = useState(row?.capacity || 1)
   const [building, setBuilding] = useState<Building | null>(row?.building || null)
   const [buildingId, setBuildingId] = useState<number>(row?.building.id || 0)
-  const { data: allBuilding, isSuccess } = useBuilding()
+  const { data: allBuilding } = useBuilding()
   const createRoomMutation = useCreateRoomType()
   const updateRoomMutation = useUpdateRoomType()
 
@@ -160,17 +162,29 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth size='small'>
-                <Autocomplete
-                  value={building}
-                  onChange={(_, selectedBuilding) => {
-                    setBuilding(selectedBuilding as Building | null)
-                    setBuildingId(selectedBuilding ? selectedBuilding.id : 0)
+                <InputLabel id='building-select-label'>Chi nhánh</InputLabel>
+                <Select
+                  labelId='building-select-label'
+                  label='Chi nhánh'
+                  value={building?.id}
+                  onChange={(event) => {
+                    const selectedId = event.target.value
+                    const building = allBuilding ? allBuilding.find((b) => b.id === selectedId) : null
+                    if (building) {
+                      setBuilding(building)
+                    } else {
+                      setBuilding(null)
+                    }
+                    setBuildingId(building ? building.id : 0)
                   }}
-                  options={isSuccess ? allBuilding : []}
-                  getOptionLabel={(option) => option.address}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  renderInput={(params) => <TextField {...params} label='Chi nhánh' size='small' />}
-                />
+                >
+                  {allBuilding &&
+                    allBuilding.map((building) => (
+                      <MenuItem key={building.id} value={building.id}>
+                        {building.address}
+                      </MenuItem>
+                    ))}
+                </Select>
               </FormControl>
             </Grid>
           </Grid>
