@@ -115,7 +115,7 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
               <Typography>Loại dịch vụ</Typography>
             </Grid>
             <Grid size={9}>
-              <Select name='status' fullWidth size='small' value={type} onChange={handleChange}>
+              <Select name='type' fullWidth size='small' value={type} onChange={handleChange}>
                 {Object.values(AmenityTypeEnum).map((type) => (
                   <MenuItem key={type} value={type}>
                     {type}
