@@ -88,3 +88,12 @@ export type Pagination = {
   page: number
   take: number
 }
+
+export type Amenity = {
+  id: number
+  name: string
+  price: number
+  quantity: number
+  type: string
+  imageUrl: string
+}

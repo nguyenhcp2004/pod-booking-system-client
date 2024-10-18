@@ -9,6 +9,7 @@ import ForgotPassword from '~/pages/ForgotPassword'
 import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
+import ManageAmenity from '~/pages/ManageAmenity'
 import ManageAmenityOrders from '~/pages/ManageAmenityOrders/ManageAmenityOrders'
 import ManageBuilding from '~/pages/ManageBuilding'
 import ManageOrder from '~/pages/ManageOrder/ManageOrder'
@@ -73,6 +74,14 @@ export default function useRouteElements() {
           element: <ManageOrder />
         },
         {
+          path: '/admin/amenities',
+          element: <ManageAmenity />
+        },
+<<<<<<< HEAD
+        {
+=======
+         {
+>>>>>>> 75911650677ab05aa9ac54996f06cbcf962936b3
           path: '/admin/room-types',
           element: <ManageRoomType />
         },
