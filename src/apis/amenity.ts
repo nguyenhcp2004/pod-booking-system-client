@@ -18,7 +18,10 @@ const amenityApiRequest = {
     return http.get<GetListAmenityResType>(`/amenity?${stringified}`)
   },
   createAmenity: (body: CreateAmenityBodyType) => http.post<CreateAmenityResType>('/amenity', body),
-  editAmenity: (body: EditAmenityBodyType) => http.put<CreateAmenityResType>(`/amenity/${body.id}`, body)
-}
+  editAmenity: (body: EditAmenityBodyType) => http.put<CreateAmenityResType>(`/amenity/${body.id}`, body),
+  getAmenitiesByType: (amenityType: string) => {
+    return http.get<AmenityListResType>(`/amenity/type?type=${amenityType}`)
+  }
+}    
 
 export default amenityApiRequest
