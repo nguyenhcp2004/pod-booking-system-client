@@ -16,23 +16,24 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
-import moment, { Moment } from 'moment'
-import { DatePicker } from '@mui/x-date-pickers'
-import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { useGetBookedRooms } from '~/queries/useRoom'
+import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
+import { formatStartEndTime } from '~/utils/utils'
 
 export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [errorState, setErrorState] = useState<string | null>(null)
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
-  const [selectedDate, setSelectedDate] = useState<Moment | null>(moment())
-  const [timeSlot, setTimeSlot] = useState<string>()
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
   const { data: responseAllAmenities } = useGetAmenities()
+  const { data: responseBookedRooms } = useGetBookedRooms()
   const amenities: AmenityType[] = response?.data.data ?? []
   const allAmenities: AmenityType[] = responseAllAmenities ?? []
+  const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
+  const [selectBookedRooms, setSelectBookedRooms] = useState<BookedRoomSchemaType | null>(null)
 
   useEffect(() => {
     if (selectedAmenityType) {
@@ -153,9 +154,9 @@ export default function AmenityPage() {
     setSelectedAmenityType(event.target.value)
   }
 
-  const handleTimeSlotChange = (event: SelectChangeEvent<string>) => {
-    const newTimeSlot = event.target.value
-    setTimeSlot(newTimeSlot)
+  const handleSelectBookedRoom = (event: SelectChangeEvent<string>) => {
+    const selectedRoom = bookedRooms.find((room) => room.startTime === event.target.value)
+    setSelectBookedRooms(selectedRoom || null)
   }
 
   // const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
@@ -171,61 +172,35 @@ export default function AmenityPage() {
               </Typography>
             </Box>
             <Box sx={{ padding: '0px 20px 20px 20px' }}>
-              <Grid container spacing={2} sx={{ marginBottom: '20px' }}>
-                <Grid size={12}>
-                  <DatePicker
-                    label='Ngày đã đặt'
-                    value={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
-                    format={DEFAULT_DATE_FORMAT}
-                  />
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth size='small'>
-                    <InputLabel id='time-slot-label'>Slot</InputLabel>
-                    <Select labelId='time-slot-label' value={timeSlot} label='Slot' onChange={handleTimeSlotChange}>
-                      <MenuItem value='7 - 9'>7h - 9h</MenuItem>
-                      <MenuItem value='9 - 11'>9h - 11h</MenuItem>
-                      <MenuItem value='13 - 15'>13h - 15h</MenuItem>
-                      <MenuItem value='15 - 17'>15h - 17h</MenuItem>
-                      <MenuItem value='17 - 19'>17h - 19h</MenuItem>
-                      <MenuItem value='19 - 21'>19h - 21h</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth size='small'>
-                    <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
-                    <Select
-                      labelId='room-type-label'
-                      value={''}
-                      label='Chọn Phòng đã đặt'
-                      // onChange={(e) => setRoomType(e.target.value)}
-                    >
-                      {/* {bookingData?.selectedRooms.map((room, index) => (
-                        <MenuItem key={index} value={room.name}>
-                          {room.name}
-                        </MenuItem>
-                      ))} */}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth size='small'>
-                    <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
-                    <Select
-                      labelId='amenities-label'
-                      value={selectedAmenityType}
-                      label='Chọn loại tiện ích'
-                      onChange={handleAmenityTypeChange}
-                    >
-                      <MenuItem value='Food'>Food</MenuItem>
-                      <MenuItem value='Office'>Office</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px 20px 0px 0px', gap: '24px' }}>
+                <FormControl fullWidth>
+                  <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
+                  <Select
+                    labelId='booked-room-label'
+                    value={selectBookedRooms?.startTime || ''}
+                    label='Chọn Phòng đã đặt'
+                    onChange={handleSelectBookedRoom}
+                  >
+                    {bookedRooms.map((room) => (
+                      <MenuItem key={room.id} value={room.startTime}>
+                        {room.name} - {formatStartEndTime(room.startTime, room.endTime)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+                  <Select
+                    labelId='amenities-label'
+                    value={selectedAmenityType}
+                    label='Chọn loại tiện ích'
+                    onChange={handleAmenityTypeChange}
+                  >
+                    <MenuItem value='Food'>Food</MenuItem>
+                    <MenuItem value='Office'>Office</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
 
               <Box sx={{ padding: '49px 0px 29px 0px' }}>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
