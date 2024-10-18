@@ -85,7 +85,7 @@ export type EditBuildingResType = z.TypeOf<typeof EditBuildingRes>
 export const GetFilteredBuildingQuery = z.object({
   page: z.number(),
   take: z.number(),
-  address: z.string().optional()
+  address: z.string()
 })
 
 export type GetFilteredBuildingQueryType = z.TypeOf<typeof GetFilteredBuildingQuery>

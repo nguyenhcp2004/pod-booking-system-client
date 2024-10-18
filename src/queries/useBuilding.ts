@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import buildingApiRequest from '~/apis/building'
 import { Pagination } from '~/constants/type'
+import { GetFilteredBuildingQueryType } from '~/schemaValidations/building.schema'
 
 export const useGetListBuilding = (query: Pagination) => {
   return useQuery({
@@ -26,5 +27,12 @@ export const useEditBuildingMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buidlings'] })
     }
+  })
+}
+
+export const useGetFilterBuilding = (query: GetFilteredBuildingQueryType) => {
+  return useQuery({
+    queryKey: ['filter-building', { query }],
+    queryFn: () => buildingApiRequest.getFilteredBuilding(query)
   })
 }

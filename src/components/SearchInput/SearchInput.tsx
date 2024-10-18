@@ -3,7 +3,16 @@ import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import { useState } from 'react'
 
-export default function SearchInput() {
+interface Props {
+  setPaginationModel: React.Dispatch<
+    React.SetStateAction<{
+      take: number
+      page: number
+      address: string
+    }>
+  >
+}
+export default function SearchInput({ setPaginationModel }: Props) {
   const [query, setQuery] = useState('')
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -12,7 +21,10 @@ export default function SearchInput() {
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      console.log('queries: ', query)
+      setPaginationModel((prev) => ({
+        ...prev,
+        address: query
+      }))
     }
   }
 

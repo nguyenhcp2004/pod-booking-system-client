@@ -1,5 +1,5 @@
-import { useGetListBuilding } from '~/queries/useBuilding'
-import { BuildingStatus } from '~/schemaValidations/building.schema'
+import { useGetFilterBuilding } from '~/queries/useBuilding'
+import { BuildingStatus, GetFilteredBuildingQueryType } from '~/schemaValidations/building.schema'
 import { Box, Chip, Typography } from '@mui/material'
 import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
@@ -13,10 +13,12 @@ export default function ManageBuilding() {
     pageSize: 5,
     page: 0
   })
-  const { data, isLoading } = useGetListBuilding({
+  const [paginationFilter, setPaginationFilter] = useState({
     page: paginationModel.page + 1,
-    take: paginationModel.pageSize
+    take: paginationModel.pageSize,
+    address: ''
   })
+  const { data, isLoading } = useGetFilterBuilding(paginationFilter as GetFilteredBuildingQueryType)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
@@ -87,7 +89,7 @@ export default function ManageBuilding() {
         sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px', alignItems: 'center' }}
       >
         <BuildingModal action={ACTION.CREATE} />
-        <SearchInput />
+        <SearchInput setPaginationModel={setPaginationFilter} />
         {/* <GridToolbarQuickFilter sx={{ maxWidth: '320px', height: '56px', justifyContent: 'center' }} /> */}
       </GridToolbarContainer>
     )
