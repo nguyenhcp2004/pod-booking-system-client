@@ -23,6 +23,7 @@ export const OrderDetailSchema = z.object({
   buildingId: z.number(),
   roomId: z.number(),
   roomName: z.string(),
+  roomImage: z.string(),
   orderId: z.string(),
   amenities: z.array(AmenitySchema),
   servicePackageId: z.number(),
