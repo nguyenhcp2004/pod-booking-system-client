@@ -200,7 +200,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             size='small'
             variant='outlined'
             label='Địa chỉ'
-            value={building?.address || searchBuilding || ''}
+            value={showBuildingList ? searchBuilding : building?.address || searchBuilding}
             onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
             fullWidth
