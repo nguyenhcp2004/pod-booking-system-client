@@ -1,7 +1,6 @@
-import { BarChart } from '@mui/x-charts/BarChart' // Import BarChart from MUI
+import { BarChart } from '@mui/x-charts/BarChart'
 import { Card, CardContent, CardHeader, Typography, CardActions } from '@mui/material'
 
-// Fake chart data
 const chartData = [
   { name: 'Phòng 2 người', successOrders: 120 },
   { name: 'Phòng 4 người', successOrders: 90 },

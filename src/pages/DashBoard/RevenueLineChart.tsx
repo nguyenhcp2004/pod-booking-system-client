@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, Typography, CardActions } from '@mui/material'
-import { LineChart } from '@mui/x-charts/LineChart' // Importing LineChart from MUI
-import moment from 'moment' // Importing moment.js
+import { LineChart } from '@mui/x-charts/LineChart'
+import moment from 'moment'
 
 export function RevenueLineChart() {
   const chartData = [
@@ -44,11 +44,7 @@ export function RevenueLineChart() {
         />
       </CardContent>
       <CardActions>
-        <Typography variant='body2' color='textSecondary'>
-          {/* Uncomment and update this section if needed */}
-          {/* Trending up by 5.2% this month <TrendingUp className='h-4 w-4' /> */}
-          {/* Showing total revenue for the last 10 months */}
-        </Typography>
+        <Typography variant='body2' color='textSecondary'></Typography>
       </CardActions>
     </Card>
   )

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, Typography, Button, Grid, Box } from '@mui/material'
+import { Card, CardContent, CardHeader, Typography, Button, Box } from '@mui/material'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { RoomBarChart } from '~/pages/DashBoard/BarChart'
 import { RevenueLineChart } from '~/pages/DashBoard/RevenueLineChart'
@@ -6,6 +6,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
+import Grid from '@mui/material/Grid2'
 
 export default function DashboardMain() {
   const resetDateFilter = () => {}
@@ -25,7 +26,7 @@ export default function DashboardMain() {
       </Box>
 
       <Grid container spacing={2} marginTop={2}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Box height='100%'>
             <Card
               sx={{
@@ -53,7 +54,7 @@ export default function DashboardMain() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Box height='100%'>
             <Card
               sx={{
@@ -83,7 +84,7 @@ export default function DashboardMain() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Box height='100%'>
             <Card
               sx={{
@@ -113,7 +114,7 @@ export default function DashboardMain() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Box height='100%'>
             <Card
               sx={{
@@ -142,10 +143,10 @@ export default function DashboardMain() {
       </Grid>
 
       <Grid container spacing={2} marginTop={2}>
-        <Grid item xs={12} md={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
           <RevenueLineChart />
         </Grid>
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <RoomBarChart />
         </Grid>
       </Grid>
