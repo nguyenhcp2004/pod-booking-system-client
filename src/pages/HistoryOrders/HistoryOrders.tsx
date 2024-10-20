@@ -34,7 +34,7 @@ const getStatusColor = (status: string) => {
   }
 }
 
-const getAmenityIcon = (amenity) => {
+const getAmenityIcon = (amenity: string) => {
   switch (amenity.toLowerCase()) {
     case 'free wi-fi':
       return <Wifi />
@@ -74,7 +74,7 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
           <Grid size={{ xs: 12, md: 4 }}>
             <CardMedia
               component='img'
-              image='https://i.pinimg.com/enabled_lo/564x/a0/a3/57/a0a357281197e7c7bea13028eb461695.jpg'
+              image={booking.roomImage}
               alt={booking.roomName}
               sx={{
                 height: '100%',
