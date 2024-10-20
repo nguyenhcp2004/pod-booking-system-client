@@ -1,5 +1,6 @@
 import { AmenityPage } from './AmenityPage'
 import { BookingAmenityInfo } from './BookingAmenityInfo'
+import { PaymentAmenityDetail } from './PaymentAmenityDetail'
 
 export const listSteps = [
   {
@@ -11,5 +12,10 @@ export const listSteps = [
     index: 2,
     describe: 'Chi tiết',
     element: BookingAmenityInfo
+  },
+  {
+    index: 3,
+    describe: 'Thanh toán',
+    element: PaymentAmenityDetail
   }
 ]
