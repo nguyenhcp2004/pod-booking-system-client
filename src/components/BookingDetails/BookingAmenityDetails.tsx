@@ -1,22 +1,13 @@
 import { Avatar, Box, Divider, Typography, useTheme } from '@mui/material'
 import AmenityCard from './AmenityCard'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { formatDate, formatTime } from '~/utils/utils'
 
 export default function BookingAmenityDetails() {
   const theme = useTheme()
   const { bookedRoom, selectedAmenities, calculateTotal } = useBookingAmenityContext()
 
   if (!bookedRoom) return null
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  }
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
-  }
 
   const calculateHours = (startTime: string, endTime: string) => {
     const start = new Date(startTime)

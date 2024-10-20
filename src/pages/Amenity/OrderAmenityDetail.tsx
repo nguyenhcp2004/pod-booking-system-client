@@ -50,7 +50,7 @@ export default function OrderAmenityDetail() {
 
   useEffect(() => {
     const currentPath = location.pathname
-    const targetPath = `/order-detail/${activeStep}`
+    const targetPath = `/order-amenity-detail/${activeStep}`
 
     if (activeStep === 4) {
       const transactionData: TransactionData = {
@@ -59,8 +59,8 @@ export default function OrderAmenityDetail() {
         vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
         vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
       }
-      if (currentPath !== '/order-detail/4') {
-        navigate('/order-detail/4', { state: { transactionData } })
+      if (currentPath !== '/order-amenity-detail/4') {
+        navigate('/order-amenity-detail/4', { state: { transactionData } })
       }
     } else if (activeStep !== initialStep && currentPath !== targetPath) {
       navigate(targetPath)
