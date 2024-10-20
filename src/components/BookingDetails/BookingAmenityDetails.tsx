@@ -2,23 +2,23 @@ import { Avatar, Box, Divider, Typography, useTheme } from '@mui/material'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import AmenityCard from './AmenityCard'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface BookingAmenityDetailsProps {
   bookedRoom: BookedRoomSchemaType
   selectedAmenities: AmenityType[]
 }
 
-export default function BookingAmenityDetails({
-  bookedRoom,
-  selectedAmenities: initialSelectedAmenities
-}: BookingAmenityDetailsProps) {
+export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }: BookingAmenityDetailsProps) {
   const theme = useTheme()
-  const [selectedAmenities, setSelectedAmenities] = useState<AmenityType[]>(initialSelectedAmenities)
-  console.log(initialSelectedAmenities.length)
+  const [amenities, setAmenities] = useState<AmenityType[]>(selectedAmenities)
+  useEffect(() => {
+    setAmenities(selectedAmenities)
+  }, [selectedAmenities])
+  console.log(amenities.length)
 
   const removeAmenity = (amenityName: string) => {
-    setSelectedAmenities((prevAmenties) => prevAmenties.filter((amenity) => amenity.name !== amenityName))
+    setAmenities((prevAmenties) => prevAmenties.filter((amenity) => amenity.name !== amenityName))
   }
 
   const formatDate = (dateString: string) => {
@@ -117,12 +117,12 @@ export default function BookingAmenityDetails({
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          {initialSelectedAmenities.length > 0 && (
+          {amenities.length > 0 && (
             <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
               Tiện ích bạn đã chọn
             </Typography>
           )}
-          {initialSelectedAmenities.map((amenity, index) => (
+          {amenities.map((amenity, index) => (
             <Box key={amenity.id}>
               <AmenityCard bookedRoom={bookedRoom} selectedAmenities={[amenity]} removeAmenity={removeAmenity} />
               {index !== selectedAmenities.length - 1 && <Divider sx={{ my: '20px' }} />}

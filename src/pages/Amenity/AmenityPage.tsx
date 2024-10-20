@@ -74,6 +74,8 @@ export default function AmenityPage() {
         return [...prevAmenities, { ...newAmenity }]
       }
     })
+    setQuantity(0)
+    setDetailAmenity(null)
   }
 
   const handleDecrement = () => {
