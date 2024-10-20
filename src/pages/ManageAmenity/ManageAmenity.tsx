@@ -1,11 +1,21 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
-import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
+import { AmenityType, AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
 import { Box, Chip, Typography } from '@mui/material'
-import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import {
+  GridActionsCellItem,
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+  GridValidRowModel
+} from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
 import AmenityModal from '~/pages/ManageAmenity/AmenityModal'
 import { ACTION } from '~/constants/mock'
+import BlockIcon from '@mui/icons-material/Block'
+import { toast } from 'react-toastify'
+import { handleErrorApi } from '~/utils/utils'
+import { useDeleteAmenityMutation } from '~/queries/useAmenity' // Import the delete hook
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -24,6 +34,31 @@ export default function ManageBuilding() {
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
+
+  const deleteAmenityMutation = useDeleteAmenityMutation()
+
+  const handleDelete = async (amenity: AmenityType) => {
+    const { id } = amenity
+
+    if (!id) return
+
+    try {
+      const confirmDelete = window.confirm('Bạn có chắc muốn xóa dịch vụ này không?')
+      if (!confirmDelete) return
+
+      // Call delete mutation with just the id
+      await deleteAmenityMutation.mutateAsync(id)
+
+      toast.success('Xóa dịch vụ thành công!', {
+        autoClose: 3000
+      })
+    } catch (error) {
+      handleErrorApi({ error }) // Your custom error handler
+      toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
+        autoClose: 3000
+      })
+    }
+  }
 
   const columns: GridColDef[] = [
     {
@@ -75,7 +110,10 @@ export default function ManageBuilding() {
       width: 100,
       cellClassName: 'actions',
       getActions: ({ row }) => {
-        return [<AmenityModal row={row} action={ACTION.UPDATE} />]
+        return [
+          <AmenityModal row={row} action={ACTION.UPDATE} />,
+          <GridActionsCellItem icon={<BlockIcon />} onClick={() => handleDelete(row)} label='Delete' />
+        ]
       }
     }
   ]

@@ -98,3 +98,29 @@ export const EditAmenityRes = z.object({
 })
 
 export type EditAmenityResType = z.TypeOf<typeof EditAmenityRes>
+
+export const DeleteAmenityBody = z
+  .object({
+    name: z.string(),
+    price: z.number(),
+    quantity: z.number(),
+    type: z.string()
+  })
+  .strict()
+
+export type DeleteAmenityBodyType = z.TypeOf<typeof DeleteAmenityBody>
+
+export const DeleteAmenityRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z
+    .object({
+      name: z.string(),
+      price: z.number(),
+      quantity: z.number(),
+      type: z.string()
+    })
+    .nullable()
+})
+
+export type DeleteAmenityResType = z.TypeOf<typeof DeleteAmenityRes>
