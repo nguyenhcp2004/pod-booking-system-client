@@ -37,8 +37,7 @@ export function RevenueLineChart() {
           series={[
             {
               data: revenues,
-              label: 'Doanh thu',
-              color: 'hsl(var(--chart-1))'
+              label: 'Doanh thu'
             }
           ]}
           height={300}
