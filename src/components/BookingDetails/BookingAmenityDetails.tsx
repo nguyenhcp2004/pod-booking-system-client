@@ -1,14 +1,25 @@
 import { Avatar, Box, Divider, Typography, useTheme } from '@mui/material'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
+import AmenityCard from './AmenityCard'
+import { useState } from 'react'
 
 interface BookingAmenityDetailsProps {
   bookedRoom: BookedRoomSchemaType
   selectedAmenities: AmenityType[]
 }
 
-export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }: BookingAmenityDetailsProps) {
+export default function BookingAmenityDetails({
+  bookedRoom,
+  selectedAmenities: initialSelectedAmenities
+}: BookingAmenityDetailsProps) {
   const theme = useTheme()
+  const [selectedAmenities, setSelectedAmenities] = useState<AmenityType[]>(initialSelectedAmenities)
+  console.log(initialSelectedAmenities.length)
+
+  const removeAmenity = (amenityName: string) => {
+    setSelectedAmenities((prevAmenties) => prevAmenties.filter((amenity) => amenity.name !== amenityName))
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -106,20 +117,17 @@ export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }:
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          {selectedAmenities.length > 0 && (
+          {initialSelectedAmenities.length > 0 && (
             <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
               Tiện ích bạn đã chọn
             </Typography>
           )}
-          {/* {bookingData.selectedRooms.map((room, index) => {
-            if (room.amenities.length === 0) return null
-            return (
-              <Box key={index}>
-                <RoomAmenitiesCard room={room} removeAmenity={removeAmenity} />
-                {index !== roomHaveAmenities - 1 && <Divider sx={{ my: '20px' }} />}
-              </Box>
-            )
-          })} */}
+          {initialSelectedAmenities.map((amenity, index) => (
+            <Box key={amenity.id}>
+              <AmenityCard bookedRoom={bookedRoom} selectedAmenities={[amenity]} removeAmenity={removeAmenity} />
+              {index !== selectedAmenities.length - 1 && <Divider sx={{ my: '20px' }} />}
+            </Box>
+          ))}
         </Box>
       </Box>
       <Divider />
