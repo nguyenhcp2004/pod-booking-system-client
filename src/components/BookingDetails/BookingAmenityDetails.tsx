@@ -1,24 +1,12 @@
 import { Avatar, Box, Divider, Typography, useTheme } from '@mui/material'
-import { AmenityType } from '~/schemaValidations/amenity.schema'
-import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import AmenityCard from './AmenityCard'
-import { useEffect, useState } from 'react'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
-interface BookingAmenityDetailsProps {
-  bookedRoom: BookedRoomSchemaType
-  selectedAmenities: AmenityType[]
-}
-
-export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }: BookingAmenityDetailsProps) {
+export default function BookingAmenityDetails() {
   const theme = useTheme()
-  const [amenities, setAmenities] = useState<AmenityType[]>(selectedAmenities)
-  useEffect(() => {
-    setAmenities(selectedAmenities)
-  }, [selectedAmenities])
+  const { bookedRoom, selectedAmenities, calculateTotal } = useBookingAmenityContext()
 
-  const removeAmenity = (amenityName: string) => {
-    setAmenities((prevAmenties) => prevAmenties.filter((amenity) => amenity.name !== amenityName))
-  }
+  if (!bookedRoom) return null
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -42,7 +30,7 @@ export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }:
   const discount = bookedRoom.servicePackage.discountPercentage
     ? (amenitiesTotal * bookedRoom.servicePackage.discountPercentage) / 100
     : 0
-  const total = amenitiesTotal - discount
+  const total = calculateTotal()
 
   return (
     <Box sx={{ bgcolor: 'white' }}>
@@ -116,14 +104,17 @@ export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }:
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          {amenities.length > 0 && (
-            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Tiện ích bạn đã chọn
-            </Typography>
+          {selectedAmenities.length > 0 && (
+            <>
+              <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
+                Tiện ích bạn đã chọn
+              </Typography>
+              <Typography variant='subtitle2'>{bookedRoom.name}</Typography>
+            </>
           )}
-          {amenities.map((amenity, index) => (
+          {selectedAmenities.map((amenity, index) => (
             <Box key={amenity.id}>
-              <AmenityCard bookedRoom={bookedRoom} selectedAmenities={[amenity]} removeAmenity={removeAmenity} />
+              <AmenityCard amenity={amenity} />
               {index !== selectedAmenities.length - 1 && <Divider sx={{ my: '20px' }} />}
             </Box>
           ))}

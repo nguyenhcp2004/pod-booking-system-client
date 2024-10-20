@@ -20,8 +20,8 @@ import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
-// còn thiếu useContext, bổ sung sau
 export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
@@ -35,8 +35,8 @@ export default function AmenityPage() {
   const amenities: AmenityType[] = response?.data.data ?? []
   const allAmenities: AmenityType[] = responseAllAmenities ?? []
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
-  const [selectBookedRooms, setSelectBookedRooms] = useState<BookedRoomSchemaType | null>(null)
-  const [addedAmenities, setAddedAmenities] = useState<AmenityType[]>([])
+
+  const { bookedRoom, setBookedRoom, selectedAmenities, addAmenity } = useBookingAmenityContext()
 
   useEffect(() => {
     if (selectedAmenityType) {
@@ -55,7 +55,7 @@ export default function AmenityPage() {
       setErrorState('Vui lòng chọn số lượng')
       return
     }
-    if (!selectBookedRooms) {
+    if (!bookedRoom) {
       setErrorState('Vui lòng chọn phòng đã đặt')
       return
     }
@@ -65,16 +65,7 @@ export default function AmenityPage() {
       quantity: quantity
     }
 
-    setAddedAmenities((prevAmenities) => {
-      const existingAmenityIndex = prevAmenities.findIndex((amenity) => amenity.id === newAmenity.id)
-      if (existingAmenityIndex !== -1) {
-        const updatedAmenities = [...prevAmenities]
-        updatedAmenities[existingAmenityIndex].quantity += quantity
-        return updatedAmenities
-      } else {
-        return [...prevAmenities, { ...newAmenity }]
-      }
-    })
+    addAmenity(newAmenity)
     setQuantity(0)
     setDetailAmenity(null)
   }
@@ -114,7 +105,7 @@ export default function AmenityPage() {
 
   const handleSelectBookedRoom = (event: SelectChangeEvent<string>) => {
     const selectedRoom = bookedRooms.find((room) => room.startTime === event.target.value)
-    setSelectBookedRooms(selectedRoom || null)
+    setBookedRoom(selectedRoom || null)
   }
 
   // const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
@@ -135,7 +126,7 @@ export default function AmenityPage() {
                   <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
                   <Select
                     labelId='booked-room-label'
-                    value={selectBookedRooms?.startTime || ''}
+                    value={bookedRoom?.startTime || ''}
                     label='Chọn Phòng đã đặt'
                     onChange={handleSelectBookedRoom}
                   >
@@ -310,11 +301,11 @@ export default function AmenityPage() {
           </Box>
         </Grid>
 
-        {selectBookedRooms && (
+        {bookedRoom && (
           <Grid size={{ lg: 6 }} sx={{ paddingLeft: '12px' }}>
             <Box sx={{ background: '#FFF' }}>
               <Box>
-                <BookingAmenityDetails bookedRoom={selectBookedRooms} selectedAmenities={addedAmenities} />
+                <BookingAmenityDetails />
               </Box>
               <Box sx={{ width: '100%', padding: '20px' }}>
                 <Button
@@ -325,7 +316,7 @@ export default function AmenityPage() {
                     borderRadius: 'var(--12, 96px)'
                   }}
                 >
-                  {addedAmenities.length > 0 ? 'Hoàn tất' : 'Bỏ qua'}
+                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Bỏ qua'}
                 </Button>
               </Box>
             </Box>
