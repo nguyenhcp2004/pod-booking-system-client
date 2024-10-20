@@ -321,8 +321,9 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                     color: '#FFF',
                     borderRadius: 'var(--12, 96px)'
                   }}
+                  disabled={selectedAmenities.length === 0}
                 >
-                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Bỏ qua'}
+                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Vui lòng chọn tiện ích'}
                 </Button>
               </Box>
             </Box>
