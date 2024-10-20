@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Building, RoomTypeFix } from '~/constants/type'
+import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
 import http from '~/utils/http'
-import { createBookingPayload } from '~/utils/orderUtils'
+import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/orderUtils'
 
 export enum OrderStatus {
   Pending = 'Pending',
@@ -67,13 +67,41 @@ interface Amenity {
 
 export const createOrder = async (bookingInfo: BookingInfo) => {
   const payload = createBookingPayload(bookingInfo)
-  console.log('Payload:', payload)
   try {
     const response = await http.post('/order', payload)
     return response.data
   } catch (error) {
-    console.error('Error generating payment URL:', error)
+    console.error('Error create order customer side:', error)
     throw error
+  }
+}
+
+export const createOrderAD = async (bookingInfo: BookingInfo, customer: Account) => {
+  const payload = createBookingPayloadAD(bookingInfo, customer)
+  try {
+    const response = await http.post('/order', payload)
+    return response.data
+  } catch (error) {
+    console.error('Error create order admin side:', error)
+    throw error
+  }
+}
+
+export const updateOrderApi = async (order: Order, updateOrder: Order | null) => {
+  if (updateOrder != null) {
+    const updateRequest = createOrderUpdateRequest(order, updateOrder)
+    if (updateRequest) {
+      try {
+        const response = await http.put('/order', updateRequest)
+        return response.data
+      } catch (error) {
+        console.error('Error update page order:', error)
+        throw error
+      }
+    } else {
+      console.log('Không có thay đổi nào cần gửi.')
+      return { code: 400, message: 'Không có thay đổi nào cần gửi.' }
+    }
   }
 }
 
@@ -182,9 +210,9 @@ interface OrderResponse {
   updatedAt: string
 }
 
-const updateStaff = async (orderId: string, request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
+const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
   try {
-    const response = await http.put(`http://localhost:8080/order/${orderId}`, request)
+    const response = await http.put(`http://localhost:8080/order`, request)
     return response.data
   } catch (error) {
     console.error('Error updating staff:', error)
@@ -194,11 +222,8 @@ const updateStaff = async (orderId: string, request: OrderUpdateStaffRequest): P
 
 export const useUpdateStaff = () => {
   return useMutation({
-    mutationFn: ({ orderId, request }: { orderId: string; request: OrderUpdateStaffRequest }) =>
-      updateStaff(orderId, request),
-    onSuccess: () => {
-      console.log('Staff updated successfully')
-    },
+    mutationFn: ({ request }: { request: OrderUpdateStaffRequest }) => updateStaff(request),
+    onSuccess: () => {},
     onError: (error) => {
       console.error('Error updating staff:', error)
     }
@@ -208,7 +233,6 @@ export const useUpdateStaff = () => {
 const searchAccounts = async (keyword: string): Promise<Account[]> => {
   try {
     const response = await http.get(`/accounts/${keyword}/Customer`)
-    console.log('Search accounts:', response.data)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)
@@ -226,9 +250,7 @@ export const useSearchAccounts = (keyword: string) => {
 
 const searchOrder = async (keyword: string, page: number, size: number) => {
   try {
-    console.log(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
     const response = await http.get(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
-    console.log('Search order:', response.data)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)
@@ -263,5 +285,23 @@ export const useDeleteOrder = () => {
     onError: (error) => {
       console.error('Error deleting order:', error)
     }
+  })
+}
+
+const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<Room[]> => {
+  try {
+    const response = await http.get(`/rooms/type/${roomId}`)
+    return response.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+export const useRoomSameType = (roomId: string) => {
+  return useQuery({
+    queryKey: ['roomByTypeId', roomId],
+    queryFn: () => getRoomSameType({ roomId }),
+    enabled: !!roomId
   })
 }

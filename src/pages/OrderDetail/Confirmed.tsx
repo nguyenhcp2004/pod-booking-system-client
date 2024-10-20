@@ -8,6 +8,7 @@ import { useBookingContext } from '~/contexts/BookingContext'
 import { createOrder } from '~/apis/orderApi'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { Helmet } from 'react-helmet-async'
 
 export const Confirmed: React.FC = () => {
   const handleReturn = () => {
@@ -62,6 +63,7 @@ export const Confirmed: React.FC = () => {
       const building = bookingContext!.bookingData.roomType?.building
       const payload = {
         id: room.id,
+        name: room.name,
         buildingNumber: building?.id
       }
       client.send('/app/payments', {}, JSON.stringify(payload))
@@ -143,6 +145,10 @@ export const Confirmed: React.FC = () => {
 
   return (
     <Box sx={{ marginX: '104px' }}>
+      <Helmet>
+        <title>Xác nhận đặt phòng | POD System</title>
+        <meta name='description' content='Xác nhận đặt phòng: Chi tiết đặt phòng của bạn' />
+      </Helmet>
       <Box>
         <Box
           sx={{

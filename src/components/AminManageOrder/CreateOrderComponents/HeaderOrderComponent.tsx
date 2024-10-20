@@ -90,7 +90,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
       }
     }
     setSelectedDates(dateList)
-  }, [selectedDate, selectedPackage])
+  }, [selectedDate, setSelectedDates, selectedPackage])
 
   const slotsFormmated = useMemo(() => {
     return selectedSlots.map((slot) => {
@@ -124,27 +124,6 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     roomListRefetch()
   }, [selectedSlots, selectedDate, roomListRefetch])
 
-  // useEffect(() => {
-  //   setBookingData?.((prev: BookingInfo) => {
-  //     const price = bookingData?.roomType?.price
-  //     const listRoom: RoomContextType[] = selectedRooms.map((room) => {
-  //       return {
-  //         id: room.id,
-  //         name: room.name,
-  //         price: price,
-  //         image: room.image,
-  //         amenities: []
-  //       }
-  //     })
-  //     return {
-  //       ...prev,
-  //       selectedRooms: listRoom || [],
-  //       date: selectedDate?.format('YYYY-MM-DD') || null,
-  //       timeSlots: selectedSlots || [],
-  //       servicePackage: selectedPackage || null
-  //     }
-  //   })
-  // }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
   const handleBuildingSearch = (query: string) => {
     setSearchBuilding(query)
     const buildings = query.trim() ? searchBuildingData || [] : allBuilding || []
@@ -155,6 +134,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     setBuilding(b)
     setSearchBuilding(b.address)
     setRoomTypeList(roomType || [])
+    setShowBuildingList(false)
   }
 
   const handleSelectRoomType = (e: SelectChangeEvent<number | null>) => {
@@ -170,27 +150,19 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     updateSelectedDates(date, selectedPackage)
   }
 
-  // const formatSlots = (slots: slotType[]) => {
-  //   return slots.map((slot) => {
-  //     const [start, end] = slot.split('-')
-  //     const startTime = moment(selectedDate).set(parseTime(start)).format('YYYY-MM-DDTHH:mm:ss')
-  //     const endTime = moment(selectedDate).set(parseTime(end)).format('YYYY-MM-DDTHH:mm:ss')
-  //     return `${startTime}_${endTime}`
-  //   })
-  // }
-
-  // const parseTime = (time: string) => {
-  //   const [hour, minute] = time.split(':').map(Number)
-  //   return { hour, minute, second: 0, millisecond: 0 }
-  // }
-
   const updateBookingData = (updates: Partial<BookingInfo>) => {
     setBookingData((prev) => ({ ...prev, ...updates }))
   }
 
   const handleSelectPackage = (pkg: ServicePackage | null) => {
     setSelectedPackage(pkg)
+    setBookingData((prev) => ({ ...prev, servicePackage: pkg }))
     updateSelectedDates(selectedDate, pkg)
+  }
+
+  const handleSelectSlots = (slots: slotType[]) => {
+    setSelectedSlots(slots as slotType[])
+    setBookingData((prev) => ({ ...prev, timeSlots: slots }))
   }
 
   const handleSelectRooms = (rooms: Room[]) => {
@@ -219,14 +191,6 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     }
     setSelectedDates(dateList)
   }
-  // const handleAddRoomType = (e: SelectChangeEvent<number | null>) => {
-  //   const value = e.target.value ? Number(e.target.value) : ''
-  //   const selectedRoomType = roomTypeList.find((roomT) => roomT.id === Number(value)) || null
-  //   setBookingData((prev) => {
-  //     return { ...prev, roomType: selectedRoomType }
-  //   })
-  //   setRoomTypeID(value === '' ? null : Number(value))
-  // }
 
   return (
     <Box sx={{ padding: 3, marginY: 2, bgcolor: 'white', borderRadius: '5px' }}>
@@ -236,7 +200,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             size='small'
             variant='outlined'
             label='Địa chỉ'
-            value={building?.address || searchBuilding || ''}
+            value={showBuildingList ? searchBuilding : building?.address || searchBuilding}
             onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
             fullWidth
@@ -340,10 +304,9 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               options={SLOT}
               value={selectedSlots}
               onChange={(_, slots) => {
-                setSelectedSlots(slots as slotType[])
+                handleSelectSlots(slots as slotType[])
               }}
               disableCloseOnSelect
-              limitTags={1}
               renderOption={(props, option, { selected }) => {
                 const { key, ...optionProps } = props
                 return (
@@ -401,7 +364,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               onChange={(_, servicePackage) => {
                 handleSelectPackage(servicePackage)
               }}
-              options={isSuccess ? servicePackage.data.data : []}
+              options={isSuccess ? servicePackage?.data?.data : []}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
             />

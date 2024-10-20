@@ -39,3 +39,10 @@ export const useEditAmenityMutation = () => {
     }
   })
 }
+
+export const useGetAmenitiesByType = (amenityType: string) => {
+  return useQuery({
+    queryKey: ['amenitiesByType'],
+    queryFn: () => amenityApiRequest.getAmenitiesByType(amenityType)
+  })
+}

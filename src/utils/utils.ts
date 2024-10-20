@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import axios, { AxiosError, HttpStatusCode } from 'axios'
+import moment from 'moment'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
@@ -157,4 +158,10 @@ export function getComparator<Key extends keyof any>(
 
 export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0
+}
+
+export const formatStartEndTime = (start: string, end: string) => {
+  const startFormatted = moment(start).format('HH:mm DD/MM/YYYY')
+  const endFormatted = moment(end).format('HH:mm DD/MM/YYYY')
+  return `${startFormatted} -> ${endFormatted}`
 }

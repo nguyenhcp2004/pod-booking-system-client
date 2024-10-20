@@ -24,11 +24,15 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
   const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
   const handleIncrement = () => {
+    if (!room) {
+      setErrorState('Vui lòng chọn phòng')
+      return
+    }
     if (!detailAmenity) {
       setErrorState('Vui lòng chọn tiện ích')
       return
     } else {
-      if (detailAmenity.quantity < quantity) {
+      if (detailAmenity.quantity < quantity + 1) {
         setErrorState('Số lượng tiện ích không đủ')
         return
       }
@@ -129,7 +133,12 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px 20px 0px 0px', gap: '24px' }}>
           <FormControl fullWidth>
             <InputLabel id='location-label'>Chọn Phòng</InputLabel>
-            <Select labelId='r-type-label' value={room} label='Chọn Phòng' onChange={(e) => setRoom(e.target.value)}>
+            <Select
+              labelId='r-type-label'
+              value={room || ''}
+              label='Chọn Phòng'
+              onChange={(e) => setRoom(e.target.value)}
+            >
               {bookingData?.selectedRooms.map((r, index) => (
                 <MenuItem key={index} value={r.name}>
                   {r.name}

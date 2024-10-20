@@ -1,21 +1,24 @@
-import { useGetListBuilding } from '~/queries/useBuilding'
-import { BuildingStatus } from '~/schemaValidations/building.schema'
+import { useGetFilterBuilding } from '~/queries/useBuilding'
+import { BuildingStatus, GetFilteredBuildingQueryType } from '~/schemaValidations/building.schema'
 import { Box, Chip, Typography } from '@mui/material'
-import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
 import BuildingModal from '~/pages/ManageBuilding/BuildingModal'
 import { ACTION } from '~/constants/mock'
+import SearchInput from '~/components/SearchInput/SearchInput'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
-  const { data, isLoading } = useGetListBuilding({
+  const [paginationFilter, setPaginationFilter] = useState({
     page: paginationModel.page + 1,
-    take: paginationModel.pageSize
+    take: paginationModel.pageSize,
+    address: ''
   })
+  const { data, isLoading } = useGetFilterBuilding(paginationFilter as GetFilteredBuildingQueryType)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
@@ -82,9 +85,12 @@ export default function ManageBuilding() {
 
   const Toolbar = () => {
     return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+      <GridToolbarContainer
+        sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px', alignItems: 'center' }}
+      >
         <BuildingModal action={ACTION.CREATE} />
-        <GridToolbarQuickFilter />
+        <SearchInput setPaginationModel={setPaginationFilter} />
+        {/* <GridToolbarQuickFilter sx={{ maxWidth: '320px', height: '56px', justifyContent: 'center' }} /> */}
       </GridToolbarContainer>
     )
   }

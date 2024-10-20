@@ -37,6 +37,45 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
     listSlotFull.push(slot)
   })
   const listSlot = [...new Set(listSlotFull)]
+
+  const total = order.orderDetails.reduce((acc, detail) => {
+    return (
+      acc +
+      (detail.roomPrice * order.orderDetails.length +
+        detail.amenities.reduce((acc, amenity) => acc + amenity.price * amenity.quantity, 0)) *
+        (1 - (order.orderDetails[0].servicePackage?.discountPercentage ?? 0) / 100)
+    )
+  }, 0)
+
+  const mergeAmenities = (amenities: { name: string; price: number; quantity: number }[]) => {
+    return amenities.reduce(
+      (acc, amenity) => {
+        const existing = acc.find((item) => item.name === amenity.name)
+        if (existing) {
+          existing.quantity += amenity.quantity
+        } else {
+          acc.push({ ...amenity })
+        }
+        return acc
+      },
+      [] as { name: string; price: number; quantity: number }[]
+    )
+  }
+
+  const groupedOrderDetails = order.orderDetails.reduce(
+    (acc, detail) => {
+      const { roomName, amenities } = detail
+
+      if (!acc[roomName]) {
+        acc[roomName] = []
+      }
+
+      acc[roomName] = acc[roomName].concat(amenities)
+      return acc
+    },
+    {} as Record<string, { name: string; price: number; quantity: number }[]>
+  )
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -96,7 +135,7 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                 label='Nhân viên phụ trách'
                 size='small'
                 variant='outlined'
-                value={order.orderDetails[0].orderHandler.name}
+                value={order.orderDetails[0]?.orderHandler?.name || 'N/A'}
                 InputProps={{
                   readOnly: true
                 }}
@@ -150,12 +189,11 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                   options={listSlot}
                   value={listSlot}
                   disableCloseOnSelect
-                  limitTags={1}
                   sx={{
                     '.MuiAutocomplete-inputRoot': {
                       opacity: 1,
                       pointerEvents: 'none',
-                      height: '52px'
+                      minHeight: '52px'
                     },
                     '.MuiAutocomplete-endAdornment': {
                       display: 'none'
@@ -168,7 +206,7 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
                         ...params.InputProps,
                         readOnly: true
                       }}
-                      label='Slot'
+                      label='Khung giờ'
                       size='small'
                       disabled
                     />
@@ -232,35 +270,67 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
         </Card>
         <Card sx={{ padding: 3, marginY: 2 }}>
           <Typography variant='h6' sx={{ marginBottom: 3 }}>
-            Khách hàng: {order.orderDetails[0].customer.name}
+            Khách hàng: {order.orderDetails[0]?.customer?.name}
           </Typography>
           <Typography variant='body1' sx={{ marginBottom: 1 }}>
-            Email: {order.orderDetails[0].customer.email}
+            Email: {order.orderDetails[0]?.customer?.email}
           </Typography>
           <Typography variant='body1' sx={{ marginBottom: 1 }}>
-            Hạng: {order.orderDetails[0].customer.rankingName || 'Chưa có'}
+            Hạng: {order.orderDetails[0]?.customer?.rankingName || 'Chưa có'}
           </Typography>
         </Card>
         <Card sx={{ padding: 3, marginY: 2 }}>
           <Typography variant='h6' sx={{ marginBottom: 3 }}>
             Chi tiết đơn hàng
           </Typography>
-          {order.orderDetails.map((orderDetail, index) => (
-            <Box key={index} sx={{}}>
-              <Typography variant='body1' sx={{ marginBottom: 1 }}>
-                Phòng: {orderDetail.roomName}
-              </Typography>
-              <Box>
-                {orderDetail.amenities.map((amenity, index) => (
-                  <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='body2'>{amenity.name}</Typography>
-                    <Typography variant='body2'>{amenity.price}</Typography>
-                  </Box>
-                ))}
+          {Object.entries(groupedOrderDetails).map(([roomName, amenities], index) => {
+            const mergedAmenities = mergeAmenities(amenities)
+
+            return (
+              <Box key={index} sx={{ marginBottom: 2 }}>
+                <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', marginBottom: 1 }}>
+                  <Typography variant='body1'>Phòng:</Typography>
+                  <Typography variant='body1' sx={{ fontWeight: '500' }}>
+                    {roomName}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant='body1' sx={{ marginBottom: 1 }}>
+                    Dịch vụ:
+                  </Typography>
+                  {mergedAmenities.length == 0 && (
+                    <Typography variant='body2' sx={{ marginLeft: '30px' }}>
+                      Không có dịch vụ
+                    </Typography>
+                  )}
+                  {mergedAmenities.map((amenity, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        display: 'flex',
+                        marginLeft: '30px',
+                        justifyContent: 'space-between',
+                        width: '150px',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Typography variant='body2' sx={{ marginBottom: '5px' }}>
+                        • {amenity.name}
+                      </Typography>
+                      <Typography variant='body2'>x {amenity.quantity}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+                {index !== Object.entries(groupedOrderDetails).length - 1 && <Divider sx={{ marginY: 2 }} />}
               </Box>
-              {index !== order.orderDetails.length - 1 && <Divider sx={{ marginY: 2 }} />}
-            </Box>
-          ))}
+            )
+          })}
+          <Divider sx={{ marginY: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Typography variant='h6' sx={{ fontWeight: '500' }}>
+              Tổng tiền: {total.toLocaleString()} VNĐ
+            </Typography>
+          </Box>
         </Card>
       </Box>
     </Modal>

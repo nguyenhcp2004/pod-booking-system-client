@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import SockJS from 'sockjs-client'
 import { toast } from 'react-toastify'
 import Stomp from 'stompjs'
+import { Helmet } from 'react-helmet-async'
 
 const QRCodePayment = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
@@ -62,7 +63,7 @@ const QRCodePayment = () => {
       client.subscribe('/topic/payments', (data) => {
         const roomId = JSON.parse(data.body)
         if (bookingData!.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+          toast.success(`Phòng ${roomId.name} vừa được đặt`)
         }
       })
     })
@@ -121,6 +122,10 @@ const QRCodePayment = () => {
         gap: '20px'
       }}
     >
+      <Helmet>
+        <title>Thanh toán | POD System</title>
+        <meta name='description' content='Thanh toán đặt phòng: Hoàn tất giao dịch của bạn' />
+      </Helmet>
       <Typography variant='h5' gutterBottom>
         Thanh toán bằng QR Code
       </Typography>

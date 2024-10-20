@@ -42,3 +42,13 @@ const FilterRoomTypeRes = z.object({
 })
 
 export type FilterRoomTypeRes = z.TypeOf<typeof FilterRoomTypeRes>
+
+export const RoomTypeRequest = z.object({
+  name: z.string(),
+  price: z.number().min(1000),
+  quantity: z.number(),
+  capacity: z.number().min(1),
+  buildingId: z.number()
+})
+
+export type RoomTypeRequest = z.TypeOf<typeof RoomTypeRequest>

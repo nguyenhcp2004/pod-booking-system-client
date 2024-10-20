@@ -35,8 +35,10 @@ import { mapOrderToRow } from '~/utils/orderUtils'
 import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageOrder() {
+  const { account } = useAppContext()
   const today = moment()
   const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -69,7 +71,6 @@ export default function ManageOrder() {
   const deleteOrderMutation = useDeleteOrder()
 
   const handleDeleteOrder = () => {
-    console.log(`Deleting order with ID: ${selectedOrder?.id}`)
     if (selectedOrder) {
       deleteOrderMutation.mutate(selectedOrder?.id, {
         onSuccess: (data) => {
@@ -91,11 +92,17 @@ export default function ManageOrder() {
   const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
 
+  //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
   useEffect(() => {
     client.connect({}, () => {
       client.subscribe('/topic/payments', (data) => {
         const room = JSON.parse(data.body)
-        toast.success(`Phòng ${room.name} vừa được đặt`)
+        const isAdminRole = account?.role === 'Admin'
+        const isManagerOfBuilding =
+          (account?.role === 'Manager' || account?.role === 'Staff') && account?.buildingNumber === room.buildingNumber
+        if (isAdminRole || isManagerOfBuilding) {
+          toast.success(`Phòng ${room.name} vừa được đặt`)
+        }
       })
     })
 
@@ -104,7 +111,8 @@ export default function ManageOrder() {
         client.disconnect(() => {})
       }
     }
-  }, [client])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.data.map(mapOrderToRow)
@@ -118,7 +126,7 @@ export default function ManageOrder() {
       if (searchData) {
         const searchRowsData = searchData.data.data.map(mapOrderToRow)
         setRows([...searchRowsData])
-        setRowCount(searchRowsData.data.totalRecord)
+        setRowCount(searchData?.data?.totalRecord || 0)
       }
     } else {
       if (orderData) {
@@ -145,8 +153,9 @@ export default function ManageOrder() {
         orderHandler: selectedStaff
       }
     }
-    updateStaff({ orderId, request })
+    updateStaff({ request })
     setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
+    toast.success('Cập nhật nhân viên thành công')
   }
 
   const columns: GridColDef[] = [
@@ -185,13 +194,13 @@ export default function ManageOrder() {
               '.MuiOutlinedInput-notchedOutline': { border: 'none' },
               '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
             }}
-            value={staffId}
+            value={staffId || ''}
             onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
             fullWidth
             displayEmpty
             renderValue={(selected) => {
               let selectedStaff = staffList.find((staff) => staff.id === selected)
-              if (!selectedStaff) selectedStaff = params.row.orderHandler
+              if (!selectedStaff) selectedStaff = params.row?.orderHandler
               return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
             }}
           >
@@ -392,7 +401,7 @@ export default function ManageOrder() {
         rows={rows}
         columns={columns}
         paginationModel={{ page: currentPage, pageSize: pageSize }}
-        pageSizeOptions={[5, 10, 20]}
+        pageSizeOptions={[5, 10]}
         pagination
         paginationMode='server'
         rowCount={rowCount}
