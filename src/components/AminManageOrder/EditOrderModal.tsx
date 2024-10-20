@@ -160,7 +160,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
       toast.success('Cập nhật đơn hàng thành công')
       onClose()
     } else {
-      toast.error('Cập nhật đơn hàng thất bại')
+      setLoading(false)
+      toast.error(response.message)
+      onClose()
     }
   }
 

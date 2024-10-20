@@ -8,7 +8,7 @@ export default function AdminSideBar() {
       sx={{
         padding: '20px 20px 0px',
         height: '100vh',
-        width: '300px',
+        width: '250px',
         borderRight: '2px solid #DFE3E8',
         display: 'flex',
         flexDirection: 'column'
