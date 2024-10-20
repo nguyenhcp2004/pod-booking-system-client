@@ -100,7 +100,7 @@ export const updateOrderApi = async (order: Order, updateOrder: Order | null) =>
       }
     } else {
       console.log('Không có thay đổi nào cần gửi.')
-      return
+      return { code: 400, message: 'Không có thay đổi nào cần gửi.' }
     }
   }
 }
