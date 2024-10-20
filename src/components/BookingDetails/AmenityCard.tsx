@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme } from '@mui/material'
-// import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
@@ -10,7 +10,7 @@ interface AmenityCardProps {
 
 export default function AmenityCard({ amenity }: AmenityCardProps) {
   const theme = useTheme()
-  //   const location = useLocation()
+  const location = useLocation()
   const { bookedRoom, removeAmenity } = useBookingAmenityContext()
 
   if (!bookedRoom) return null
@@ -34,19 +34,19 @@ export default function AmenityCard({ amenity }: AmenityCardProps) {
           <Typography variant='subtitle2' fontWeight='bold'>
             {amenity.price} VND
           </Typography>
-          {/* {location.pathname == '/order-detail/1' && ( */}
-          <ClearIcon
-            onClick={() => removeAmenity(amenity.id)}
-            sx={{
-              marginTop: '-2px',
-              color: theme.palette.grey[300],
-              cursor: 'pointer',
-              '&:hover': {
-                color: theme.palette.error.main
-              }
-            }}
-          />
-          {/* )} */}
+          {location.pathname == '/order-amenity-detail/1' && (
+            <ClearIcon
+              onClick={() => removeAmenity(amenity.id)}
+              sx={{
+                marginTop: '-2px',
+                color: theme.palette.grey[300],
+                cursor: 'pointer',
+                '&:hover': {
+                  color: theme.palette.error.main
+                }
+              }}
+            />
+          )}
         </Box>
       </Box>
     </Box>

@@ -85,7 +85,7 @@ export default function Header() {
           )}
           <Button
             component={Link}
-            to='/amenity'
+            to='/order-amenity-detail/1'
             sx={{
               textTransform: 'uppercase',
               paddingX: '11px',
