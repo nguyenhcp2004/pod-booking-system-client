@@ -8,6 +8,7 @@ import PODRoomTypeCard, { PODRoomTypeCardProps } from '~/components/LandingPage/
 import moment, { Moment } from 'moment'
 import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
 import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
+import { Helmet } from 'react-helmet-async'
 
 const STORAGE_KEY = 'roomTypeFilterStateLandingPage'
 
@@ -109,6 +110,10 @@ export default function Home() {
 
   return (
     <Box sx={{ width: '100%' }}>
+      <Helmet>
+        <title>Trang chủ | POD System</title>
+        <meta name='description' content='Trang chủ dự án POD Booking System' />
+      </Helmet>
       {/* Hero Section */}
       <Grid
         container
