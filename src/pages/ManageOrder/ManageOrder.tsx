@@ -39,7 +39,6 @@ import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageOrder() {
   const { account } = useAppContext()
-  console.log(account)
   const today = moment()
   const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -72,7 +71,6 @@ export default function ManageOrder() {
   const deleteOrderMutation = useDeleteOrder()
 
   const handleDeleteOrder = () => {
-    console.log(`Deleting order with ID: ${selectedOrder?.id}`)
     if (selectedOrder) {
       deleteOrderMutation.mutate(selectedOrder?.id, {
         onSuccess: (data) => {

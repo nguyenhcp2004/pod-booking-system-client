@@ -35,7 +35,6 @@ export default function RoomType() {
 
   useEffect(() => {
     if (data?.data.data) {
-      console.log(data.data.data[0].price)
       setRows(data.data.data)
     }
   }, [data])

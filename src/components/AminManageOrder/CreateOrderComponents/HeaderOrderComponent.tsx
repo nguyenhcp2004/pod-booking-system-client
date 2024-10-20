@@ -200,7 +200,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             size='small'
             variant='outlined'
             label='Địa chỉ'
-            value={building?.address || searchBuilding || ''}
+            value={showBuildingList ? searchBuilding : building?.address || searchBuilding}
             onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
             fullWidth
@@ -362,7 +362,6 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             <Autocomplete
               value={selectedPackage}
               onChange={(_, servicePackage) => {
-                console.log(servicePackage)
                 handleSelectPackage(servicePackage)
               }}
               options={isSuccess ? servicePackage?.data?.data : []}

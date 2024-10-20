@@ -29,7 +29,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
             size='small'
             variant='standard'
             label='Tìm kiếm khách hàng'
-            value={customer?.name || searchCustomer || ''}
+            value={showCustomerList ? searchCustomer : customer?.name || searchCustomer}
             onChange={(e) => setSearchCustomer(e.target.value)}
             onFocus={() => setShowCustomerList(true)}
             fullWidth
@@ -53,7 +53,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 <Box
                   key={index}
                   onClick={() => {
-                    setSearchCustomer(a.name ?? '')
+                    setSearchCustomer(a.name || '')
                     setCustomer(a)
                     setShowCustomerList(false)
                   }}
