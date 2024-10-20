@@ -11,7 +11,7 @@ import {
   Backdrop,
   CircularProgress
 } from '@mui/material'
-import { Moment } from 'moment'
+import moment, { Moment } from 'moment'
 import { BookingInfo, slotType } from '~/contexts/BookingContext'
 import CloseIcon from '@mui/icons-material/Close'
 import { Account, createOrderAD } from '~/apis/orderApi'
@@ -49,7 +49,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
     setBookingData({
       roomType: null,
       selectedRooms: [],
-      date: null,
+      date: moment().format('DD-MM-YYYY').toString(),
       timeSlots: [],
       servicePackage: null
     })
@@ -62,8 +62,6 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose }) =>
   const handleCreateOrder = async () => {
     setLoading(true)
     setOpenPayment(false)
-    console.log(bookingData)
-    console.log(customer)
     if (customer) {
       const response = await createOrderAD(bookingData, customer)
       if (response.code == 201) {
