@@ -22,7 +22,12 @@ import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
-export default function AmenityPage() {
+interface CommonProps {
+  onNext: () => void
+  onBack: () => void
+}
+
+export const AmenityPage: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [errorState, setErrorState] = useState<string | null>(null)
@@ -309,6 +314,7 @@ export default function AmenityPage() {
               </Box>
               <Box sx={{ width: '100%', padding: '20px' }}>
                 <Button
+                  onClick={props.onNext}
                   fullWidth
                   sx={{
                     background: colors.primary[500],
