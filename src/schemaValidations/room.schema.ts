@@ -13,6 +13,7 @@ const BuildingSchema = z.object({
 const RoomTypeSchema = z.object({
   id: z.number(),
   name: z.string(),
+  price: z.number(),
   quantity: z.number(),
   capacity: z.number(),
   building: BuildingSchema
