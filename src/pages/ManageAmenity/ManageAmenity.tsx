@@ -1,31 +1,35 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
-import { AmenityType, AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
+import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
 import { Box, Chip, Typography } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
+  GridRowId,
   GridToolbarContainer,
   GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Table from '~/components/Table/Table'
 import AmenityModal from '~/pages/ManageAmenity/AmenityModal'
 import { ACTION } from '~/constants/mock'
 import BlockIcon from '@mui/icons-material/Block'
 import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
-import { useDeleteAmenityMutation } from '~/queries/useAmenity' // Import the delete hook
+import { useDeleteAmenityMutation } from '~/queries/useAmenity'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
-  const { data, isLoading } = useGetListAmenity({
+  const { data, refetch, isLoading } = useGetListAmenity({
     page: paginationModel.page + 1,
     take: paginationModel.pageSize
   })
+  const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
+
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
@@ -37,26 +41,41 @@ export default function ManageBuilding() {
 
   const deleteAmenityMutation = useDeleteAmenityMutation()
 
-  const handleDelete = async (amenity: AmenityType) => {
-    const { id } = amenity
+  useEffect(() => {
+    if (data?.data.data) {
+      setRows(
+        data.data.data.map((amenity, index) => ({
+          ...amenity,
+          sequentialIndex: index + 1,
+          status: amenity.isDeleted === 0 ? 'Hoạt động' : 'Không hoạt động'
+        }))
+      )
+      setTotalRowCount(data.data.totalRecord)
+    }
+  }, [data])
 
-    if (!id) return
+  useEffect(() => {
+    refetch()
+  }, [paginationModel])
 
-    try {
-      const confirmDelete = window.confirm('Bạn có chắc muốn xóa dịch vụ này không?')
-      if (!confirmDelete) return
+  const handleToggleStatus = (id: GridRowId) => async () => {
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
+      const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
+      try {
+        // Call delete mutation with just the id
+        await deleteAmenityMutation.mutateAsync(rowToToggle.id)
 
-      // Call delete mutation with just the id
-      await deleteAmenityMutation.mutateAsync(id)
-
-      toast.success('Xóa dịch vụ thành công!', {
-        autoClose: 3000
-      })
-    } catch (error) {
-      handleErrorApi({ error }) // Your custom error handler
-      toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
-        autoClose: 3000
-      })
+        toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`, {
+          autoClose: 3000
+        })
+        setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
+      } catch (error) {
+        handleErrorApi({ error }) // Your custom error handler
+        toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
+          autoClose: 3000
+        })
+      }
     }
   }
 
@@ -104,6 +123,22 @@ export default function ManageBuilding() {
       editable: true
     },
     {
+      field: 'status',
+      headerName: 'Trạng thái',
+      width: 150,
+      type: 'singleSelect',
+      valueOptions: ['Hoạt động', 'Không hoạt động'],
+      renderCell: (params) => (
+        <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
+      ),
+      editable: true,
+      preProcessEditCellProps: (params) => {
+        const { id, props } = params
+        editedRowRef.current[id] = { ...editedRowRef.current[id], status: props.value }
+        return { ...props }
+      }
+    },
+    {
       field: 'actions',
       type: 'actions',
       headerName: 'Hành động',
@@ -112,7 +147,12 @@ export default function ManageBuilding() {
       getActions: ({ row }) => {
         return [
           <AmenityModal row={row} action={ACTION.UPDATE} />,
-          <GridActionsCellItem icon={<BlockIcon />} onClick={() => handleDelete(row)} label='Delete' />
+          <GridActionsCellItem
+            icon={row.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
+            label={row.status === 'Hoạt động' ? 'Ban' : 'Unban'}
+            onClick={handleToggleStatus(row.id)}
+            color={row.status === 'Hoạt động' ? 'error' : 'success'}
+          />
         ]
       }
     }
