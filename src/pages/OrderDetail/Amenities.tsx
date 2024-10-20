@@ -13,6 +13,7 @@ import { Amenity, BookingContext } from '~/contexts/BookingContext'
 import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { Helmet } from 'react-helmet-async'
 
 interface CommonProps {
   onNext: () => void
@@ -153,6 +154,13 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
   return (
     <Box sx={{ marginX: '104px' }}>
+      <Helmet>
+        <title>Đặt dịch vụ | POD System</title>
+        <meta
+          name='description'
+          content='Đặt thêm tiện ích: Nâng cao trải nghiệm phòng với đồ ăn, bàn ghế và hơn thế nữa'
+        />
+      </Helmet>
       <Grid container spacing={2}>
         <Grid size={{ lg: 6 }} sx={{ padding: '0px !important' }}>
           <Box sx={{ marginRight: '12px', background: '#FFF', paddingRight: '12px' }}>

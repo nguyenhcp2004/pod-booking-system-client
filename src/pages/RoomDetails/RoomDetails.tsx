@@ -17,6 +17,7 @@ import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
 import { Link, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
+import { Helmet } from 'react-helmet-async'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -120,6 +121,10 @@ export default function RoomDetail() {
         gap: '28px'
       }}
     >
+      <Helmet>
+        <title> {bookingData?.roomType?.name} | POD System</title>
+        <meta name='description' content='Chọn Phòng Hoàn Hảo Cho Mọi Dịp - Từ Họp Nhóm Đến Làm Việc Cá Nhân' />
+      </Helmet>
       <Grid container size={12} spacing={6}>
         <Grid container size={{ xs: 12, md: 6 }} rowSpacing={1}>
           <Box sx={{ width: '100%' }}>
