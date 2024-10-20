@@ -15,7 +15,6 @@ export default function BookingAmenityDetails({ bookedRoom, selectedAmenities }:
   useEffect(() => {
     setAmenities(selectedAmenities)
   }, [selectedAmenities])
-  console.log(amenities.length)
 
   const removeAmenity = (amenityName: string) => {
     setAmenities((prevAmenties) => prevAmenties.filter((amenity) => amenity.name !== amenityName))

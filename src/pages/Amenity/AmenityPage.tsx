@@ -21,6 +21,7 @@ import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
 
+// còn thiếu useContext, bổ sung sau
 export default function AmenityPage() {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
