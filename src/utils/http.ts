@@ -1,6 +1,7 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, HttpStatusCode } from 'axios'
+import { toast } from 'react-toastify'
 import envConfig from '~/constants/config'
-import { AuthResponse } from '~/schemaValidations/auth.schema'
+import { AuthResponse, ErrorResponse } from '~/schemaValidations/auth.schema'
 import {
   clearLS,
   getAccessTokenFromLS,
@@ -9,6 +10,7 @@ import {
   setAccountToLS,
   setRefreshTokenToLS
 } from '~/utils/auth'
+import { isAxiosUnauthorizedError } from '~/utils/utils'
 
 export class Http {
   instance: AxiosInstance
@@ -21,14 +23,13 @@ export class Http {
       baseURL: envConfig.VITE_API_ENDPOINT,
       timeout: 10000,
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: this.accessToken ? `Bearer ${this.accessToken}` : ''
+        'Content-Type': 'application/json'
       }
     })
 
     this.instance.interceptors.request.use(
       (config) => {
-        if (this.accessToken && config.headers) {
+        if (this.accessToken && config.headers && config.url !== '/auth/refresh-token') {
           config.headers.Authorization = `Bearer ${this.accessToken}`
           return config
         }
@@ -58,6 +59,30 @@ export class Http {
         return response
       },
       (error) => {
+        //Chỉ toast lỗi không phải 422 và 401
+        if (
+          ![HttpStatusCode.UnprocessableEntity, HttpStatusCode.Unauthorized].includes(error.response?.status as number)
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const data: any | undefined = error.response?.data
+          const message = data?.message || error.message
+          toast.error(message)
+        }
+        // Lỗi Unauthorized (401) có rất nhiều trường hợp
+        // - Token không đúng
+        // - Không truyền token
+        // - Token hết hạn*
+
+        //Nếu là lỗi 401
+        if (isAxiosUnauthorizedError<ErrorResponse<{ name: string; message: string }>>(error)) {
+          const config = error.response?.config || { headers: {}, url: '' }
+          const { url } = config
+          // Trường hợp Token hết hạn và request đó không phải là của request refresh token
+          // Tiến hành qua page refresh token
+          if (url !== '/auth/refresh-token') {
+            window.location.href = `/refresh-token?refreshToken=${this.refreshToken}&redirect=/`
+          }
+        }
         return Promise.reject(error)
       }
     )
