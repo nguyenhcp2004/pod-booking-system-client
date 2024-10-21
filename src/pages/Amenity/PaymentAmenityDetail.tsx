@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
-import QRCodePayment from '~/components/QRCodePayment/QRCodePayment'
+import QRCodePaymentAmenity from '~/components/QRCodePayment/QRCodePaymentAmenity'
 
 export const PaymentAmenityDetail: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ export const PaymentAmenityDetail: React.FC = () => {
           </Grid>
           <Grid size={{ xs: 12, lg: 6 }} sx={{ paddingLeft: '12px' }}>
             <Box>
-              <QRCodePayment />
+              <QRCodePaymentAmenity />
             </Box>
           </Grid>
         </Grid>

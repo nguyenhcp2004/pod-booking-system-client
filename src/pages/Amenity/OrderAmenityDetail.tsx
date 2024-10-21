@@ -17,7 +17,6 @@ export default function OrderAmenityDetail() {
   const { step } = useParams()
   const location = useLocation()
   const initialStep = Number(step) || 1
-  console.log('initialStep', initialStep)
   const [activeStep, setActiveStep] = useState<number>(initialStep)
   const queryParams = useMemo(() => new URLSearchParams(window.location.search), [])
   const colors = tokens('light')
@@ -75,7 +74,7 @@ export default function OrderAmenityDetail() {
 
   const handleBack = () => {
     if (activeStep > 1) {
-      navigate(`/order-detail/${activeStep - 1}`)
+      navigate(`/order-amenity-detail/${activeStep - 1}`)
       setActiveStep((prevActiveStep) => prevActiveStep - 1)
     }
   }
