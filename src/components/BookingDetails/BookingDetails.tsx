@@ -1,6 +1,7 @@
 import { Box, Typography, Divider, useTheme, Avatar } from '@mui/material'
 import { useBookingContext } from '~/contexts/BookingContext'
 import RoomAmenitiesCard from './RoomAmenitiesCard'
+import { calTotalPrice } from '~/utils/order'
 
 const BookingDetails = () => {
   const bookingContext = useBookingContext()
@@ -9,22 +10,6 @@ const BookingDetails = () => {
   const theme = useTheme()
 
   if (!bookingData) return null
-
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
-
-  const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    ) || 0
-  )
-
-  let discount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
-  }
 
   const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
   const removeAmenity = (amenity: string) => {
@@ -101,15 +86,17 @@ const BookingDetails = () => {
                 <Typography variant='body2' fontWeight='bold'>
                   Gói:
                 </Typography>
-                <Typography variant='body2'>{bookingData.servicePackage?.name}</Typography>
+                <Typography variant='body2'>
+                  {bookingData.servicePackage?.name} ({calTotalPrice(bookingData).packageRepeat} ngày)
+                </Typography>
               </Box>
             </Box>
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
           {roomHaveAmenities > 0 && (
-            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Tiện ích bạn đã chọn
+            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main} fontWeight='bold'>
+              Dịch vụ bạn đã chọn
             </Typography>
           )}
           {bookingData.selectedRooms.map((room, index) => {
@@ -130,23 +117,23 @@ const BookingDetails = () => {
             Tổng giá các phòng:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {roomTotal.toLocaleString()} VND
+            {calTotalPrice(bookingData).totalRoomPrice.toLocaleString()} VND
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Tổng giá các tiện ích:
+            Tổng giá các dịch vụ:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {amenitiesTotal.toLocaleString()} VND
+            {calTotalPrice(bookingData).totalAmenitiesPrice.toLocaleString()} VND
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Điscount:
+            Giảm giá: ({bookingData.servicePackage?.name} {bookingData.servicePackage?.discountPercentage}%)
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {discount.toLocaleString()} VND
+            {calTotalPrice(bookingData).discount.toLocaleString()} VND
           </Typography>
         </Box>
       </Box>
@@ -156,7 +143,7 @@ const BookingDetails = () => {
           Tổng đơn:
         </Typography>
         <Typography variant='subtitle2' fontWeight='bold'>
-          {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
+          {calTotalPrice(bookingData).total.toLocaleString()} VND
         </Typography>
       </Box>
     </Box>

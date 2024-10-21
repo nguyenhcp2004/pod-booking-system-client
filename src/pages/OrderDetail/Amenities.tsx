@@ -14,6 +14,7 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
+import { calTotalPrice } from '~/utils/order'
 
 interface CommonProps {
   onNext: () => void
@@ -103,29 +104,44 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
   const handleIncrement = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
-      if (detailAmenity.quantity < quantity + 1) {
-        setErrorState('Số lượng tiện ích không đủ')
-        return
-      }
-      if (detailAmenity.type === 'Office') {
-        const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
-        const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
-        console.log(preAmennity)
-        if (preAmennity.length > 0) {
-          if (preAmennity[0].quantity + quantity >= 2) {
-            setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
+      const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
+      const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
+      console.log(newQuantityApplyPackage, detailAmenity.quantity, preAmennity.length)
+      if (preAmennity.length > 0) {
+        if (
+          detailAmenity.quantity <
+          newQuantityApplyPackage + preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat
+        ) {
+          setErrorState('Số lượng tiện ích không đủ')
+          return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (
+            (preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat + newQuantityApplyPackage) /
+              calTotalPrice(bookingData).packageRepeat >=
+            2
+          ) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
             return
           }
           setErrorState(null)
           setQuantity((prevQuantity) => prevQuantity + 1)
           return
         }
-        if (quantity >= 2) {
-          setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      } else {
+        if (detailAmenity.quantity < newQuantityApplyPackage) {
+          setErrorState('Số lượng tiện ích không đủ')
           return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (newQuantityApplyPackage / calTotalPrice(bookingData).packageRepeat >= 3) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
+            return
+          }
         }
       }
       setErrorState(null)

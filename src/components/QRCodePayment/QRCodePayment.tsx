@@ -9,6 +9,7 @@ import SockJS from 'sockjs-client'
 import { toast } from 'react-toastify'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
+import { calTotalPrice } from '~/utils/order'
 
 const QRCodePayment = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
@@ -18,24 +19,6 @@ const QRCodePayment = () => {
   const bookingContext = useBookingContext()
   const bookingData = bookingContext?.bookingData
   const theme = useTheme()
-
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
-
-  const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    ) || 0
-  )
-
-  let discountAmount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discountAmount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
-  }
-  const total = roomTotal + amenitiesTotal - discountAmount
-  const grandTotal = Math.floor(total)
 
   const { mutate: createPaymentUrl } = useMutation({
     mutationFn: async (amount: number) => {
@@ -78,7 +61,11 @@ const QRCodePayment = () => {
 
   useEffect(() => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    if (bookingData) {
+      if (bookingData) {
+        createPaymentUrl(calTotalPrice(bookingData).total)
+      }
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -92,11 +79,13 @@ const QRCodePayment = () => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [grandTotal, createPaymentUrl])
+  }, [bookingData, createPaymentUrl])
+
+  if (!bookingData) return null
 
   const handleReload = () => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    createPaymentUrl(calTotalPrice(bookingData).total)
     setTimeLeft(15 * 60)
     setShowReload(false)
   }
@@ -164,7 +153,7 @@ const QRCodePayment = () => {
       )}
 
       <Typography variant='subtitle1' color={theme.palette.primary.main} fontWeight='bold'>
-        {grandTotal.toLocaleString()} VND
+        {calTotalPrice(bookingData).total.toLocaleString()} VND
       </Typography>
     </Box>
   )

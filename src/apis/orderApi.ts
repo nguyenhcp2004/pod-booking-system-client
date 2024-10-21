@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
 import http from '~/utils/http'
-import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/orderUtils'
+import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
 
 export enum OrderStatus {
   Pending = 'Pending',

@@ -31,7 +31,7 @@ const RoomAmenitiesCard: React.FC<{ room: RoomContextType; removeAmenity: (ameni
             </Typography>
             <Box sx={{ flex: 1 }} display='flex' justifyContent='flex-end' gap='5px'>
               <Typography variant='subtitle2' fontWeight='bold'>
-                {amenity.price} VND
+                {amenity.price.toLocaleString()} VND
               </Typography>
               {location.pathname == '/order-detail/1' && (
                 <ClearIcon

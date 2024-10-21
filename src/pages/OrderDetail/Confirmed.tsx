@@ -10,6 +10,7 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
 import { useGetMe } from '~/queries/useAccount'
+import { calTotalPrice } from '~/utils/order'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -85,16 +86,6 @@ export const Confirmed: React.FC = () => {
   const bookingData = bookingContext?.bookingData
   if (!bookingData) return null
 
-  const roomTotal = Math.round((bookingData?.roomType?.price ?? 0) * bookingData.selectedRooms.length || 0)
-  const amenitiesTotal = Math.round(
-    bookingData.selectedRooms.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    )
-  )
-  const discount =
-    Math.round(((bookingData?.servicePackage?.discountPercentage ?? 0) * (roomTotal + amenitiesTotal)) / 100) || 0
-
   return (
     <Box sx={{ marginX: '104px' }}>
       <Helmet>
@@ -134,7 +125,7 @@ export const Confirmed: React.FC = () => {
                     Tổng đơn
                   </Typography>
                   <Typography variant='subtitle2' fontWeight='bold'>
-                    {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
+                    {calTotalPrice(bookingData).total.toLocaleString()} VND
                   </Typography>
                 </Box>
                 <Divider />
@@ -188,7 +179,7 @@ export const Confirmed: React.FC = () => {
           </Box>
         </Box>
         <Box display='flex' justifyContent='flex-end' gap='10px' sx={{ mr: '38px' }}>
-          <Button variant='outlined'>Hủy đơn hàng</Button>
+          {/* <Button variant='outlined'>Hủy đơn hàng</Button> */}
           <Button variant='contained' onClick={handleReturn}>
             Trở về trang chủ
           </Button>
