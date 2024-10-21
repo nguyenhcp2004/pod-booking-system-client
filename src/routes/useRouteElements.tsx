@@ -49,10 +49,6 @@ export default function useRouteElements() {
           element: <RoomDetails />
         },
         {
-          path: '/amenity',
-          element: <AmenityPage />
-        },
-        {
           path: '/refresh-token',
           element: <RefreshToken />
         }

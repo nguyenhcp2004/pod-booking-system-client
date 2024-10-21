@@ -38,6 +38,7 @@ const ServicePackage = z.object({
 
 const BookedRoomSchema = z.object({
   id: z.number(),
+  orderDetailId: z.string(),
   name: z.string(),
   description: z.string(),
   image: z.string(),

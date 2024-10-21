@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 const OrderDetailAmenityBody = z.object({
-  quanity: z.number(),
+  quantity: z.number(),
   price: z.number(),
   orderDetailId: z.string(),
   amenityId: z.number()
