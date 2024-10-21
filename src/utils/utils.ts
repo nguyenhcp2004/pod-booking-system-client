@@ -23,6 +23,10 @@ export function isAxiosUnprocessableEntityError<FormError>(error: unknown): erro
   return isAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity
 }
 
+export function isAxiosUnauthorizedError<UnauthorizedError>(error: unknown): error is AxiosError<UnauthorizedError> {
+  return isAxiosError(error) && error.response?.status === HttpStatusCode.Unauthorized
+}
+
 export const checkAndRefreshToken = async (param?: {
   onSuccess?: () => void
   onError?: () => void
