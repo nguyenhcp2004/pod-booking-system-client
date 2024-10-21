@@ -5,6 +5,8 @@ import Table from '~/components/Table/Table'
 import { useGetListAmenityOrders } from '~/queries/useOrderDetailAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { formatCurrency } from '~/utils/currency'
+import AmenityOrderModal from './AmenityOrderModal'
+import { ACTION } from '~/constants/mock'
 
 const ManageAmenityOrders = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -63,7 +65,7 @@ const ManageAmenityOrders = () => {
       width: 100,
       cellClassName: 'actions',
       getActions: ({ row }) => {
-        return []
+        return [<AmenityOrderModal row={row} refetch={refetch} action={ACTION.UPDATE} />]
       }
     }
   ]
@@ -71,7 +73,7 @@ const ManageAmenityOrders = () => {
   const Toolbar = () => {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        {/* <RoomModal
+        <AmenityOrderModal
           row={{
             id: 1,
             name: '',
@@ -98,7 +100,7 @@ const ManageAmenityOrders = () => {
           }}
           refetch={refetch}
           action={ACTION.CREATE}
-        /> */}
+        />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )

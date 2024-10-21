@@ -62,7 +62,7 @@ export default function ManageRoom() {
       headerName: 'ID',
       width: 50
     },
-    { field: 'name', headerName: 'Tên', width: 150 },
+    { field: 'name', headerName: 'Tên' },
     {
       field: 'description',
       headerName: 'Mô tả',
@@ -72,7 +72,7 @@ export default function ManageRoom() {
     {
       field: 'image',
       headerName: 'Ảnh',
-      width: 150,
+
       renderCell: (params: GridRenderCellParams) => (
         <img
           src={params.value as string}
@@ -84,21 +84,21 @@ export default function ManageRoom() {
     {
       field: 'roomType',
       headerName: 'Loại phòng',
-      width: 150,
+
       valueGetter: (value: RoomType) => value?.name
     },
     {
       field: 'status',
       headerName: 'Trạng thái',
-      width: 150,
+
       type: 'singleSelect',
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
       )
     },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150 },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150 },
+    { field: 'createdAt', headerName: 'Thời gian tạo' },
+    { field: 'updatedAt', headerName: 'Thời gian cập nhật' },
     {
       field: 'actions',
       type: 'actions',
