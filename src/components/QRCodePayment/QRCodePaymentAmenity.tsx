@@ -15,8 +15,6 @@ const QRCodePaymentAmenity = () => {
   const { bookedRoom, calculateTotal } = useBookingAmenityContext()
   const theme = useTheme()
 
-  console.log(paymentUrl)
-
   const total = calculateTotal() * 1000
 
   const { mutate: createPaymentUrl } = useMutation({
@@ -24,12 +22,11 @@ const QRCodePaymentAmenity = () => {
       const paymentRequest = {
         amount: amount,
         orderId: bookedRoom?.orderId.toString() || '',
-        returnUrl: import.meta.env.VITE_VNPAY_RETURN_URL as string
+        returnUrl: import.meta.env.VITE_VNPAY_RETURN_URL_AMENITY as string
       }
       return await generatePaymentUrl(paymentRequest)
     },
     onSuccess: (data) => {
-      console.log(data)
       setPaymentUrl(data.url)
       setLoading(false)
     },
