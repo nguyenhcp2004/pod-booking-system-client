@@ -5,7 +5,7 @@ import Table from '~/components/Table/Table'
 import { useGetListAmenityOrders } from '~/queries/useOrderDetailAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { formatCurrency } from '~/utils/currency'
-import AmenityOrderModal from './AmenityOrderModal'
+import AmenityOrderModal from './AddModal'
 import { ACTION } from '~/constants/mock'
 
 const ManageAmenityOrders = () => {
@@ -44,6 +44,8 @@ const ManageAmenityOrders = () => {
       width: 50
     },
     { field: 'orderId', headerName: 'Mã đơn', width: 150 },
+    { field: 'room', headerName: 'Phòng', width: 150 },
+    { field: 'customer', headerName: 'Khách hàng', width: 200 },
     { field: 'amenity', headerName: 'Tên tiện ích', width: 150, valueGetter: (value: AmenityType) => value?.name },
 
     { field: 'quantity', headerName: 'Số lượng', width: 150 },
@@ -73,34 +75,7 @@ const ManageAmenityOrders = () => {
   const Toolbar = () => {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <AmenityOrderModal
-          row={{
-            id: 1,
-            name: '',
-            description: '',
-            image: '',
-            roomType: {
-              name: '',
-              id: 0,
-              quantity: 0,
-              capacity: 0,
-              building: {
-                status: '',
-                createdAt: '',
-                updatedAt: '',
-                address: '',
-                id: 0,
-                description: '',
-                hotlineNumber: ''
-              }
-            },
-            status: 'Available',
-            createdAt: '2021-09-01',
-            updatedAt: '2021-09-01'
-          }}
-          refetch={refetch}
-          action={ACTION.CREATE}
-        />
+        <AmenityOrderModal refetch={refetch} action={ACTION.CREATE} />
         <GridToolbarQuickFilter />
       </GridToolbarContainer>
     )

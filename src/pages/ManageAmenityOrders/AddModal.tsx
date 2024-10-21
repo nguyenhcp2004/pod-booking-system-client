@@ -5,30 +5,34 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField
+  Typography,
+  useTheme
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
+
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { ACTION } from '~/constants/mock'
 import { AmenityOrderType } from '~/schemaValidations/amenityOrder.schema'
+import { tokens } from '~/themes/theme'
 import { handleErrorApi } from '~/utils/utils'
+import AddAmenity from './AddAmenity'
+import BookingDetails from './BookingDetails'
+import { BookingInfo } from '~/contexts/BookingContext'
 
 const AmenityOrderModal = ({
   row,
   refetch,
   action
 }: {
-  row: AmenityOrderType
+  row?: AmenityOrderType
   refetch: () => void
   action: string
 }) => {
+  const theme = useTheme()
+  const colors = tokens(theme.palette.mode)
   const [open, setOpen] = useState(false)
   const handleClickOpen = () => {
     setOpen(true)
@@ -37,7 +41,13 @@ const AmenityOrderModal = ({
   const handleClose = () => {
     setOpen(false)
   }
-
+  const [bookingData, setBookingData] = useState<BookingInfo>({
+    roomType: null,
+    selectedRooms: [],
+    date: null,
+    timeSlots: [],
+    servicePackage: null
+  })
   return (
     <>
       {action === ACTION.UPDATE ? (
@@ -55,7 +65,10 @@ const AmenityOrderModal = ({
         fullWidth
         PaperProps={{
           sx: {
-            position: 'relative'
+            position: 'relative',
+            background: colors.grey[50],
+            minWidth: 1200,
+            display: 'flex'
           },
           component: 'form',
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
@@ -83,15 +96,40 @@ const AmenityOrderModal = ({
         }}
       >
         <BackdropCustom loading={false} />
-        <DialogTitle>{action === ACTION.CREATE ? 'Tạo phòng' : 'Chỉnh sửa ' + row?.name}</DialogTitle>
-        <DialogContent></DialogContent>
+        <DialogTitle>
+          <Typography variant='h5' fontWeight='500'>
+            {action === ACTION.CREATE ? 'Tạo đơn tiện ích' : 'Chỉnh sửa đơn'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Grid
+            container
+            spacing={2}
+            sx={{
+              borderRadius: 2,
+              width: '100%'
+            }}
+          >
+            <Grid size={6}>
+              <AddAmenity bookingData={bookingData} setBookingData={setBookingData} />
+            </Grid>
+            <Grid size={6}>
+              <BookingDetails bookingData={bookingData} setBookingData={setBookingData} />
+            </Grid>
+          </Grid>
+        </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color='error'>
             Hủy
           </Button>
-          <Button type='submit' color='success'>
-            {action === ACTION.CREATE ? 'Tạo' : 'Lưu'}
-          </Button>
+          {action === ACTION.CREATE ? (
+            <>
+              <Button variant='outlined'>Thanh toán tiền mặt</Button>
+              <Button variant='outlined'>Thanh toán qua thẻ</Button>
+            </>
+          ) : (
+            <Button>Cập nhật</Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
