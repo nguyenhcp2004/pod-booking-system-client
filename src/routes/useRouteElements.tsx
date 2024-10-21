@@ -19,6 +19,7 @@ import ManageRoomType from '~/pages/ManageRoomType'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
+import RefreshToken from '~/pages/RefreshToken/RefreshToken'
 import Register from '~/pages/Register'
 import RoomDetails from '~/pages/RoomDetails/RoomDetails'
 
@@ -51,6 +52,10 @@ export default function useRouteElements() {
         {
           path: '/amenity',
           element: <AmenityPage />
+        },
+        {
+          path: '/refresh-token',
+          element: <RefreshToken />
         }
       ]
     },
