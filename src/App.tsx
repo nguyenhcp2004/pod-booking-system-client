@@ -10,21 +10,25 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import 'moment/locale/en-gb'
 import { BookingProvider } from './contexts/BookingContext'
 import { HelmetProvider } from 'react-helmet-async'
+import { BookingAmenityProvider } from './contexts/BookingAmenityContext'
+
 function App() {
   const routeElements = useRouteElements()
   return (
-    <>
-      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='en-gb'>
-        <HelmetProvider>
-          <ThemeProvider theme={theme}>
-            <BookingProvider>{routeElements}</BookingProvider>
-            <RefreshToken />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='en-gb'>
+      <HelmetProvider>
+        <ThemeProvider theme={theme}>
+          <BookingProvider>
+            <BookingAmenityProvider>
+              {routeElements}
+              <RefreshToken />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </BookingAmenityProvider>
+          </BookingProvider>
           <ToastContainer />
-        </HelmetProvider>
-      </LocalizationProvider>
-    </>
+        </ThemeProvider>
+      </HelmetProvider>
+    </LocalizationProvider>
   )
 }
 

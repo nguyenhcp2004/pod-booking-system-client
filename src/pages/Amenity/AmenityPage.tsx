@@ -19,8 +19,15 @@ import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
+import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
-export default function AmenityPage() {
+interface CommonProps {
+  onNext: () => void
+  onBack: () => void
+}
+
+export const AmenityPage: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [errorState, setErrorState] = useState<string | null>(null)
@@ -33,7 +40,8 @@ export default function AmenityPage() {
   const amenities: AmenityType[] = response?.data.data ?? []
   const allAmenities: AmenityType[] = responseAllAmenities ?? []
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
-  const [selectBookedRooms, setSelectBookedRooms] = useState<BookedRoomSchemaType | null>(null)
+
+  const { bookedRoom, setBookedRoom, selectedAmenities, addAmenity } = useBookingAmenityContext()
 
   useEffect(() => {
     if (selectedAmenityType) {
@@ -44,81 +52,27 @@ export default function AmenityPage() {
   }, [selectedAmenityType, refetch])
 
   const handleAddAmentity = () => {
-    if (!detailAmenity) return
-    if (quantity === 0) {
+    if (!detailAmenity) {
+      setErrorState('Vui lòng chọn tiện ích')
       return
     }
-    // const newAmenity: Amenity = {
-    //   id: detailAmenity?.id,
-    //   name: detailAmenity?.name,
-    //   price: detailAmenity?.price,
-    //   quantity: quantity
-    // }
-    //   setBookingData((prev) => ({
-    //     ...prev,
-    //     selectedRooms: prev.selectedRooms.map((room) => {
-    //       if (room.name === roomType) {
-    //         if (room.amenities.find((item) => item.name === newAmenity.name)) {
-    //           return {
-    //             ...room,
-    //             amenities: room.amenities.map((item) => {
-    //               if (item.name === newAmenity.name) {
-    //                 return {
-    //                   ...item,
-    //                   quantity: item.quantity + newAmenity.quantity
-    //                 }
-    //               }
-    //               return item
-    //             })
-    //           }
-    //         } else {
-    //           return {
-    //             ...room,
-    //             amenities: [...room.amenities, newAmenity]
-    //           }
-    //         }
-    //       }
-    //       return room
-    //     })
-    //   }))
-    //   setErrorState(null)
-    //   setQuantity(0)
-    //   setDetailAmenity(null)
-    //   console.log(bookingData)
-    // }
+    if (quantity === 0) {
+      setErrorState('Vui lòng chọn số lượng')
+      return
+    }
+    if (!bookedRoom) {
+      setErrorState('Vui lòng chọn phòng đã đặt')
+      return
+    }
 
-    //   const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
+    const newAmenity = {
+      ...detailAmenity,
+      quantity: quantity
+    }
 
-    //   const handleIncrement = () => {
-    //     if (!detailAmenity) {
-    //       setErrorState('Vui lòng chọn tiện ích')
-    //       return
-    //     } else {
-    //       if (detailAmenity.quantity < quantity) {
-    //         setErrorState('Số lượng tiện ích không đủ')
-    //         return
-    //       }
-    //       if (detailAmenity.type === 'Office') {
-    //         const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
-    //         const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
-    //         console.log(preAmennity)
-    //         if (preAmennity.length > 0) {
-    //           if (preAmennity[0].quantity + quantity >= 2) {
-    //             setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-    //             return
-    //           }
-    //         setErrorState(null)
-    //         setQuantity((prevQuantity) => prevQuantity + 1)
-    //         return
-    //       }
-    //       if (quantity >= 2) {
-    //         setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-    //         return
-    //       }
-    //     }
-    //     setErrorState(null)
-    //     setQuantity((prevQuantity) => prevQuantity + 1)
-    //   }
+    addAmenity(newAmenity)
+    setQuantity(0)
+    setDetailAmenity(null)
   }
 
   const handleDecrement = () => {
@@ -156,7 +110,7 @@ export default function AmenityPage() {
 
   const handleSelectBookedRoom = (event: SelectChangeEvent<string>) => {
     const selectedRoom = bookedRooms.find((room) => room.startTime === event.target.value)
-    setSelectBookedRooms(selectedRoom || null)
+    setBookedRoom(selectedRoom || null)
   }
 
   // const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
@@ -177,7 +131,7 @@ export default function AmenityPage() {
                   <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
                   <Select
                     labelId='booked-room-label'
-                    value={selectBookedRooms?.startTime || ''}
+                    value={bookedRoom?.startTime || ''}
                     label='Chọn Phòng đã đặt'
                     onChange={handleSelectBookedRoom}
                   >
@@ -352,25 +306,29 @@ export default function AmenityPage() {
           </Box>
         </Grid>
 
-        {/* <Grid size={{ lg: 6 }} sx={{ paddingLeft: '12px' }}>
-          <Box sx={{ background: '#FFF' }}>
-            <Box>
-              <BookingDetails />
+        {bookedRoom && (
+          <Grid size={{ lg: 6 }} sx={{ paddingLeft: '12px' }}>
+            <Box sx={{ background: '#FFF' }}>
+              <Box>
+                <BookingAmenityDetails />
+              </Box>
+              <Box sx={{ width: '100%', padding: '20px' }}>
+                <Button
+                  onClick={props.onNext}
+                  fullWidth
+                  sx={{
+                    background: colors.primary[500],
+                    color: '#FFF',
+                    borderRadius: 'var(--12, 96px)'
+                  }}
+                  disabled={selectedAmenities.length === 0}
+                >
+                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Vui lòng chọn tiện ích'}
+                </Button>
+              </Box>
             </Box>
-            <Box sx={{ width: '100%', padding: '20px' }}>
-              <Button
-                fullWidth
-                sx={{
-                  background: colors.primary[500],
-                  color: '#FFF',
-                  borderRadius: 'var(--12, 96px)'
-                }}
-              >
-                {roomHaveAmenities ? 'Hoàn tất' : 'Bỏ qua'}
-              </Button>
-            </Box>
-          </Box>
-        </Grid> */}
+          </Grid>
+        )}
       </Grid>
     </Box>
   )

@@ -13,6 +13,7 @@ const BuildingSchema = z.object({
 const RoomTypeSchema = z.object({
   id: z.number(),
   name: z.string(),
+  price: z.number(),
   quantity: z.number(),
   capacity: z.number(),
   building: BuildingSchema
@@ -37,6 +38,8 @@ const ServicePackage = z.object({
 
 const BookedRoomSchema = z.object({
   id: z.number(),
+  orderId: z.string(),
+  orderDetailId: z.string(),
   name: z.string(),
   description: z.string(),
   image: z.string(),
