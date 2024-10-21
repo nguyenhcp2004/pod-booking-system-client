@@ -14,16 +14,8 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
-import {
-  Account,
-  Order,
-  OrderStatus,
-  useDeleteOrder,
-  useOrders,
-  useSearchOrder,
-  useStaffAccounts,
-  useUpdateStaff
-} from '~/apis/orderApi'
+import { Account, Order, OrderStatus } from '~/apis/orderApi'
+import { useOrders, useSearchOrder, useStaffAccounts, useUpdateStaff, useDeleteOrder } from '~/queries/useOrder'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNoteIcon from '@mui/icons-material/EditNote'

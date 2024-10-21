@@ -15,7 +15,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import React, { useEffect, useMemo, useState, SetStateAction, Dispatch } from 'react'
-import { useBuilding, useRoomType, useSearchBuilding } from '~/apis/orderApi'
+import { useBuilding, useRoomType, useSearchBuilding } from '~/queries/useOrder'
 import { SLOT } from '~/constants/slot'
 import { Building, Room, RoomTypeFix, ServicePackage } from '~/constants/type'
 import { BookingInfo, RoomContextType, slotType } from '~/contexts/BookingContext'

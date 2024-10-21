@@ -21,7 +21,7 @@ import { ACTION } from '~/constants/mock'
 import { RoomTypeSchemaType } from '~/schemaValidations/roomType.schema'
 import { useCreateRoomType, useUpdateRoomType } from '~/queries/useRoomType'
 import { Building } from '~/constants/type'
-import { useBuilding } from '~/apis/orderApi'
+import { useBuilding } from '~/queries/useOrder'
 import { toast } from 'react-toastify'
 
 const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refetch: () => void; action: string }) => {
