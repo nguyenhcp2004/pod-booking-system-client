@@ -4,7 +4,8 @@ import {
   EditAmenityBodyType,
   CreateAmenityResType,
   CreateAmenityBodyType,
-  AmenityListResType
+  AmenityListResType,
+  DeleteAmenityResType
 } from '~/schemaValidations/amenity.schema'
 import { Pagination } from '~/constants/type'
 import queryString from 'query-string'
@@ -21,7 +22,8 @@ const amenityApiRequest = {
   editAmenity: (body: EditAmenityBodyType) => http.put<CreateAmenityResType>(`/amenity/${body.id}`, body),
   getAmenitiesByType: (amenityType: string) => {
     return http.get<AmenityListResType>(`/amenity/type?type=${amenityType}`)
-  }
-}    
+  },
+  deleteAmenity: (id: number) => http.delete<DeleteAmenityResType>(`/amenity/${id}`)
+}
 
 export default amenityApiRequest

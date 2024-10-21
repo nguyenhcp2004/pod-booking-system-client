@@ -8,7 +8,8 @@ const AmenitySchema = z.object({
   type: z.string(),
   imageUrl: z.string().nullable(),
   createdAt: z.string().nullable(),
-  updatedAt: z.string().nullable()
+  updatedAt: z.string().nullable(),
+  isDeleted: z.number()
 })
 
 export const AmenityListRes = z.object({
@@ -32,7 +33,8 @@ export const GetListAmenityRes = z.object({
       price: z.number(),
       quantity: z.number(),
       type: z.string(),
-      imageUrl: z.string()
+      imageUrl: z.string(),
+      isDeleted: z.number()
     })
   )
 })
@@ -45,7 +47,8 @@ export const CreateAmenityBody = z
     price: z.number(),
     quantity: z.number(),
     type: z.string(),
-    imageUrl: z.string()
+    imageUrl: z.string(),
+    isDeleted: z.number()
   })
   .strict()
 
@@ -60,7 +63,8 @@ export const CreateAmenityRes = z.object({
     price: z.number(),
     quantity: z.number(),
     type: z.string(),
-    imageUrl: z.string()
+    imageUrl: z.string(),
+    isDeleted: z.number()
   })
 })
 
@@ -78,7 +82,8 @@ export const EditAmenityBody = z
     price: z.number(),
     quantity: z.number(),
     type: z.string(),
-    imageUrl: z.string()
+    imageUrl: z.string(),
+    isDeleted: z.number()
   })
   .strict()
 
@@ -93,8 +98,37 @@ export const EditAmenityRes = z.object({
     price: z.number(),
     quantity: z.number(),
     type: z.string(),
-    imageUrl: z.string()
+    imageUrl: z.string(),
+    isDeleted: z.number()
   })
 })
 
 export type EditAmenityResType = z.TypeOf<typeof EditAmenityRes>
+
+export const DeleteAmenityBody = z
+  .object({
+    name: z.string(),
+    price: z.number(),
+    quantity: z.number(),
+    type: z.string(),
+    isDeleted: z.number()
+  })
+  .strict()
+
+export type DeleteAmenityBodyType = z.TypeOf<typeof DeleteAmenityBody>
+
+export const DeleteAmenityRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z
+    .object({
+      name: z.string(),
+      price: z.number(),
+      quantity: z.number(),
+      type: z.string(),
+      isDeleted: z.number()
+    })
+    .nullable()
+})
+
+export type DeleteAmenityResType = z.TypeOf<typeof DeleteAmenityRes>
