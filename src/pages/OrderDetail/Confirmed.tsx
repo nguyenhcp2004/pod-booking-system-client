@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Divider, Typography, useTheme, Backdrop, CircularProgress, Paper } from '@mui/material'
+import { Avatar, Box, Button, Divider, Typography, useTheme, Backdrop, CircularProgress } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -9,51 +9,41 @@ import { createOrder } from '~/apis/orderApi'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
+import { useGetMe } from '~/queries/useAccount'
 
 export const Confirmed: React.FC = () => {
-  const handleReturn = () => {
-    console.log('Back to homepage')
-    localStorage.setItem('bookingData', JSON.stringify({}))
-    navigate('/')
-  }
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
-  const transactionData = location.state?.transactionData
-  const [status, setStatus] = useState<boolean | null>(null)
   const bookingContext = useBookingContext()
+  const transactionData = location.state?.transactionData
+  const { data: userData } = useGetMe()
+  const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
-  console.log(bookingContext)
+
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
 
   const { isLoading } = useQuery({
     queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
     queryFn: async () => {
-      const transactionResponse = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
-      if (!transactionResponse) {
-        throw new Error('No response from API')
-      }
+      const response = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
+      if (!response) throw new Error('No response from API')
 
-      if (transactionResponse.status === 'OK' && orderCreated == 0) {
-        console.log('Order created:', orderCreated)
-        setOrderCreated(orderCreated + 1)
+      if (response.status === 'OK' && orderCreated === 0) {
+        setOrderCreated(1)
         setStatus(true)
-        if (!bookingContext) {
-          throw new Error('Booking context is undefined')
-        }
-        const response = await createOrder(bookingContext.bookingData)
-        console.log('Response request:', response)
+        if (!bookingContext) throw new Error('Booking context is undefined')
 
-        return transactionResponse
+        await createOrder(bookingContext.bookingData)
+        return response
       } else {
-        if (orderCreated == 1) {
-          setStatus(false)
-        }
-        throw new Error(transactionResponse.message || 'Transaction not successful')
+        setStatus(false)
+        throw new Error(response.message || 'Transaction not successful')
       }
     },
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
+
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
 
@@ -77,9 +67,12 @@ export const Confirmed: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingContext])
 
-  if (!transactionData) {
-    return <Box>No order data available.</Box>
+  const handleReturn = () => {
+    localStorage.setItem('bookingData', JSON.stringify({}))
+    navigate('/')
   }
+
+  if (!transactionData) return <Box>No order data available.</Box>
 
   if (isLoading) {
     return (
@@ -88,60 +81,19 @@ export const Confirmed: React.FC = () => {
       </Backdrop>
     )
   }
-  if (status === null) {
-    return (
-      <Paper
-        sx={{
-          marginX: '104px',
-          height: '70vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-          gap: '50px'
-        }}
-      >
-        <Typography variant='h5'>You need create an order</Typography>
-        <Button variant='contained' onClick={handleReturn}>
-          Back to homepage
-        </Button>
-      </Paper>
-    )
-  }
 
   const bookingData = bookingContext?.bookingData
-
   if (!bookingData) return null
 
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
-
+  const roomTotal = Math.round((bookingData?.roomType?.price ?? 0) * bookingData.selectedRooms.length || 0)
   const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
+    bookingData.selectedRooms.reduce(
       (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
       0
-    ) || 0
+    )
   )
-
-  let discount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
-  }
-
-  const bookingInfo = {
-    orderId: '#ABCXYZ',
-    customerName: 'Phạm Thị Anh Đào',
-    totalPrice: roomTotal + amenitiesTotal - discount,
-    roomType: bookingData.roomType?.name || '',
-    pricePerHour: bookingData.roomType?.price || 0,
-    address: bookingData.roomType?.building?.address || '',
-    date: bookingData.date || '',
-    timeSlots: bookingData.timeSlots.join(', '),
-    rooms: bookingData.selectedRooms.map((room) => room.name),
-    package: bookingData.servicePackage?.name || '',
-    imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
-  }
+  const discount =
+    Math.round(((bookingData?.servicePackage?.discountPercentage ?? 0) * (roomTotal + amenitiesTotal)) / 100) || 0
 
   return (
     <Box sx={{ marginX: '104px' }}>
@@ -149,134 +101,97 @@ export const Confirmed: React.FC = () => {
         <title>Xác nhận đặt phòng | POD System</title>
         <meta name='description' content='Xác nhận đặt phòng: Chi tiết đặt phòng của bạn' />
       </Helmet>
-      <Box>
-        <Box
-          sx={{
-            bgcolor: 'white',
-            width: '100%',
-            mx: 'auto',
-            minHeight: '70vh',
-            paddingTop: '108px',
-            paddingBottom: '38px'
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', paddingBottom: '70px' }}>
-            <Box sx={{ width: '40%' }}>
-              {status ? (
-                <Box textAlign='center'>
-                  <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.success.main }} />
-                  <Typography variant='h3' fontWeight='bold' gutterBottom>
-                    Đặt phòng thành công
-                  </Typography>
-                </Box>
-              ) : (
-                <Box textAlign='center'>
-                  <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.error.main }} />
-                  <Typography variant='h3' fontWeight='bold' gutterBottom>
-                    Đặt phòng thất bại
-                  </Typography>
-                </Box>
-              )}
+      <Box
+        sx={{
+          bgcolor: 'white',
+          width: '100%',
+          mx: 'auto',
+          minHeight: '70vh',
+          py: '108px'
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pb: '70px' }}>
+          <Box sx={{ width: '40%', textAlign: 'center' }}>
+            <CheckCircleIcon
+              sx={{ fontSize: 50, color: status ? theme.palette.success.main : theme.palette.error.main }}
+            />
+            <Typography variant='h3' fontWeight='bold' gutterBottom>
+              {status ? 'Đặt phòng thành công' : 'Đặt phòng thất bại'}
+            </Typography>
 
-              <Box sx={{ marginY: '32px' }} textAlign='center'>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-                      Mã đơn
-                    </Typography>
-                    <Typography variant='subtitle2' fontWeight='bold'>
-                      {bookingInfo.orderId}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-                      Tên khách hàng
-                    </Typography>
-                    <Typography variant='subtitle2' fontWeight='bold'>
-                      {bookingInfo.customerName}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-                      Tổng đơn
-                    </Typography>
-                    <Typography variant='subtitle2' fontWeight='bold'>
-                      {bookingInfo.totalPrice.toLocaleString()} VND
-                    </Typography>
-                  </Box>
-                  <Divider />
+            <Box sx={{ my: '32px', textAlign: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant='subtitle2' color={theme.palette.grey[500]}>
+                    Tên khách hàng
+                  </Typography>
+                  <Typography variant='subtitle2' fontWeight='bold'>
+                    {userData?.data?.data?.name}
+                  </Typography>
                 </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant='subtitle2' color={theme.palette.grey[500]}>
+                    Tổng đơn
+                  </Typography>
+                  <Typography variant='subtitle2' fontWeight='bold'>
+                    {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
+                  </Typography>
+                </Box>
+                <Divider />
               </Box>
+            </Box>
 
-              <Box display='flex' gap='20px' alignItems='center' sx={{ padding: '20px' }}>
-                <Avatar
-                  src={bookingInfo.imageSrc}
-                  alt={bookingInfo.roomType}
-                  sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
-                  variant='rounded'
-                />
+            <Box display='flex' gap='20px' alignItems='center' sx={{ p: '20px' }}>
+              <Avatar
+                src={bookingData.selectedRooms[0].image}
+                alt={bookingData.roomType?.name}
+                sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
+                variant='rounded'
+              />
+              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '193px' }}>
+                <Typography variant='h5' fontWeight='bold'>
+                  {bookingData.roomType?.name}
+                </Typography>
+                <Box display='flex' sx={{ mt: '4px' }}>
+                  <Typography variant='subtitle2' color={theme.palette.primary.main}>
+                    {bookingData.roomType?.price.toLocaleString()} VND
+                  </Typography>
+                  <Typography variant='subtitle2'>/tiếng</Typography>
+                </Box>
                 <Box
                   sx={{
-                    minHeight: '193px',
+                    mt: '12px',
                     display: 'flex',
-                    justifyContent: 'flex-start',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    gap: '12px',
+                    alignItems: 'flex-start'
                   }}
-                  id='hi'
                 >
-                  <Typography variant='h5' fontWeight='bold'>
-                    {bookingInfo.roomType}
+                  <Typography variant='body2'>
+                    <b>Địa chỉ:</b> {bookingData.roomType?.building?.address}
                   </Typography>
-                  <Box display='flex' sx={{ marginTop: '4px' }}>
-                    <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                      {bookingInfo.pricePerHour.toLocaleString()} VND
-                    </Typography>
-                    <Typography variant='subtitle2'>/tiếng</Typography>
-                  </Box>
-                  <Box sx={{ marginTop: '12px' }} flexDirection='column' display='flex' gap='12px'>
-                    <Box display='flex' gap='3px'>
-                      <Typography variant='body2' fontWeight='bold'>
-                        Địa chỉ:
-                      </Typography>
-                      <Typography variant='body2'> {bookingInfo.address}</Typography>
-                    </Box>
-                    <Box display='flex' gap='3px'>
-                      <Typography variant='body2' fontWeight='bold'>
-                        Ngày:
-                      </Typography>
-                      <Typography variant='body2'>{bookingInfo.date}</Typography>
-                    </Box>
-
-                    <Box display='flex' gap='3px'>
-                      <Typography variant='body2' fontWeight='bold'>
-                        Slot:
-                      </Typography>
-                      <Typography variant='body2'>{bookingInfo.timeSlots}</Typography>
-                    </Box>
-                    <Box display='flex' gap='3px'>
-                      <Typography variant='body2' fontWeight='bold'>
-                        Phòng:
-                      </Typography>
-                      <Typography variant='body2'>{bookingInfo.rooms.join(', ')}</Typography>
-                    </Box>
-                    <Box display='flex' gap='3px'>
-                      <Typography variant='body2' fontWeight='bold'>
-                        Gói:
-                      </Typography>
-                      <Typography variant='body2'>{bookingInfo.package}</Typography>
-                    </Box>
-                  </Box>
+                  <Typography variant='body2'>
+                    <b>Ngày:</b> {bookingData.date}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <b>Slot:</b> {bookingData.timeSlots}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <b>Phòng:</b> {bookingData.selectedRooms.map((room) => room.name).join(', ')}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <b>Gói:</b> {bookingData.servicePackage?.name}
+                  </Typography>
                 </Box>
               </Box>
             </Box>
           </Box>
-          <Box display='flex' justifyContent='flex-end' gap='10px' sx={{ marginRight: '38px' }}>
-            <Button variant='outlined'>Add amenities</Button>
-            <Button variant='outlined'>Cancel booking</Button>
-            <Button variant='contained' onClick={handleReturn}>
-              Back to homepage
-            </Button>
-          </Box>
+        </Box>
+        <Box display='flex' justifyContent='flex-end' gap='10px' sx={{ mr: '38px' }}>
+          <Button variant='outlined'>Hủy đơn hàng</Button>
+          <Button variant='contained' onClick={handleReturn}>
+            Trở về trang chủ
+          </Button>
         </Box>
       </Box>
     </Box>
