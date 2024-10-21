@@ -47,15 +47,14 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
     try {
       if (action === ACTION.UPDATE) {
         await updateRoomMutation.mutateAsync({ updateData: payload, roomTypeId: row.id })
-        toast.success('Cập nhật phòng thành công')
+        toast.success('Cập nhật loại phòng thành công')
       } else {
         await createRoomMutation.mutateAsync(payload)
-        toast.success('Tạo phòng thành công')
+        toast.success('Tạo thêm loại phòng mới thành công')
       }
       refetch()
     } catch (error) {
-      console.error('Error handling room type:', error)
-      toast.error('Có lỗi xảy ra, vui lòng thử lại')
+      toast.error('Có lỗi xảy ra, vui lòng thử lại: ' + error)
     } finally {
       setLoading(false)
       handleClose()
@@ -70,7 +69,7 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
         </IconButton>
       ) : (
         <Button color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
-          Thêm phòng
+          Thêm loại phòng
         </Button>
       )}
       <Dialog open={open} onClose={handleClose} fullWidth PaperProps={{ component: 'form', onSubmit: handleSubmit }}>

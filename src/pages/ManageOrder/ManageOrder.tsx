@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
-import {
-  Chip,
-  Select,
-  MenuItem,
-  Box,
-  Typography,
-  useTheme,
-  Backdrop,
-  CircularProgress,
-  Button,
-  TextField
-} from '@mui/material'
+import { Chip, Select, MenuItem, Box, Typography, useTheme, Button, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
@@ -47,12 +36,13 @@ export default function ManageOrder() {
   const [searchProcess, setSearchProcess] = useState<string>('')
   const theme = useTheme()
 
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
   const [createMode, setCreateMode] = useState<boolean>(false)
   const [editMode, setEditMode] = useState<boolean>(false)
   const [viewMode, setViewMode] = useState<boolean>(false)
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
 
@@ -77,11 +67,12 @@ export default function ManageOrder() {
 
   const {
     data: orderData,
-    isLoading: isOrderLoading,
-    error: orderError
+    error: orderError,
+    refetch,
+    isFetching
   } = useOrders(formattedStartDate, formattedEndDate, currentPage, pageSize)
-  const { data: searchData, isLoading: isSearchLoading } = useSearchOrder(searchKeyword, currentPage, pageSize)
-  const { data: staffData, isLoading: isStaffLoading, error: staffError } = useStaffAccounts()
+  const { data: searchData, isFetching: isSearchFetching } = useSearchOrder(searchKeyword, currentPage, pageSize)
+  const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
 
   //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
@@ -105,6 +96,7 @@ export default function ManageOrder() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
   useEffect(() => {
     if (orderData) {
       const rowsData = orderData.data.data.map(mapOrderToRow)
@@ -349,12 +341,6 @@ export default function ManageOrder() {
 
   return (
     <Box sx={{ width: '100%', height: 600 }}>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isOrderLoading || isStaffLoading || isSearchLoading}
-      >
-        <CircularProgress color='inherit' />
-      </Backdrop>
       <Typography variant='h5' sx={{ marginBottom: '10px' }}>
         Quản lý đơn hàng
       </Typography>
@@ -402,8 +388,9 @@ export default function ManageOrder() {
           setPageSize(newPaginationModel.pageSize)
         }}
         slots={{ toolbar: Toolbar }}
+        loading={isFetching || isSearchFetching || isStaffFetching}
       />
-      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} />
+      <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} refetch={refetch} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
       <EditOrderModal
         open={editMode}

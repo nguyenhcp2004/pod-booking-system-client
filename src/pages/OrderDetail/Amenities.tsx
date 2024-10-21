@@ -110,13 +110,12 @@ export const Amenities: React.FC<CommonProps> = (props) => {
       const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
       const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
       const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
-      console.log(newQuantityApplyPackage, detailAmenity.quantity, preAmennity.length)
       if (preAmennity.length > 0) {
         if (
           detailAmenity.quantity <
           newQuantityApplyPackage + preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat
         ) {
-          setErrorState('Số lượng tiện ích không đủ')
+          setErrorState('Số lượng dịch vụ không đủ')
           return
         }
         if (detailAmenity.type === 'Office') {
@@ -134,7 +133,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
         }
       } else {
         if (detailAmenity.quantity < newQuantityApplyPackage) {
-          setErrorState('Số lượng tiện ích không đủ')
+          setErrorState('Số lượng dịch vụ không đủ')
           return
         }
         if (detailAmenity.type === 'Office') {
@@ -174,7 +173,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
         <title>Đặt dịch vụ | POD System</title>
         <meta
           name='description'
-          content='Đặt thêm tiện ích: Nâng cao trải nghiệm phòng với đồ ăn, bàn ghế và hơn thế nữa'
+          content='Đặt thêm dịch vụ: Nâng cao trải nghiệm phòng với đồ ăn, bàn ghế và hơn thế nữa'
         />
       </Helmet>
       <Grid container spacing={2}>
@@ -206,11 +205,11 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+                  <InputLabel id='amenities-label'>Chọn loại dịch vụ</InputLabel>
                   <Select
                     labelId='amenities-label'
                     value={selectedAmenity || ''}
-                    label='Chọn loại tiện ích'
+                    label='Chọn loại dịch vụ'
                     onChange={(e) => {
                       setSelectedAmenity(e.target.value)
                     }}
@@ -226,7 +225,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
               <Box sx={{ padding: '49px 0px 29px 0px' }}>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
-                  Danh sách tiện ích
+                  Danh sách dịch vụ
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 0' }}>
                   {filteredAmenities.map((item, index) => (
@@ -347,7 +346,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   }}
                   onClick={() => handleAddAmentity()}
                 >
-                  Thêm tiện ích
+                  Thêm dịch vụ
                 </Button>
               </Box>
             </Box>
