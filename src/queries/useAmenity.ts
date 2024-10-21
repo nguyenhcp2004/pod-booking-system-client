@@ -50,7 +50,7 @@ export const useGetAmenitiesByType = (amenityType: string) => {
 export const useDeleteAmenityMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => amenityApiRequest.deleteAmenity(id), // Call deleteAmenity with only id
+    mutationFn: (id: number) => amenityApiRequest.deleteAmenity(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['amenity'] })
     }

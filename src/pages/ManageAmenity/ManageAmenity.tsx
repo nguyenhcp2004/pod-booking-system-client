@@ -56,7 +56,7 @@ export default function ManageBuilding() {
 
   useEffect(() => {
     refetch()
-  }, [paginationModel])
+  }, [paginationModel, refetch])
 
   const handleToggleStatus = (id: GridRowId) => async () => {
     const rowToToggle = rows.find((row) => row.id === id)

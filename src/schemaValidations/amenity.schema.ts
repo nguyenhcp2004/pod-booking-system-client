@@ -9,7 +9,8 @@ const AmenitySchema = z.object({
   imageUrl: z.string().nullable(),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),
-  isDeleted: z.number()
+  isDeleted: z.number(),
+  buildingNumber: z.number()
 })
 
 export const AmenityListRes = z.object({
