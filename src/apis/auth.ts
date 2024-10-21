@@ -16,12 +16,14 @@ const authApiRequest = {
     data: RefreshTokenResType
   }> | null,
   login: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
-  refreshToken(body: RefreshTokenBodyType) {
+  async refreshToken(body: RefreshTokenBodyType) {
     if (this.refreshTokenRequest) {
       return this.refreshTokenRequest
     }
     this.refreshTokenRequest = http.post<RefreshTokenResType>('/auth/refresh-token', body)
-    return this.refreshTokenRequest
+    const result = await this.refreshTokenRequest
+    this.refreshTokenRequest = null
+    return result
   },
   logout: (body: LogoutBodyType) => http.post<LogoutResType>('/auth/logout', body)
 }
