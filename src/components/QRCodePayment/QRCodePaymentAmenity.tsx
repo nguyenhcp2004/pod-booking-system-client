@@ -38,7 +38,7 @@ const QRCodePaymentAmenity = () => {
 
   useEffect(() => {
     setLoading(true)
-    createPaymentUrl(total)
+    createPaymentUrl(Math.floor(total))
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
