@@ -4,7 +4,7 @@ import { AppContext } from '~/contexts/AppProvider'
 import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
-import AmenityPage from '~/pages/Amenity'
+import OrderAmenityDetail from '~/pages/Amenity'
 import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
 import HistoryOrders from '~/pages/HistoryOrders'
@@ -47,10 +47,6 @@ export default function useRouteElements() {
         {
           path: '/room-details/:id',
           element: <RoomDetails />
-        },
-        {
-          path: '/amenity',
-          element: <AmenityPage />
         },
         {
           path: '/refresh-token',
@@ -135,6 +131,10 @@ export default function useRouteElements() {
             {
               path: '/history-orders',
               element: <HistoryOrders />
+            },
+            {
+              path: '/order-amenity-detail/:step?',
+              element: <OrderAmenityDetail />
             }
           ]
         }

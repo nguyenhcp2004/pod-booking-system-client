@@ -13,6 +13,7 @@ const BuildingSchema = z.object({
 const RoomTypeSchema = z.object({
   id: z.number(),
   name: z.string(),
+  price: z.number(),
   quantity: z.number(),
   capacity: z.number(),
   building: BuildingSchema
@@ -37,6 +38,8 @@ const ServicePackage = z.object({
 
 const BookedRoomSchema = z.object({
   id: z.number(),
+  orderId: z.string(),
+  orderDetailId: z.string(),
   name: z.string(),
   description: z.string(),
   image: z.string(),
@@ -47,7 +50,7 @@ const BookedRoomSchema = z.object({
   roomType: RoomTypeSchema
 })
 
-const BookedRoomSchemaRes = z.object({
+export const BookedRoomSchemaRes = z.object({
   code: z.number(),
   data: z.array(BookedRoomSchema),
   messsage: z.string()
@@ -59,7 +62,7 @@ export type BookedRoomSchemaType = z.TypeOf<typeof BookedRoomSchema>
 
 export type BookedRoomSchemaResType = z.TypeOf<typeof BookedRoomSchemaRes>
 
-const FilterRoomByTypeAndSlotsQuery = z.object({
+export const FilterRoomByTypeAndSlotsQuery = z.object({
   typeId: z.number(),
   slots: z.array(z.string())
 })
@@ -92,7 +95,7 @@ export const RoomCustomSchema = z.object({
   slots: z.array(SlotCustomSchema)
 })
 
-const RoomCustomArraySchema = z.array(RoomCustomSchema)
+export const RoomCustomArraySchema = z.array(RoomCustomSchema)
 
 export type RoomCustomArraySchemaType = z.TypeOf<typeof RoomCustomArraySchema>
 
