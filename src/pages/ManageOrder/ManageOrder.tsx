@@ -70,8 +70,12 @@ export default function ManageOrder() {
     error: orderError,
     refetch,
     isFetching
-  } = useOrders(formattedStartDate, formattedEndDate, currentPage, pageSize)
-  const { data: searchData, isFetching: isSearchFetching } = useSearchOrder(searchKeyword, currentPage, pageSize)
+  } = useOrders({ startDate: formattedStartDate, endDate: formattedEndDate, page: currentPage, size: pageSize })
+  const { data: searchData, isFetching: isSearchFetching } = useSearchOrder({
+    keyword: searchKeyword,
+    page: currentPage,
+    size: pageSize
+  })
   const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
 

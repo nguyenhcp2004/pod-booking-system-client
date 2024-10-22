@@ -122,7 +122,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
           if (
             (preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat + newQuantityApplyPackage) /
               calTotalPrice(bookingData).packageRepeat >=
-            2
+            3
           ) {
             setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
             return

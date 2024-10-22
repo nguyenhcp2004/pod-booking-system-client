@@ -62,9 +62,7 @@ const QRCodePayment = () => {
   useEffect(() => {
     setLoading(true)
     if (bookingData) {
-      if (bookingData) {
-        createPaymentUrl(calTotalPrice(bookingData).total)
-      }
+      createPaymentUrl(calTotalPrice(bookingData).total)
     }
 
     const timer = setInterval(() => {

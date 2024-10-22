@@ -34,8 +34,8 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
       return
     } else {
       const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
-      const selecRoom = bookingData.selectedRooms.filter((room1) => room1.name === room)[0]
-      const preAmennity = selecRoom.amenities.filter((item) => item.name === detailAmenity.name)
+      const selectedRoom = bookingData.selectedRooms.filter((item) => item.name === room)[0]
+      const preAmennity = selectedRoom.amenities.filter((item) => item.name === detailAmenity.name)
       if (preAmennity.length > 0) {
         if (
           detailAmenity.quantity <
@@ -48,7 +48,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
           if (
             (preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat + newQuantityApplyPackage) /
               calTotalPrice(bookingData).packageRepeat >=
-            2
+            3
           ) {
             setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
             return
@@ -105,12 +105,12 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     }
     setBookingData((prev) => ({
       ...prev,
-      selectedRooms: prev.selectedRooms.map((r) => {
-        if (r.name === room) {
-          if (r.amenities.find((item) => item.name === newAmenity.name)) {
+      selectedRooms: prev.selectedRooms.map((itemRoom) => {
+        if (itemRoom.name === room) {
+          if (itemRoom.amenities.find((item) => item.name === newAmenity.name)) {
             return {
-              ...r,
-              amenities: r.amenities.map((item) => {
+              ...itemRoom,
+              amenities: itemRoom.amenities.map((item) => {
                 if (item.name === newAmenity.name) {
                   return {
                     ...item,
@@ -122,12 +122,12 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             }
           } else {
             return {
-              ...r,
-              amenities: [...r.amenities, newAmenity]
+              ...itemRoom,
+              amenities: [...itemRoom.amenities, newAmenity]
             }
           }
         }
-        return r
+        return itemRoom
       })
     }))
     setErrorState(null)

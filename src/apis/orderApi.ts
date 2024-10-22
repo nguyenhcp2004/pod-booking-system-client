@@ -1,3 +1,4 @@
+import queryString from 'query-string'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
 import http from '~/utils/http'
@@ -82,9 +83,10 @@ interface OrderResponse {
 }
 
 //Read
-export const getPageOrder = async (startDate: string, endDate: string, page: number, size: number) => {
+export const getPageOrder = async (params: { startDate: string; endDate: string; page: number; size: number }) => {
   try {
-    const response = await http.get(`/order/page?startDate=${startDate}&endDate=${endDate}&page=${page}&size=${size}`)
+    const query = queryString.stringify(params)
+    const response = await http.get(`/order/page?${query}`)
     return response.data
   } catch (error) {
     console.error('Error getting page order:', error)
@@ -92,9 +94,10 @@ export const getPageOrder = async (startDate: string, endDate: string, page: num
   }
 }
 
-export const searchOrder = async (keyword: string, page: number, size: number) => {
+export const searchOrder = async (params: { keyword: string; page: number; size: number }) => {
   try {
-    const response = await http.get(`/order/search?keyword=${keyword}&page=${page}&size=${size}`)
+    const query = queryString.stringify(params)
+    const response = await http.get(`/order/search?${query}`)
     return response.data
   } catch (error) {
     console.error('Error searching accounts:', error)

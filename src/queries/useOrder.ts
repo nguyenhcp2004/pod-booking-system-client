@@ -14,19 +14,19 @@ import {
 } from '~/apis/orderApi'
 
 //Read
-export const useOrders = (startDate: string, endDate: string, page: number, size: number) => {
+export const useOrders = (params: { startDate: string; endDate: string; page: number; size: number }) => {
   return useQuery({
-    queryKey: ['orders', startDate, endDate, page, size],
-    queryFn: () => getPageOrder(startDate, endDate, page, size),
-    enabled: !!startDate && !!endDate
+    queryKey: ['orders', params],
+    queryFn: () => getPageOrder(params),
+    enabled: !!params.startDate && !!params.endDate
   })
 }
 
-export const useSearchOrder = (keyword: string, page: number, size: number) => {
+export const useSearchOrder = (params: { keyword: string; page: number; size: number }) => {
   return useQuery({
-    queryKey: ['searchOrder', keyword, page, size],
-    queryFn: () => searchOrder(keyword, page, size),
-    enabled: !!keyword
+    queryKey: ['searchOrder', params],
+    queryFn: () => searchOrder(params),
+    enabled: !!params.keyword
   })
 }
 
