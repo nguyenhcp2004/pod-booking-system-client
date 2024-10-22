@@ -6,7 +6,7 @@ export const useCreateOrderDetailAmenityMutation = () => {
   return useMutation({
     mutationFn: orderDetailAmenityApi.createOrderDetailAmenity,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['create-order-detail-amenity'] })
+      queryClient.invalidateQueries({ queryKey: ['order-detail-amenity'] })
     }
   })
 }
