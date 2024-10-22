@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const OrderDetailAmenityBody = z.object({
+export const OrderDetailAmenityBody = z.object({
   quantity: z.number(),
   price: z.number(),
   orderDetailId: z.string(),
@@ -22,7 +22,7 @@ const OrderDetailAmenitySchema = z.object({
   amenity: AmenitySchema
 })
 
-const OrderDetailAmenityRes = z.object({
+export const OrderDetailAmenityRes = z.object({
   code: z.number(),
   data: OrderDetailAmenitySchema,
   message: z.string()
