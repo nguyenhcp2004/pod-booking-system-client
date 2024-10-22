@@ -3,7 +3,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTransactionInfo } from '~/apis/paymentApi'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
@@ -17,73 +17,42 @@ export const Confirmed: React.FC = () => {
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityMutation()
 
   const [status, setStatus] = useState<boolean | null>(null)
-  const [orderCreated, setOrderCreated] = useState(false)
+  const [orderCreated, setOrderCreated] = useState(0)
 
   const transactionData = location.state?.transactionData
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
 
-  //   const { isLoading } = useQuery({
-  //     queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
-  //     queryFn: async () => {
-  //       const transactionResponse = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
-  //       if (!transactionResponse) {
-  //         throw new Error('No response from API')
-  //       }
-
-  //       if (transactionResponse.status === 'OK' && orderCreated == 0) {
-  //         console.log('Order created:', orderCreated)
-  //         setOrderCreated(orderCreated + 1)
-  //         setStatus(true)
-  //         if (selectedAmenities.length < 1) {
-  //           throw new Error('Booking context is undefined')
-  //         }
-
-  //         return transactionResponse
-  //       } else {
-  //         if (orderCreated == 1) {
-  //           setStatus(false)
-  //         }
-  //         throw new Error(transactionResponse.message || 'Transaction not successful')
-  //       }
-  //     },
-  //     enabled: !!vnp_BankCode && !!vnp_ResponseCode
-  //   })
-
-  const { isLoading, data: transactionResponse } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
-    queryFn: () => fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode),
-    enabled: !!vnp_BankCode && !!vnp_ResponseCode,
-    retry: false
-  })
+    queryFn: async () => {
+      const transactionResponse = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
+      if (!transactionResponse) {
+        throw new Error('No response from API')
+      }
 
-  useEffect(() => {
-    const createOrderAndAmenities = async () => {
-      if (transactionResponse?.status === 'OK' && !orderCreated) {
-        try {
-          setStatus(true)
+      if (transactionResponse.status === 'OK' && orderCreated === 0) {
+        setOrderCreated(orderCreated + 1)
+        setStatus(true)
+        // Create order detail amenities
+        for (const amenity of selectedAmenities) {
+          await createOrderDetailAmenityMutation.mutateAsync({
+            orderDetailId: bookedRoom?.orderDetailId as string,
+            amenityId: amenity.id,
+            quantity: amenity.quantity,
+            price: amenity.price
+          })
+        }
 
-          // Create order detail amenities
-          for (const amenity of selectedAmenities) {
-            await createOrderDetailAmenityMutation.mutateAsync({
-              orderDetailId: bookedRoom?.orderDetailId as string,
-              amenityId: amenity.id,
-              quantity: amenity.quantity,
-              price: amenity.price
-            })
-          }
-
-          setOrderCreated(true)
-        } catch (error) {
-          console.error('Error creating order:', error)
+        return transactionResponse
+      } else {
+        if (orderCreated === 1) {
           setStatus(false)
         }
-      } else if (transactionResponse && transactionResponse.status !== 'OK') {
-        setStatus(false)
+        throw new Error(transactionResponse.message || 'Transaction not successful')
       }
-    }
-
-    createOrderAndAmenities()
-  }, [transactionResponse, orderCreated, bookedRoom, selectedAmenities, createOrderDetailAmenityMutation])
+    },
+    enabled: !!vnp_BankCode && !!vnp_ResponseCode
+  })
 
   const handleReturn = () => {
     console.log('Back to homepage')
