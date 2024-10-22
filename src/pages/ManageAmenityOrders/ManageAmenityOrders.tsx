@@ -5,7 +5,7 @@ import Table from '~/components/Table/Table'
 import { useGetListAmenityOrders } from '~/queries/useOrderDetailAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { formatCurrency } from '~/utils/currency'
-import AmenityOrderModal from './AddModal'
+import AmenityOrderModal from './AmenityOrderModal'
 import { ACTION } from '~/constants/mock'
 
 const ManageAmenityOrders = () => {

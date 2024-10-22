@@ -37,7 +37,7 @@ const Table = ({
       includeHeaders: true,
       expand: true
     })
-  }, [rows, loading])
+  }, [rows, loading, apiRef, columns])
 
   return (
     <DataGrid
