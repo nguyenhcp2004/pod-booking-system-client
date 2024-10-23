@@ -1,6 +1,6 @@
-import { DataGrid, GridColDef, GridSlots, GridValidRowModel } from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridSlots, GridValidRowModel, useGridApiRef } from '@mui/x-data-grid'
 import { viVN } from '@mui/x-data-grid/locales'
-import { Dispatch, SetStateAction, useMemo, useRef } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react'
 
 const Table = ({
   columns,
@@ -21,8 +21,8 @@ const Table = ({
   setPaginationModel?: Dispatch<SetStateAction<{ pageSize: number; page: number }>>
   totalRowCount?: number
 }) => {
+  const apiRef = useGridApiRef()
   const rowCountRef = useRef(totalRowCount || 0)
-
   const rowCount = useMemo(() => {
     if (totalRowCount !== undefined) {
       rowCountRef.current = totalRowCount
@@ -30,8 +30,18 @@ const Table = ({
     return rowCountRef.current
   }, [totalRowCount])
 
+  useEffect(() => {
+    apiRef.current.autosizeColumns({
+      columns: columns.map((column) => column.field),
+      includeOutliers: true,
+      includeHeaders: true,
+      expand: true
+    })
+  }, [rows, loading, apiRef, columns])
+
   return (
     <DataGrid
+      apiRef={apiRef}
       loading={loading}
       rows={rows}
       columns={columns}

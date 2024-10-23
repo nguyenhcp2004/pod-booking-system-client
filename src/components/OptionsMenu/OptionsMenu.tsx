@@ -15,6 +15,7 @@ import { getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
+import { useEffect } from 'react'
 
 interface Props {
   anchorEl: HTMLElement | null
@@ -42,6 +43,21 @@ export default function OptionsMenu({ anchorEl }: Props) {
       handleErrorApi({ error })
     }
   }
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (!getRefreshTokenFromLS()) {
+        setAccount(null)
+        setAuth(false)
+        navigate('/')
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [navigate, setAuth, setAccount])
   return (
     <>
       <Button
