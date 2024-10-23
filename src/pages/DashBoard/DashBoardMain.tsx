@@ -7,9 +7,12 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
 import Grid from '@mui/material/Grid2'
+import { useCountServedRooms } from '~/queries/useRoom'
 
 export default function DashboardMain() {
   const resetDateFilter = () => {}
+  const { data } = useCountServedRooms()
+  const numberServedRooms = data?.data.data
 
   return (
     <div>
@@ -134,7 +137,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberServedRooms}
                 </Typography>
               </CardContent>
             </Card>
