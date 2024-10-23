@@ -1,5 +1,5 @@
 import { Edit } from '@mui/icons-material'
-import { IconButton, MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
+import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
 import { useState } from 'react'
 import { ACTION } from '~/constants/mock'
 import { Amenity } from '~/constants/type'
@@ -100,12 +100,12 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
               <Typography>Số lượng</Typography>
             </Grid>
             <Grid size={9}>
-              <TextareaAutosize
+              <TextField
+                fullWidth
+                size='small'
                 name='quantity'
-                style={{ width: '100%', padding: '6px' }}
-                minRows={2}
-                maxRows={4}
-                maxLength={255}
+                type='number'
+                inputProps={{ min: 0 }}
                 defaultValue={row?.quantity}
               />
             </Grid>
