@@ -197,7 +197,7 @@ export const getStaff = async (): Promise<Account[]> => {
 
 export const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
   try {
-    const response = await http.put(`http://localhost:8080/order`, request)
+    const response = await http.put(`/order`, request)
     return response.data
   } catch (error) {
     console.error('Error updating staff:', error)
