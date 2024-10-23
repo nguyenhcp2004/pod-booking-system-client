@@ -8,7 +8,7 @@ interface BookingDetailsCustomProps {
   setBookingData: Dispatch<SetStateAction<BookingInfo>>
 }
 
-const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
+const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   if (!bookingData) return null
 
@@ -40,8 +40,8 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
     })
   }
   return (
-    <Box sx={{ bgcolor: 'white' }}>
-      <Box sx={{ padding: '20px' }}>
+    <Box sx={{ backgroundColor: 'white', padding: 3, borderRadius: 2, width: '100%' }}>
+      <Box sx={{ paddingY: '20px' }}>
         <Typography variant='h5' color={theme.palette.primary.main} gutterBottom fontWeight='bold'>
           Đơn đặt
         </Typography>
@@ -165,4 +165,4 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
   )
 }
 
-export default BookingDetailsCustom
+export default BookingDetails

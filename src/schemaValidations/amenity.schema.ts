@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const AmenitySchema = z.object({
+export const AmenitySchema = z.object({
   id: z.number(),
   name: z.string(),
   price: z.number(),
