@@ -54,6 +54,7 @@ const getAmenityIcon = (amenity: string) => {
 }
 
 function BookingCard({ booking, index }: { booking: OrderDetailType; index: number }) {
+  console.log(booking)
   return (
     <Grow in={true} timeout={500 + index * 250}>
       <Card
