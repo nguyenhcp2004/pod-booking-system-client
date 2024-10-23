@@ -34,3 +34,10 @@ export const useGetBookedRooms = () => {
     queryFn: () => roomApiRequest.getBookedRooms()
   })
 }
+
+export const useCountServedRooms = () => {
+  return useQuery({
+    queryKey: ['count-rooms'],
+    queryFn: () => roomApiRequest.countServedRooms()
+  })
+}
