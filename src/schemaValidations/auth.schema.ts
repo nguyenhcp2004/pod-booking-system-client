@@ -13,6 +13,7 @@ export const LoginBody = z
 export type LoginBodyType = z.TypeOf<typeof LoginBody>
 
 export const Account = z.object({
+  id: z.string(),
   name: z.string(),
   email: z.string(),
   avatar: z.string(),

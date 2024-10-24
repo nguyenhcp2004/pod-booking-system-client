@@ -4,6 +4,8 @@ import {
   CreateAccountBodyType,
   GetManageAccountRes,
   GetMeResType,
+  SendMailBodyType,
+  SendMailResType,
   UpdateAccountByAdminBodyType,
   UpdateAccountByAdminResType
 } from '~/schemaValidations/account.schema'
@@ -20,7 +22,8 @@ const accountApiRequest = {
   },
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
-  }
+  },
+  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-email', body)
 }
 
 export default accountApiRequest
