@@ -11,26 +11,41 @@ import { tokens } from '~/themes/theme'
 import { handleErrorApi } from '~/utils/utils'
 import AddAmenity from './AddAmenity'
 import BookingDetails from './BookingDetails'
-import { BookingInfo } from '~/contexts/BookingContext'
+import { Amenity } from '~/constants/type'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import PaymentBox from '~/components/AminManageOrder/CreateOrderComponents/PaymentBox'
+import QRCodePaymentAmenity from '~/components/QRCodePayment/QRCodePaymentAmenity'
+import QRCodePaymentStaffAmenity from '~/components/QRCodePayment/QRCodePaymentStaffAmenity'
+
+type BookingType = {
+  bookedRoom: any
+  amenities: Amenity[]
+}
 
 const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; refetch: () => void }) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [open, setOpen] = useState(false)
+  const [openPayment, setOpenPayment] = useState(false)
+  const { clearAll } = useBookingAmenityContext()
   const handleClickOpen = () => {
+    clearAll()
     setOpen(true)
   }
 
   const handleClose = () => {
+    clearAll()
     setOpen(false)
   }
-  const [bookingData, setBookingData] = useState<BookingInfo>({
-    roomType: null,
-    selectedRooms: [],
-    date: null,
-    timeSlots: [],
-    servicePackage: null
-  })
+  const handleCardPayment = async () => {
+    setOpenPayment(true)
+
+    // if (response.code === 201) {
+    //   toast.success('Tạo đơn hàng thành công')
+    //   handleClose()
+    // }
+  }
+
   return (
     <>
       <Button color='primary' startIcon={<Add />} onClick={handleClickOpen}>
@@ -89,11 +104,12 @@ const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; ref
             }}
           >
             <Grid size={6}>
-              <AddAmenity bookingData={bookingData} setBookingData={setBookingData} />
+              <AddAmenity />
             </Grid>
             <Grid size={6}>
-              <BookingDetails bookingData={bookingData} setBookingData={setBookingData} />
+              <BookingDetails />
             </Grid>
+            <Grid size={12}>{openPayment && <QRCodePaymentStaffAmenity />}</Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -102,7 +118,9 @@ const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; ref
           </Button>
 
           <Button variant='outlined'>Thanh toán tiền mặt</Button>
-          <Button variant='outlined'>Thanh toán qua thẻ</Button>
+          <Button variant='outlined' onClick={handleCardPayment}>
+            Thanh toán qua thẻ
+          </Button>
         </DialogActions>
       </Dialog>
     </>
