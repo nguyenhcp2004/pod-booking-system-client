@@ -80,7 +80,7 @@ export class Http {
           // Trường hợp Token hết hạn và request đó không phải là của request refresh token
           // Tiến hành qua page refresh token
           if (url !== '/auth/refresh-token') {
-            return (window.location.href = `/refresh-token?refreshToken=${this.refreshToken}&redirect=/`)
+            return (window.location.href = `/refresh-token?refreshToken=${this.refreshToken}&redirect=${location.pathname}`)
           }
         }
         return Promise.reject(error)

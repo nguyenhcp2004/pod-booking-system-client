@@ -5,9 +5,7 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import { useMutation } from '@tanstack/react-query'
 import { generatePaymentUrl } from '~/apis/paymentApi'
 import { QRCodeSVG } from 'qrcode.react'
-import SockJS from 'sockjs-client'
-import { toast } from 'react-toastify'
-import Stomp from 'stompjs'
+
 import { Helmet } from 'react-helmet-async'
 import { calTotalPrice } from '~/utils/order'
 
@@ -38,26 +36,6 @@ const QRCodePayment = () => {
       setLoading(false)
     }
   })
-  const socketCL = new SockJS('http://localhost:8080/ws')
-  const client = Stomp.over(socketCL)
-
-  useEffect(() => {
-    client.connect({}, () => {
-      client.subscribe('/topic/payments', (data) => {
-        const roomId = JSON.parse(data.body)
-        if (bookingData!.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.name} vừa được đặt`)
-        }
-      })
-    })
-
-    return () => {
-      if (client.connected) {
-        client.disconnect(() => {})
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingData])
 
   useEffect(() => {
     setLoading(true)

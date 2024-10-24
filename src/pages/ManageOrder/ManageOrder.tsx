@@ -89,6 +89,7 @@ export default function ManageOrder() {
           (account?.role === 'Manager' || account?.role === 'Staff') && account?.buildingNumber === room.buildingNumber
         if (isAdminRole || isManagerOfBuilding) {
           toast.success(`Phòng ${room.name} vừa được đặt`)
+          refetch()
         }
       })
     })
