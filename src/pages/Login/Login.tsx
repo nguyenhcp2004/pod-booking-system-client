@@ -13,7 +13,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { handleErrorApi } from '~/utils/utils'
 import { AppContext } from '~/contexts/AppProvider'
@@ -52,6 +52,7 @@ export default function Login() {
     }
   })
   const navigate = useNavigate()
+  const location = useLocation()
   const loginMutation = useLoginMutation()
 
   const onSubmit = handleSubmit(async (data) => {
@@ -63,7 +64,8 @@ export default function Login() {
       toast.success(result.data.message, {
         autoClose: 3000
       })
-      navigate('/')
+      const redirectPath = location.state?.from?.pathname || '/'
+      navigate(redirectPath)
     } catch (error) {
       handleErrorApi({ error, setError })
     }

@@ -71,3 +71,17 @@ export const CreateAccountBody = z.object({
 })
 
 export type CreateAccountBodyType = z.TypeOf<typeof CreateAccountBody>
+
+export const SendMailBody = z.object({
+  email: z.string().email(),
+  startTime: z.string()
+})
+
+export type SendMailBodyType = z.TypeOf<typeof SendMailBody>
+
+export const SendMailRes = z.object({
+  code: z.number(),
+  message: z.string()
+})
+
+export type SendMailResType = z.TypeOf<typeof SendMailRes>

@@ -57,7 +57,9 @@ export const Confirmed: React.FC = () => {
         name: room.name,
         buildingNumber: building?.id
       }
-      client.send('/app/payments', {}, JSON.stringify(payload))
+      if (status) {
+        client.send('/app/payments', {}, JSON.stringify(payload))
+      }
     })
 
     return () => {
@@ -66,7 +68,7 @@ export const Confirmed: React.FC = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingContext])
+  }, [status])
 
   const handleReturn = () => {
     localStorage.setItem('bookingData', JSON.stringify({}))
