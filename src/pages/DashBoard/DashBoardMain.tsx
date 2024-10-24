@@ -14,6 +14,8 @@ import moment, { Moment } from 'moment'
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
 import { useCountCurrentCustomer, useCountCustomer } from '~/queries/useAccount'
 import { CountCustomerReqType } from '~/schemaValidations/account.schema'
+import { useGetRevenue } from '~/queries/useOrderDetail'
+import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment | null>(null)
@@ -30,12 +32,16 @@ export default function DashboardMain() {
 
   const { data: numberCurrentOrderRes } = useCountCurrentOrder()
   const countOrderParam: CountOrderReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYY hh:mm A') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYY hh:mm A') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
   }
   const countCustomerParam: CountCustomerReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYY hh:mm A') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYY hh:mm A') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
+  }
+  const getRevenueParam: GetRevenueReqType = {
+    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
   }
 
   const { data: numberOrderRes, refetch: refetchOrder } = useCountOrder(countOrderParam)
@@ -59,6 +65,9 @@ export default function DashboardMain() {
   const { data: numberCurrentCustomerRes } = useCountCurrentCustomer()
   const { data: numberCustomerRes } = useCountCustomer(countCustomerParam)
   const numberCustomer = startTime && endTime ? numberCustomerRes?.data.data : numberCurrentCustomerRes?.data.data
+
+  const { data: revenueRes } = useGetRevenue(getRevenueParam)
+  const revenue = revenueRes?.data.data
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {
@@ -123,7 +132,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {revenue?.toLocaleString()}
                 </Typography>
               </CardContent>
             </Card>
