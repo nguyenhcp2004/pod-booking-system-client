@@ -14,6 +14,7 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
+import { calTotalPrice } from '~/utils/order'
 
 interface CommonProps {
   onNext: () => void
@@ -103,29 +104,43 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
   const handleIncrement = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
-      if (detailAmenity.quantity < quantity + 1) {
-        setErrorState('Số lượng tiện ích không đủ')
-        return
-      }
-      if (detailAmenity.type === 'Office') {
-        const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
-        const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
-        console.log(preAmennity)
-        if (preAmennity.length > 0) {
-          if (preAmennity[0].quantity + quantity >= 2) {
-            setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
+      const room = bookingData.selectedRooms.filter((room) => room.name === roomType)[0]
+      const preAmennity = room.amenities.filter((item) => item.name === detailAmenity.name)
+      if (preAmennity.length > 0) {
+        if (
+          detailAmenity.quantity <
+          newQuantityApplyPackage + preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat
+        ) {
+          setErrorState('Số lượng dịch vụ không đủ')
+          return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (
+            (preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat + newQuantityApplyPackage) /
+              calTotalPrice(bookingData).packageRepeat >=
+            3
+          ) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
             return
           }
           setErrorState(null)
           setQuantity((prevQuantity) => prevQuantity + 1)
           return
         }
-        if (quantity >= 2) {
-          setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      } else {
+        if (detailAmenity.quantity < newQuantityApplyPackage) {
+          setErrorState('Số lượng dịch vụ không đủ')
           return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (newQuantityApplyPackage / calTotalPrice(bookingData).packageRepeat >= 3) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
+            return
+          }
         }
       }
       setErrorState(null)
@@ -158,7 +173,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
         <title>Đặt dịch vụ | POD System</title>
         <meta
           name='description'
-          content='Đặt thêm tiện ích: Nâng cao trải nghiệm phòng với đồ ăn, bàn ghế và hơn thế nữa'
+          content='Đặt thêm dịch vụ: Nâng cao trải nghiệm phòng với đồ ăn, bàn ghế và hơn thế nữa'
         />
       </Helmet>
       <Grid container spacing={2}>
@@ -190,11 +205,11 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+                  <InputLabel id='amenities-label'>Chọn loại dịch vụ</InputLabel>
                   <Select
                     labelId='amenities-label'
                     value={selectedAmenity || ''}
-                    label='Chọn loại tiện ích'
+                    label='Chọn loại dịch vụ'
                     onChange={(e) => {
                       setSelectedAmenity(e.target.value)
                     }}
@@ -210,7 +225,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
 
               <Box sx={{ padding: '49px 0px 29px 0px' }}>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
-                  Danh sách tiện ích
+                  Danh sách dịch vụ
                 </Typography>
                 <Grid container spacing={4} sx={{ padding: '10px 0' }}>
                   {filteredAmenities.map((item, index) => (
@@ -331,7 +346,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   }}
                   onClick={() => handleAddAmentity()}
                 >
-                  Thêm tiện ích
+                  Thêm dịch vụ
                 </Button>
               </Box>
             </Box>

@@ -38,14 +38,16 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
   })
   const listSlot = [...new Set(listSlotFull)]
 
-  const total = order.orderDetails.reduce((acc, detail) => {
-    return (
-      acc +
-      (detail.roomPrice * order.orderDetails.length +
-        detail.amenities.reduce((acc, amenity) => acc + amenity.price * amenity.quantity, 0)) *
-        (1 - (order.orderDetails[0].servicePackage?.discountPercentage ?? 0) / 100)
-    )
-  }, 0)
+  const total = Math.round(
+    order.orderDetails.reduce((acc, detail) => {
+      return (
+        acc +
+        (detail.roomPrice * order.orderDetails.length +
+          detail.amenities.reduce((acc, amenity) => acc + amenity.price * amenity.quantity, 0)) *
+          (1 - (order.orderDetails[0].servicePackage?.discountPercentage ?? 0) / 100)
+      )
+    }, 0)
+  )
 
   const mergeAmenities = (amenities: { name: string; price: number; quantity: number }[]) => {
     return amenities.reduce(

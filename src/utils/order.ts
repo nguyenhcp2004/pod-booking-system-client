@@ -88,8 +88,6 @@ export const createBookingPayloadAD = (bookingData: BookingInfo, customer: Accou
     }
   }
 
-  console.log('startTime:', startTime)
-  console.log('endTime:', endTime)
   if (!startTime || !endTime || startTime.length === 0 || endTime.length === 0) {
     return null
   }
@@ -198,4 +196,49 @@ export const createOrderUpdateRequest = (currentOrder: Order, updatedOrder: Orde
     ...(orderDetails.length > 0 && { orderDetails })
   }
   return Object.keys(request).length > 1 ? request : null
+}
+
+export const calTotalPrice = (bookingData: BookingInfo) => {
+  let packageRepeat = 0
+  if (bookingData?.servicePackage) {
+    switch (bookingData?.servicePackage?.id.toString()) {
+      case '1':
+        packageRepeat = 4
+        break
+      case '2':
+        packageRepeat = 30
+        break
+      case '3':
+        packageRepeat = 1
+        break
+    }
+  }
+
+  const roomPrice = bookingData?.roomType?.price ?? 0
+  const totalRoomPrice = Math.round(roomPrice * bookingData?.selectedRooms.length * packageRepeat)
+
+  const totalAmenitiesPrice = Math.round(
+    bookingData?.selectedRooms.reduce((acc, room) => {
+      return (
+        acc +
+        room.amenities.reduce((amenityAcc, amenity) => {
+          return amenityAcc + amenity.price * amenity.quantity * packageRepeat
+        }, 0)
+      )
+    }, 0) || 0
+  )
+
+  const discount = Math.round(
+    ((bookingData?.servicePackage?.discountPercentage ?? 0) * (totalRoomPrice + totalAmenitiesPrice)) / 100
+  )
+
+  const total = Math.round(totalRoomPrice + totalAmenitiesPrice - discount)
+
+  return {
+    total,
+    totalRoomPrice,
+    totalAmenitiesPrice,
+    discount,
+    packageRepeat
+  }
 }

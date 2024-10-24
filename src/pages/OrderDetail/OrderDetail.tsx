@@ -1,10 +1,10 @@
-import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
-import { listSteps } from './listSteps'
-import { useState, useEffect, useContext, useMemo } from 'react'
-import { tokens } from '~/themes/theme'
-import { BookingContext } from '~/contexts/BookingContext'
+import { Box, Step, StepLabel, Stepper, styled, Dialog, DialogTitle, DialogActions, Button } from '@mui/material'
+import { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
+import { tokens } from '~/themes/theme'
+import { BookingContext } from '~/contexts/BookingContext'
+import { listSteps } from './listSteps'
 
 export interface TransactionData {
   vnp_Amount: string | null
@@ -16,73 +16,68 @@ export interface TransactionData {
 export default function OrderDetail() {
   const { step } = useParams()
   const location = useLocation()
-  const initialStep = Number(step) || 1
-  console.log('initialStep', initialStep)
-  const [activeStep, setActiveStep] = useState<number>(initialStep)
-  const queryParams = useMemo(() => new URLSearchParams(window.location.search), [])
-  const colors = tokens('light')
   const navigate = useNavigate()
-  const [loading, setLoading] = useState<boolean>(false)
-
+  const colors = tokens('light')
   const bookingContext = useContext(BookingContext)
-  if (!bookingContext) {
-    throw new Error('BookingContext must be used within a BookingProvider')
-  }
 
+  if (!bookingContext) throw new Error('BookingContext must be used within a BookingProvider')
+
+  const initialStep = Number(step) || 1
+  const [activeStep, setActiveStep] = useState(initialStep)
+  const [loading, setLoading] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+
+  const queryParams = useMemo(() => new URLSearchParams(window.location.search), [])
   const vnp_Amount = queryParams.get('vnp_Amount')
 
-  useEffect(() => {
-    if (vnp_Amount) {
-      setActiveStep(4)
-    } else if (step) {
-      setActiveStep(initialStep)
-    }
-    setLoading(true)
-  }, [vnp_Amount, step, initialStep])
+  const transactionData: TransactionData = useMemo(
+    () => ({
+      vnp_Amount,
+      vnp_BankCode: queryParams.get('vnp_BankCode'),
+      vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
+      vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
+    }),
+    [vnp_Amount, queryParams]
+  )
 
-  useEffect(() => {
-    window.onpopstate = () => {
-      const pathStep = location.pathname.split('/').pop()
-      const currentStep = Number(pathStep) || 1
-      setActiveStep(currentStep - 1)
-    }
+  const updateStepFromPath = useCallback(() => {
+    const pathStep = Number(location.pathname.split('/').pop()) || 1
+    setActiveStep(pathStep - 1)
   }, [location.pathname])
 
   useEffect(() => {
-    const currentPath = location.pathname
-    const targetPath = `/order-detail/${activeStep}`
+    window.onpopstate = updateStepFromPath
+    return () => {
+      window.onpopstate = null
+    }
+  }, [updateStepFromPath])
 
-    if (activeStep === 4) {
-      const transactionData: TransactionData = {
-        vnp_Amount: vnp_Amount,
-        vnp_BankCode: queryParams.get('vnp_BankCode'),
-        vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
-        vnp_ResponseCode: queryParams.get('vnp_ResponseCode')
-      }
-      if (currentPath !== '/order-detail/4') {
-        navigate('/order-detail/4', { state: { transactionData } })
-      }
-    } else if (activeStep !== initialStep && currentPath !== targetPath) {
+  useEffect(() => {
+    setActiveStep(vnp_Amount ? 4 : initialStep)
+    setLoading(true)
+  }, [vnp_Amount, initialStep])
+
+  useEffect(() => {
+    const targetPath = `/order-detail/${activeStep}`
+    if (activeStep === 4 && location.pathname !== '/order-detail/4') {
+      navigate('/order-detail/4', { state: { transactionData } })
+    } else if (activeStep !== initialStep && location.pathname !== targetPath) {
       navigate(targetPath)
     }
-  }, [activeStep, loading, initialStep, navigate, vnp_Amount, queryParams, location.pathname])
+  }, [activeStep, initialStep, location.pathname, navigate, transactionData])
 
-  const handleNext = () => {
-    if (activeStep < listSteps.length) {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1)
-    }
-  }
+  const handleNext = () => activeStep < listSteps.length && setActiveStep((prev) => prev + 1)
 
   const handleBack = () => {
     if (activeStep > 1) {
       navigate(`/order-detail/${activeStep - 1}`)
-      setActiveStep((prevActiveStep) => prevActiveStep - 1)
-    }
+      setActiveStep((prev) => prev - 1)
+    } else setShowConfirmDialog(true)
   }
 
-  const commonProps = {
-    onNext: handleNext,
-    onBack: handleBack
+  const handleConfirmExit = () => {
+    setShowConfirmDialog(false)
+    navigate('/')
   }
 
   const CustomStepIcon = styled('div')<{ completed: boolean }>(({ completed }) => ({
@@ -97,11 +92,11 @@ export default function OrderDetail() {
     fontSize: 12
   }))
 
-  const CurrentStepComponent = listSteps[activeStep - 1].element
+  const CurrentStepComponent = listSteps[activeStep - 1]?.element
 
   return (
     <Box sx={{ bgcolor: colors.grey[50], minHeight: '80vh' }}>
-      <Box sx={{ width: '100%', paddingX: '104px', paddingY: '30px' }}>
+      <Box sx={{ width: '100%', px: '104px', py: '30px' }}>
         <Stepper activeStep={activeStep}>
           {listSteps.map((step) => (
             <Step key={step.index}>
@@ -121,7 +116,20 @@ export default function OrderDetail() {
           </Box>
         )}
       </Box>
-      <Box sx={{ paddingBottom: '30px' }}>{loading ? <CurrentStepComponent {...commonProps} /> : ''}</Box>
+      <Box sx={{ pb: '30px' }}>
+        {loading && CurrentStepComponent && <CurrentStepComponent onNext={handleNext} onBack={handleBack} />}
+      </Box>
+      <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
+        <DialogTitle>Đơn hàng chưa được tạo. Bạn có chắc chắn muốn thoát?</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setShowConfirmDialog(false)} color='primary'>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmExit} color='secondary'>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
