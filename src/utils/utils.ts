@@ -185,3 +185,15 @@ export const formatDateAndSlot = ({ date, timeSlot }: { date: string; timeSlot: 
   const dateTime = moment(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm')
   return dateTime.format('YYYY-MM-DDTHH:mm:ss')
 }
+
+export const formatQueryDateTime = (startTime: string, endTime: string) => {
+  const formatDate = (date: string) => {
+    return date.replace(/\s/g, ' ')
+  }
+
+  const startTimeUrl = formatDate(startTime as string)
+  const endTimeUrl = formatDate(endTime as string)
+
+  const queryString = `startTime=${startTimeUrl}&endTime=${endTimeUrl}`
+  return queryString
+}

@@ -47,3 +47,18 @@ export const GetListOrderDetailRes = z.object({
 })
 
 export type GetListOrderDetailResType = z.TypeOf<typeof GetListOrderDetailRes>
+
+export const GetRevenueRes = z.object({
+  code: z.number(),
+  data: z.number(),
+  message: z.string()
+})
+
+export type GetRevenueResType = z.TypeOf<typeof GetRevenueRes>
+
+export const GetRevenueReq = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable()
+})
+
+export type GetRevenueReqType = z.TypeOf<typeof GetRevenueReq>
