@@ -1,4 +1,10 @@
 import { Box, Chip, Link, Typography } from '@mui/material'
+import { ACTION, ROOM_STATUS } from '~/constants/mock'
+import { useGetListRooms } from '~/queries/useRoom'
+import Table from '~/components/Table/Table'
+import { RoomType } from '~/constants/type'
+import { useEffect, useState } from 'react'
+import RoomModal from './RoomModal'
 import {
   GridColDef,
   GridRenderCellParams,
@@ -6,31 +12,27 @@ import {
   GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
-import { useEffect, useState } from 'react'
-import Table from '~/components/Table/Table'
-
-import { useGetListRooms } from '~/queries/useRoom'
-import { RoomType } from '~/constants/type'
-import RoomModal from './RoomModal'
-import { ACTION, ROOM_STATUS } from '~/constants/mock'
 
 export default function ManageRoom() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
+  const [rows, setRows] = useState<GridValidRowModel[]>([])
+  const [totalRowCount, setTotalRowCount] = useState<number>()
+
   const { data, refetch, isFetching } = useGetListRooms({
     page: paginationModel.page + 1,
     take: paginationModel.pageSize
   })
-  const [rows, setRows] = useState<GridValidRowModel[]>([])
-  const [totalRowCount, setTotalRowCount] = useState<number>()
+
   useEffect(() => {
     if (data) {
       setRows([...data.data.data])
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
+
   useEffect(() => {
     refetch()
   }, [paginationModel])
@@ -60,7 +62,7 @@ export default function ManageRoom() {
       headerName: 'ID',
       width: 50
     },
-    { field: 'name', headerName: 'Tên', width: 150 },
+    { field: 'name', headerName: 'Tên' },
     {
       field: 'description',
       headerName: 'Mô tả',
@@ -70,7 +72,7 @@ export default function ManageRoom() {
     {
       field: 'image',
       headerName: 'Ảnh',
-      width: 150,
+
       renderCell: (params: GridRenderCellParams) => (
         <img
           src={params.value as string}
@@ -82,21 +84,21 @@ export default function ManageRoom() {
     {
       field: 'roomType',
       headerName: 'Loại phòng',
-      width: 150,
+
       valueGetter: (value: RoomType) => value?.name
     },
     {
       field: 'status',
       headerName: 'Trạng thái',
-      width: 150,
+
       type: 'singleSelect',
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
       )
     },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150 },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150 },
+    { field: 'createdAt', headerName: 'Thời gian tạo' },
+    { field: 'updatedAt', headerName: 'Thời gian cập nhật' },
     {
       field: 'actions',
       type: 'actions',
@@ -144,6 +146,7 @@ export default function ManageRoom() {
       </GridToolbarContainer>
     )
   }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>

@@ -35,3 +35,9 @@ export const useCreateAccountMutation = () => {
     }
   })
 }
+
+export const useSendMailMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.sendMail
+  })
+}

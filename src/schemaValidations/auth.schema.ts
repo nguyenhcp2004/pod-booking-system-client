@@ -15,7 +15,9 @@ export type LoginBodyType = z.TypeOf<typeof LoginBody>
 export const Account = z.object({
   name: z.string(),
   email: z.string(),
-  avatar: z.string()
+  avatar: z.string(),
+  role: z.string(),
+  buildingNumber: z.number()
 })
 
 export type AccountType = z.TypeOf<typeof Account>

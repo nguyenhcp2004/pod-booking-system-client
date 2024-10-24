@@ -1,116 +1,157 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  Modal,
+  Box,
+  Typography,
+  useTheme,
+  IconButton,
+  Grid,
+  Divider,
+  Backdrop,
+  CircularProgress
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
-import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
-interface Order {
-  id: string
-  customerName: string
-  date: string
-  slot: string
-  room: string
-  address: string
-  status: string
-  staff: string
-  servicePackage: string
-}
+import { BookingInfo, slotType } from '~/contexts/BookingContext'
+import CloseIcon from '@mui/icons-material/Close'
+import { Account, createOrderAD } from '~/apis/orderApi'
+import Calendar from '../Calendar/Calendar'
+import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
+import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
+import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
+import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
+import { useNavigate } from 'react-router-dom'
+import PaymentBox from './CreateOrderComponents/PaymentBox'
+import { toast } from 'react-toastify'
 
 interface CreateOrderModalProps {
   open: boolean
   onClose: () => void
-  setOrders: React.Dispatch<React.SetStateAction<Order[]>>
+  refetch: () => void
 }
 
-const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, setOrders }) => {
-  const [date, setDate] = useState<Moment | null>(null)
-  const [slot, setSlot] = useState('')
-  const [servicePackage, setServicePackage] = useState('')
-  const [status, setStatus] = useState('Active')
+const initialBookingData: BookingInfo = {
+  roomType: null,
+  selectedRooms: [],
+  date: moment().format('DD-MM-YYYY').toString(),
+  timeSlots: [],
+  servicePackage: null
+}
 
-  const handleCreate = () => {
-    const newOrder = {
-      id: `ORD${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      customerName: 'Tên khách hàng',
-      date: moment(date).format(DEFAULT_DATE_FORMAT),
-      slot,
-      room: 'Room A',
-      address: 'Địa chỉ',
-      status,
-      staff: 'Nhân viên',
-      servicePackage
+const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refetch }) => {
+  const theme = useTheme()
+  const navigate = useNavigate()
+
+  const [selectedDates, setSelectedDates] = useState<Moment[]>([])
+  const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
+  const [customer, setCustomer] = useState<Account | null>(null)
+  const [bookingData, setBookingData] = useState<BookingInfo>(initialBookingData)
+  const [openPayment, setOpenPayment] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setBookingData(initialBookingData)
+    setCustomer(null)
+    setOpenPayment(false)
+    setLoading(false)
+    setSelectedSlots([])
+  }, [open])
+
+  const handleOfflinePayment = async () => {
+    setLoading(true)
+    if (!customer) return
+    const response = await createOrderAD(bookingData, customer)
+    if (response.code === 201) {
+      toast.success('Tạo đơn hàng thành công')
+      onClose()
+      refetch()
     }
+    setLoading(false)
+  }
 
-    setOrders((prevOrders) => [...prevOrders, newOrder])
-    onClose()
+  const handleCardPayment = async () => {
+    if (!customer) return
+    setOpenPayment(true)
+    const response = await createOrderAD(bookingData, customer)
+    if (response.code === 201) {
+      toast.success('Tạo đơn hàng thành công')
+      navigate('/admin/orders')
+    }
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Tạo đơn hàng</DialogTitle>
-      <DialogContent>
-        <DatePicker
-          label='Ngày'
-          value={date}
-          onChange={(newDate) => setDate(newDate)}
-          slotProps={{ textField: { size: 'small', fullWidth: true } }}
-          format={DEFAULT_DATE_FORMAT}
+    <Modal open={open} onClose={onClose}>
+      <Box
+        sx={{
+          width: '70vw',
+          height: '90vh',
+          margin: '40px auto',
+          p: 3,
+          bgcolor: theme.palette.grey[100],
+          borderRadius: 2,
+          overflowY: 'auto'
+        }}
+      >
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Typography variant='h5' fontWeight={500} mt={2}>
+            Tạo đơn hàng
+          </Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <HeaderOrderComponent
+          bookingData={bookingData}
+          setBookingData={setBookingData}
+          setSelectedDates={setSelectedDates}
+          selectedSlots={selectedSlots}
+          setSelectedSlots={setSelectedSlots}
         />
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Slot</InputLabel>
-          <Select value={slot} onChange={(e) => setSlot(e.target.value)}>
-            {Array.from({ length: 6 }, (_, i) => {
-              const startTime = moment()
-                .startOf('day')
-                .add(i * 2, 'hours')
-                .format('HH:mm')
-              const endTime = moment()
-                .startOf('day')
-                .add(i * 2 + 2, 'hours')
-                .format('HH:mm')
-              return (
-                <MenuItem key={startTime} value={`${startTime} - ${endTime}`}>
-                  {`${startTime} - ${endTime}`}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Gói dịch vụ</InputLabel>
-          <Select value={servicePackage} onChange={(e) => setServicePackage(e.target.value)}>
-            <MenuItem value='Basic'>Cơ bản</MenuItem>
-            <MenuItem value='Premium'>Nâng cao</MenuItem>
-            <MenuItem value='Deluxe'>Deluxe</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin='normal'>
-          <InputLabel>Status</InputLabel>
-          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <MenuItem value='Hoạt động'>Hoạt động</MenuItem>
-            <MenuItem value='Hủy bỏ'>Hủy bỏ</MenuItem>
-            <MenuItem value='Hoàn thành'>Hoàn thành</MenuItem>
-            <MenuItem value='Đang chờ'>Đang chờ</MenuItem>
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleCreate} color='primary'>
-          Tạo
-        </Button>
-      </DialogActions>
-    </Dialog>
+
+        <Grid container spacing={2}>
+          <Grid item lg={6} md={6}>
+            <Calendar selected={selectedDates} slots={selectedSlots} />
+          </Grid>
+
+          <Grid item lg={6} md={6} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <CustomerOrderCard customer={customer} setCustomer={setCustomer} bookingData={bookingData} />
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Grid container spacing={2}>
+          <Grid item lg={6} md={6}>
+            <AddAmenityOrder bookingData={bookingData} setBookingData={setBookingData} />
+          </Grid>
+
+          <Grid item lg={6} md={6}>
+            <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
+              <BookingDetailsCustom bookingData={bookingData} setBookingData={setBookingData} />
+            </Box>
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button variant='text' onClick={onClose}>
+            Hủy
+          </Button>
+          <Button variant='outlined' onClick={handleOfflinePayment}>
+            Thanh toán tiền mặt
+          </Button>
+          <Button variant='outlined' onClick={handleCardPayment}>
+            Thanh toán qua thẻ
+          </Button>
+        </Box>
+
+        {openPayment && <PaymentBox bookingData={bookingData} />}
+
+        <Backdrop open={loading} sx={{ color: '#fff', zIndex: theme.zIndex.drawer + 1 }}>
+          <CircularProgress color='inherit' />
+        </Backdrop>
+      </Box>
+    </Modal>
   )
 }
 

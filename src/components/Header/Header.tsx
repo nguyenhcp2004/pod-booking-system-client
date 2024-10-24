@@ -61,7 +61,7 @@ export default function Header() {
         >
           FlexiPod
         </Typography>
-        <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ gap: 3 }} display={{ xs: 'none', md: 'flex' }}>
           <Button
             component={Link}
             to='/'
@@ -83,6 +83,18 @@ export default function Header() {
               Đơn đặt
             </Button>
           )}
+          <Button
+            component={Link}
+            to='/order-amenity-detail/1'
+            sx={{
+              textTransform: 'uppercase',
+              paddingX: '11px',
+              paddingY: '8px',
+              lineHeight: '26px'
+            }}
+          >
+            Tiện Ích
+          </Button>
           <Button sx={{ textTransform: 'uppercase', paddingX: '11px', paddingY: '8px', lineHeight: '26px' }}>
             Liên hệ
           </Button>

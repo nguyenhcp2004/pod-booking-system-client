@@ -5,9 +5,9 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import { useMutation } from '@tanstack/react-query'
 import { generatePaymentUrl } from '~/apis/paymentApi'
 import { QRCodeSVG } from 'qrcode.react'
-import SockJS from 'sockjs-client'
-import { toast } from 'react-toastify'
-import Stomp from 'stompjs'
+
+import { Helmet } from 'react-helmet-async'
+import { calTotalPrice } from '~/utils/order'
 
 const QRCodePayment = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
@@ -18,29 +18,12 @@ const QRCodePayment = () => {
   const bookingData = bookingContext?.bookingData
   const theme = useTheme()
 
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
-
-  const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    ) || 0
-  )
-
-  let discountAmount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discountAmount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
-  }
-  const total = roomTotal + amenitiesTotal - discountAmount
-  const grandTotal = Math.floor(total)
-
   const { mutate: createPaymentUrl } = useMutation({
     mutationFn: async (amount: number) => {
       const paymentRequest = {
         amount: amount,
-        orderId: bookingData?.roomType?.id?.toString() || ''
+        orderId: bookingData?.roomType?.id?.toString() || '',
+        returnUrl: import.meta.env.VITE_VNPAY_RETURN_URL as string
       }
       return await generatePaymentUrl(paymentRequest)
     },
@@ -53,30 +36,12 @@ const QRCodePayment = () => {
       setLoading(false)
     }
   })
-  const socketCL = new SockJS('http://localhost:8080/ws')
-  const client = Stomp.over(socketCL)
-
-  useEffect(() => {
-    client.connect({}, () => {
-      client.subscribe('/topic/payments', (data) => {
-        const roomId = JSON.parse(data.body)
-        if (bookingData!.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
-        }
-      })
-    })
-
-    return () => {
-      if (client.connected) {
-        client.disconnect(() => {})
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingData])
 
   useEffect(() => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    if (bookingData) {
+      createPaymentUrl(calTotalPrice(bookingData).total)
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -90,11 +55,13 @@ const QRCodePayment = () => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [grandTotal, createPaymentUrl])
+  }, [bookingData, createPaymentUrl])
+
+  if (!bookingData) return null
 
   const handleReload = () => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    createPaymentUrl(calTotalPrice(bookingData).total)
     setTimeLeft(15 * 60)
     setShowReload(false)
   }
@@ -120,6 +87,10 @@ const QRCodePayment = () => {
         gap: '20px'
       }}
     >
+      <Helmet>
+        <title>Thanh toán | POD System</title>
+        <meta name='description' content='Thanh toán đặt phòng: Hoàn tất giao dịch của bạn' />
+      </Helmet>
       <Typography variant='h5' gutterBottom>
         Thanh toán bằng QR Code
       </Typography>
@@ -158,7 +129,7 @@ const QRCodePayment = () => {
       )}
 
       <Typography variant='subtitle1' color={theme.palette.primary.main} fontWeight='bold'>
-        {grandTotal.toLocaleString()} VND
+        {calTotalPrice(bookingData).total.toLocaleString()} VND
       </Typography>
     </Box>
   )

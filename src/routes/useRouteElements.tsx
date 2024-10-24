@@ -4,17 +4,22 @@ import { AppContext } from '~/contexts/AppProvider'
 import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
+import OrderAmenityDetail from '~/pages/Amenity'
 import DashBoard from '~/pages/DashBoard'
 import ForgotPassword from '~/pages/ForgotPassword'
 import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
+import ManageAmenity from '~/pages/ManageAmenity'
+import ManageAmenityOrders from '~/pages/ManageAmenityOrders/ManageAmenityOrders'
 import ManageBuilding from '~/pages/ManageBuilding'
 import ManageOrder from '~/pages/ManageOrder/ManageOrder'
 import ManageRoom from '~/pages/ManageRoom'
+import ManageRoomType from '~/pages/ManageRoomType'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
+import RefreshToken from '~/pages/RefreshToken/RefreshToken'
 import Register from '~/pages/Register'
 import RoomDetails from '~/pages/RoomDetails/RoomDetails'
 
@@ -43,6 +48,10 @@ export default function useRouteElements() {
         {
           path: '/room-details/:id',
           element: <RoomDetails />
+        },
+        {
+          path: '/refresh-token',
+          element: <RefreshToken />
         }
       ]
     },
@@ -69,6 +78,18 @@ export default function useRouteElements() {
         {
           path: '/admin/orders',
           element: <ManageOrder />
+        },
+        {
+          path: '/admin/amenities',
+          element: <ManageAmenity />
+        },
+        {
+          path: '/admin/room-types',
+          element: <ManageRoomType />
+        },
+        {
+          path: '/admin/amenity-orders',
+          element: <ManageAmenityOrders />
         }
       ]
     },
@@ -115,6 +136,10 @@ export default function useRouteElements() {
             {
               path: '/history-orders',
               element: <HistoryOrders />
+            },
+            {
+              path: '/order-amenity-detail/:step?',
+              element: <OrderAmenityDetail />
             }
           ]
         }

@@ -9,6 +9,7 @@ import { slotType, useBookingContext } from '~/contexts/BookingContext'
 import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { Helmet } from 'react-helmet-async'
 
 //import { array } from 'zod'
 interface CommonProps {
@@ -36,7 +37,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
       client.subscribe('/topic/payments', (data) => {
         const roomId = JSON.parse(data.body)
         if (bookingData.selectedRooms.some((room) => room.id == roomId.id)) {
-          toast.success(`Phòng ${roomId.id} vừa được đặt`)
+          toast.success(`Phòng ${roomId.name} vừa được đặt`)
         }
       })
     })
@@ -54,6 +55,10 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
 
   return (
     <Box id='hehe' sx={{ height: '100%', marginX: '104px' }}>
+      <Helmet>
+        <title>Thông tin đặt phòng | POD System</title>
+        <meta name='description' content='Chi tiết đặt phòng: Tìm phòng phù hợp với lịch trình của bạn' />
+      </Helmet>
       <Grid container spacing={2} sx={{}}>
         <Grid size={{ xs: 12, md: 6 }} sx={{ paddingRight: '24px !important', paddingTop: '0px !important' }}>
           <Box>

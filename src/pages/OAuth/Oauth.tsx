@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAppContext } from '~/contexts/AppProvider'
 import { setAccessTokenToLS, setAccountToLS, setRefreshTokenToLS } from '~/utils/auth'
@@ -11,6 +11,7 @@ export default function Oauth() {
   const [searchParams] = useSearchParams()
   const accessToken = searchParams.get('accessToken')
   const refreshToken = searchParams.get('refreshToken')
+  const locationHook = useLocation()
   useEffect(() => {
     if (accessToken && refreshToken) {
       if (count.current === 0) {
@@ -23,7 +24,7 @@ export default function Oauth() {
             autoClose: 2000
           })
         })
-        location.href = '/'
+        location.href = locationHook.state?.from || '/'
       }
       count.current++
     } else {
@@ -37,6 +38,6 @@ export default function Oauth() {
       }
       count.current++
     }
-  }, [accessToken, refreshToken, navigate, setAuth])
+  }, [accessToken, refreshToken, navigate, setAuth, locationHook])
   return null
 }

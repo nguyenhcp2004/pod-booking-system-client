@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import axios, { AxiosError, HttpStatusCode } from 'axios'
+import moment from 'moment'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
@@ -20,6 +21,10 @@ export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
 }
 export function isAxiosUnprocessableEntityError<FormError>(error: unknown): error is AxiosError<FormError> {
   return isAxiosError(error) && error.response?.status === HttpStatusCode.UnprocessableEntity
+}
+
+export function isAxiosUnauthorizedError<UnauthorizedError>(error: unknown): error is AxiosError<UnauthorizedError> {
+  return isAxiosError(error) && error.response?.status === HttpStatusCode.Unauthorized
 }
 
 export const checkAndRefreshToken = async (param?: {
@@ -157,4 +162,26 @@ export function getComparator<Key extends keyof any>(
 
 export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0
+}
+
+export const formatStartEndTime = (start: string, end: string) => {
+  const startFormatted = moment(start).format('HH:mm DD/MM/YYYY')
+  const endFormatted = moment(end).format('HH:mm DD/MM/YYYY')
+  return `${startFormatted} -> ${endFormatted}`
+}
+
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+export const formatTime = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+export const formatDateAndSlot = ({ date, timeSlot }: { date: string; timeSlot: string }) => {
+  const startTime = timeSlot.split(' - ')[0]
+  const dateTime = moment(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm')
+  return dateTime.format('YYYY-MM-DDTHH:mm:ss')
 }
