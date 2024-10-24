@@ -41,3 +41,10 @@ export const useSendMailMutation = () => {
     mutationFn: accountApiRequest.sendMail
   })
 }
+
+export const useCountCurrentCustomer = () => {
+  return useQuery({
+    queryKey: ['number-customers'],
+    queryFn: () => accountApiRequest.countCurrentCustomer()
+  })
+}

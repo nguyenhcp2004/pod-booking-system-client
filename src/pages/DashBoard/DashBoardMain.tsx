@@ -12,6 +12,7 @@ import { useCountCurrentOrder, useCountOrder } from '~/queries/useOrder'
 import { useEffect, useState } from 'react'
 import moment, { Moment } from 'moment'
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
+import { useCountCurrentCustomer } from '~/queries/useAccount'
 
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment | null>(null)
@@ -48,6 +49,9 @@ export default function DashboardMain() {
   }, [fetchNumberOrder, refetchOrder])
 
   const numberOrder = fetchNumberOrder ? numberOrderRes?.data.data : numberCurrentOrderRes?.data.data
+
+  const { data: numberCurrentCustomerRes } = useCountCurrentCustomer()
+  const numberCustomer = numberCurrentCustomerRes?.data.data
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {
@@ -139,7 +143,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberCustomer}
                 </Typography>
                 <Typography variant='caption' sx={{ color: '#43a047' }}>
                   Đặt phòng

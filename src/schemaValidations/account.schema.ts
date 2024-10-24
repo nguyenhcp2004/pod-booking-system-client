@@ -85,3 +85,18 @@ export const SendMailRes = z.object({
 })
 
 export type SendMailResType = z.TypeOf<typeof SendMailRes>
+
+export const CountCustomersRes = z.object({
+  code: z.number(),
+  data: z.number(),
+  message: z.string()
+})
+
+export type CountCustomerResType = z.TypeOf<typeof CountCustomersRes>
+
+export const CountCustomerReq = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable()
+})
+
+export type CountCustomerReqType = z.TypeOf<typeof CountCustomerReq>

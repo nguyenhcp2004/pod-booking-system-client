@@ -1,6 +1,7 @@
 import queryString from 'query-string'
 import { Pagination } from '~/constants/type'
 import {
+  CountCustomerResType,
   CreateAccountBodyType,
   GetManageAccountRes,
   GetMeResType,
@@ -23,7 +24,8 @@ const accountApiRequest = {
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
   },
-  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-mail', body)
+  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-mail', body),
+  countCurrentCustomer: () => http.get<CountCustomerResType>('/accounts/number-accounts-current')
 }
 
 export default accountApiRequest
