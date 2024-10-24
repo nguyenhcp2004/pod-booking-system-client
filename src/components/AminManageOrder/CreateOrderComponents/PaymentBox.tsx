@@ -6,6 +6,7 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import { QRCodeSVG } from 'qrcode.react'
 import { Link } from 'react-router-dom'
 import { BookingInfo } from '~/contexts/BookingContext'
+import { calTotalPrice } from '~/utils/order'
 
 interface PaymentBoxProps {
   bookingData: BookingInfo
@@ -17,23 +18,6 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
   const [paymentUrl, setPaymentUrl] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
   const theme = useTheme()
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
-
-  const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    ) || 0
-  )
-
-  let discountAmount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discountAmount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
-  }
-  const total = roomTotal + amenitiesTotal - discountAmount
-  const grandTotal = Math.floor(total)
 
   const { mutate: createPaymentUrl } = useMutation({
     mutationFn: async (amount: number) => {
@@ -56,7 +40,7 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
 
   useEffect(() => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    createPaymentUrl(calTotalPrice(bookingData).total)
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -70,11 +54,11 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [grandTotal, createPaymentUrl])
+  }, [bookingData, createPaymentUrl])
 
   const handleReload = () => {
     setLoading(true)
-    createPaymentUrl(grandTotal)
+    createPaymentUrl(calTotalPrice(bookingData).total)
     setTimeLeft(15 * 60)
     setShowReload(false)
   }
@@ -137,7 +121,7 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
       )}
 
       <Typography variant='subtitle1' color={theme.palette.primary.main} fontWeight='bold'>
-        {grandTotal.toLocaleString()} VND
+        {calTotalPrice(bookingData).total.toLocaleString()} VND
       </Typography>
     </Box>
   )

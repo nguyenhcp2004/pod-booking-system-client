@@ -1,6 +1,7 @@
 import { Box, Divider, TextField, Typography, useTheme } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Account, useSearchAccounts } from '~/apis/orderApi'
+import { Account } from '~/apis/orderApi'
+import { useSearchAccounts } from '~/queries/useOrder'
 import { BookingInfo, RoomContextType } from '~/contexts/BookingContext'
 
 interface CustomerOrderCardProps {

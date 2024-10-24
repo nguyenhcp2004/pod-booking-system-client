@@ -1,11 +1,12 @@
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
 import React, { Dispatch, SetStateAction, useState } from 'react'
-import { Amenity, BookingInfo, RoomContextType } from '~/contexts/BookingContext'
+import { Amenity, BookingInfo } from '~/contexts/BookingContext'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
+import { calTotalPrice } from '~/utils/order'
 
 interface AddAmenityOrderProps {
   bookingData: BookingInfo
@@ -29,28 +30,43 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
       return
     }
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
-      if (detailAmenity.quantity < quantity + 1) {
-        setErrorState('Số lượng tiện ích không đủ')
-        return
-      }
-      if (detailAmenity.type === 'Office') {
-        const r1 = bookingData.selectedRooms.filter((r1: RoomContextType) => r1.name === room)[0]
-        const preAmennity = r1?.amenities.filter((item: Amenity) => item.name === detailAmenity.name)
-        if (preAmennity?.length > 0) {
-          if (preAmennity[0].quantity + quantity >= 2) {
-            setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
+      const selectedRoom = bookingData.selectedRooms.filter((item) => item.name === room)[0]
+      const preAmennity = selectedRoom.amenities.filter((item) => item.name === detailAmenity.name)
+      if (preAmennity.length > 0) {
+        if (
+          detailAmenity.quantity <
+          newQuantityApplyPackage + preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat
+        ) {
+          setErrorState('Số lượng dịch vụ không đủ')
+          return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (
+            (preAmennity[0].quantity * calTotalPrice(bookingData).packageRepeat + newQuantityApplyPackage) /
+              calTotalPrice(bookingData).packageRepeat >=
+            3
+          ) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
             return
           }
           setErrorState(null)
           setQuantity((prevQuantity) => prevQuantity + 1)
           return
         }
-        if (quantity >= 2) {
-          setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
+      } else {
+        if (detailAmenity.quantity < newQuantityApplyPackage) {
+          setErrorState('Số lượng dịch vụ không đủ')
           return
+        }
+        if (detailAmenity.type === 'Office') {
+          if (newQuantityApplyPackage / calTotalPrice(bookingData).packageRepeat >= 3) {
+            setErrorState('Mỗi phòng chỉ được chọn tối đa 2 dịch vụ này')
+            return
+          }
         }
       }
       setErrorState(null)
@@ -89,12 +105,12 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     }
     setBookingData((prev) => ({
       ...prev,
-      selectedRooms: prev.selectedRooms.map((r) => {
-        if (r.name === room) {
-          if (r.amenities.find((item) => item.name === newAmenity.name)) {
+      selectedRooms: prev.selectedRooms.map((itemRoom) => {
+        if (itemRoom.name === room) {
+          if (itemRoom.amenities.find((item) => item.name === newAmenity.name)) {
             return {
-              ...r,
-              amenities: r.amenities.map((item) => {
+              ...itemRoom,
+              amenities: itemRoom.amenities.map((item) => {
                 if (item.name === newAmenity.name) {
                   return {
                     ...item,
@@ -106,12 +122,12 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             }
           } else {
             return {
-              ...r,
-              amenities: [...r.amenities, newAmenity]
+              ...itemRoom,
+              amenities: [...itemRoom.amenities, newAmenity]
             }
           }
         }
-        return r
+        return itemRoom
       })
     }))
     setErrorState(null)
@@ -147,11 +163,11 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+            <InputLabel id='amenities-label'>Chọn loại dịch vụ</InputLabel>
             <Select
               labelId='amenities-label'
               value={selectedAmenity || ''}
-              label='Chọn loại tiện ích'
+              label='Chọn loại dịch vụ'
               onChange={(e) => {
                 setSelectedAmenity(e.target.value)
               }}
@@ -167,7 +183,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
 
         <Box sx={{ padding: '49px 0px 29px 0px' }}>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
-            Danh sách tiện ích
+            Danh sách dịch vụ
           </Typography>
           <Grid container spacing={4} sx={{ padding: '10px 0' }}>
             {filteredAmenities.map((item, index) => (
@@ -268,7 +284,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             </Box>
           </Box>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '20px', textAlign: 'center' }}>
-            {detailAmenity?.price ? detailAmenity.price * quantity : 0} VND
+            {Math.round(detailAmenity?.price ? detailAmenity.price * quantity : 0).toLocaleString()} VND
           </Typography>
         </Box>
         <Box sx={{ padding: '20px 0px 10px 0px' }}>
@@ -290,7 +306,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
               handleAddAmentity()
             }}
           >
-            Thêm tiện ích
+            Thêm dịch vụ
           </Button>
         </Box>
       </Box>
