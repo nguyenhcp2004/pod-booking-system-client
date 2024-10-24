@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
 import { Pagination } from '~/constants/type'
+import { CountCustomerReqType } from '~/schemaValidations/account.schema'
 
 export const useGetMe = () => {
   return useQuery({
@@ -44,7 +45,14 @@ export const useSendMailMutation = () => {
 
 export const useCountCurrentCustomer = () => {
   return useQuery({
-    queryKey: ['number-customers'],
+    queryKey: ['count-current-customers'],
     queryFn: () => accountApiRequest.countCurrentCustomer()
+  })
+}
+
+export const useCountCustomer = (query: CountCustomerReqType) => {
+  return useQuery({
+    queryKey: ['count-customers'],
+    queryFn: () => accountApiRequest.countCustomer(query)
   })
 }

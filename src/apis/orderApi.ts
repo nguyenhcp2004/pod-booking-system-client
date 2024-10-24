@@ -4,6 +4,7 @@ import { BookingInfo } from '~/contexts/BookingContext'
 import { CountOrderReqType, CountOrderResType } from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
+import { formatQueryDateTime } from '~/utils/utils'
 
 export enum OrderStatus {
   Pending = 'Pending',
@@ -230,15 +231,7 @@ export const deleteOrder = async (orderId: string) => {
 export const orderApiRequest = {
   countCurrentOrder: () => http.get<CountOrderResType>('/order/number-order-current-day'),
   countOrder: (query: CountOrderReqType) => {
-    const formatDate = (date: string) => {
-      return date.replace(/\s/g, ' ')
-    }
-
-    const startTime = formatDate(query.startTime as string)
-    const endTime = formatDate(query.endTime as string)
-
-    const queryString = `startTime=${startTime}&endTime=${endTime}`
-    console.log(queryString)
+    const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     return http.get<CountOrderResType>(`/order/number-order?${queryString}`)
   }
 }

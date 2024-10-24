@@ -12,7 +12,8 @@ import { useCountCurrentOrder, useCountOrder } from '~/queries/useOrder'
 import { useEffect, useState } from 'react'
 import moment, { Moment } from 'moment'
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
-import { useCountCurrentCustomer } from '~/queries/useAccount'
+import { useCountCurrentCustomer, useCountCustomer } from '~/queries/useAccount'
+import { CountCustomerReqType } from '~/schemaValidations/account.schema'
 
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment | null>(null)
@@ -32,6 +33,11 @@ export default function DashboardMain() {
     startTime: startTime ? startTime.format('DD/MM/YYYY hh:mm A') : '',
     endTime: endTime ? endTime.format('DD/MM/YYYY hh:mm A') : ''
   }
+  const countCustomerParam: CountCustomerReqType = {
+    startTime: startTime ? startTime.format('DD/MM/YYYY hh:mm A') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYY hh:mm A') : ''
+  }
+
   const { data: numberOrderRes, refetch: refetchOrder } = useCountOrder(countOrderParam)
 
   useEffect(() => {
@@ -51,7 +57,8 @@ export default function DashboardMain() {
   const numberOrder = fetchNumberOrder ? numberOrderRes?.data.data : numberCurrentOrderRes?.data.data
 
   const { data: numberCurrentCustomerRes } = useCountCurrentCustomer()
-  const numberCustomer = numberCurrentCustomerRes?.data.data
+  const { data: numberCustomerRes } = useCountCustomer(countCustomerParam)
+  const numberCustomer = startTime && endTime ? numberCustomerRes?.data.data : numberCurrentCustomerRes?.data.data
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {
