@@ -12,6 +12,7 @@ import orderApiRequest, {
   searchOrder,
   updateStaff
 } from '~/apis/orderApi'
+import { CountOrderReqType } from '~/schemaValidations/order.schema'
 
 //Read
 export const useOrders = (params: { startDate: string; endDate: string; page: number; size: number }) => {
@@ -105,5 +106,12 @@ export const useCountCurrentOrder = () => {
   return useQuery({
     queryKey: ['count-current-orders'],
     queryFn: () => orderApiRequest.countCurrentOrder()
+  })
+}
+
+export const useCountOrder = (query: CountOrderReqType) => {
+  return useQuery({
+    queryKey: ['count-orders'],
+    queryFn: () => orderApiRequest.countOrder(query)
   })
 }

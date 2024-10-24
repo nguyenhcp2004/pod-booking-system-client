@@ -6,3 +6,10 @@ export const CountOrderRes = z.object({
   message: z.string()
 })
 export type CountOrderResType = z.TypeOf<typeof CountOrderRes>
+
+export const CountOrderReq = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable()
+})
+
+export type CountOrderReqType = z.TypeOf<typeof CountOrderReq>

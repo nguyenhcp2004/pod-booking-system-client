@@ -1,7 +1,7 @@
 import queryString from 'query-string'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
-import { CountOrderResType } from '~/schemaValidations/order.schema'
+import { CountOrderReqType, CountOrderResType } from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
 
@@ -228,7 +228,19 @@ export const deleteOrder = async (orderId: string) => {
 }
 
 export const orderApiRequest = {
-  countCurrentOrder: () => http.get<CountOrderResType>('/order/number-order-current-day')
+  countCurrentOrder: () => http.get<CountOrderResType>('/order/number-order-current-day'),
+  countOrder: (query: CountOrderReqType) => {
+    const formatDate = (date: string) => {
+      return date.replace(/\s/g, ' ')
+    }
+
+    const startTime = formatDate(query.startTime as string)
+    const endTime = formatDate(query.endTime as string)
+
+    const queryString = `startTime=${startTime}&endTime=${endTime}`
+    console.log(queryString)
+    return http.get<CountOrderResType>(`/order/number-order?${queryString}`)
+  }
 }
 
 export default orderApiRequest
