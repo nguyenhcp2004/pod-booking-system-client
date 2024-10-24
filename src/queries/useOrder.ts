@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {
+import orderApiRequest, {
   deleteOrder,
   getBuilding,
   getPageOrder,
@@ -98,5 +98,12 @@ export const useDeleteOrder = () => {
     onError: (error) => {
       console.error('Error deleting order:', error)
     }
+  })
+}
+
+export const useCountCurrentOrder = () => {
+  return useQuery({
+    queryKey: ['count-current-orders'],
+    queryFn: () => orderApiRequest.countCurrentOrder()
   })
 }

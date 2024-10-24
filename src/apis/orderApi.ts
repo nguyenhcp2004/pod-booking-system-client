@@ -1,6 +1,7 @@
 import queryString from 'query-string'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
+import { CountOrderResType } from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
 
@@ -225,3 +226,9 @@ export const deleteOrder = async (orderId: string) => {
     throw error
   }
 }
+
+export const orderApiRequest = {
+  countCurrentOrder: () => http.get<CountOrderResType>('/order/number-order-current-day')
+}
+
+export default orderApiRequest

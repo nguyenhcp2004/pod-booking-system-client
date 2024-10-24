@@ -8,11 +8,14 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
 import Grid from '@mui/material/Grid2'
 import { useCountServedRooms } from '~/queries/useRoom'
+import { useCountCurrentOrder } from '~/queries/useOrder'
 
 export default function DashboardMain() {
   const resetDateFilter = () => {}
   const { data } = useCountServedRooms()
   const numberServedRooms = data?.data.data
+  const { data: numberCurrentOrderRes } = useCountCurrentOrder()
+  const numberCurrentOrder = numberCurrentOrderRes?.data.data
 
   return (
     <div>
@@ -107,7 +110,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberCurrentOrder}
                 </Typography>
                 <Typography variant='caption' sx={{ color: '#fb8c00' }}>
                   Đã thanh toán
