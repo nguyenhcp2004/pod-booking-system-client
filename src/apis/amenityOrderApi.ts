@@ -1,13 +1,20 @@
 import queryString from 'query-string'
-import { Pagination } from '~/constants/type'
-import { GetListAmenityOrderResType } from '~/schemaValidations/amenityOrder.schema'
+
+import {
+  EditAmenityOrderBodyType,
+  GetListAmenityOrderResType,
+  OrderDetailAmenityReqType
+} from '~/schemaValidations/amenityOrder.schema'
 
 import http from '~/utils/http'
 
 const amenityOrderApiRequest = {
-  getListAmenityOrders: (query: Pagination) => {
+  getListAmenityOrders: (query: OrderDetailAmenityReqType) => {
     const stringified = queryString.stringify(query)
-    return http.get<GetListAmenityOrderResType>(`/amenity-orders?${stringified}`)
+    return http.get<GetListAmenityOrderResType>(`/order-detail-amenity/page?${stringified}`)
+  },
+  updateAmenityOrder: (body: EditAmenityOrderBodyType) => {
+    return http.put(`/order-detail-amenity`, body)
   }
 }
 

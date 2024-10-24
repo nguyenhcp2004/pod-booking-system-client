@@ -1,20 +1,11 @@
 import { Add, Edit } from '@mui/icons-material'
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Typography,
-  useTheme
-} from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 
 import BackdropCustom from '~/components/Progress/Backdrop'
-import { ACTION } from '~/constants/mock'
+
 import { AmenityOrderType } from '~/schemaValidations/amenityOrder.schema'
 import { tokens } from '~/themes/theme'
 import { handleErrorApi } from '~/utils/utils'
@@ -22,15 +13,7 @@ import AddAmenity from './AddAmenity'
 import BookingDetails from './BookingDetails'
 import { BookingInfo } from '~/contexts/BookingContext'
 
-const AmenityOrderModal = ({
-  row,
-  refetch,
-  action
-}: {
-  row?: AmenityOrderType
-  refetch: () => void
-  action: string
-}) => {
+const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; refetch: () => void }) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const [open, setOpen] = useState(false)
@@ -50,15 +33,10 @@ const AmenityOrderModal = ({
   })
   return (
     <>
-      {action === ACTION.UPDATE ? (
-        <IconButton onClick={handleClickOpen}>
-          <Edit />
-        </IconButton>
-      ) : (
-        <Button color='primary' startIcon={<Add />} onClick={handleClickOpen}>
-          Tạo đơn tiện ích
-        </Button>
-      )}
+      <Button color='primary' startIcon={<Add />} onClick={handleClickOpen}>
+        Tạo đơn tiện ích
+      </Button>
+
       <Dialog
         open={open}
         onClose={handleClose}
@@ -98,7 +76,7 @@ const AmenityOrderModal = ({
         <BackdropCustom loading={false} />
         <DialogTitle>
           <Typography variant='h5' fontWeight='500'>
-            {action === ACTION.CREATE ? 'Tạo đơn tiện ích' : 'Chỉnh sửa đơn'}
+            Tạo đơn tiện ích
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -122,18 +100,13 @@ const AmenityOrderModal = ({
           <Button onClick={handleClose} color='error'>
             Hủy
           </Button>
-          {action === ACTION.CREATE ? (
-            <>
-              <Button variant='outlined'>Thanh toán tiền mặt</Button>
-              <Button variant='outlined'>Thanh toán qua thẻ</Button>
-            </>
-          ) : (
-            <Button>Cập nhật</Button>
-          )}
+
+          <Button variant='outlined'>Thanh toán tiền mặt</Button>
+          <Button variant='outlined'>Thanh toán qua thẻ</Button>
         </DialogActions>
       </Dialog>
     </>
   )
 }
 
-export default AmenityOrderModal
+export default CreateAmenityOrderModal

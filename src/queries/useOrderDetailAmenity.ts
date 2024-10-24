@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import orderDetailAmenityApi from '~/apis/orderDetailAmenity'
 import amenityOrderApiRequest from '~/apis/amenityOrderApi'
-import { Pagination } from '~/constants/type'
+import { OrderDetailAmenityReqType } from '~/schemaValidations/amenityOrder.schema'
 
 export const useCreateOrderDetailAmenityMutation = () => {
   const queryClient = useQueryClient()
@@ -13,9 +13,19 @@ export const useCreateOrderDetailAmenityMutation = () => {
   })
 }
 
-export const useGetListAmenityOrders = (query: Pagination) => {
+export const useGetListAmenityOrders = (query: OrderDetailAmenityReqType) => {
   return useQuery({
     queryKey: ['get-order-amenity'],
     queryFn: () => amenityOrderApiRequest.getListAmenityOrders(query)
+  })
+}
+
+export const useUpdateAmenityOrder = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: amenityOrderApiRequest.updateAmenityOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['update-order-amenity'] })
+    }
   })
 }
