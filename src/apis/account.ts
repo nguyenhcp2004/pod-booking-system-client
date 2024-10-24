@@ -26,7 +26,7 @@ const accountApiRequest = {
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
   },
-  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-mail', body),
+  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-email', body),
   countCurrentCustomer: () => http.get<CountCustomerResType>('/accounts/number-accounts-current-day'),
   countCustomer: (query: CountCustomerReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)

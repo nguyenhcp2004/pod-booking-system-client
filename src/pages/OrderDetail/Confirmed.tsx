@@ -3,14 +3,17 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTransactionInfo } from '~/apis/paymentApi'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useBookingContext } from '~/contexts/BookingContext'
 import { createOrder } from '~/apis/orderApi'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
-import { useGetMe } from '~/queries/useAccount'
+import { useSendMailMutation } from '~/queries/useAccount'
 import { calTotalPrice } from '~/utils/order'
+import { formatDateAndSlot } from '~/utils/utils'
+import { useAppContext } from '~/contexts/AppProvider'
+import { toast } from 'react-toastify'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -18,7 +21,8 @@ export const Confirmed: React.FC = () => {
   const location = useLocation()
   const bookingContext = useBookingContext()
   const transactionData = location.state?.transactionData
-  const { data: userData } = useGetMe()
+  const { account: userData } = useAppContext()
+  const sendMailMutation = useSendMailMutation()
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
 
@@ -44,6 +48,18 @@ export const Confirmed: React.FC = () => {
     },
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
+  const hanldeSendMail = useCallback(() => {
+    bookingContext!.bookingData.timeSlots.forEach(async (timeSlot) => {
+      await sendMailMutation.mutateAsync({
+        email: userData?.email as string,
+        startTime: formatDateAndSlot({
+          date: bookingContext!.bookingData.date as string,
+          timeSlot
+        })
+      })
+    })
+    toast.success('Hệ thống vừa gửi tin nhắn đặt lịch cho quý khách')
+  }, [bookingContext, sendMailMutation, userData])
 
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
@@ -72,6 +88,9 @@ export const Confirmed: React.FC = () => {
 
   const handleReturn = () => {
     localStorage.setItem('bookingData', JSON.stringify({}))
+    if (status === true) {
+      hanldeSendMail()
+    }
     navigate('/')
   }
 
@@ -119,7 +138,7 @@ export const Confirmed: React.FC = () => {
                     Tên khách hàng
                   </Typography>
                   <Typography variant='subtitle2' fontWeight='bold'>
-                    {userData?.data?.data?.name}
+                    {userData?.name}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
