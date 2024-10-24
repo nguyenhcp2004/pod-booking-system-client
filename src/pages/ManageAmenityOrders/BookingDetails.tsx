@@ -2,16 +2,31 @@ import { Box, Typography, Divider, useTheme, Avatar } from '@mui/material'
 import { BookingInfo } from '~/contexts/BookingContext'
 import RoomAmenitiesCard from '~/components/BookingDetails/RoomAmenitiesCard'
 import { Dispatch, SetStateAction } from 'react'
-import { calTotalPrice } from '~/utils/order'
 
 interface BookingDetailsCustomProps {
   bookingData: BookingInfo
-  setBookingData: Dispatch<SetStateAction<BookingInfo>> | undefined
+  setBookingData: Dispatch<SetStateAction<BookingInfo>>
 }
 
-const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
+const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   if (!bookingData) return null
+
+  const roomTotal = Math.round(
+    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
+  )
+
+  const amenitiesTotal = Math.round(
+    bookingData?.selectedRooms?.reduce(
+      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
+      0
+    ) || 0
+  )
+
+  let discount = 0
+  if (bookingData?.servicePackage?.discountPercentage) {
+    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
+  }
 
   const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
   const removeAmenity = (amenity: string) => {
@@ -25,8 +40,8 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
     })
   }
   return (
-    <Box sx={{ bgcolor: 'white' }}>
-      <Box sx={{ padding: '20px' }}>
+    <Box sx={{ backgroundColor: 'white', padding: 3, borderRadius: 2, width: '100%' }}>
+      <Box sx={{ paddingY: '20px' }}>
         <Typography variant='h5' color={theme.palette.primary.main} gutterBottom fontWeight='bold'>
           Đơn đặt
         </Typography>
@@ -86,9 +101,9 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
-                  Gói dịch vụ:
+                  Gói:
                 </Typography>
-                <Typography variant='body2'>({calTotalPrice(bookingData).packageRepeat} ngày)</Typography>
+                <Typography variant='body2'>{bookingData.servicePackage?.name}</Typography>
               </Box>
             </Box>
           </Box>
@@ -96,7 +111,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
           {roomHaveAmenities > 0 && (
             <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Dịch vụ bạn đã chọn
+              Tiện ích bạn đã chọn
             </Typography>
           )}
           {bookingData.selectedRooms.map((room, index) => {
@@ -114,26 +129,26 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
       <Box sx={{ padding: '20px' }} display='flex' flexDirection='column' gap='20px'>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Tổng các phòng:
+            Tổng giá các phòng:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).totalRoomPrice.toLocaleString()} VND
+            {roomTotal.toLocaleString()} VND
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Tổng các dịch vụ:
+            Tổng giá các tiện ích:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).totalAmenitiesPrice.toLocaleString()} VND
+            {amenitiesTotal.toLocaleString()} VND
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Giảm giá: ({bookingData.servicePackage?.name} {bookingData.servicePackage?.discountPercentage}%)
+            Điscount:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).discount.toLocaleString()} VND
+            {discount.toLocaleString()} VND
           </Typography>
         </Box>
       </Box>
@@ -143,11 +158,11 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
           Tổng đơn:
         </Typography>
         <Typography variant='subtitle2' fontWeight='bold'>
-          {calTotalPrice(bookingData).total.toLocaleString()} VND
+          {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
         </Typography>
       </Box>
     </Box>
   )
 }
 
-export default BookingDetailsCustom
+export default BookingDetails

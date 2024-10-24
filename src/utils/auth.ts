@@ -17,6 +17,9 @@ export const clearLS = () => {
   localStorage.removeItem('accessToken')
   localStorage.removeItem('refreshToken')
   localStorage.removeItem('account')
+  localStorage.removeItem('bookingData')
+  localStorage.removeItem('bookingAmenities')
+  localStorage.removeItem('roomTypeFilterStateLandingPage')
 }
 
 export const getAccessTokenFromLS = () => {

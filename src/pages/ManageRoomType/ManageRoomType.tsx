@@ -19,6 +19,7 @@ import Table from '~/components/Table/Table'
 import { Building, RoomTypeFix } from '~/constants/type'
 import { useDeleteRoomType } from '~/queries/useRoomType'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { toast } from 'react-toastify'
 
 export default function RoomType() {
   const [rows, setRows] = useState<RoomTypeFix[]>([])
@@ -43,7 +44,7 @@ export default function RoomType() {
     if (!selectedRow) return
 
     if (selectedRow.quantity > 0) {
-      alert('Không thể xóa loại phòng có số lượng phòng lớn hơn 0')
+      toast.error('Không thể xóa loại phòng có số lượng phòng lớn hơn 0')
       setOpenConfirm(false)
       return
     }
