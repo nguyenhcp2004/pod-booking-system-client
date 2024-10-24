@@ -20,6 +20,7 @@ import { useState } from 'react'
 import { useGetListOrderDetail } from '~/queries/useOrderDetail'
 import { formatCurrency } from '~/utils/currency'
 import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
+import { useAppContext } from '~/contexts/AppProvider'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -164,10 +165,11 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
 
 export default function HistoryOrders() {
   const [page, setPage] = useState(1)
+  const { account } = useAppContext()
   const { data } = useGetListOrderDetail({
     page: page,
     take: 3,
-    customerId: '93619322-b041-4323-af50-9fe07e6c5bf4'
+    customerId: account?.id as string
   })
   const listOrders = data?.data
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
