@@ -79,7 +79,7 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
           {action === ACTION.CREATE ? 'Tạo chi nhánh' : 'Chỉnh sửa chi nhánh'}
         </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
+          <Grid container spacing={2} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Chi nhánh</Typography>
             </Grid>

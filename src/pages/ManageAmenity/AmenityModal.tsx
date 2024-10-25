@@ -10,7 +10,7 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Grid2'
 import { useCreateAmenityMutation, useEditAmenityMutation } from '~/queries/useAmenity'
 import { AmenityTypeEnum, CreateAmenityBodyType, EditAmenityBodyType } from '~/schemaValidations/amenity.schema'
 import { handleErrorApi } from '~/utils/utils'
@@ -122,10 +122,10 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent='center' justifyContent='center'>
-            <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Dịch vụ</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <TextField
                 fullWidth
                 size='small'
@@ -137,10 +137,10 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent='center' justifyContent='center'>
-            <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Giá</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <TextField
                 fullWidth
                 size='small'
@@ -153,10 +153,10 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent='center' justifyContent='center'>
-            <Grid item xs={3} sx={{ display: 'flex', alignItems: 'start' }}>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'start' }}>
               <Typography>Số lượng</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <TextField
                 fullWidth
                 size='small'
@@ -170,10 +170,10 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent='center' justifyContent='center'>
-            <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Loại dịch vụ</Typography>
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <Select name='type' fullWidth size='small' value={type} onChange={handleChange}>
                 {Object.values(AmenityTypeEnum).map((type) => (
                   <MenuItem key={type} value={type}>

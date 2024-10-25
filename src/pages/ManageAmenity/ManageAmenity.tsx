@@ -18,7 +18,7 @@ import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
 import { useDeleteAmenityMutation } from '~/queries/useAmenity'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { format } from 'date-fns'
+import moment from 'moment'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -99,8 +99,7 @@ export default function ManageBuilding() {
       width: 350,
       editable: false,
       renderCell: (params) => {
-        // Assuming params.value is a decimal or float, just format it as needed
-        const priceInVND = parseFloat(params.value).toFixed(2) // Format to 2 decimal places
+        const priceInVND = parseFloat(params.value).toFixed(2)
         return (
           <Typography variant='body2' color={theme.palette.text.primary}>
             {priceInVND.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ
@@ -115,19 +114,18 @@ export default function ManageBuilding() {
       width: 150,
       editable: false,
       renderCell: (params) => {
-        const dateValue = new Date(params.value)
+        const dateValue = moment(params.value)
 
-        const time = format(dateValue, 'HH:mm')
-
-        const date = format(dateValue, 'dd-MM-yy')
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
             <Typography variant='body2' color={theme.palette.grey[700]}>
-              {time} {}
+              {time}
             </Typography>
             <Typography variant='body2' color={theme.palette.grey[500]}>
-              | {date} {}
+              | {date}
             </Typography>
           </Box>
         )
@@ -139,19 +137,18 @@ export default function ManageBuilding() {
       width: 150,
       editable: false,
       renderCell: (params) => {
-        const dateValue = new Date(params.value)
+        const dateValue = moment(params.value)
 
-        const time = format(dateValue, 'HH:mm')
-
-        const date = format(dateValue, 'dd-MM-yy')
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
             <Typography variant='body2' color={theme.palette.grey[700]}>
-              {time} {}
+              {time}
             </Typography>
             <Typography variant='body2' color={theme.palette.grey[500]}>
-              | {date} {}
+              | {date}
             </Typography>
           </Box>
         )
