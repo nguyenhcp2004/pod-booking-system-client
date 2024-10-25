@@ -6,6 +6,7 @@ import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
 import OrderAmenityDetail from '~/pages/Amenity'
 import DashBoard from '~/pages/DashBoard'
+import EditBooking from '~/pages/EditBooking'
 import ForgotPassword from '~/pages/ForgotPassword'
 import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
@@ -140,6 +141,10 @@ export default function useRouteElements() {
             {
               path: '/order-amenity-detail/:step?',
               element: <OrderAmenityDetail />
+            },
+            {
+              path: '/edit-booking',
+              element: <EditBooking />
             }
           ]
         }
