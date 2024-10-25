@@ -1,4 +1,4 @@
-import { Cancel, CheckCircle, Done, Edit } from '@mui/icons-material'
+import { AttachMoney, Cancel, CheckCircle, Done, Edit } from '@mui/icons-material'
 import { Box, Chip, Dialog, IconButton, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { GridColDef } from '@mui/x-data-grid'
@@ -44,8 +44,16 @@ const EditAmenityOrderModal = ({
     })
     handleClose()
   }
+
   const columns: GridColDef[] = [
-    { field: 'rowId', headerName: 'ID', width: 50 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 50,
+      valueFormatter: (params) => {
+        return row.orderDetailAmenities.findIndex((item) => item.id === params) + 1
+      }
+    },
     { field: 'amenityName', headerName: 'Tên', width: 200 },
     { field: 'quantity', headerName: 'Số lượng', width: 150 },
     {
@@ -117,20 +125,21 @@ const EditAmenityOrderModal = ({
           <Box sx={{ display: 'flex' }}>
             <IconButton
               onClick={() => {
+                handleUpdate({ row, status: 'Paid' })
+              }}
+              color='primary'
+            >
+              <AttachMoney />
+            </IconButton>
+            <IconButton
+              onClick={() => {
                 handleUpdate({ row, status: 'Delivered' })
               }}
               color='success'
             >
               <CheckCircle />
             </IconButton>
-            <IconButton
-              onClick={() => {
-                handleUpdate({ row, status: 'Paid' })
-              }}
-              color='primary'
-            >
-              <Done />
-            </IconButton>
+
             <IconButton
               onClick={() => {
                 handleUpdate({ row, status: 'Canceled' })

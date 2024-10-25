@@ -22,7 +22,7 @@ const QRCodePaymentStaffAmenity = () => {
       const paymentRequest = {
         amount: amount,
         orderId: bookedRoom?.orderId.toString() || '',
-        returnUrl: import.meta.env.VITE_VNPAY_RETURN_URL_AMENITY as string
+        returnUrl: import.meta.env.VITE_VNPAY_RETURN_STAFF_AMENITY_URL as string
       }
       return await generatePaymentUrl(paymentRequest)
     },

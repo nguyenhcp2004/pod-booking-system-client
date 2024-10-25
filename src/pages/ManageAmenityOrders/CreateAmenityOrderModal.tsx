@@ -1,57 +1,73 @@
-import { Add, Edit } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import React, { useState } from 'react'
-import { toast } from 'react-toastify'
+import { useState } from 'react'
 
 import BackdropCustom from '~/components/Progress/Backdrop'
 
-import { AmenityOrderType } from '~/schemaValidations/amenityOrder.schema'
 import { tokens } from '~/themes/theme'
-import { handleErrorApi } from '~/utils/utils'
+
 import AddAmenity from './AddAmenity'
 import BookingDetails from './BookingDetails'
-import { Amenity } from '~/constants/type'
-import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
-import PaymentBox from '~/components/AminManageOrder/CreateOrderComponents/PaymentBox'
-import QRCodePaymentAmenity from '~/components/QRCodePayment/QRCodePaymentAmenity'
+
 import QRCodePaymentStaffAmenity from '~/components/QRCodePayment/QRCodePaymentStaffAmenity'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { useCreateOrderDetailAmenityStaff } from '~/queries/useOrderDetailAmenity'
+import { handleErrorApi } from '~/utils/utils'
+import { toast } from 'react-toastify'
+import Loading from '~/components/Progress/Loading'
 
-type BookingType = {
-  bookedRoom: any
-  amenities: Amenity[]
-}
-
-const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; refetch: () => void }) => {
+const CreateAmenityOrderModal = ({
+  refetch,
+  open,
+  handleClose
+}: {
+  refetch: () => void
+  open: boolean
+  handleClose: () => void
+}) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [open, setOpen] = useState(false)
+  const { clearAll, selectedAmenities, bookedRoom } = useBookingAmenityContext()
+  console.log('selectedAmenities', selectedAmenities)
   const [openPayment, setOpenPayment] = useState(false)
-  const { clearAll } = useBookingAmenityContext()
-  const handleClickOpen = () => {
-    clearAll()
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    clearAll()
-    setOpen(false)
-  }
-  const handleCardPayment = async () => {
+  const [loading, setLoading] = useState(false)
+  const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityStaff()
+  const handleCardPayment = () => {
     setOpenPayment(true)
-
-    // if (response.code === 201) {
-    //   toast.success('Tạo đơn hàng thành công')
-    //   handleClose()
-    // }
+  }
+  const handleOfflinePayment = () => {
+    try {
+      setLoading(true)
+      const apiCall = []
+      for (const amenity of selectedAmenities) {
+        apiCall.push(
+          createOrderDetailAmenityMutation.mutateAsync({
+            orderDetailId: bookedRoom?.orderDetailId as string,
+            amenityId: amenity.id,
+            quantity: amenity.quantity
+          })
+        )
+      }
+      Promise.all(apiCall).then(() => {
+        setLoading(false)
+        clearAll()
+        handleClose()
+        refetch()
+        toast.success('Tạo đơn tiện ích thành công')
+      })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+  const handleDone = () => {
+    clearAll()
+    refetch()
+    handleClose()
+    setOpenPayment(false)
   }
 
   return (
     <>
-      <Button color='primary' startIcon={<Add />} onClick={handleClickOpen}>
-        Tạo đơn tiện ích
-      </Button>
-
       <Dialog
         open={open}
         onClose={handleClose}
@@ -62,33 +78,10 @@ const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; ref
             background: colors.grey[50],
             minWidth: 1200,
             display: 'flex'
-          },
-          component: 'form',
-          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault()
-            const formData = new FormData(event.currentTarget)
-            const formJson = Object.fromEntries((formData as any).entries())
-            const payload = {
-              ...row,
-              ...formJson
-            }
-            try {
-              //   const result =
-              //     action === ACTION.UPDATE
-              //       ? await editRoomMutation.mutateAsync(payload)
-              //       : await createRoomMutation.mutateAsync(payload)
-              //   toast.success(result.data.message, {
-              //     autoClose: 3000
-              //   })
-              refetch()
-            } catch (error) {
-              handleErrorApi({ error })
-            }
-            handleClose()
           }
         }}
       >
-        <BackdropCustom loading={false} />
+        <Loading loading={loading} />
         <DialogTitle>
           <Typography variant='h5' fontWeight='500'>
             Tạo đơn tiện ích
@@ -112,14 +105,20 @@ const CreateAmenityOrderModal = ({ row, refetch }: { row?: AmenityOrderType; ref
             <Grid size={12}>{openPayment && <QRCodePaymentStaffAmenity />}</Grid>
           </Grid>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleClose} color='error'>
             Hủy
           </Button>
 
-          <Button variant='outlined'>Thanh toán tiền mặt</Button>
-          <Button variant='outlined' onClick={handleCardPayment}>
+          <Button variant='outlined' onClick={handleOfflinePayment} disabled={loading || !selectedAmenities.length}>
+            Thanh toán tiền mặt
+          </Button>
+          <Button variant='outlined' onClick={handleCardPayment} disabled={loading || !selectedAmenities.length}>
             Thanh toán qua thẻ
+          </Button>
+          <Button variant='contained' onClick={handleDone} disabled={loading || !selectedAmenities.length}>
+            Hoàn thành
           </Button>
         </DialogActions>
       </Dialog>

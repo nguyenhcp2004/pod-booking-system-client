@@ -1,18 +1,27 @@
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, Button, IconButton, Typography } from '@mui/material'
 import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
-import { useGetListAmenityOrders } from '~/queries/useOrderDetailAmenity'
+import {
+  useCreateOrderDetailAmenityMutation,
+  useCreateOrderDetailAmenityStaff,
+  useGetListAmenityOrders
+} from '~/queries/useOrderDetailAmenity'
 import { formatCurrency } from '~/utils/currency'
 import AmenityOrderModal from './CreateAmenityOrderModal'
-import { ACTION } from '~/constants/mock'
 import moment, { Moment } from 'moment'
 import { DatePicker } from '@mui/x-date-pickers'
 
 import { AmenityOrderType, OrderDetailAmenityType } from '~/schemaValidations/amenityOrder.schema'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import EditAmenityOrderModal from './EditAmenityOrderModal'
-import { Edit } from '@mui/icons-material'
+import { Add, Edit } from '@mui/icons-material'
+import { useLocation, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchTransactionInfo } from '~/apis/paymentApi'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import CreateAmenityOrderModal from './CreateAmenityOrderModal'
+import { toast } from 'react-toastify'
 
 const ManageAmenityOrders = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -24,6 +33,7 @@ const ManageAmenityOrders = () => {
   const [totalRowCount, setTotalRowCount] = useState<number>()
   const [startDate, setStartDate] = useState<Moment | null>(moment())
   const [endDate, setEndDate] = useState<Moment | null>(moment().add(7, 'days'))
+  const { clearAll } = useBookingAmenityContext()
   const { data, refetch, isFetching } = useGetListAmenityOrders({
     startDate: startDate?.format('YYYY-MM-DDT00:01') || moment().format('YYYY-MM-DDT00:00'),
     endDate: endDate?.format('YYYY-MM-DDT23:59') || moment().add(7, 'days').format('YYYY-MM-DDT23:59'),
@@ -44,21 +54,24 @@ const ManageAmenityOrders = () => {
   }, [data])
 
   useEffect(() => {
-    console.log(row)
-  }, [row])
-  useEffect(() => {
     refetch()
   }, [paginationModel, startDate, endDate])
 
   const [openModalEdit, setOpenModalEdit] = useState(false)
+  const [openModalCreate, setOpenModalCreate] = useState(false)
 
-  const handleClickOpen = ({ row }: { row: OrderDetailAmenityType }) => {
+  const handleClickEdit = ({ row }: { row: OrderDetailAmenityType }) => {
     setRow(row)
     setOpenModalEdit(true)
   }
+  const handleClickCreate = () => {
+    setOpenModalCreate(true)
+  }
 
   const handleClose = () => {
+    clearAll()
     setOpenModalEdit(false)
+    setOpenModalCreate(false)
   }
   const columns: GridColDef[] = [
     {
@@ -106,14 +119,7 @@ const ManageAmenityOrders = () => {
         return params && moment(params).format('DD/MM/YYYY HH:mm')
       }
     },
-    {
-      field: 'updatedAt',
-      headerName: 'Thời gian cập nhật',
-      width: 150,
-      valueFormatter: (params) => {
-        return params && moment(params).format('DD/MM/YYYY HH:mm')
-      }
-    },
+
     {
       field: 'actions',
       type: 'actions',
@@ -123,7 +129,7 @@ const ManageAmenityOrders = () => {
 
       getActions: ({ row }) => {
         return [
-          <IconButton onClick={() => handleClickOpen({ row })}>
+          <IconButton onClick={() => handleClickEdit({ row })}>
             <Edit />
           </IconButton>
         ]
@@ -154,7 +160,9 @@ const ManageAmenityOrders = () => {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <FilterToolbar />
-        <AmenityOrderModal refetch={refetch} />
+        <Button color='primary' startIcon={<Add />} onClick={handleClickCreate}>
+          Tạo đơn tiện ích
+        </Button>
         {/* <GridToolbarQuickFilter /> */}
       </GridToolbarContainer>
     )
@@ -178,6 +186,7 @@ const ManageAmenityOrders = () => {
         totalRowCount={totalRowCount}
       />
       {row && <EditAmenityOrderModal row={row} refetch={refetch} open={openModalEdit} handleClose={handleClose} />}
+      <CreateAmenityOrderModal refetch={refetch} open={openModalCreate} handleClose={handleClose} />
     </Box>
   )
 }

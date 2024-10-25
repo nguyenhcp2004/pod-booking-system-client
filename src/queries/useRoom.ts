@@ -38,7 +38,7 @@ export const useGetBookedRooms = () => {
 
 export const useGetBookedRoomsByAccountId = (query: GetBookedRoomsReqType) => {
   return useQuery({
-    queryKey: ['booked-rooms'],
+    queryKey: ['booked-rooms-by-account-id'],
     queryFn: () => roomApiRequest.getBookedRoomsById(query)
   })
 }

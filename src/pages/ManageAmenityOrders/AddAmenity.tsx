@@ -24,17 +24,23 @@ import { useGetBookedRoomsByAccountId } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchTransactionInfo } from '~/apis/paymentApi'
+import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
 
 const AddAmenity = () => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
 
-  const { bookedRoom, setBookedRoom, addAmenity } = useBookingAmenityContext()
+  const { selectedAmenities, bookedRoom, setBookedRoom, addAmenity } = useBookingAmenityContext()
 
   const [errorState, setErrorState] = useState<string | null>(null)
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+  const [status, setStatus] = useState<boolean | null>(null)
+  const [orderCreated, setOrderCreated] = useState(0)
   const { data: responseAmenityByType, refetch: amenitiesRefetch } = useGetAmenitiesByType(selectedAmenityType)
   const { data: responseAllAmenities = [] } = useGetAmenities()
   const [searchCustomer, setSearchCustomer] = useState('')
@@ -43,11 +49,56 @@ const AddAmenity = () => {
   const [customer, setCustomer] = useState<Account | null>(null)
   const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
   const { data: responese, refetch } = useGetBookedRoomsByAccountId({ accountId: customer?.id ?? '' })
+  const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityMutation()
   const amenities: AmenityType[] = responseAmenityByType?.data.data ?? []
   const allAmenities: AmenityType[] = responseAllAmenities ?? []
   const bookedRooms = useMemo(() => {
     return responese?.data.data || []
   }, [responese])
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  const vnp_Amount = queryParams.get('vnp_Amount')
+  const vnp_BankCode = queryParams.get('vnp_BankCode')
+  const vnp_OrderInfo = queryParams.get('vnp_OrderInfo')
+  const vnp_ResponseCode = queryParams.get('vnp_ResponseCode')
+
+  const { isLoading } = useQuery({
+    queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
+    queryFn: async () => {
+      const transactionResponse = await fetchTransactionInfo(
+        vnp_Amount ?? '',
+        vnp_BankCode ?? '',
+        vnp_OrderInfo ?? '',
+        vnp_ResponseCode ?? ''
+      )
+      if (!transactionResponse) {
+        throw new Error('No response from API')
+      }
+
+      if (transactionResponse.status === 'OK' && orderCreated === 0) {
+        setOrderCreated(orderCreated + 1)
+        setStatus(true)
+        // Create order detail amenities
+        for (const amenity of selectedAmenities) {
+          await createOrderDetailAmenityMutation.mutateAsync({
+            orderDetailId: bookedRoom?.orderDetailId as string,
+            amenityId: amenity.id,
+            quantity: amenity.quantity,
+            price: amenity.price
+          })
+        }
+
+        return transactionResponse
+      } else {
+        if (orderCreated === 1) {
+          setStatus(false)
+        }
+        throw new Error(transactionResponse.message || 'Transaction not successful')
+      }
+    },
+    enabled: !!vnp_Amount && !!vnp_BankCode && !!vnp_OrderInfo && !!vnp_ResponseCode
+  })
   useEffect(() => {
     if (selectedAmenityType) {
       amenitiesRefetch()

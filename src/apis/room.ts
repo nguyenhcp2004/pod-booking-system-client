@@ -39,7 +39,7 @@ export const roomApiRequest = {
   getBookedRooms: () => http.get<BookedRoomSchemaResType>(`/rooms/booked-rooms`),
   getBookedRoomsById: (query: GetBookedRoomsReqType) => {
     const stringified = queryString.stringify(query)
-    if (query.accountId) {
+    if (query) {
       return http.get<BookedRoomSchemaResType>(`/rooms/booked-rooms/account?${stringified}`)
     }
   }

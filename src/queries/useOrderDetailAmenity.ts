@@ -29,3 +29,13 @@ export const useUpdateAmenityOrder = () => {
     }
   })
 }
+
+export const useCreateOrderDetailAmenityStaff = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: orderDetailAmenityApi.createOrderDetailAmenityStaff,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['create-order-detail-amenity-staff'] })
+    }
+  })
+}
