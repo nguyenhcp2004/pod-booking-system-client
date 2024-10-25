@@ -27,6 +27,13 @@ export default function ManageBuilding() {
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
+  useEffect(() => {
+    setPaginationFilter((prevFilter) => ({
+      ...prevFilter,
+      page: paginationModel.page + 1,
+      take: paginationModel.pageSize
+    }))
+  }, [paginationModel])
 
   const columns: GridColDef[] = [
     {
