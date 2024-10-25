@@ -12,7 +12,8 @@ import {
   Divider,
   Grow,
   Zoom,
-  Pagination
+  Pagination,
+  Button
 } from '@mui/material'
 import { Wifi, RoomService, Pool, LocalCafe, BusinessCenter, Security, Hotel } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
@@ -21,6 +22,7 @@ import { useGetListOrderDetail } from '~/queries/useOrderDetail'
 import { formatCurrency } from '~/utils/currency'
 import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
 import { useAppContext } from '~/contexts/AppProvider'
+import { getDayNumber, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -117,11 +119,11 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
-                          16
+                          {getDayNumber(booking.startTime)}
                         </Typography>
-                        <Box gap={0.5}>
-                          <Box>th11</Box>
-                          <Box>Th4</Box>
+                        <Box gap={0.5} padding={0.5}>
+                          <Box>thg {getMonthNumber(booking.startTime)}</Box>
+                          <Box>Th {getWeekdayNumber(booking.startTime)}</Box>
                         </Box>
                       </Box>
                     </Box>
@@ -132,11 +134,11 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
-                          16
+                          {getDayNumber(booking.endTime)}
                         </Typography>
-                        <Box gap={0.5}>
-                          <Box>th11</Box>
-                          <Box>Th4</Box>
+                        <Box gap={0.5} padding={0.5}>
+                          <Box>thg {getMonthNumber(booking.endTime)}</Box>
+                          <Box>Th {getWeekdayNumber(booking.endTime)}</Box>
                         </Box>
                       </Box>
                     </Box>
@@ -200,8 +202,8 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
                 </Grid>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                <Box />
-                <Box sx={{ fontWeight: 'bold' }}>Tổng tiền: {formatCurrency(priceTotal)}</Box>
+                <Box sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Tổng tiền: {formatCurrency(priceTotal)}</Box>
+                <Button variant='contained'>Chỉnh sửa đặt phòng</Button>
               </Box>
             </CardContent>
           </Grid>
