@@ -15,7 +15,7 @@ const AmenityOrderSchema = z.object({
   amenityId: z.number(),
   amenityName: z.string(),
   amenityType: z.string(),
-  status: z.enum(['Booked', 'Delivered', 'Canceled']),
+  status: z.enum(['Booked', 'Paid', 'Delivered', 'Canceled']),
   statusDescription: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string().nullable()
@@ -54,7 +54,7 @@ export type GetListAmenityOrderResType = z.TypeOf<typeof GetListAmenityOrderRes>
 
 const EditAmenityOrderBodySchema = z.object({
   id: z.string(),
-  status: z.enum(['Booked', 'Delivered', 'Canceled'])
+  status: z.enum(['Booked', 'Paid', 'Delivered', 'Canceled'])
 })
 
 export type EditAmenityOrderBodyType = z.TypeOf<typeof EditAmenityOrderBodySchema>

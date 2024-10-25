@@ -27,7 +27,13 @@ const EditAmenityOrderModal = ({
   const colors = tokens(theme.palette.mode)
   const editAmenityOrder = useUpdateAmenityOrder()
 
-  const handleUpdate = ({ row, status }: { row: AmenityOrderType; status: 'Booked' | 'Delivered' | 'Canceled' }) => {
+  const handleUpdate = ({
+    row,
+    status
+  }: {
+    row: AmenityOrderType
+    status: 'Booked' | 'Delivered' | 'Canceled' | 'Paid'
+  }) => {
     const payload = {
       id: row?.id,
       status: status
@@ -116,6 +122,14 @@ const EditAmenityOrderModal = ({
               color='success'
             >
               <CheckCircle />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                handleUpdate({ row, status: 'Paid' })
+              }}
+              color='primary'
+            >
+              <Done />
             </IconButton>
             <IconButton
               onClick={() => {
