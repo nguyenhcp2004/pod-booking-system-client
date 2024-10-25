@@ -11,6 +11,7 @@ export const ACTION = {
 
 export const AMENITY_ORDER_STATUS = {
   BOOKED: 'Booked',
+  PAID: 'Paid',
   DELIVERED: 'Delivered',
   CANCELED: 'Canceled'
 }

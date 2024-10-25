@@ -77,7 +77,9 @@ const EditAmenityOrderModal = ({
                 ? 'default'
                 : params.value.status === AMENITY_ORDER_STATUS.DELIVERED
                   ? 'success'
-                  : 'error'
+                  : params.value.status === AMENITY_ORDER_STATUS.PAID
+                    ? 'warning'
+                    : 'error'
             }
           />
         ) : null
