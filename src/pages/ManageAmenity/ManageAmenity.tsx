@@ -1,6 +1,6 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
 import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
-import { Box, Chip, Typography } from '@mui/material'
+import { Box, Chip, Typography, useTheme } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
 import { useDeleteAmenityMutation } from '~/queries/useAmenity'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { format } from 'date-fns'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -29,7 +30,7 @@ export default function ManageBuilding() {
     take: paginationModel.pageSize
   })
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
-
+  const theme = useTheme()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
@@ -96,11 +97,66 @@ export default function ManageBuilding() {
       field: 'price',
       headerName: 'Giá',
       width: 350,
-      editable: false
+      editable: false,
+      renderCell: (params) => {
+        // Assuming params.value is a decimal or float, just format it as needed
+        const priceInVND = parseFloat(params.value).toFixed(2) // Format to 2 decimal places
+        return (
+          <Typography variant='body2' color={theme.palette.text.primary}>
+            {priceInVND.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ
+          </Typography>
+        )
+      }
     },
     { field: 'quantity', headerName: 'Số lượng', width: 150, editable: false },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: false },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: false },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = new Date(params.value)
+
+        const time = format(dateValue, 'HH:mm')
+
+        const date = format(dateValue, 'dd-MM-yy')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time} {}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date} {}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = new Date(params.value)
+
+        const time = format(dateValue, 'HH:mm')
+
+        const date = format(dateValue, 'dd-MM-yy')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time} {}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date} {}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'type',
       headerName: 'Loại dịch vụ',
