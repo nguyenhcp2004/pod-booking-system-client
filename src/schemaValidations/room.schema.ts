@@ -178,3 +178,9 @@ export const EditRoomRes = z.object({
 })
 
 export type EditRoomResType = z.TypeOf<typeof EditRoomRes>
+
+const GetBookedRoomsReq = z.object({
+  accountId: z.string()
+})
+
+export type GetBookedRoomsReqType = z.TypeOf<typeof GetBookedRoomsReq>

@@ -1,8 +1,14 @@
+import exp from 'constants'
 import { z } from 'zod'
 
 export const OrderDetailAmenityBody = z.object({
   quantity: z.number(),
   price: z.number(),
+  orderDetailId: z.string(),
+  amenityId: z.number()
+})
+export const OrderDetailAmenityStaffBody = z.object({
+  quantity: z.number(),
   orderDetailId: z.string(),
   amenityId: z.number()
 })
@@ -29,5 +35,5 @@ export const OrderDetailAmenityRes = z.object({
 })
 
 export type OrderDetailAmenityBodyType = z.TypeOf<typeof OrderDetailAmenityBody>
-
+export type OrderDetailAmenityStaffBodyType = z.TypeOf<typeof OrderDetailAmenityStaffBody>
 export type CreateOrderDetailAmenityResType = z.TypeOf<typeof OrderDetailAmenityRes>
