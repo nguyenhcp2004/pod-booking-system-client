@@ -23,6 +23,7 @@ import { formatCurrency } from '~/utils/currency'
 import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
 import { useAppContext } from '~/contexts/AppProvider'
 import { getDayNumber, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
+import { useNavigate } from 'react-router-dom'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -57,12 +58,16 @@ const getAmenityIcon = (amenity: string) => {
 }
 
 function BookingCard({ booking, index }: { booking: OrderDetailType; index: number }) {
+  const navigate = useNavigate()
   const priceQuantityTotal = booking.amenities.reduce((total, amenity) => {
     total += amenity.price * amenity.quantity
     return total
   }, 0)
 
   const priceTotal = priceQuantityTotal + booking.priceRoom
+  const handleClick = () => {
+    navigate(`/edit-booking/${booking.id}`)
+  }
 
   return (
     <Grow in={true} timeout={500 + index * 250}>
@@ -203,7 +208,9 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                 <Box sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Tổng tiền: {formatCurrency(priceTotal)}</Box>
-                <Button variant='contained'>Chỉnh sửa đặt phòng</Button>
+                <Button variant='contained' onClick={handleClick}>
+                  Chỉnh sửa đặt phòng
+                </Button>
               </Box>
             </CardContent>
           </Grid>
