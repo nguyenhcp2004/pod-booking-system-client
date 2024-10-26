@@ -56,6 +56,7 @@ export const OrderDetailFullInfoRes = z.object({
     id: z.string().uuid(),
     roomId: z.number(),
     roomName: z.string(),
+    roomImage: z.string(),
     roomPrice: z.number(),
     status: z.string(),
     startTime: z.string().datetime(),

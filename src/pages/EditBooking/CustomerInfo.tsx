@@ -1,9 +1,11 @@
 import { Box, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
+import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
 import { tokens } from '~/themes/theme'
 
-export default function CustomerInfo() {
+export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetailFullInfoResType['data'] }) {
   const colors = tokens('light')
+  const customer = orderDetail?.customer
   return (
     <Box
       sx={{
@@ -22,7 +24,7 @@ export default function CustomerInfo() {
             <TextField
               id='outlined-required'
               label='Tên'
-              defaultValue='Huỳnh Nguyên'
+              defaultValue={customer?.name}
               fullWidth
               InputProps={{
                 readOnly: true
@@ -33,7 +35,7 @@ export default function CustomerInfo() {
             <TextField
               id='outlined-required'
               label='Số điện thoại'
-              defaultValue='09xxxxxxxx'
+              defaultValue={'09xxxxxxxx'}
               fullWidth
               InputProps={{
                 readOnly: true
@@ -44,7 +46,7 @@ export default function CustomerInfo() {
             <TextField
               id='outlined-required'
               label='Email'
-              defaultValue='nguyen@gmail.com'
+              defaultValue={customer?.email}
               fullWidth
               InputProps={{
                 readOnly: true
