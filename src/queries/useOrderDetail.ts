@@ -18,7 +18,7 @@ export const useGetOrderDetail = (orderDetailId: string) => {
 
 export const useGetRevenue = (query: GetRevenueReqType) => {
   return useQuery({
-    queryKey: ['order-detail-revenue'],
+    queryKey: ['order-detail-revenue', query],
     queryFn: () => orderDetailApiRequest.getRevenue(query),
     enabled: !!query.startTime && !!query.endTime
   })
