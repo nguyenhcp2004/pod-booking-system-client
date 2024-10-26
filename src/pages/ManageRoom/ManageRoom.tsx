@@ -125,6 +125,7 @@ export default function ManageRoom() {
               id: 0,
               quantity: 0,
               capacity: 0,
+              price: 0,
               building: {
                 status: '',
                 createdAt: '',

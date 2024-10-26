@@ -8,3 +8,10 @@ export const ACTION = {
   UPDATE: 'UPDATE',
   DELETE: 'DELETE'
 }
+
+export const AMENITY_ORDER_STATUS = {
+  BOOKED: 'Booked',
+  PAID: 'Paid',
+  DELIVERED: 'Delivered',
+  CANCELED: 'Canceled'
+}

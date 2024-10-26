@@ -1,125 +1,179 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
-import { useGetAmenities } from '~/queries/useAmenity'
+import {
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+  useTheme
+} from '@mui/material'
+import { useEffect, useMemo, useState } from 'react'
+import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
 import { tokens } from '~/themes/theme'
 import Grid from '@mui/material/Grid2'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
-import { Amenity, BookingInfo, RoomContextType } from '~/contexts/BookingContext'
-import { Add, Remove } from '@mui/icons-material'
 
-interface AddAmenityOrderProps {
-  bookingData: BookingInfo
-  setBookingData: Dispatch<SetStateAction<BookingInfo>>
-}
-const AddAmenity: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingData }) => {
+import { Add, Remove } from '@mui/icons-material'
+import { useSearchAccounts } from '~/queries/useOrder'
+import { Account } from '~/apis/orderApi'
+import { useGetBookedRoomsByAccountId } from '~/queries/useRoom'
+import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
+import { formatStartEndTime } from '~/utils/utils'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { fetchTransactionInfo } from '~/apis/paymentApi'
+import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
+
+const AddAmenity = () => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
 
-  const [room, setRoom] = useState<string | null>(null)
-  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
-  const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+  const { selectedAmenities, bookedRoom, setBookedRoom, addAmenity } = useBookingAmenityContext()
+
   const [errorState, setErrorState] = useState<string | null>(null)
+  const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
+  const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+  const [status, setStatus] = useState<boolean | null>(null)
+  const [orderCreated, setOrderCreated] = useState(0)
+  const { data: responseAmenityByType, refetch: amenitiesRefetch } = useGetAmenitiesByType(selectedAmenityType)
+  const { data: responseAllAmenities = [] } = useGetAmenities()
+  const [searchCustomer, setSearchCustomer] = useState('')
+  const [listCustomer, setListCustomer] = useState<Account[]>([])
+  const [showCustomerList, setShowCustomerList] = useState(false)
+  const [customer, setCustomer] = useState<Account | null>(null)
+  const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
+  const { data: responese, refetch } = useGetBookedRoomsByAccountId({ accountId: customer?.id ?? '' })
+  const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityMutation()
+  const amenities: AmenityType[] = responseAmenityByType?.data.data ?? []
+  const allAmenities: AmenityType[] = responseAllAmenities ?? []
+  const bookedRooms = useMemo(() => {
+    return responese?.data.data || []
+  }, [responese])
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
 
-  const { data: amenities = [] } = useGetAmenities()
-  const filteredAmenities = useMemo(() => {
-    return selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
-  }, [selectedAmenity, amenities])
+  const vnp_Amount = queryParams.get('vnp_Amount')
+  const vnp_BankCode = queryParams.get('vnp_BankCode')
+  const vnp_OrderInfo = queryParams.get('vnp_OrderInfo')
+  const vnp_ResponseCode = queryParams.get('vnp_ResponseCode')
 
-  const handleIncrement = () => {
-    if (!room) {
-      setErrorState('Vui lòng chọn phòng')
+  const { isLoading } = useQuery({
+    queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
+    queryFn: async () => {
+      const transactionResponse = await fetchTransactionInfo(
+        vnp_Amount ?? '',
+        vnp_BankCode ?? '',
+        vnp_OrderInfo ?? '',
+        vnp_ResponseCode ?? ''
+      )
+      if (!transactionResponse) {
+        throw new Error('No response from API')
+      }
+
+      if (transactionResponse.status === 'OK' && orderCreated === 0) {
+        setOrderCreated(orderCreated + 1)
+        setStatus(true)
+        // Create order detail amenities
+        for (const amenity of selectedAmenities) {
+          await createOrderDetailAmenityMutation.mutateAsync({
+            orderDetailId: bookedRoom?.orderDetailId as string,
+            amenityId: amenity.id,
+            quantity: amenity.quantity,
+            price: amenity.price
+          })
+        }
+
+        return transactionResponse
+      } else {
+        if (orderCreated === 1) {
+          setStatus(false)
+        }
+        throw new Error(transactionResponse.message || 'Transaction not successful')
+      }
+    },
+    enabled: !!vnp_Amount && !!vnp_BankCode && !!vnp_OrderInfo && !!vnp_ResponseCode
+  })
+  useEffect(() => {
+    if (selectedAmenityType) {
+      amenitiesRefetch()
+    }
+    setDetailAmenity(null)
+    setQuantity(0)
+  }, [selectedAmenityType, refetch])
+
+  useEffect(() => {
+    refetch()
+  }, [customer])
+  useEffect(() => {
+    setListCustomer(searchCustomer.trim() ? searchCustomerData || [] : [])
+  }, [searchCustomer, searchCustomerData])
+
+  const handleAddAmentity = () => {
+    if (!detailAmenity) {
+      setErrorState('Vui lòng chọn tiện ích')
       return
     }
+    if (quantity === 0) {
+      setErrorState('Vui lòng chọn số lượng')
+      return
+    }
+    if (!bookedRoom) {
+      setErrorState('Vui lòng chọn phòng đã đặt')
+      return
+    }
+
+    const newAmenity = {
+      ...detailAmenity,
+      quantity: quantity
+    }
+
+    addAmenity(newAmenity)
+    setQuantity(0)
+    setDetailAmenity(null)
+  }
+
+  const handleDecrement = () => {
+    if (quantity > 0) {
+      // setErrorState(null)
+      setQuantity((prevQuantity) => prevQuantity - 1)
+    }
+  }
+  const handleIncrement = () => {
     if (!detailAmenity) {
       setErrorState('Vui lòng chọn tiện ích')
       return
     } else {
-      if (detailAmenity.quantity < quantity + 1) {
+      if (detailAmenity.quantity < quantity) {
         setErrorState('Số lượng tiện ích không đủ')
         return
-      }
-      if (detailAmenity.type === 'Office') {
-        const r1 = bookingData.selectedRooms.filter((r1: RoomContextType) => r1.name === room)[0]
-        const preAmennity = r1?.amenities.filter((item: Amenity) => item.name === detailAmenity.name)
-        if (preAmennity?.length > 0) {
-          if (preAmennity[0].quantity + quantity >= 2) {
-            setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-            return
-          }
-          setErrorState(null)
-          setQuantity((prevQuantity) => prevQuantity + 1)
-          return
-        }
-        if (quantity >= 2) {
-          setErrorState('Bạn chỉ được chọn tối đa 2 dịch vụ này')
-          return
-        }
       }
       setErrorState(null)
       setQuantity((prevQuantity) => prevQuantity + 1)
     }
   }
 
-  const handleDecrement = () => {
-    if (quantity > 0) {
-      setErrorState(null)
-      setQuantity((prevQuantity) => prevQuantity - 1)
-    }
-  }
-
   const handleSelectAmenity = (item: AmenityType) => {
-    setErrorState(null)
     setQuantity(0)
-    if (detailAmenity?.name == item.name) {
+    if (detailAmenity?.name === item.name) {
       setDetailAmenity(null)
       return
     }
     setDetailAmenity(item)
   }
 
-  const handleAddAmentity = () => {
-    if (!detailAmenity) return
-    if (quantity === 0) {
-      setErrorState('Vui lòng chọn số lượng')
-      return
-    }
-    const newAmenity: Amenity = {
-      id: detailAmenity?.id,
-      name: detailAmenity?.name,
-      price: detailAmenity?.price,
-      quantity: quantity
-    }
-    setBookingData((prev) => ({
-      ...prev,
-      selectedRooms: prev.selectedRooms.map((r) => {
-        if (r.name === room) {
-          if (r.amenities.find((item) => item.name === newAmenity.name)) {
-            return {
-              ...r,
-              amenities: r.amenities.map((item) => {
-                if (item.name === newAmenity.name) {
-                  return {
-                    ...item,
-                    quantity: item.quantity + newAmenity.quantity
-                  }
-                }
-                return item
-              })
-            }
-          } else {
-            return {
-              ...r,
-              amenities: [...r.amenities, newAmenity]
-            }
-          }
-        }
-        return r
-      })
-    }))
-    setErrorState(null)
-    setQuantity(0)
-    setDetailAmenity(null)
+  const handleAmenityTypeChange = (event: SelectChangeEvent<string>) => {
+    setSelectedAmenityType(event.target.value)
+  }
+
+  const handleSelectBookedRoom = (event: SelectChangeEvent<string>) => {
+    const selectedRoom = bookedRooms.find((room) => room.startTime === event.target.value)
+    setBookedRoom(selectedRoom || null)
   }
 
   return (
@@ -134,14 +188,51 @@ const AddAmenity: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingDat
       <Box>
         <Grid container spacing={2}>
           <Grid size={6}>
-            <FormControl fullWidth>
-              <InputLabel size='small'>Chọn khách hàng</InputLabel>
-              <Select size='small' label='Chọn khách hàng'>
-                <MenuItem value=''>Khách hàng 1</MenuItem>
-                <MenuItem value=''>Khách hàng 2</MenuItem>
-                <MenuItem value=''>Khách hàng 3</MenuItem>
-              </Select>
-            </FormControl>
+            <Box sx={{ position: 'relative' }}>
+              <TextField
+                size='small'
+                variant='outlined'
+                label='Tìm kiếm khách hàng'
+                value={showCustomerList ? searchCustomer : customer?.name || searchCustomer}
+                onChange={(e) => setSearchCustomer(e.target.value)}
+                onFocus={() => setShowCustomerList(true)}
+                fullWidth
+              />
+
+              {showCustomerList && (
+                <Box
+                  sx={{
+                    width: '100%',
+                    position: 'absolute',
+                    zIndex: 5,
+                    maxHeight: '150px',
+                    top: '52px',
+                    overflowY: 'scroll',
+                    paddingRight: 4,
+                    bgcolor: 'white',
+                    borderRadius: 2,
+                    boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  {listCustomer.map((a, index) => (
+                    <Box
+                      key={index}
+                      onClick={() => {
+                        setSearchCustomer(a.name || '')
+                        setCustomer(a)
+                        setShowCustomerList(false)
+                      }}
+                      sx={{ '&:hover': { backgroundColor: theme.palette.grey[200] }, cursor: 'pointer' }}
+                    >
+                      <Typography variant='body1' sx={{ paddingX: 2, paddingY: 2 }}>
+                        {a.name}
+                      </Typography>
+                      {index !== listCustomer.length - 1 && <Divider sx={{ width: '100%' }} />}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
           </Grid>
           <Grid size={6}>
             <FormControl fullWidth>
@@ -149,14 +240,14 @@ const AddAmenity: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingDat
               <Select
                 size='small'
                 label='Chọn Phòng'
-                value={room}
-                onChange={(e) => {
-                  setRoom(e.target.value as string)
-                }}
+                value={bookedRoom?.startTime || ''}
+                onChange={handleSelectBookedRoom}
               >
-                <MenuItem value=''>Phòng 1</MenuItem>
-                <MenuItem value=''>Phòng 2</MenuItem>
-                <MenuItem value=''>Phòng 3</MenuItem>
+                {bookedRooms.map((room: BookedRoomSchemaType) => (
+                  <MenuItem key={room.id} value={room.startTime}>
+                    {room.name} - {formatStartEndTime(room.startTime, room.endTime)}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -165,17 +256,12 @@ const AddAmenity: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingDat
               <InputLabel size='small'>Chọn loại tiện ích</InputLabel>
               <Select
                 size='small'
-                value={selectedAmenity || ''}
+                value={selectedAmenityType}
                 label='Chọn loại tiện ích'
-                onChange={(e) => {
-                  setSelectedAmenity(e.target.value)
-                }}
+                onChange={handleAmenityTypeChange}
               >
-                {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
-                  <MenuItem key={index} value={uniqueType}>
-                    {uniqueType}
-                  </MenuItem>
-                ))}
+                <MenuItem value='Food'>Food</MenuItem>
+                <MenuItem value='Office'>Office</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -186,29 +272,49 @@ const AddAmenity: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingDat
             Danh sách tiện ích
           </Typography>
           <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-            {filteredAmenities.map((item, index) => (
-              <Grid size={{ lg: 4, md: 6, xs: 12 }} key={index}>
-                <Button
-                  variant='outlined'
-                  fullWidth
-                  sx={{
-                    padding: '10px 0px',
-                    minHeight: '50px',
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                    color: 'black',
-                    borderColor: 'black',
-                    fontSize: '14px',
-                    backgroundColor: detailAmenity?.name == item.name ? colors.grey[100] : 'transparent'
-                  }}
-                  onClick={() => {
-                    handleSelectAmenity(item)
-                  }}
-                >
-                  {item.name}
-                </Button>
-              </Grid>
-            ))}
+            {selectedAmenityType !== ''
+              ? amenities.map((item) => (
+                  <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                    <Button
+                      variant='outlined'
+                      fullWidth
+                      sx={{
+                        padding: '10px 0px',
+                        minHeight: '50px',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                        color: 'black',
+                        borderColor: 'black',
+                        fontSize: '14px',
+                        backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                      }}
+                      onClick={() => handleSelectAmenity(item)}
+                    >
+                      {item.name}
+                    </Button>
+                  </Grid>
+                ))
+              : allAmenities.map((item) => (
+                  <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                    <Button
+                      variant='outlined'
+                      fullWidth
+                      sx={{
+                        padding: '10px 0px',
+                        minHeight: '50px',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                        color: 'black',
+                        borderColor: 'black',
+                        fontSize: '14px',
+                        backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                      }}
+                      onClick={() => handleSelectAmenity(item)}
+                    >
+                      {item.name}
+                    </Button>
+                  </Grid>
+                ))}
           </Grid>
         </Box>
         <Box

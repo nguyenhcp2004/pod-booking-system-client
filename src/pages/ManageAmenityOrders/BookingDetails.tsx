@@ -1,54 +1,38 @@
-import { Box, Typography, Divider, useTheme, Avatar } from '@mui/material'
-import { BookingInfo } from '~/contexts/BookingContext'
-import RoomAmenitiesCard from '~/components/BookingDetails/RoomAmenitiesCard'
-import { Dispatch, SetStateAction } from 'react'
+import { Avatar, Box, Divider, Typography, useTheme } from '@mui/material'
+import AmenityCard from './AmenityCard'
+import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { formatDate, formatTime } from '~/utils/utils'
 
-interface BookingDetailsCustomProps {
-  bookingData: BookingInfo
-  setBookingData: Dispatch<SetStateAction<BookingInfo>>
-}
-
-const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
+export default function BookingAmenityDetails() {
   const theme = useTheme()
-  if (!bookingData) return null
+  const { bookedRoom, selectedAmenities, calculateTotal } = useBookingAmenityContext()
 
-  const roomTotal = Math.round(
-    bookingData?.roomType?.price ? bookingData.roomType.price * bookingData?.selectedRooms?.length : 0
-  )
+  if (!bookedRoom) return null
 
-  const amenitiesTotal = Math.round(
-    bookingData?.selectedRooms?.reduce(
-      (total, room) => total + room.amenities.reduce((sum, amenity) => sum + amenity.price * amenity.quantity, 0),
-      0
-    ) || 0
-  )
-
-  let discount = 0
-  if (bookingData?.servicePackage?.discountPercentage) {
-    discount = Math.round((bookingData.servicePackage.discountPercentage * (roomTotal + amenitiesTotal)) / 100)
+  const calculateHours = (startTime: string, endTime: string) => {
+    const start = new Date(startTime)
+    const end = new Date(endTime)
+    const diffInMs = end.getTime() - start.getTime()
+    return Math.ceil(diffInMs / (1000 * 60 * 60)) // Round up to the nearest hour
   }
+  const hours = calculateHours(bookedRoom.startTime, bookedRoom.endTime)
+  const roomTotal = bookedRoom.roomType.price * hours
+  const amenitiesTotal = selectedAmenities.reduce((total, amenity) => total + amenity.price * amenity.quantity, 0)
+  const discount = bookedRoom.servicePackage.discountPercentage
+    ? (amenitiesTotal * bookedRoom.servicePackage.discountPercentage) / 100
+    : 0
+  const total = calculateTotal()
 
-  const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
-  const removeAmenity = (amenity: string) => {
-    setBookingData?.((prev) => {
-      if (!prev) return prev
-      const newSelectedRooms = prev.selectedRooms.map((room) => {
-        const newAmenities = room.amenities.filter((item) => item.name !== amenity)
-        return { ...room, amenities: newAmenities }
-      })
-      return { ...prev, selectedRooms: newSelectedRooms }
-    })
-  }
   return (
-    <Box sx={{ backgroundColor: 'white', padding: 3, borderRadius: 2, width: '100%' }}>
-      <Box sx={{ paddingY: '20px' }}>
+    <Box sx={{ bgcolor: 'white' }}>
+      <Box sx={{ padding: '20px' }}>
         <Typography variant='h5' color={theme.palette.primary.main} gutterBottom fontWeight='bold'>
           Đơn đặt
         </Typography>
         <Box display='flex' alignItems='center' sx={{ marginTop: '24px' }} gap='20px'>
           <Avatar
-            src={bookingData?.selectedRooms[0]?.image}
-            alt={bookingData?.roomType?.name}
+            src={bookedRoom.image || ''}
+            alt={bookedRoom.name || ''}
             sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
             variant='rounded'
           />
@@ -61,11 +45,11 @@ const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setB
             }}
           >
             <Typography variant='h5' fontWeight='bold'>
-              {bookingData.roomType?.name}
+              {bookedRoom.roomType.name || 'Chưa chọn loại phòng'}
             </Typography>
             <Box display='flex' sx={{ marginTop: '4px' }}>
               <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                {bookingData.roomType?.price.toLocaleString()} VND
+                {bookedRoom.roomType.price.toLocaleString()} VND
               </Typography>
               <Typography variant='subtitle2'>/tiếng</Typography>
             </Box>
@@ -76,60 +60,62 @@ const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setB
                 </Typography>
                 <Typography variant='body2'>
                   {' '}
-                  {bookingData.roomType?.building?.address
-                    ? bookingData?.roomType?.building?.address
-                    : bookingData?.roomType?.building?.address}
+                  {bookedRoom.roomType.building.address
+                    ? bookedRoom.roomType.building.address
+                    : bookedRoom.roomType.building.address}
                 </Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
                   Ngày:
                 </Typography>
-                <Typography variant='body2'>{bookingData.date}</Typography>
+                <Typography variant='body2'>{formatDate(bookedRoom.startTime)}</Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
                   Slot:
                 </Typography>
-                <Typography variant='body2'>{bookingData.timeSlots.join(', ')}</Typography>
+                <Typography variant='body2'>
+                  {formatTime(bookedRoom.startTime)} - {formatTime(bookedRoom.endTime)}
+                </Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
                   Phòng:
                 </Typography>
-                <Typography variant='body2'>{bookingData.selectedRooms.map((room) => room.name).join(', ')}</Typography>
+                <Typography variant='body2'>{bookedRoom.name}</Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
                   Gói:
                 </Typography>
-                <Typography variant='body2'>{bookingData.servicePackage?.name}</Typography>
+                <Typography variant='body2'>{bookedRoom.servicePackage.name}</Typography>
               </Box>
             </Box>
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
-          {roomHaveAmenities > 0 && (
-            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Tiện ích bạn đã chọn
-            </Typography>
+          {selectedAmenities.length > 0 && (
+            <>
+              <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
+                Tiện ích bạn đã chọn
+              </Typography>
+              <Typography variant='subtitle2'>{bookedRoom.name}</Typography>
+            </>
           )}
-          {bookingData.selectedRooms.map((room, index) => {
-            if (room.amenities.length === 0) return null
-            return (
-              <Box key={index}>
-                <RoomAmenitiesCard room={room} removeAmenity={removeAmenity} />
-                {index !== roomHaveAmenities - 1 && <Divider sx={{ my: '20px' }} />}
-              </Box>
-            )
-          })}
+          {selectedAmenities.map((amenity, index) => (
+            <Box key={amenity.id}>
+              <AmenityCard amenity={amenity} />
+              {index !== selectedAmenities.length - 1 && <Divider sx={{ my: '20px' }} />}
+            </Box>
+          ))}
         </Box>
       </Box>
       <Divider />
       <Box sx={{ padding: '20px' }} display='flex' flexDirection='column' gap='20px'>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Tổng giá các phòng:
+            Tổng giá phòng:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
             {roomTotal.toLocaleString()} VND
@@ -158,11 +144,9 @@ const BookingDetails: React.FC<BookingDetailsCustomProps> = ({ bookingData, setB
           Tổng đơn:
         </Typography>
         <Typography variant='subtitle2' fontWeight='bold'>
-          {(roomTotal + amenitiesTotal - discount).toLocaleString()} VND
+          {total.toLocaleString()} VND
         </Typography>
       </Box>
     </Box>
   )
 }
-
-export default BookingDetails
