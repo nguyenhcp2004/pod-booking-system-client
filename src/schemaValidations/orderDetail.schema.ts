@@ -48,3 +48,44 @@ export const GetListOrderDetailRes = z.object({
 })
 
 export type GetListOrderDetailResType = z.TypeOf<typeof GetListOrderDetailRes>
+
+export const OrderDetailFullInfoRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z.object({
+    id: z.string().uuid(),
+    roomId: z.number(),
+    roomName: z.string(),
+    roomPrice: z.number(),
+    status: z.string(),
+    startTime: z.string().datetime(),
+    endTime: z.string().datetime(),
+    buildingAddress: z.string(),
+    buildingId: z.number(),
+    servicePackage: z.object({
+      id: z.number(),
+      name: z.string(),
+      discountPercentage: z.number()
+    }),
+    customer: z.object({
+      id: z.string().uuid(),
+      name: z.string(),
+      email: z.string().email(),
+      avatar: z.string().url(),
+      role: z.string(),
+      buildingNumber: z.number(),
+      rankingName: z.string().nullable()
+    }),
+    orderHandler: z.nullable(z.string()),
+    amenities: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        price: z.number(),
+        quantity: z.number()
+      })
+    )
+  })
+})
+
+export type OrderDetailFullInfoResType = z.TypeOf<typeof OrderDetailFullInfoRes>

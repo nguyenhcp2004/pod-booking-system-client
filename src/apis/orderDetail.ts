@@ -1,5 +1,9 @@
 import queryString from 'query-string'
-import { GetListOrderDetailQueryType, GetListOrderDetailResType } from '~/schemaValidations/orderDetail.schema'
+import {
+  GetListOrderDetailQueryType,
+  GetListOrderDetailResType,
+  OrderDetailFullInfoResType
+} from '~/schemaValidations/orderDetail.schema'
 import http from '~/utils/http'
 
 export const orderDetailApiRequest = {
@@ -11,5 +15,6 @@ export const orderDetailApiRequest = {
     }
     const stringified = queryString.stringify(pagination)
     return http.get<GetListOrderDetailResType>(`/order-detail/customer/${query.customerId}?${stringified}`)
-  }
+  },
+  getOrderDetail: (orderDetailId: string) => http.get<OrderDetailFullInfoResType>(`/order-detail/${orderDetailId}`)
 }
