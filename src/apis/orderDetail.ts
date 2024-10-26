@@ -19,7 +19,10 @@ export const orderDetailApiRequest = {
     return http.get<GetListOrderDetailResType>(`/order-detail/${query.customerId}?${stringified}`)
   },
   getRevenue: (query: GetRevenueReqType) => {
-    const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
+    let queryString = ''
+    if (query.startTime && query.endTime) {
+      queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
+    }
     return http.get<GetRevenueResType>(`/order-detail/revenue?${queryString}`)
   }
 }

@@ -20,17 +20,13 @@ import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment | null>(null)
   const [endTime, setEndTime] = useState<Moment | null>(null)
-  const [fetchNumberOrder, setFetchNumberOrder] = useState(false)
+  const [fetchRevenue, setFetchRevenue] = useState(false)
   const resetDateFilter = () => {
     setStartTime(null)
     setEndTime(null)
-    setFetchNumberOrder(false)
+    setFetchRevenue(false)
   }
 
-  const { data } = useCountServedRooms()
-  const numberServedRooms = data?.data.data
-
-  const { data: numberCurrentOrderRes } = useCountCurrentOrder()
   const countOrderParam: CountOrderReqType = {
     startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null,
     endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null
@@ -44,30 +40,45 @@ export default function DashboardMain() {
     endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
   }
 
-  const { data: numberOrderRes, refetch: refetchOrder } = useCountOrder(countOrderParam)
+  /**
+   * Call api count served room
+   */
+  const { data } = useCountServedRooms()
+  const numberServedRooms = data?.data.data
 
-  useEffect(() => {
-    if (startTime && endTime) {
-      setFetchNumberOrder(true)
-    } else {
-      setFetchNumberOrder(false)
-    }
-  }, [startTime, endTime])
+  /**
+   * Call api count order
+   */
+  const { data: numberCurrentOrderRes } = useCountCurrentOrder()
+  const { data: numberOrderRes } = useCountOrder(countOrderParam)
+  const numberOrder = startTime && endTime ? numberOrderRes?.data.data : numberCurrentOrderRes?.data.data
 
-  useEffect(() => {
-    if (fetchNumberOrder) {
-      refetchOrder()
-    }
-  }, [fetchNumberOrder, refetchOrder])
-
-  const numberOrder = fetchNumberOrder ? numberOrderRes?.data.data : numberCurrentOrderRes?.data.data
-
+  /**
+   * Call api count customer
+   */
   const { data: numberCurrentCustomerRes } = useCountCurrentCustomer()
   const { data: numberCustomerRes } = useCountCustomer(countCustomerParam)
   const numberCustomer = startTime && endTime ? numberCustomerRes?.data.data : numberCurrentCustomerRes?.data.data
 
-  const { data: revenueRes } = useGetRevenue(getRevenueParam)
+  /**
+   * Call api calculate revenue
+   */
+  const { data: revenueRes, refetch: refetchRevenue } = useGetRevenue(getRevenueParam)
   const revenue = revenueRes?.data.data
+
+  useEffect(() => {
+    if (startTime && endTime) {
+      setFetchRevenue(true)
+    } else {
+      setFetchRevenue(false)
+    }
+  }, [startTime, endTime])
+
+  useEffect(() => {
+    if (fetchRevenue) {
+      refetchRevenue()
+    }
+  }, [fetchRevenue, refetchRevenue])
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {

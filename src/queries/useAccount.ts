@@ -53,6 +53,7 @@ export const useCountCurrentCustomer = () => {
 export const useCountCustomer = (query: CountCustomerReqType) => {
   return useQuery({
     queryKey: ['count-customers'],
-    queryFn: () => accountApiRequest.countCustomer(query)
+    queryFn: () => accountApiRequest.countCustomer(query),
+    enabled: !!query.startTime && !!query.endTime
   })
 }
