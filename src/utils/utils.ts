@@ -217,3 +217,7 @@ export const getDayNumber = (dateString: string) => {
   const date = new Date(dateString)
   return date.getDate() // Trả về số ngày trong tháng
 }
+
+export const getHour = (dateString: string) => {
+  return moment(dateString).format('HH') // Kết quả là "07"
+}

@@ -2,6 +2,7 @@ import queryString from 'query-string'
 import {
   GetListOrderDetailQueryType,
   GetListOrderDetailResType,
+  OrderDetailFullInfoResType,
   GetRevenueReqType,
   GetRevenueResType
 } from '~/schemaValidations/orderDetail.schema'
@@ -9,15 +10,16 @@ import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
 
 export const orderDetailApiRequest = {
-  getOrderDetail: (query: GetListOrderDetailQueryType) => {
+  getOrderDetailOfCustomer: (query: GetListOrderDetailQueryType) => {
     const pagination = {
       page: query.page,
       take: query.take,
       status: query.status
     }
     const stringified = queryString.stringify(pagination)
-    return http.get<GetListOrderDetailResType>(`/order-detail/${query.customerId}?${stringified}`)
+    return http.get<GetListOrderDetailResType>(`/order-detail/customer/${query.customerId}?${stringified}`)
   },
+  getOrderDetail: (orderDetailId: string) => http.get<OrderDetailFullInfoResType>(`/order-detail/${orderDetailId}`),
   getRevenueCurrentDay: () => {
     return http.get<GetRevenueResType>(`/order-detail/revenue-current-day`)
   },
