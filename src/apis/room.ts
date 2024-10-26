@@ -26,8 +26,10 @@ export const roomApiRequest = {
     return http.get<AvailableSlotsResType>(`/rooms/available-slots?${stringified}`)
   },
   getUnavailableRooms: (query: UnavailableRoomsQueryType) => {
-    const stringified = queryString.stringify(query)
-    return http.get<UnavailableRoomsResType>(`/rooms/unavailable?${stringified}`)
+    if (query.startTime && query.endTime) {
+      const stringified = queryString.stringify(query)
+      return http.get<UnavailableRoomsResType>(`/rooms/unavailable?${stringified}`)
+    }
   },
   getListRooms: (query: Pagination) => {
     const stringified = queryString.stringify(query)
