@@ -5,6 +5,6 @@ import { GetListOrderDetailQueryType } from '~/schemaValidations/orderDetail.sch
 export const useGetListOrderDetail = (query: GetListOrderDetailQueryType) => {
   return useQuery({
     queryKey: ['order-detail', { query }],
-    queryFn: () => orderDetailApiRequest.getOrderDetail(query)
+    queryFn: () => orderDetailApiRequest.getOrderDetailOfCustomer(query)
   })
 }
