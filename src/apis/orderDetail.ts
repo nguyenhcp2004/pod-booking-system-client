@@ -18,6 +18,9 @@ export const orderDetailApiRequest = {
     const stringified = queryString.stringify(pagination)
     return http.get<GetListOrderDetailResType>(`/order-detail/${query.customerId}?${stringified}`)
   },
+  getRevenueCurrentDay: () => {
+    return http.get<GetRevenueResType>(`/order-detail/revenue-current-day`)
+  },
   getRevenue: (query: GetRevenueReqType) => {
     let queryString = ''
     if (query.startTime && query.endTime) {

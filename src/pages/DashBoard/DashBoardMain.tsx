@@ -9,22 +9,20 @@ import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
 import Grid from '@mui/material/Grid2'
 import { useCountServedRooms } from '~/queries/useRoom'
 import { useCountCurrentOrder, useCountOrder } from '~/queries/useOrder'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import moment, { Moment } from 'moment'
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
 import { useCountCurrentCustomer, useCountCustomer } from '~/queries/useAccount'
 import { CountCustomerReqType } from '~/schemaValidations/account.schema'
-import { useGetRevenue } from '~/queries/useOrderDetail'
+import { useGetRevenue, useGetRevenueCurrentDay } from '~/queries/useOrderDetail'
 import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment | null>(null)
   const [endTime, setEndTime] = useState<Moment | null>(null)
-  const [fetchRevenue, setFetchRevenue] = useState(false)
   const resetDateFilter = () => {
     setStartTime(null)
     setEndTime(null)
-    setFetchRevenue(false)
   }
 
   const countOrderParam: CountOrderReqType = {
@@ -63,22 +61,9 @@ export default function DashboardMain() {
   /**
    * Call api calculate revenue
    */
-  const { data: revenueRes, refetch: refetchRevenue } = useGetRevenue(getRevenueParam)
-  const revenue = revenueRes?.data.data
-
-  useEffect(() => {
-    if (startTime && endTime) {
-      setFetchRevenue(true)
-    } else {
-      setFetchRevenue(false)
-    }
-  }, [startTime, endTime])
-
-  useEffect(() => {
-    if (fetchRevenue) {
-      refetchRevenue()
-    }
-  }, [fetchRevenue, refetchRevenue])
+  const { data: revenueCurrentDay } = useGetRevenueCurrentDay()
+  const { data: revenueRes } = useGetRevenue(getRevenueParam)
+  const revenue = startTime && endTime ? revenueRes?.data.data : revenueCurrentDay?.data.data
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {

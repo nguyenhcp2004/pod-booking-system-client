@@ -12,6 +12,14 @@ export const useGetListOrderDetail = (query: GetListOrderDetailQueryType) => {
 export const useGetRevenue = (query: GetRevenueReqType) => {
   return useQuery({
     queryKey: ['order-detail-revenue'],
-    queryFn: () => orderDetailApiRequest.getRevenue(query)
+    queryFn: () => orderDetailApiRequest.getRevenue(query),
+    enabled: !!query.startTime && !!query.endTime
+  })
+}
+
+export const useGetRevenueCurrentDay = () => {
+  return useQuery({
+    queryKey: ['order-detail-revenue-current-day'],
+    queryFn: () => orderDetailApiRequest.getRevenueCurrentDay()
   })
 }
