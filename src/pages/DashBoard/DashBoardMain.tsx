@@ -32,16 +32,16 @@ export default function DashboardMain() {
 
   const { data: numberCurrentOrderRes } = useCountCurrentOrder()
   const countOrderParam: CountOrderReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null,
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null
   }
   const countCustomerParam: CountCustomerReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
   }
   const getRevenueParam: GetRevenueReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYYThh:mmTA') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYYThh:mmTA') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
   }
 
   const { data: numberOrderRes, refetch: refetchOrder } = useCountOrder(countOrderParam)
@@ -71,11 +71,11 @@ export default function DashboardMain() {
 
   const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
     if (date) {
-      const formattedDate = moment(date).format('DD/MM/YYYY hh:mm A')
+      const formattedDate = date.format('DD/MM/YYYY[T]hh:mm[T]A')
       if (isStartTime) {
-        setStartTime(moment(formattedDate, 'DD/MM/YYYY hh:mm A'))
+        setStartTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
       } else {
-        setEndTime(moment(formattedDate, 'DD/MM/YYYY hh:mm A'))
+        setEndTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
       }
     } else {
       if (isStartTime) {

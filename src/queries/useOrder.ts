@@ -111,7 +111,8 @@ export const useCountCurrentOrder = () => {
 
 export const useCountOrder = (query: CountOrderReqType) => {
   return useQuery({
-    queryKey: ['count-orders'],
-    queryFn: () => orderApiRequest.countOrder(query)
+    queryKey: ['count-orders', query],
+    queryFn: () => orderApiRequest.countOrder(query),
+    enabled: !!query.startTime && !!query.endTime
   })
 }
