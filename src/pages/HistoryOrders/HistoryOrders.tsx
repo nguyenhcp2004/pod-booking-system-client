@@ -12,7 +12,8 @@ import {
   Divider,
   Grow,
   Zoom,
-  Pagination
+  Pagination,
+  Button
 } from '@mui/material'
 import { Wifi, RoomService, Pool, LocalCafe, BusinessCenter, Security, Hotel } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
@@ -21,6 +22,7 @@ import { useGetListOrderDetail } from '~/queries/useOrderDetail'
 import { formatCurrency } from '~/utils/currency'
 import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
 import { useAppContext } from '~/contexts/AppProvider'
+import { getDayNumber, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -55,7 +57,13 @@ const getAmenityIcon = (amenity: string) => {
 }
 
 function BookingCard({ booking, index }: { booking: OrderDetailType; index: number }) {
-  console.log(booking)
+  const priceQuantityTotal = booking.amenities.reduce((total, amenity) => {
+    total += amenity.price * amenity.quantity
+    return total
+  }, 0)
+
+  const priceTotal = priceQuantityTotal + booking.priceRoom
+
   return (
     <Grow in={true} timeout={500 + index * 250}>
       <Card
@@ -93,17 +101,55 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
             <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <Box sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant='h5' component='div'>
-                    {booking.roomName}
-                  </Typography>
-                  <Chip label={booking.status} color={getStatusColor(booking.status)} sx={{ fontWeight: 'bold' }} />
+                  <Box>
+                    <Chip
+                      label={booking.status === 'Successfully' ? 'Đã xác nhận đặt phòng' : 'Phòng đã được hủy'}
+                      color={getStatusColor(booking.status)}
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                    <Typography variant='h5' component='div' sx={{ mt: 1 }}>
+                      {booking.roomName}
+                    </Typography>
+                  </Box>
+                  {/* Status, Check-in, and Check-out tags */}
+                  <Box sx={{ display: 'flex', gap: 0.8 }}>
+                    <Box>
+                      <Typography variant='body1' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                        Nhận phòng
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
+                          {getDayNumber(booking.startTime)}
+                        </Typography>
+                        <Box gap={0.5} padding={0.5}>
+                          <Box>thg {getMonthNumber(booking.startTime)}</Box>
+                          <Box>Th {getWeekdayNumber(booking.startTime)}</Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Divider orientation='vertical' flexItem />
+                    <Box>
+                      <Typography variant='body1' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                        Trả phòng
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
+                          {getDayNumber(booking.endTime)}
+                        </Typography>
+                        <Box gap={0.5} padding={0.5}>
+                          <Box>thg {getMonthNumber(booking.endTime)}</Box>
+                          <Box>Th {getWeekdayNumber(booking.endTime)}</Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
                 </Box>
                 <Typography color='text.secondary' gutterBottom>
-                  Mã đơn: {booking.id} | Ngày: {booking.startTime}
+                  Mã đơn: {booking.id}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Typography variant='h6' component='div' sx={{ mr: 1 }}>
-                    Giá thuê: {formatCurrency(booking.priceRoom)}
+                    Giá thuê: {formatCurrency(booking.priceRoom)}/giờ
                   </Typography>
                 </Box>
                 <Divider sx={{ my: 2 }} />
@@ -143,7 +189,11 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
                           </ListItemIcon>
                           <ListItemText
                             primary={amenity.name}
-                            secondary={amenity.price === 0 ? 'Miễn phí' : '20.000đ'}
+                            secondary={
+                              amenity.price === 0
+                                ? 'Miễn phí'
+                                : formatCurrency(amenity.price) + `  x ${amenity.quantity}`
+                            }
                           />
                         </ListItem>
                       ))}
@@ -152,8 +202,8 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
                 </Grid>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                <Box />
-                <Box sx={{ fontWeight: 'bold' }}>Tổng tiền: 100K</Box>
+                <Box sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Tổng tiền: {formatCurrency(priceTotal)}</Box>
+                <Button variant='contained'>Chỉnh sửa đặt phòng</Button>
               </Box>
             </CardContent>
           </Grid>
@@ -166,12 +216,19 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
 export default function HistoryOrders() {
   const [page, setPage] = useState(1)
   const { account } = useAppContext()
+  const [selectedTag, setSelectedTag] = useState('Successfully') // Default selection
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag)
+  }
   const { data } = useGetListOrderDetail({
     page: page,
     take: 3,
-    customerId: account?.id as string
+    customerId: account?.id as string,
+    status: selectedTag
   })
   const listOrders = data?.data
+  console.log(listOrders?.data)
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)
   }
@@ -180,6 +237,53 @@ export default function HistoryOrders() {
       <Typography variant='h4' gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', mb: 4 }}>
         Lịch sử đặt phòng
       </Typography>
+
+      <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+        <Box
+          onClick={() => handleTagClick('Successfully')}
+          sx={{
+            cursor: 'pointer',
+            position: 'relative',
+            color: selectedTag === 'Successfully' ? 'primary.main' : 'text.secondary',
+            fontWeight: selectedTag === 'Successfully' ? 'bold' : 'normal',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: -4,
+              height: '3px',
+              backgroundColor: selectedTag === 'Successfully' ? 'primary.main' : 'transparent',
+              transition: 'all 0.3s ease'
+            }
+          }}
+        >
+          Đã hoàn tất
+        </Box>
+
+        <Box
+          onClick={() => handleTagClick('Rejected')}
+          sx={{
+            cursor: 'pointer',
+            position: 'relative',
+            color: selectedTag === 'Rejected' ? 'primary.main' : 'text.secondary',
+            fontWeight: selectedTag === 'Rejected' ? 'bold' : 'normal',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: -4,
+              height: '3px',
+              backgroundColor: selectedTag === 'Rejected' ? 'primary.main' : 'transparent',
+              transition: 'all 0.3s ease'
+            }
+          }}
+        >
+          Đã hủy
+        </Box>
+      </Box>
+
       {listOrders?.data.map((booking, index) => <BookingCard key={booking.id} booking={booking} index={index} />)}
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>

@@ -186,6 +186,26 @@ export const formatDateAndSlot = ({ date, timeSlot }: { date: string; timeSlot: 
   return dateTime.format('YYYY-MM-DDTHH:mm:ss')
 }
 
+export const getMonthNumber = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.getMonth() + 1
+}
+
+export const getWeekdayNumber = (dateString: string) => {
+  const date = new Date(dateString)
+  const dayNumber = date.getDay()
+  if (dayNumber === 0) {
+    return 'CN'
+  }
+
+  return dayNumber + 1
+}
+
+export const getDayNumber = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.getDate() // Trả về số ngày trong tháng
+}
+
 export const formatQueryDateTime = (startTime: string, endTime: string) => {
   const formatDate = (date: string) => {
     return date.replace(/\s/g, ' ')
