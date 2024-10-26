@@ -1,4 +1,4 @@
-import { DataGrid, GridColDef, GridSlots, GridValidRowModel, useGridApiRef } from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowId, GridSlots, GridValidRowModel, useGridApiRef } from '@mui/x-data-grid'
 import { viVN } from '@mui/x-data-grid/locales'
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react'
 
@@ -20,6 +20,10 @@ const Table = ({
   paginationModel?: { pageSize: number; page: number }
   setPaginationModel?: Dispatch<SetStateAction<{ pageSize: number; page: number }>>
   totalRowCount?: number
+  getDetailPanelContent?: (row: GridValidRowModel) => JSX.Element
+  getDetailPanelHeight?: (row: GridValidRowModel) => number
+  detailPanelExpandedRowIds?: GridRowId[]
+  onDetailPanelExpandedRowIdsChange?: (expandedIds: GridRowId[]) => void
 }) => {
   const apiRef = useGridApiRef()
   const rowCountRef = useRef(totalRowCount || 0)

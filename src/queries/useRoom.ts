@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import roomApiRequest from '~/apis/room'
 import { Pagination } from '~/constants/type'
+import { GetBookedRoomsReqType } from '~/schemaValidations/room.schema'
 
 export const useGetListRooms = (query: Pagination) => {
   return useQuery({
@@ -39,5 +40,12 @@ export const useCountServedRooms = () => {
   return useQuery({
     queryKey: ['count-rooms'],
     queryFn: () => roomApiRequest.countServedRooms()
+  })
+}
+
+export const useGetBookedRoomsByAccountId = (query: GetBookedRoomsReqType) => {
+  return useQuery({
+    queryKey: ['booked-rooms-by-account-id'],
+    queryFn: () => roomApiRequest.getBookedRoomsById(query)
   })
 }
