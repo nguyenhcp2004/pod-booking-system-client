@@ -128,7 +128,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  {revenue?.toLocaleString()}
+                  {revenue?.toLocaleString('vi-VN')} VNĐ
                 </Typography>
               </CardContent>
             </Card>

@@ -30,3 +30,10 @@ export const useGetRevenueCurrentDay = () => {
     queryFn: () => orderDetailApiRequest.getRevenueCurrentDay()
   })
 }
+
+export const useGetRevenueByMonth = () => {
+  return useQuery({
+    queryKey: ['order-detail-revenue-by-month'],
+    queryFn: () => orderDetailApiRequest.getRevenueByMonth()
+  })
+}

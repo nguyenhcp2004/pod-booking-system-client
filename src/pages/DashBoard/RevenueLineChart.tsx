@@ -1,49 +1,65 @@
 import { Card, CardContent, CardHeader, Typography, CardActions } from '@mui/material'
 import { LineChart } from '@mui/x-charts/LineChart'
 import moment from 'moment'
+import { useMemo } from 'react'
+import { useGetRevenueByMonth } from '~/queries/useOrderDetail'
+
+interface RevenueByMonthDto {
+  date: string
+  revenue: number
+}
 
 export function RevenueLineChart() {
-  const chartData = [
-    { date: '01/01/2024', revenue: 1000 },
-    { date: '01/02/2024', revenue: 2000 },
-    { date: '01/03/2024', revenue: 1500 },
-    { date: '01/04/2024', revenue: 3000 },
-    { date: '01/05/2024', revenue: 2500 },
-    { date: '01/06/2024', revenue: 4000 },
-    { date: '01/07/2024', revenue: 3500 },
-    { date: '01/08/2024', revenue: 5000 },
-    { date: '01/09/2024', revenue: 4500 },
-    { date: '01/10/2024', revenue: 6000 },
-    { date: '01/11/2024', revenue: 6000 },
-    { date: '01/12/2024', revenue: 6000 }
-  ]
+  const { data: revenueByMonthRes, isLoading, error } = useGetRevenueByMonth()
 
-  const dates = chartData.map((item) => moment(item.date, 'DD/MM/YYYY').toDate())
-  const revenues = chartData.map((item) => item.revenue)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const chartData: RevenueByMonthDto[] = revenueByMonthRes?.data.data || []
+
+  const { dates, revenues, monthRange } = useMemo(() => {
+    const sortedData = [...chartData].sort((a, b) => moment(a.date).diff(moment(b.date)))
+    const dates = sortedData.map((item) => moment(item.date).toDate())
+    const revenues = sortedData.map((item) => item.revenue)
+
+    const firstMonth = moment(sortedData[0]?.date).format('MM')
+    const lastMonth = moment(sortedData[sortedData.length - 1]?.date).format('MM')
+    const year = moment(sortedData[0]?.date).format('YYYY')
+    const monthRange =
+      sortedData.length > 0
+        ? `Phân tích doanh thu tháng ${firstMonth}-${lastMonth} năm ${year}`
+        : 'Chưa có dữ liệu doanh thu'
+
+    return { dates, revenues, monthRange }
+  }, [chartData])
+
+  if (isLoading) return <Typography>Đang tải dữ liệu...</Typography>
+  if (error) return <Typography>Có lỗi xảy ra: {error.message}</Typography>
 
   return (
     <Card>
-      <CardHeader
-        title={<Typography variant='h6'>Doanh thu</Typography>}
-        subheader='Phân tích doanh thu tháng 1 - 12 năm 2024'
-      />
+      <CardHeader title={<Typography variant='h6'>Doanh thu</Typography>} subheader={monthRange} />
       <CardContent>
-        <LineChart
-          xAxis={[
-            {
-              data: dates,
-              label: 'Ngày',
-              valueFormatter: (value) => moment(value).format('DD/MM/YYYY')
-            }
-          ]}
-          series={[
-            {
-              data: revenues,
-              label: 'Doanh thu'
-            }
-          ]}
-          height={300}
-        />
+        {chartData.length > 0 ? (
+          <LineChart
+            xAxis={[
+              {
+                data: dates,
+                label: 'Ngày',
+                valueFormatter: (value) => moment(value).format('DD/MM/YYYY')
+              }
+            ]}
+            series={[
+              {
+                data: revenues,
+                label: 'Doanh thu',
+                valueFormatter: (value) => `${value?.toLocaleString('vi-VN')} VND`
+              }
+            ]}
+            height={300}
+            margin={{ top: 20, right: 20, bottom: 20, left: 60 }}
+          />
+        ) : (
+          <Typography>Không có dữ liệu</Typography>
+        )}
       </CardContent>
       <CardActions>
         <Typography variant='body2' color='textSecondary'></Typography>

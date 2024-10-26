@@ -105,3 +105,16 @@ export const GetRevenueReq = z.object({
 })
 
 export type GetRevenueReqType = z.TypeOf<typeof GetRevenueReq>
+
+export const RevenueByMonthSchema = z.object({
+  date: z.string(),
+  revenue: z.number()
+})
+
+export const GetRevenueByMonthRes = z.object({
+  code: z.number(),
+  data: z.array(RevenueByMonthSchema),
+  message: z.string()
+})
+
+export type GetRevenueByMonthResType = z.TypeOf<typeof GetRevenueByMonthRes>

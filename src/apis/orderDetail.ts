@@ -4,7 +4,8 @@ import {
   GetListOrderDetailResType,
   OrderDetailFullInfoResType,
   GetRevenueReqType,
-  GetRevenueResType
+  GetRevenueResType,
+  GetRevenueByMonthResType
 } from '~/schemaValidations/orderDetail.schema'
 import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
@@ -29,5 +30,8 @@ export const orderDetailApiRequest = {
       queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     }
     return http.get<GetRevenueResType>(`/order-detail/revenue?${queryString}`)
+  },
+  getRevenueByMonth: () => {
+    return http.get<GetRevenueByMonthResType>('/order-detail/revenue-by-month')
   }
 }
