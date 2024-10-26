@@ -4,7 +4,8 @@ export const GetListOrderDetailQuery = z
   .object({
     customerId: z.string(),
     page: z.number().optional(),
-    take: z.number().optional()
+    take: z.number().optional(),
+    status: z.string().optional()
   })
   .strict()
 

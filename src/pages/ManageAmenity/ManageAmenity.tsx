@@ -1,6 +1,6 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
 import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
-import { Box, Chip, Typography } from '@mui/material'
+import { Box, Chip, Typography, useTheme } from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
 import { useDeleteAmenityMutation } from '~/queries/useAmenity'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import moment from 'moment'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -29,7 +30,7 @@ export default function ManageBuilding() {
     take: paginationModel.pageSize
   })
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
-
+  const theme = useTheme()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
@@ -63,7 +64,6 @@ export default function ManageBuilding() {
     if (rowToToggle) {
       const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
       try {
-        // Call delete mutation with just the id
         await deleteAmenityMutation.mutateAsync(rowToToggle.id)
 
         toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`, {
@@ -71,7 +71,7 @@ export default function ManageBuilding() {
         })
         setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
       } catch (error) {
-        handleErrorApi({ error }) // Your custom error handler
+        handleErrorApi({ error })
         toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
           autoClose: 3000
         })
@@ -92,16 +92,68 @@ export default function ManageBuilding() {
         }
       }
     },
-    { field: 'name', headerName: 'Dịch vụ', width: 350, editable: true },
+    { field: 'name', headerName: 'Dịch vụ', width: 350, editable: false },
     {
       field: 'price',
       headerName: 'Giá',
       width: 350,
-      editable: true
+      editable: false,
+      renderCell: (params) => {
+        const priceInVND = parseFloat(params.value).toFixed(2)
+        return (
+          <Typography variant='body2' color={theme.palette.text.primary}>
+            {priceInVND.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ
+          </Typography>
+        )
+      }
     },
-    { field: 'quantity', headerName: 'Số lượng', width: 150, editable: true },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: true },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: true },
+    { field: 'quantity', headerName: 'Số lượng', width: 150, editable: false },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'type',
       headerName: 'Loại dịch vụ',
@@ -111,16 +163,10 @@ export default function ManageBuilding() {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          color={
-            params.value === AmenityTypeEnum.Food
-              ? 'warning' // Predefined 'warning' color for Food
-              : params.value === 'success'
-                ? 'success' // Predefined 'success' color
-                : 'error' // Predefined 'error' color for other values
-          }
+          color={params.value === AmenityTypeEnum.Food ? 'warning' : params.value === 'success' ? 'success' : 'error'}
         />
       ),
-      editable: true
+      editable: false
     },
     {
       field: 'status',
@@ -131,7 +177,7 @@ export default function ManageBuilding() {
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
       ),
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], status: props.value }
