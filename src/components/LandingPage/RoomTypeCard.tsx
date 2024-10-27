@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, CardMedia, Typography, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useNavigate } from 'react-router-dom'
+import { slotType, useBookingContext } from '~/contexts/BookingContext'
 
 export interface PODRoomTypeCardProps {
   id: number
@@ -18,12 +19,31 @@ export interface PODRoomTypeCardProps {
     createdAt: string
     updatedAt: string
   }
+  date: string | null
+  timeSlot: slotType[]
 }
 
-const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ id, name, price, quantity, capacity, building }) => {
+const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
+  id,
+  name,
+  price,
+  quantity,
+  capacity,
+  building,
+  date,
+  timeSlot
+}) => {
   const navigate = useNavigate()
+  const { setBookingData } = useBookingContext()
 
   const handleBookRoom = () => {
+    setBookingData({
+      roomType: { id, name, price, quantity, capacity, building },
+      selectedRooms: [],
+      date: date,
+      timeSlots: timeSlot,
+      servicePackage: null
+    })
     navigate(`/room-details/${id}`)
   }
 

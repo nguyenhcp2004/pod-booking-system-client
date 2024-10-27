@@ -10,6 +10,7 @@ import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
 import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
 import { Helmet } from 'react-helmet-async'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { slotType } from '~/contexts/BookingContext'
 
 export default function Component() {
   const [page, setPage] = useState(1)
@@ -173,15 +174,12 @@ export default function Component() {
         </Grid>
         {/* Rooms Section Card */}
         <Grid container spacing={2}>
-          {data?.data.data.map((roomType: PODRoomTypeCardProps) => (
+          {data?.data.data.map((roomType: Omit<PODRoomTypeCardProps, 'date' | 'timeSlot'>) => (
             <Grid size={12} key={roomType.id}>
               <PODRoomTypeCard
-                id={roomType.id}
-                name={roomType.name}
-                price={roomType.price}
-                quantity={roomType.quantity}
-                capacity={roomType.capacity}
-                building={roomType.building}
+                {...roomType}
+                date={date ? date.format(DEFAULT_DATE_FORMAT) : null}
+                timeSlot={timeSlot ? [timeSlot as slotType] : []}
               />
             </Grid>
           ))}
