@@ -209,7 +209,7 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                 <Box sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Tổng tiền: {formatCurrency(priceTotal)}</Box>
                 <Button variant='contained' onClick={handleClick}>
-                  Chỉnh sửa đặt phòng
+                  Xem chi tiết hóa đơn
                 </Button>
               </Box>
             </CardContent>
