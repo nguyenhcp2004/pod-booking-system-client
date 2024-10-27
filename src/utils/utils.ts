@@ -186,6 +186,18 @@ export const formatDateAndSlot = ({ date, timeSlot }: { date: string; timeSlot: 
   return dateTime.format('YYYY-MM-DDTHH:mm:ss')
 }
 
+export const formatQueryDateTime = (startTime: string, endTime: string) => {
+  const formatDate = (date: string) => {
+    return date.replace(/\s/g, ' ')
+  }
+
+  const startTimeUrl = formatDate(startTime as string)
+  const endTimeUrl = formatDate(endTime as string)
+
+  const queryString = `startTime=${startTimeUrl}&endTime=${endTimeUrl}`
+  return queryString
+}
+
 export const getMonthNumber = (dateString: string) => {
   const date = new Date(dateString)
   return date.getMonth() + 1
