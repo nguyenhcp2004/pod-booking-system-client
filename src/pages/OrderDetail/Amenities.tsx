@@ -7,7 +7,7 @@ import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
-import { useGetAmenities } from '~/queries/useAmenity'
+import { useGetActiveAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext } from '~/contexts/BookingContext'
 import { toast } from 'react-toastify'
@@ -26,7 +26,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const colors = tokens(theme.palette.mode)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0)
-  const { data: amenities = [] } = useGetAmenities()
+  const { data: amenities = [] } = useGetActiveAmenities()
   const [errorState, setErrorState] = useState<string | null>(null)
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
