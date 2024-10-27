@@ -160,8 +160,13 @@ export default function Component() {
           </Grid>
           <Grid size={3}>
             <FormControl fullWidth>
-              <InputLabel id='time-slot-label'>Slot</InputLabel>
-              <Select labelId='time-slot-label' value={timeSlot || ''} label='Slot' onChange={handleTimeSlotChange}>
+              <InputLabel id='time-slot-label'>Khung giờ</InputLabel>
+              <Select
+                labelId='time-slot-label'
+                value={timeSlot || ''}
+                label='Khung giờ'
+                onChange={handleTimeSlotChange}
+              >
                 <MenuItem value='07:00 - 09:00'>7h - 9h</MenuItem>
                 <MenuItem value='09:00 - 11:00'>9h - 11h</MenuItem>
                 <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
