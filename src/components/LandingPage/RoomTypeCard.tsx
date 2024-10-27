@@ -10,6 +10,7 @@ export interface PODRoomTypeCardProps {
   price: number
   quantity: number
   capacity: number
+  image: string
   building: {
     id: number
     address: string
@@ -29,6 +30,7 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
   price,
   quantity,
   capacity,
+  image,
   building,
   date,
   timeSlot
@@ -57,7 +59,7 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
           <CardMedia
             component='img'
             sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            image='src/assets/images/roomCardImage.jpg'
+            image={image}
             alt={name}
           />
         </Grid>
