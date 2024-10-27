@@ -9,61 +9,31 @@ import moment, { Moment } from 'moment'
 import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
 import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
 import { Helmet } from 'react-helmet-async'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
-const STORAGE_KEY = 'roomTypeFilterStateLandingPage'
-
-export default function Home() {
+export default function Component() {
   const [page, setPage] = useState(1)
-  const [filterQuery, setFilterQuery] = useState<FilterRoomTypeQuery>(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY)
-    if (savedState) {
-      const parsedState = JSON.parse(savedState)
-      return {
-        ...parsedState,
-        page: 1,
-        take: 4
-      }
-    }
-    return {
-      address: '',
-      capacity: undefined,
-      startTime: undefined,
-      endTime: undefined,
-      page: 1,
-      take: 4
-    }
+  const [filterQuery, setFilterQuery] = useState<FilterRoomTypeQuery>({
+    address: '',
+    capacity: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    page: 1,
+    take: 4
   })
   const { data, refetch } = useGetFilterRoomType(filterQuery)
-  const [location, setLocation] = useState(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY)
-    return savedState ? JSON.parse(savedState).address : null
-  })
-  const [roomType, setRoomType] = useState(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY)
-    return savedState ? `Phòng ${JSON.parse(savedState).capacity} người` : undefined
-  })
-  const [date, setDate] = useState<Moment | null>(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY)
-    return savedState ? moment(JSON.parse(savedState).startTime) : moment()
-  })
-  const [timeSlot, setTimeSlot] = useState<string>(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY)
-    if (savedState) {
-      const { startTime, endTime } = JSON.parse(savedState)
-      const start = moment(startTime).hour()
-      const end = moment(endTime).hour()
-      return `${start} - ${end}`
-    }
-    return '9 - 11'
-  })
+
+  const [location, setLocation] = useState<string | null>(null)
+  const [roomType, setRoomType] = useState<string | null>(null)
+  const [date, setDate] = useState<Moment | null>(moment())
+  const [timeSlot, setTimeSlot] = useState<string | null>(null)
 
   useEffect(() => {
-    setFilterQuery((prev: object) => ({ ...prev, page }))
+    setFilterQuery((prev) => ({ ...prev, page }))
   }, [page])
 
   useEffect(() => {
     refetch()
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filterQuery))
   }, [filterQuery, refetch])
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
@@ -72,7 +42,7 @@ export default function Home() {
 
   const handleDateChange = (newDate: Moment | null) => {
     setDate(newDate)
-    updateFilterQuery(newDate, timeSlot)
+    updateFilterQuery(newDate, timeSlot as string)
   }
 
   const handleTimeSlotChange = (event: SelectChangeEvent<string>) => {
@@ -84,14 +54,14 @@ export default function Home() {
   const handleLocationChange = (event: SelectChangeEvent<string>) => {
     const newLocation = event.target.value
     setLocation(newLocation)
-    setFilterQuery((prev: object) => ({ ...prev, address: newLocation }))
+    setFilterQuery((prev) => ({ ...prev, address: newLocation }))
   }
 
   const handleRoomTypeChange = (event: SelectChangeEvent<string>) => {
     const newRoomType = event.target.value
     setRoomType(newRoomType)
     const capacity = parseInt(newRoomType.split(' ')[1])
-    setFilterQuery((prev: object) => ({ ...prev, capacity }))
+    setFilterQuery((prev) => ({ ...prev, capacity }))
   }
 
   const updateFilterQuery = (selectedDate: Moment | null, selectedTimeSlot: string) => {
@@ -100,7 +70,7 @@ export default function Home() {
       const startTime = selectedDate.clone().hour(parseInt(startHour)).minute(0).second(0)
       const endTime = selectedDate.clone().hour(parseInt(endHour)).minute(0).second(0)
 
-      setFilterQuery((prev: object) => ({
+      setFilterQuery((prev) => ({
         ...prev,
         startTime: startTime.format('YYYY-MM-DDTHH:mm:ss'),
         endTime: endTime.format('YYYY-MM-DDTHH:mm:ss')
@@ -184,13 +154,13 @@ export default function Home() {
               onChange={handleDateChange}
               sx={{ width: '100%' }}
               label='Ngày đặt'
-              format='DD/MM/YYYY'
+              format={DEFAULT_DATE_FORMAT}
             />
           </Grid>
           <Grid size={3}>
             <FormControl fullWidth>
               <InputLabel id='time-slot-label'>Slot</InputLabel>
-              <Select labelId='time-slot-label' value={timeSlot} label='Slot' onChange={handleTimeSlotChange}>
+              <Select labelId='time-slot-label' value={timeSlot || ''} label='Slot' onChange={handleTimeSlotChange}>
                 <MenuItem value='7 - 9'>7h - 9h</MenuItem>
                 <MenuItem value='9 - 11'>9h - 11h</MenuItem>
                 <MenuItem value='13 - 15'>13h - 15h</MenuItem>
