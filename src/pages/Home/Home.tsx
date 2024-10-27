@@ -27,7 +27,7 @@ export default function Component() {
   const [location, setLocation] = useState<string | null>(null)
   const [roomType, setRoomType] = useState<string | null>(null)
   const [date, setDate] = useState<Moment | null>(moment())
-  const [timeSlot, setTimeSlot] = useState<string | null>(null)
+  const [timeSlot, setTimeSlot] = useState<slotType | null>(null)
 
   useEffect(() => {
     setFilterQuery((prev) => ({ ...prev, page }))
@@ -43,13 +43,13 @@ export default function Component() {
 
   const handleDateChange = (newDate: Moment | null) => {
     setDate(newDate)
-    updateFilterQuery(newDate, timeSlot as string)
+    updateFilterQuery(newDate, timeSlot as slotType)
   }
 
   const handleTimeSlotChange = (event: SelectChangeEvent<string>) => {
     const newTimeSlot = event.target.value
-    setTimeSlot(newTimeSlot)
-    updateFilterQuery(date, newTimeSlot)
+    setTimeSlot(newTimeSlot as slotType)
+    updateFilterQuery(date, newTimeSlot as slotType)
   }
 
   const handleLocationChange = (event: SelectChangeEvent<string>) => {
@@ -65,9 +65,9 @@ export default function Component() {
     setFilterQuery((prev) => ({ ...prev, capacity }))
   }
 
-  const updateFilterQuery = (selectedDate: Moment | null, selectedTimeSlot: string) => {
+  const updateFilterQuery = (selectedDate: Moment | null, selectedTimeSlot: slotType | null) => {
     if (selectedDate && selectedTimeSlot) {
-      const [startHour, endHour] = selectedTimeSlot.split(' - ').map((time) => time.replace('h', ''))
+      const [startHour, endHour] = selectedTimeSlot.split(' - ')
       const startTime = selectedDate.clone().hour(parseInt(startHour)).minute(0).second(0)
       const endTime = selectedDate.clone().hour(parseInt(endHour)).minute(0).second(0)
 
@@ -162,12 +162,13 @@ export default function Component() {
             <FormControl fullWidth>
               <InputLabel id='time-slot-label'>Slot</InputLabel>
               <Select labelId='time-slot-label' value={timeSlot || ''} label='Slot' onChange={handleTimeSlotChange}>
-                <MenuItem value='7 - 9'>7h - 9h</MenuItem>
-                <MenuItem value='9 - 11'>9h - 11h</MenuItem>
-                <MenuItem value='13 - 15'>13h - 15h</MenuItem>
-                <MenuItem value='15 - 17'>15h - 17h</MenuItem>
-                <MenuItem value='17 - 19'>17h - 19h</MenuItem>
-                <MenuItem value='19 - 21'>19h - 21h</MenuItem>
+                <MenuItem value='07:00 - 09:00'>7h - 9h</MenuItem>
+                <MenuItem value='09:00 - 11:00'>9h - 11h</MenuItem>
+                <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
+                <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
+                <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
+                <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
+                <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
               </Select>
             </FormControl>
           </Grid>
