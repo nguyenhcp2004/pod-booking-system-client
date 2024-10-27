@@ -37,3 +37,10 @@ export const useGetRevenueByMonth = () => {
     queryFn: () => orderDetailApiRequest.getRevenueByMonth()
   })
 }
+
+export const useGetNumberOrderByBuilding = () => {
+  return useQuery({
+    queryKey: ['order-detail-number-order-by-month'],
+    queryFn: () => orderDetailApiRequest.getNumberOrdersByBuilding()
+  })
+}

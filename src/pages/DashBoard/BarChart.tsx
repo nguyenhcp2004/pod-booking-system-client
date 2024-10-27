@@ -1,23 +1,43 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { BarChart } from '@mui/x-charts/BarChart'
 import { Card, CardContent, CardHeader, Typography, CardActions } from '@mui/material'
+import { useGetNumberOrderByBuilding } from '~/queries/useOrderDetail'
+import { useMemo } from 'react'
 
-const chartData = [
-  { name: 'Phòng 2 người', successOrders: 120 },
-  { name: 'Phòng 4 người', successOrders: 90 },
-  { name: 'Họp', successOrders: 70 },
-  { name: 'Họp 2', successOrders: 150 },
-  { name: 'Hội nghị', successOrders: 85 }
-]
+interface NumberOrderByBuildingDto {
+  buildingNumber: number
+  address: string
+  numberOrders: number
+}
+
+// type ChartDataType = NumberOrderByBuildingDto & { [key: string]: string | number }
 
 export function RoomBarChart() {
+  const { data: numberOrderByBuildingRes, isLoading, error } = useGetNumberOrderByBuilding()
+
+  const chartData: NumberOrderByBuildingDto[] = numberOrderByBuildingRes?.data.data || []
+
+  const sortedData = useMemo(() => {
+    return [...chartData]
+      .sort((a, b) => b.numberOrders - a.numberOrders)
+      .slice(0, 5)
+      .map((item) => ({
+        ...item,
+        numberOrdersLabel: item.numberOrders.toString() // Add a string version for labels
+      }))
+  }, [chartData])
+
+  if (isLoading) return <Typography>Đang tải dữ liệu...</Typography>
+  if (error) return <Typography>Có lỗi xảy ra: {error.message}</Typography>
+
   return (
     <Card>
       <CardHeader title={<Typography variant='h6'>Xếp hạng loại phòng</Typography>} subheader='Được gọi nhiều nhất' />
       <CardContent>
         <BarChart
-          dataset={chartData}
-          yAxis={[{ scaleType: 'band', dataKey: 'name' }]}
-          series={[{ dataKey: 'successOrders', label: 'Đơn đặt' }]}
+          dataset={sortedData}
+          yAxis={[{ scaleType: 'band', dataKey: 'address' }]}
+          series={[{ dataKey: 'numberOrders', label: 'Đơn đặt' }]}
           xAxis={[
             {
               label: 'Đơn đặt'

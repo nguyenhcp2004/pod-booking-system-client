@@ -118,3 +118,17 @@ export const GetRevenueByMonthRes = z.object({
 })
 
 export type GetRevenueByMonthResType = z.TypeOf<typeof GetRevenueByMonthRes>
+
+export const NumberOrderByBuildingSchema = z.object({
+  buildingNumber: z.number(),
+  address: z.string(),
+  numberOrders: z.number()
+})
+
+export const GetNumberOrderByBuildingRes = z.object({
+  code: z.number(),
+  data: z.array(NumberOrderByBuildingSchema),
+  message: z.string()
+})
+
+export type GetNumberOrderByBuildingResType = z.TypeOf<typeof GetNumberOrderByBuildingRes>
