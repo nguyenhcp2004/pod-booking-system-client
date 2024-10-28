@@ -17,6 +17,10 @@ export default function EditBooking() {
   const orderDetail = data?.data.data
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
     setLoaded(true)
   }, [])
   return (
