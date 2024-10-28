@@ -97,12 +97,14 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
     const payLoadCreate = {
       ...formJson,
       role: role,
-      status: status
+      status: status,
+      buildingNumber: buildingNumber
     }
     const payLoadUpdate = {
       ...row,
       role: role,
-      status: status
+      status: status,
+      buildingNumber: buildingNumber
     }
     try {
       let result
@@ -227,6 +229,11 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.buildingNumber && (
+                    <Typography color='error' variant='caption'>
+                      {errors.buildingNumber}
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
             </>
