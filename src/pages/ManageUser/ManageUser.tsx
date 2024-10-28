@@ -196,7 +196,8 @@ export default function ManageUser() {
       getActions: ({ row }) => {
         const propRow = {
           ...row,
-          buildingNumber: row?.building?.id || 0
+          buildingNumber: row?.building?.id || 0,
+          status: row.status === 'Hoạt động' ? 1 : 0
         }
         return [
           <UserModal row={propRow} refetch={refetch} action={ACTION.UPDATE} />,

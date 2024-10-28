@@ -32,9 +32,10 @@ import { useGetAllBuilding } from '~/queries/useBuilding'
 
 const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: () => void; action: string }) => {
   const [open, setOpen] = useState(false)
-  const [role, setRole] = useState(ACTION.CREATE ? AccountRole.Customer.toString() : row?.role)
-  const [buildingNumber, setBuildingNumber] = useState(ACTION.CREATE ? 0 : row.buildingNumber)
-  const [status, setStatus] = useState<number>(ACTION.CREATE ? 1 : row?.status) // Default to active (1)
+  const [name, setName] = useState(ACTION.CREATE === action ? '' : row.name)
+  const [role, setRole] = useState(ACTION.CREATE === action ? AccountRole.Customer.toString() : row.role)
+  const [buildingNumber, setBuildingNumber] = useState(ACTION.CREATE === action ? 0 : row.buildingNumber)
+  const [status, setStatus] = useState<number>(ACTION.CREATE === action ? 1 : row.status)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const createAccount = useCreateAccountMutation()
   const updateAccount = useUpdateAccountByAdmin()
@@ -52,6 +53,10 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
 
   const handleBuildingNumberChange = (event: SelectChangeEvent<number>) => {
     setBuildingNumber(event.target.value as number)
+  }
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value)
   }
 
   const handleClickOpen = () => {
@@ -96,16 +101,19 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
     const formJson = Object.fromEntries(formData.entries()) as unknown as CreateAccountBodyType
     const payLoadCreate = {
       ...formJson,
+      name: name,
       role: role,
       status: status,
       buildingNumber: buildingNumber
     }
     const payLoadUpdate = {
       ...row,
+      name: name,
       role: role,
       status: status,
       buildingNumber: buildingNumber
     }
+
     try {
       let result
       if (action === ACTION.UPDATE) {
@@ -118,7 +126,6 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
           return
         }
         result = await createAccount.mutateAsync(payLoadCreate)
-        console.log(result)
       }
       toast.success(result?.data.message, {
         autoClose: 3000
@@ -166,7 +173,8 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                 type='text'
                 size='small'
                 name='name'
-                defaultValue={row?.name}
+                value={name}
+                onChange={handleNameChange}
                 error={!!errors.name}
                 helperText={errors.name}
               />
