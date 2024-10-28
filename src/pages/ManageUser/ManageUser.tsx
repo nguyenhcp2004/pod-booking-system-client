@@ -194,8 +194,12 @@ export default function ManageUser() {
       width: 100,
       cellClassName: 'actions',
       getActions: ({ row }) => {
+        const propRow = {
+          ...row,
+          buildingNumber: row?.building?.id || 0
+        }
         return [
-          <UserModal row={row} refetch={refetch} action={ACTION.UPDATE} />,
+          <UserModal row={propRow} refetch={refetch} action={ACTION.UPDATE} />,
           <GridActionsCellItem
             icon={row.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
             label={row.status === 'Hoạt động' ? 'Ban' : 'Unban'}
