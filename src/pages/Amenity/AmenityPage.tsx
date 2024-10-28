@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import { useGetActiveAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
+import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
@@ -35,7 +35,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
-  const { data: responseAllAmenities } = useGetActiveAmenities()
+  const { data: responseAllAmenities } = useGetAmenities()
   const { data: responseBookedRooms } = useGetBookedRooms()
   const amenities: AmenityType[] = response?.data.data ?? []
   const allAmenities: AmenityType[] = responseAllAmenities ?? []

@@ -10,6 +10,8 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
+import { useGetMe } from '~/queries/useAccount'
+import { isValidVietnamPhoneNumber } from '~/utils/utils'
 
 //import { array } from 'zod'
 interface CommonProps {
@@ -25,6 +27,9 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const bookingData = bookingContext!.bookingData
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
+  const { data: account } = useGetMe()
+  const [phoneNumber, setPhoneNumber] = useState(account?.data.data.phoneNumber || '')
+  const [phoneError, setPhoneError] = useState<string | null>(null)
   useEffect(() => {
     if (bookingData) {
       setSelectedDates([moment(bookingData.date)])
@@ -53,6 +58,19 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   // Đồng thời thì thằng stompjs nó khó chịu là vào mỗi page thì mình sẽ phải tạo 1 socket mới luôn, tức dù mình navigate nó cũng disconnect
   if (!bookingData) return null
 
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(event.target.value)
+  }
+
+  const handleNext = () => {
+    if (!isValidVietnamPhoneNumber(phoneNumber)) {
+      setPhoneError('Số điện thoại không hợp lệ')
+      return
+    }
+    setPhoneError(null)
+    props.onNext() // proceed if valid
+  }
+
   return (
     <Box id='hehe' sx={{ height: '100%', marginX: '104px' }}>
       <Helmet>
@@ -72,7 +90,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Tên'
-                      defaultValue='Phạm Thị Anh Đào'
+                      defaultValue={account?.data.data.name || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
@@ -83,18 +101,22 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Số điện thoại'
-                      defaultValue='09xxxxxxxx'
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
                       fullWidth
+                      error={!!phoneError}
+                      helperText={phoneError}
                       InputProps={{
-                        readOnly: true
+                        readOnly: account?.data.data.phoneNumber ? true : false
                       }}
                     />
                   </Grid>
+
                   <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
                     <TextField
                       id='outlined-required'
                       label='Email'
-                      defaultValue='dao@gmail.com'
+                      defaultValue={account?.data.data.email || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
@@ -133,7 +155,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
           >
             <Box sx={{ width: '100%' }}>
               <Button
-                onClick={props.onNext}
+                onClick={handleNext}
                 fullWidth
                 sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
               >
