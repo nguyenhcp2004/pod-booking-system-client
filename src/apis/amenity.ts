@@ -14,6 +14,9 @@ const amenityApiRequest = {
   getAllAmenities: () => {
     return http.get<AmenityListResType>('/amenity/all')
   },
+  getAllActiveAmenities: () => {
+    return http.get<AmenityListResType>('/amenity/allActive')
+  },
   getListAmenity: (query: Pagination) => {
     const stringified = queryString.stringify(query)
     return http.get<GetListAmenityResType>(`/amenity?${stringified}`)

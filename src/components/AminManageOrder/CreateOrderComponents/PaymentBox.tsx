@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, useTheme } from '@mui/material'
+import { Box, Button, IconButton, Typography, useTheme } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { generatePaymentUrl } from '~/apis/paymentApi'
@@ -7,12 +7,14 @@ import { QRCodeSVG } from 'qrcode.react'
 import { Link } from 'react-router-dom'
 import { BookingInfo } from '~/contexts/BookingContext'
 import { calTotalPrice } from '~/utils/order'
+import { formatCurrency } from '~/utils/currency'
 
 interface PaymentBoxProps {
   bookingData: BookingInfo
+  handleCreateOrder: () => void
 }
 
-const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
+const PaymentBox = ({ bookingData, handleCreateOrder }: PaymentBoxProps) => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
   const [showReload, setShowReload] = useState(false)
   const [paymentUrl, setPaymentUrl] = useState<string>('')
@@ -121,8 +123,11 @@ const PaymentBox = ({ bookingData }: PaymentBoxProps) => {
       )}
 
       <Typography variant='subtitle1' color={theme.palette.primary.main} fontWeight='bold'>
-        {calTotalPrice(bookingData).total.toLocaleString()} VND
+        {formatCurrency(calTotalPrice(bookingData).total)}
       </Typography>
+      <Button variant='contained' onClick={handleCreateOrder}>
+        Xác nhận đã thanh toán
+      </Button>
     </Box>
   )
 }

@@ -10,6 +10,7 @@ import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
 
 const iconSx = {
   width: '24px',
@@ -36,6 +37,11 @@ const menuItems = [
     title: 'Phòng',
     to: '/admin/rooms',
     icon: <MeetingRoomIcon sx={iconSx} />
+  },
+  {
+    title: 'Loại phòng',
+    to: '/admin/room-types',
+    icon: <RoomPreferencesIcon sx={iconSx} />
   },
   {
     title: 'Chi nhánh',

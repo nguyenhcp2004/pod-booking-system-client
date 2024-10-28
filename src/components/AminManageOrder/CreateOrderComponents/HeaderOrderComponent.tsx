@@ -227,7 +227,6 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                 maxHeight: '150px',
                 top: '52px',
                 overflowY: 'scroll',
-                paddingRight: 4,
                 bgcolor: 'white',
                 borderRadius: 2,
                 boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.2)'
@@ -250,20 +249,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
         </Box>
         <Box sx={{ flex: 1, paddingX: 2 }}>
           <FormControl fullWidth>
-            <InputLabel id='staff-select-label'>Room type</InputLabel>
+            <InputLabel id='staff-select-label'>Loại phòng</InputLabel>
             <Select
               labelId='staff-select-label'
-              label='Room type'
+              label='Loại phòng'
               value={roomTypeID || ''}
               onChange={(e) => handleSelectRoomType(e)}
               fullWidth
               renderValue={(selected) => {
                 const selectedRoomType = roomTypeList.find((roomT) => roomT.id == selected)
-                return selectedRoomType ? selectedRoomType.name : 'Room type'
+                return selectedRoomType ? selectedRoomType.name : 'Chọn loại phòng'
               }}
             >
               <MenuItem value='' disabled>
-                Chọn room type
+                Chọn loại phòng
               </MenuItem>
               {roomTypeList.map((roomT) => (
                 <MenuItem key={roomT.id} value={roomT.id}>
@@ -306,6 +305,11 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               onChange={(_, slots) => {
                 handleSelectSlots(slots as slotType[])
               }}
+              sx={{
+                '.MuiAutocomplete-inputRoot': {
+                  minHeight: '52px'
+                }
+              }}
               disableCloseOnSelect
               renderOption={(props, option, { selected }) => {
                 const { key, ...optionProps } = props
@@ -322,7 +326,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   </li>
                 )
               }}
-              renderInput={(params) => <TextField {...params} label='Slot' size='small' />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='Khung giờ'
+                  size='small'
+                  InputLabelProps={{
+                    sx: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '70%'
+                    }
+                  }}
+                />
+              )}
             />
           </FormControl>
         </Box>
@@ -336,6 +353,11 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               value={selectedRooms}
               onChange={(_, rooms) => {
                 handleSelectRooms(rooms as Room[])
+              }}
+              sx={{
+                '.MuiAutocomplete-inputRoot': {
+                  minHeight: '52px'
+                }
               }}
               getOptionLabel={(option) => option.name}
               renderOption={(props, option, { selected }) => {
@@ -353,7 +375,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   </li>
                 )
               }}
-              renderInput={(params) => <TextField {...params} label='Chọn phòng' size='small' />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='Chọn phòng'
+                  size='small'
+                  InputLabelProps={{
+                    sx: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '70%'
+                    }
+                  }}
+                />
+              )}
             />
           </FormControl>
         </Box>
@@ -364,9 +399,27 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               onChange={(_, servicePackage) => {
                 handleSelectPackage(servicePackage)
               }}
+              sx={{
+                '.MuiAutocomplete-inputRoot': {
+                  minHeight: '52px'
+                }
+              }}
               options={isSuccess ? servicePackage?.data?.data : []}
               getOptionLabel={(option) => option.name}
-              renderInput={(params) => <TextField {...params} label='Chọn gói' size='small' />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='Chọn gói'
+                  size='small'
+                  InputLabelProps={{
+                    sx: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '70%'
+                    }
+                  }}
+                />
+              )}
             />
           </FormControl>
         </Box>

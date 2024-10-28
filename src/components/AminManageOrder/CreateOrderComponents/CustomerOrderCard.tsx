@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Account } from '~/apis/orderApi'
 import { useSearchAccounts } from '~/queries/useOrder'
 import { BookingInfo, RoomContextType } from '~/contexts/BookingContext'
+import moment from 'moment'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 interface CustomerOrderCardProps {
   customer: Account | null
@@ -14,7 +16,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
   const [searchCustomer, setSearchCustomer] = useState<string>('')
   const [listCustomer, setListCustomer] = useState<Account[]>([])
   const [showCustomerList, setShowCustomerList] = useState(false)
-
+  const today = moment()
   const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
   const theme = useTheme()
 
@@ -27,8 +29,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
       <Box sx={{ padding: 3, bgcolor: 'white', borderRadius: '5px' }}>
         <Box sx={{ position: 'relative', marginBottom: '20px' }}>
           <TextField
-            size='small'
-            variant='standard'
+            variant='outlined'
             label='Tìm kiếm khách hàng'
             value={showCustomerList ? searchCustomer : customer?.name || searchCustomer}
             onChange={(e) => setSearchCustomer(e.target.value)}
@@ -44,7 +45,6 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 maxHeight: '150px',
                 top: '52px',
                 overflowY: 'scroll',
-                paddingRight: 4,
                 bgcolor: 'white',
                 borderRadius: 2,
                 boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.2)'
@@ -93,20 +93,32 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
         }}
       >
         <Typography variant='h6' sx={{ marginBottom: 3 }}>
-          Các phòng và slot đã chọn
+          Các phòng và khung giờ đã chọn
         </Typography>
         <Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Typography variant='body1' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body1'
+              sx={{
+                marginBottom: 1
+              }}
+            >
               Danh sách phòng:
             </Typography>
-            <Typography variant='body2' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body2'
+              sx={{
+                marginBottom: 1,
+                fontWeight: bookingData?.selectedRooms.length > 0 ? 'normal' : 'bold',
+                color: bookingData?.selectedRooms.length > 0 ? 'inherit' : 'red'
+              }}
+            >
               {bookingData?.selectedRooms.map((room: RoomContextType) => room.name).join(', ') || 'Chưa chọn phòng'}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
-              Date:
+              Ngày:
             </Typography>
             <Typography
               variant='body2'
@@ -116,12 +128,12 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 color: bookingData?.date ? 'inherit' : 'red'
               }}
             >
-              {bookingData?.date || 'Chưa chọn ngày'}
+              {moment(bookingData?.date).format(DEFAULT_DATE_FORMAT) || moment(today).format(DEFAULT_DATE_FORMAT)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
-              Slot:
+              Khung giờ:
             </Typography>
             <Typography
               variant='body2'
@@ -131,7 +143,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 color: bookingData?.timeSlots.length > 0 ? 'inherit' : 'red'
               }}
             >
-              {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn slot'}
+              {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn khung giờ'}
             </Typography>
           </Box>
         </Box>
