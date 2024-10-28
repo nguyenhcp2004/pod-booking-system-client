@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardMedia, Typography, Button } from '@mui/material'
+import { Card, CardMedia, Typography, Button, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useNavigate } from 'react-router-dom'
 import { slotType, useBookingContext } from '~/contexts/BookingContext'
@@ -51,55 +51,84 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
 
   return (
     <Card
-      sx={{ display: 'flex', borderRadius: '16px', mb: '40px', justifyContent: 'space-between', border: '1px solid' }}
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        borderRadius: '16px',
+        mb: '24px',
+        border: '1px solid',
+        overflow: 'hidden'
+      }}
       elevation={0}
     >
       <Grid container>
-        <Grid size={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <CardMedia
             component='img'
-            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            sx={{
+              width: '100%',
+              height: { xs: '200px', md: '100%' },
+              objectFit: 'cover'
+            }}
             image={image}
             alt={name}
           />
         </Grid>
-        <Grid container size={8} sx={{ padding: '24px' }}>
-          <Grid size={10} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
-            <Typography component='div' variant='subtitle1' fontWeight='bold'>
+        <Grid container size={{ xs: 12, md: 8 }} sx={{ p: { xs: 2, md: 3 } }}>
+          <Grid size={{ xs: 12, md: 10 }} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Typography variant='h6' fontWeight='bold'>
               {name}
             </Typography>
-            <Typography variant='subtitle2' color='text.secondary' component='div'>
-              <b>Địa chỉ:</b> {building.address}
+            <Typography variant='body2' color='text.secondary'>
+              <Box component='span' fontWeight='bold'>
+                Địa chỉ:
+              </Box>{' '}
+              {building.address}
             </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Mô tả:</b> {building.description}
+            <Typography variant='body2' color='text.secondary'>
+              <Box component='span' fontWeight='bold'>
+                Mô tả:
+              </Box>{' '}
+              {building.description}
             </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Dung Lượng:</b> {capacity}
+            <Typography variant='body2' color='text.secondary'>
+              <Box component='span' fontWeight='bold'>
+                Dung Lượng:
+              </Box>{' '}
+              {capacity} người
             </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Số lượng phòng:</b> {quantity}
+            <Typography variant='body2' color='text.secondary'>
+              <Box component='span' fontWeight='bold'>
+                Số lượng phòng:
+              </Box>{' '}
+              {quantity}
             </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Tiện ích:</b> Wi-fi tốc độ cao, Điều hòa, Bàn ghế thoải mái, Ổ cắm điện
+            <Typography variant='body2' color='text.secondary'>
+              <Box component='span' fontWeight='bold'>
+                Tiện ích:
+              </Box>{' '}
+              Wi-fi tốc độ cao, Điều hòa, Bàn ghế thoải mái, Ổ cắm điện
             </Typography>
           </Grid>
           <Grid
-            size={2}
-            sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}
+            size={{ xs: 12, md: 2 }}
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'row', md: 'column' },
+              justifyContent: 'space-between',
+              alignItems: { xs: 'center', md: 'flex-end' },
+              mt: { xs: 2, md: 0 }
+            }}
           >
-            <Typography variant='h6' component='div' color='primary' fontWeight='bold'>
+            <Typography variant='h6' color='primary' fontWeight='bold' sx={{ mb: { xs: 0, md: 2 } }}>
               {price.toLocaleString()}
               <Typography
                 component='span'
                 sx={{
-                  color: 'var(--Grey-grey-400, #6A6A77)',
-                  fontFamily: 'Roboto',
-                  fontSize: '16px',
-                  fontStyle: 'normal',
+                  color: 'text.secondary',
+                  fontSize: '14px',
                   fontWeight: 400,
-                  lineHeight: '120%',
-                  marginLeft: '4px'
+                  ml: 0.5
                 }}
               >
                 VND/tiếng
@@ -109,7 +138,12 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
               variant='contained'
               color='primary'
               onClick={handleBookRoom}
-              sx={{ borderRadius: '96px', paddingX: '22px', paddingY: '8px' }}
+              sx={{
+                borderRadius: '96px',
+                px: 3,
+                py: 1,
+                width: { xs: 'auto', md: '100%' }
+              }}
             >
               ĐẶT PHÒNG
             </Button>

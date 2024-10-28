@@ -92,41 +92,49 @@ export default function Component() {
       {/* Hero Section */}
       <Grid
         container
-        rowSpacing={1}
+        rowSpacing={2}
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{ paddingX: '104px', paddingY: '24px' }}
+        sx={{ px: { xs: 2, sm: 4, md: 13 }, py: { xs: 3, md: 4 } }}
       >
-        <Grid size={6} style={{ alignContent: 'center' }}>
-          <Typography variant='h3' sx={{ fontWeight: 'bold' }} color='primary'>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Typography variant='h3' sx={{ fontWeight: 'bold', fontSize: { xs: '2rem', md: '3rem' } }} color='primary'>
             FlexiPod
           </Typography>
-          <Typography variant='h3' color='secondary'>
+          <Typography variant='h3' color='secondary' sx={{ fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
             Tiện lợi, riêng tư
           </Typography>
-          <Typography variant='subtitle1' color='neutral'>
+          <Typography variant='subtitle1' color='neutral' sx={{ mt: 2 }}>
             Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
           </Typography>
         </Grid>
-        <Grid size={6}>
-          <img src={homePageBanner} alt='' style={{ borderRadius: '8px', width: '100%' }} />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <img
+            src={homePageBanner}
+            alt='FlexiPod Banner'
+            style={{ borderRadius: '8px', width: '100%', height: 'auto' }}
+          />
         </Grid>
       </Grid>
       {/* Rooms Section  */}
       <Grid
         container
-        rowSpacing={1}
+        rowSpacing={2}
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{ paddingX: '104px', paddingY: '24px' }}
+        sx={{ px: { xs: 2, sm: 4, md: 13 }, py: { xs: 3, md: 4 } }}
       >
         {/* Rooms Section Title */}
-        <Grid size={12}>
-          <Typography variant='h3' sx={{ fontWeight: 'bold', textAlign: 'center' }} color='primary'>
+        <Grid size={{ xs: 12 }}>
+          <Typography
+            variant='h3'
+            sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '2rem', md: '3rem' } }}
+            color='primary'
+          >
             Đặt phòng
           </Typography>
         </Grid>
         {/* Rooms Section Filter */}
         <Grid container size={12} spacing={2} style={{ paddingTop: '32px', paddingBottom: '32px' }}>
-          <Grid size={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth>
               <InputLabel id='location-label'>Địa chỉ</InputLabel>
               <Select labelId='location-label' value={location || ''} label='Địa chỉ' onChange={handleLocationChange}>
@@ -138,7 +146,7 @@ export default function Component() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid size={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth>
               <InputLabel id='room-type-label'>Loại phòng</InputLabel>
               <Select
@@ -155,7 +163,7 @@ export default function Component() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid size={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <DatePicker
               value={date}
               onChange={handleDateChange}
@@ -164,7 +172,7 @@ export default function Component() {
               format={DEFAULT_DATE_FORMAT}
             />
           </Grid>
-          <Grid size={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth>
               <InputLabel id='time-slot-label'>Khung giờ</InputLabel>
               <Select
@@ -187,7 +195,7 @@ export default function Component() {
         {/* Rooms Section Card */}
         <Grid container spacing={2}>
           {data?.data.data.map((roomType: Omit<PODRoomTypeCardProps, 'date' | 'timeSlot'>) => (
-            <Grid size={12} key={roomType.id}>
+            <Grid size={{ xs: 12 }} key={roomType.id}>
               <PODRoomTypeCard
                 {...roomType}
                 date={date ? date.format(DEFAULT_DATE_FORMAT) : null}
@@ -197,7 +205,7 @@ export default function Component() {
           ))}
         </Grid>
         {/* Rooms Section Pagination Button */}
-        <Grid size={12} sx={{ justifyContent: 'center', display: 'flex', mt: 4 }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <Pagination
             count={data?.data.totalPage || 1}
             page={page}
