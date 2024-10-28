@@ -21,9 +21,8 @@ import { useAppContext } from '~/contexts/AppProvider'
 export default function ManageOrder() {
   const { account } = useAppContext()
   const today = moment()
-  const sevenDaysAgo = moment().subtract(7, 'days')
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
-  const [selectedStartDate, setSelectedStartDate] = useState<Moment | null>(sevenDaysAgo)
+  const [selectedStartDate, setSelectedStartDate] = useState<Moment | null>(today)
   const formattedStartDate = selectedStartDate?.startOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
 

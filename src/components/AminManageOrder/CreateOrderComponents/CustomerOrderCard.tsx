@@ -27,8 +27,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
       <Box sx={{ padding: 3, bgcolor: 'white', borderRadius: '5px' }}>
         <Box sx={{ position: 'relative', marginBottom: '20px' }}>
           <TextField
-            size='small'
-            variant='standard'
+            variant='outlined'
             label='Tìm kiếm khách hàng'
             value={showCustomerList ? searchCustomer : customer?.name || searchCustomer}
             onChange={(e) => setSearchCustomer(e.target.value)}
@@ -44,7 +43,6 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 maxHeight: '150px',
                 top: '52px',
                 overflowY: 'scroll',
-                paddingRight: 4,
                 bgcolor: 'white',
                 borderRadius: 2,
                 boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.2)'
@@ -93,7 +91,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
         }}
       >
         <Typography variant='h6' sx={{ marginBottom: 3 }}>
-          Các phòng và slot đã chọn
+          Các phòng và khung giờ đã chọn
         </Typography>
         <Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -106,7 +104,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
-              Date:
+              Ngày:
             </Typography>
             <Typography
               variant='body2'
@@ -121,7 +119,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <Typography variant='body1' sx={{ marginBottom: 1 }}>
-              Slot:
+              Khung giờ:
             </Typography>
             <Typography
               variant='body2'

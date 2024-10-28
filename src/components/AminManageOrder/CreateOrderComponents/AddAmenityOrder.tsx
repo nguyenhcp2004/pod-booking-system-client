@@ -7,6 +7,7 @@ import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { calTotalPrice } from '~/utils/order'
+import { formatCurrency } from '~/utils/currency'
 
 interface AddAmenityOrderProps {
   bookingData: BookingInfo
@@ -284,7 +285,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             </Box>
           </Box>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '20px', textAlign: 'center' }}>
-            {Math.round(detailAmenity?.price ? detailAmenity.price * quantity : 0).toLocaleString()} VND
+            {formatCurrency(Math.round(detailAmenity?.price ? detailAmenity.price * quantity : 0))}
           </Typography>
         </Box>
         <Box sx={{ padding: '20px 0px 10px 0px' }}>
