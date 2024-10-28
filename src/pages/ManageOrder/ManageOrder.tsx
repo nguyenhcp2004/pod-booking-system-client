@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react'
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
-import { Chip, Select, MenuItem, Box, Typography, useTheme, Button, TextField } from '@mui/material'
+import {
+  Chip,
+  Select,
+  MenuItem,
+  Box,
+  Typography,
+  useTheme,
+  Button,
+  TextField,
+  SelectChangeEvent,
+  FormControl,
+  InputLabel
+} from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
@@ -25,6 +37,7 @@ export default function ManageOrder() {
   const [selectedStartDate, setSelectedStartDate] = useState<Moment | null>(today)
   const formattedStartDate = selectedStartDate?.startOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
+  const [status, setStatus] = useState<OrderStatus | null>(null)
 
   const [currentPage, setCurrentPage] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(10)
@@ -49,6 +62,11 @@ export default function ManageOrder() {
     setSelectedOrder(order)
   }
 
+  const handleChange = (event: SelectChangeEvent) => {
+    const value = event.target.value === 'all' ? null : (event.target.value as OrderStatus)
+    setStatus(value)
+  }
+
   const deleteOrderMutation = useDeleteOrder()
 
   const handleDeleteOrder = () => {
@@ -69,7 +87,13 @@ export default function ManageOrder() {
     error: orderError,
     refetch,
     isFetching
-  } = useOrders({ startDate: formattedStartDate, endDate: formattedEndDate, page: currentPage, size: pageSize })
+  } = useOrders({
+    startDate: formattedStartDate,
+    endDate: formattedEndDate,
+    page: currentPage,
+    size: pageSize,
+    status: status !== null ? status : undefined
+  })
   const { data: searchData, isFetching: isSearchFetching } = useSearchOrder({
     keyword: searchKeyword,
     page: currentPage,
@@ -325,6 +349,30 @@ export default function ManageOrder() {
           onChange={(newValue) => setSelectedEndDate(newValue)}
           slotProps={{ textField: { fullWidth: true } }}
         />
+        <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
+          <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
+          <Select
+            labelId='order-status-label'
+            value={status ?? 'all'}
+            onChange={handleChange}
+            label='Trạng thái đơn hàng'
+            sx={{
+              height: 52,
+              '.MuiSelect-select': {
+                display: 'flex',
+                alignItems: 'center',
+                height: '100%'
+              }
+            }}
+          >
+            <MenuItem value='all'>All</MenuItem>
+            {Object.values(OrderStatus).map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
       <Box display='flex' gap={2}>
         <GridToolbarQuickFilter
