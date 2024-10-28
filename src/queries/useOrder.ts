@@ -15,7 +15,13 @@ import orderApiRequest, {
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
 
 //Read
-export const useOrders = (params: { startDate: string; endDate: string; page: number; size: number }) => {
+export const useOrders = (params: {
+  startDate: string
+  endDate: string
+  page: number
+  size: number
+  status?: string | null
+}) => {
   return useQuery({
     queryKey: ['orders', params],
     queryFn: () => getPageOrder(params),

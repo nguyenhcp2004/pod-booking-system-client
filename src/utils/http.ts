@@ -21,7 +21,7 @@ export class Http {
     this.refreshToken = getRefreshTokenFromLS()
     this.instance = axios.create({
       baseURL: envConfig.VITE_API_ENDPOINT,
-      timeout: 10000,
+      timeout: 30000,
       headers: {
         'Content-Type': 'application/json'
       }

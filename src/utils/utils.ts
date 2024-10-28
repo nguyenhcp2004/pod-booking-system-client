@@ -221,3 +221,13 @@ export const getDayNumber = (dateString: string) => {
 export const getHour = (dateString: string) => {
   return moment(dateString).format('HH') // Kết quả là "07"
 }
+
+export function isValidVietnamPhoneNumber(phoneNumber: string): boolean {
+  // Regular expression for valid Vietnam phone numbers
+  const vietnamPhoneNumberRegex = /^(03|05|07|08|09)[0-9]{8}$/
+  return vietnamPhoneNumberRegex.test(phoneNumber)
+}
+
+export const getDayBefore = (dateString: string) => {
+  return moment(dateString).subtract(1, 'days').format('DD')
+}

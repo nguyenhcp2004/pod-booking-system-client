@@ -2,8 +2,10 @@ import { Box, Button, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { tokens } from '~/themes/theme'
 import ModeCommentIcon from '@mui/icons-material/ModeComment'
+import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
+import { getDayBefore, getMonthNumber } from '~/utils/utils'
 
-export default function Contact() {
+export default function Contact({ orderDetail }: { orderDetail: OrderDetailFullInfoResType['data'] }) {
   const colors = tokens('light')
   return (
     <Box
@@ -21,8 +23,8 @@ export default function Contact() {
         <Grid container spacing={2}>
           <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '1rem' }}>
             <Box>
-              Để hủy miễn phí, bạn cần phải hủy <b>trước</b> ngày 17 Tháng 11 23:59 giờ. Sau thời gian này, bạn sẽ không
-              thể hủy được nữa.
+              Để hủy miễn phí, bạn cần phải hủy <b>trước</b> ngày {getDayBefore(orderDetail.startTime)} Tháng{' '}
+              {getMonthNumber(orderDetail.startTime)} 23:59 giờ. Sau thời gian này, bạn sẽ không thể hủy được nữa.
             </Box>
           </Grid>
         </Grid>

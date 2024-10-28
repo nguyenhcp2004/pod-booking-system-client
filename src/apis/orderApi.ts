@@ -85,9 +85,24 @@ interface OrderResponse {
 }
 
 //Read
-export const getPageOrder = async (params: { startDate: string; endDate: string; page: number; size: number }) => {
+export const getPageOrder = async (params: {
+  startDate: string
+  endDate: string
+  page: number
+  size: number
+  status?: string | null
+}) => {
   try {
-    const query = queryString.stringify(params)
+    const queryParams: { startDate: string; endDate: string; page: number; size: number; status?: string } = {
+      startDate: params.startDate,
+      endDate: params.endDate,
+      page: params.page,
+      size: params.size
+    }
+    if (params.status !== null) {
+      queryParams.status = params.status
+    }
+    const query = queryString.stringify(queryParams)
     const response = await http.get(`/order/page?${query}`)
     return response.data
   } catch (error) {
