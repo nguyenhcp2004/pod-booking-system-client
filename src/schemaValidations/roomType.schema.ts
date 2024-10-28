@@ -16,6 +16,7 @@ const RoomTypeSchema = z.object({
   price: z.number(),
   quantity: z.number(),
   capacity: z.number(),
+  image: z.string(),
   building: BuildingSchema
 })
 

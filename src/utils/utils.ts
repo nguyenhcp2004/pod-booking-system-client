@@ -227,3 +227,7 @@ export function isValidVietnamPhoneNumber(phoneNumber: string): boolean {
   const vietnamPhoneNumberRegex = /^(03|05|07|08|09)[0-9]{8}$/
   return vietnamPhoneNumberRegex.test(phoneNumber)
 }
+
+export const getDayBefore = (dateString: string) => {
+  return moment(dateString).subtract(1, 'days').format('DD')
+}
