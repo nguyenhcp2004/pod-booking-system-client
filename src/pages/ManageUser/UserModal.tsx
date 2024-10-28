@@ -64,6 +64,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
   }
 
   const handleClose = () => {
+    setName('')
     setOpen(false)
   }
 
