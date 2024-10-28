@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
-import { useGetMe } from '~/queries/useAccount'
+import { useAppContext } from '~/contexts/AppProvider'
 import { isValidVietnamPhoneNumber } from '~/utils/utils'
 
 //import { array } from 'zod'
@@ -27,15 +27,31 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const bookingData = bookingContext!.bookingData
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
-  const { data: account } = useGetMe()
-  const [phoneNumber, setPhoneNumber] = useState(account?.data.data.phoneNumber || '')
+  const { account: account } = useAppContext()
+  const [phoneNumber, setPhoneNumber] = useState(account?.phoneNumber || '')
   const [phoneError, setPhoneError] = useState<string | null>(null)
   useEffect(() => {
+    const dateList = []
+
     if (bookingData) {
-      setSelectedDates([moment(bookingData.date)])
+      const initialDate = moment(bookingData.date)
+      dateList.push(initialDate)
       setSelectedSlots(bookingData.timeSlots)
+      const selectedPackage = bookingData.servicePackage
+      if (selectedPackage) {
+        if (selectedPackage.id == '1') {
+          dateList.push(moment(initialDate).add(1, 'week'))
+          dateList.push(moment(initialDate).add(2, 'week'))
+          dateList.push(moment(initialDate).add(3, 'week'))
+        } else if (selectedPackage.id == '2') {
+          for (let i = 1; i <= 30; i++) {
+            dateList.push(moment(initialDate).add(i, 'days'))
+          }
+        }
+      }
+      setSelectedDates(dateList)
     }
-  }, [bookingData])
+  }, [bookingData, bookingData.servicePackage?.id])
 
   useEffect(() => {
     client.connect({}, () => {
@@ -90,7 +106,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Tên'
-                      defaultValue={account?.data.data.name || ''}
+                      defaultValue={account?.name || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
@@ -107,7 +123,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                       error={!!phoneError}
                       helperText={phoneError}
                       InputProps={{
-                        readOnly: account?.data.data.phoneNumber ? true : false
+                        readOnly: account?.phoneNumber ? true : false
                       }}
                     />
                   </Grid>
@@ -116,7 +132,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Email'
-                      defaultValue={account?.data.data.email || ''}
+                      defaultValue={account?.email || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
