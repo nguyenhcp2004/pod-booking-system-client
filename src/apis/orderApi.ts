@@ -1,7 +1,12 @@
 import queryString from 'query-string'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
-import { CountOrderReqType, CountOrderResType } from '~/schemaValidations/order.schema'
+import {
+  CountOrderReqType,
+  CountOrderResType,
+  GetListOrderByAccountIdQueryType,
+  GetListOrderByAccountIdResType
+} from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
 import { formatQueryDateTime } from '~/utils/utils'
@@ -248,6 +253,15 @@ export const orderApiRequest = {
   countOrder: (query: CountOrderReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     return http.get<CountOrderResType>(`/order/number-order?${queryString}`)
+  },
+  getListOrderByAccountId: (query: GetListOrderByAccountIdQueryType) => {
+    const queryObject = {
+      page: query.page,
+      take: query.take,
+      status: query.status
+    }
+    const stringified = queryString.stringify(queryObject)
+    return http.get<GetListOrderByAccountIdResType>(`/order/${query.accountId}?${stringified}`)
   }
 }
 
