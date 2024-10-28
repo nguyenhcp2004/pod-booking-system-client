@@ -43,7 +43,11 @@ export default function Header() {
         display: 'flex',
         justifyContent: 'space-between',
         alignSelf: 'stretch',
-        height: '92px'
+        height: '92px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 999,
+        backgroundColor: 'white'
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
