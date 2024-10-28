@@ -21,6 +21,11 @@ interface CommonProps {
   onBack: () => void
 }
 
+const amenityTranslations: Record<string, string> = {
+  Food: 'Thức ăn',
+  Office: 'Thiết bị'
+}
+
 export const Amenities: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
@@ -216,7 +221,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                   >
                     {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
                       <MenuItem key={index} value={uniqueType}>
-                        {uniqueType}
+                        {amenityTranslations[uniqueType] || uniqueType}
                       </MenuItem>
                     ))}
                   </Select>
