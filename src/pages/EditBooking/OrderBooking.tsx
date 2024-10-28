@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Divider, InputLabel, MenuItem, Select, useTheme } from '@mui/material'
 import moment from 'moment'
 import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
-import { getHour } from '~/utils/utils'
+import { getDayNumber, getHour, getMonthNumber } from '~/utils/utils'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
+import { CanceledReason } from '~/constants/type'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -205,18 +206,13 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     <MenuItem value='' disabled>
                       Chọn một trong số các lý do sau
                     </MenuItem>
-                    <MenuItem value={1}>Đặt phòng không được xác nhận kịp thời</MenuItem>
-                    <MenuItem value={2}>Không thật sự tin tưởng vào uy tín của dịch vụ chúng tôi</MenuItem>
-                    <MenuItem value={3}>Lo lắng về sự an toàn cho vị trí phòng đặt</MenuItem>
-                    <MenuItem value={4}>Quyết định chọn phòng khác không có trên FlexiPod</MenuItem>
-                    <MenuItem value={5}>Không thích chính sách hủy phòng</MenuItem>
-                    <MenuItem value={6}>Không hài lòng với cách thanh toán</MenuItem>
-                    <MenuItem value={7}>Buộc phải hủy phòng hay hoãn lịch</MenuItem>
-                    <MenuItem value={8}>Tìm thấy giá thấp hơn trên mạng</MenuItem>
-                    <MenuItem value={9}>Tìm được giá thấp hơn qua dịch vụ địa phương</MenuItem>
-                    <MenuItem value={10}>Sẽ đặt phòng khác trên website của chúng tôi</MenuItem>
-                    <MenuItem value={11}>Sẽ đặt phòng trực tiếp với chi nhánh</MenuItem>
-                    <MenuItem value={12}>Khác</MenuItem>
+                    {Object.values(CanceledReason).map((key, index) => {
+                      return (
+                        <MenuItem key={index} value={key}>
+                          {key}
+                        </MenuItem>
+                      )
+                    })}
                   </Select>
                 </Box>
                 <Box sx={{ marginBottom: 2 }}>
@@ -235,9 +231,11 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     Miễn phí hủy phòng
                   </Typography>
                   <Typography gutterBottom>
-                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến 10 tháng 11, 2022 và không phải trả gì!
-                    Bất kỳ việc hủy phòng nào ghi nhận được sau ngày 10 tháng 11, 2022 sẽ phải trả phí cho toàn bộ thời
-                    gian ở. Nếu quý khách không đến hoặc hủy phòng, thì sẽ không được hoàn tiến.
+                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến {getDayNumber(orderDetail.startTime)}{' '}
+                    tháng {getMonthNumber(orderDetail.startTime)}, năm 2024 và không phải trả gì! Bất kỳ việc hủy phòng
+                    nào ghi nhận được sau ngày {getDayNumber(orderDetail.startTime)} tháng{' '}
+                    {getMonthNumber(orderDetail.startTime)}, 2024 sẽ phải trả phí cho toàn bộ thời gian ở. Nếu quý khách
+                    không đến hoặc hủy phòng, thì sẽ không được hoàn tiến.
                   </Typography>
                 </Box>
               </DialogContent>
