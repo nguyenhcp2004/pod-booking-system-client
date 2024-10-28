@@ -1,41 +1,154 @@
-import { Card, CardContent, CardHeader, Typography, Button, Box } from '@mui/material'
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Button,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  ButtonGroup
+} from '@mui/material'
+
 import { RoomBarChart } from '~/pages/DashBoard/BarChart'
 import { RevenueLineChart } from '~/pages/DashBoard/RevenueLineChart'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import Grid from '@mui/material/Grid2'
 import { useCountServedRooms } from '~/queries/useRoom'
 import { useCountCurrentOrder, useCountOrder } from '~/queries/useOrder'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import moment, { Moment } from 'moment'
 import { CountOrderReqType } from '~/schemaValidations/order.schema'
 import { useCountCurrentCustomer, useCountCustomer } from '~/queries/useAccount'
 import { CountCustomerReqType } from '~/schemaValidations/account.schema'
 import { useGetRevenue, useGetRevenueCurrentDay } from '~/queries/useOrderDetail'
 import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
+import { DatePicker } from '@mui/x-date-pickers'
 
 export default function DashboardMain() {
-  const [startTime, setStartTime] = useState<Moment | null>(null)
-  const [endTime, setEndTime] = useState<Moment | null>(null)
-  const resetDateFilter = () => {
-    setStartTime(null)
-    setEndTime(null)
+  const [startTime, setStartTime] = useState<Moment | null>(moment().startOf('day'))
+  const [endTime, setEndTime] = useState<Moment | null>(moment().endOf('day'))
+  const [selectTime, setSelectTime] = useState<Moment>(moment().startOf('day'))
+
+  const [selectMode, setSelectMode] = useState<string>('DATE')
+
+  const quarterList = useMemo(() => {
+    const from = moment().year(2024).startOf('year')
+    const to = moment().endOf('year')
+    const quarters = []
+    let current = from.clone()
+    while (current.isBefore(to)) {
+      const quarter = current.clone()
+      quarters.push({
+        key: quarters.length + 1,
+        label: `Quý ${current.quarter()}/${current.year()}`,
+        value: quarter
+      })
+      current.add(1, 'quarter')
+    }
+    return quarters
+  }, [])
+
+  const [quarter, setQuarter] = useState<number>(quarterList[0].key)
+
+  useEffect(() => {
+    const start = selectTime.clone()
+    const end = selectTime.clone()
+    if (selectMode === 'DATE') {
+      setStartTime(start.startOf('day'))
+      setEndTime(end.endOf('day'))
+    } else if (selectMode === 'MONTH') {
+      setStartTime(start.startOf('month'))
+      setEndTime(end.endOf('month'))
+    } else if (selectMode === 'QUARTER') {
+      setStartTime(moment(quarter).startOf('quarter'))
+      setEndTime(moment(quarter).endOf('quarter'))
+    }
+  }, [selectTime, selectMode, quarter])
+
+  useEffect(() => {
+    console.log(startTime?.format('DD/MM/YYYY HH:mm'), endTime?.format('DD/MM/YYYY HH:mm'))
+  }, [startTime, endTime])
+
+  const pickerMode = useMemo(() => {
+    switch (selectMode) {
+      case 'DATE':
+        return {
+          mode: 'day',
+          label: 'Chọn ngày',
+          format: 'DD/MM/YYYY'
+        }
+      case 'MONTH':
+        return {
+          mode: 'month',
+          label: 'Chọn tháng',
+          format: 'MM/YYYY'
+        }
+      case 'QUARTER':
+        return {
+          mode: 'quarter',
+          label: 'Chọn quý',
+          format: 'MM/YYYY'
+        }
+      default:
+        return {
+          mode: 'day',
+          label: 'Chọn ngày',
+          format: 'DD/MM/YYYY'
+        }
+    }
+  }, [selectMode])
+
+  const handleGetToday = () => {
+    setSelectTime(moment().startOf('day'))
+    const currentQuarter = quarterList.find((tempQuarter) => tempQuarter.value.isSame(moment(), 'quarter'))
+    if (currentQuarter) {
+      setQuarter(currentQuarter.key)
+    }
+  }
+
+  const handleNext = () => {
+    const now = selectTime.clone()
+    if (selectMode === 'DATE') {
+      setSelectTime(now.add(1, 'day'))
+    } else if (selectMode === 'MONTH') {
+      setSelectTime(now.add(1, 'month'))
+    } else if (selectMode === 'QUARTER') {
+      setSelectTime(now.add(1, 'quarter'))
+      setQuarter((quarter) => quarter + 1)
+    }
+  }
+
+  const handlePrev = () => {
+    const now = selectTime.clone()
+    if (selectMode === 'DATE') {
+      setSelectTime(now.subtract(1, 'day'))
+    } else if (selectMode === 'MONTH') {
+      setSelectTime(now.subtract(1, 'month'))
+    } else if (selectMode === 'QUARTER') {
+      setSelectTime(now.subtract(1, 'quarter'))
+      setQuarter((quarter) => quarter - 1)
+    }
   }
 
   const countOrderParam: CountOrderReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null,
-    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null
+    startTime: startTime ? startTime.format('DD/MM/YYYYTHH:mm') : null,
+    endTime: endTime ? endTime.format('DD/MM/YYYYTHH:mm') : null
   }
   const countCustomerParam: CountCustomerReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYYTHH:mm') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYYTHH:mm') : ''
   }
   const getRevenueParam: GetRevenueReqType = {
-    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
-    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
+    startTime: startTime ? startTime.format('DD/MM/YYYYTHH:mm') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYYTHH:mm') : ''
   }
 
   /**
@@ -65,45 +178,67 @@ export default function DashboardMain() {
   const { data: revenueRes } = useGetRevenue(getRevenueParam)
   const revenue = startTime && endTime ? revenueRes?.data.data : revenueCurrentDay?.data.data
 
-  const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
-    if (date) {
-      const formattedDate = date.format('DD/MM/YYYY[T]hh:mm[T]A')
-      if (isStartTime) {
-        setStartTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
-      } else {
-        setEndTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
-      }
-    } else {
-      if (isStartTime) {
-        setStartTime(null)
-      } else {
-        setEndTime(null)
-      }
-    }
-  }
-
   return (
     <div>
       <Box display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
-        <Box>
-          <DateTimePicker
-            label='Từ ngày'
-            value={startTime}
-            onChange={(newValue) => handleDateChange(newValue, true)}
-            format='DD/MM/YYYY hh:mm A'
-          />
+        <Box width={120}>
+          <FormControl fullWidth>
+            <InputLabel size='small'>Chế độ xem</InputLabel>
+            <Select
+              size='small'
+              value={selectMode}
+              label='Chế độ xem'
+              onChange={(e) => setSelectMode(e.target.value as string)}
+            >
+              <MenuItem value={'DATE'}>Ngày</MenuItem>
+              <MenuItem value={'MONTH'}>Tháng</MenuItem>
+              <MenuItem value={'QUARTER'}>Quý</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
-        <Box>
-          <DateTimePicker
-            label='Đến ngày'
-            value={endTime}
-            onChange={(newValue) => handleDateChange(newValue, false)}
-            format='DD/MM/YYYY hh:mm A'
-          />
+        <Box minWidth={120}>
+          {selectMode !== 'QUARTER' ? (
+            <DatePicker
+              label={pickerMode.label}
+              value={selectTime}
+              views={selectMode === 'MONTH' ? ['month', 'year'] : ['year', 'month', 'day']}
+              onChange={(date) => {
+                if (date) setSelectTime(date)
+              }}
+              format={pickerMode.format}
+              slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            />
+          ) : (
+            <FormControl fullWidth>
+              <InputLabel size='small'>{pickerMode.label}</InputLabel>
+              <Select
+                size='small'
+                label={pickerMode.label}
+                value={quarter}
+                onChange={(e) => setQuarter(e.target.value as number)}
+              >
+                {quarterList.map((quarter) => (
+                  <MenuItem key={quarter.key} value={quarter.key}>
+                    {quarter.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
         </Box>
-        <Button variant='outlined' onClick={resetDateFilter}>
-          Reset
+
+        <Button variant='outlined' onClick={handleGetToday}>
+          Hôm nay
         </Button>
+
+        <ButtonGroup size='small' color='primary'>
+          <Button onClick={handlePrev} disabled={selectMode === 'QUARTER' && quarter == 1}>
+            <NavigateBeforeIcon />
+          </Button>
+          <Button onClick={handleNext} disabled={selectMode === 'QUARTER' && quarter == quarterList.length}>
+            <NavigateNextIcon />
+          </Button>
+        </ButtonGroup>
       </Box>
 
       <Grid container spacing={2} marginTop={2}>
