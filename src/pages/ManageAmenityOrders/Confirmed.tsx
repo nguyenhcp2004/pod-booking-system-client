@@ -14,7 +14,7 @@ export const Confirmed: React.FC = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
-  const { selectedAmenities, bookedRoom, clearAll } = useBookingAmenityContext()
+  const { selectedAmenities, bookedRoom } = useBookingAmenityContext()
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityStaff()
 
   const [status, setStatus] = useState<boolean | null>(null)
