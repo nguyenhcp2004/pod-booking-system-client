@@ -90,3 +90,45 @@ export const OrderDetailFullInfoRes = z.object({
 })
 
 export type OrderDetailFullInfoResType = z.TypeOf<typeof OrderDetailFullInfoRes>
+
+export const GetRevenueRes = z.object({
+  code: z.number(),
+  data: z.number(),
+  message: z.string()
+})
+
+export type GetRevenueResType = z.TypeOf<typeof GetRevenueRes>
+
+export const GetRevenueReq = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable()
+})
+
+export type GetRevenueReqType = z.TypeOf<typeof GetRevenueReq>
+
+export const RevenueByMonthSchema = z.object({
+  date: z.string(),
+  revenue: z.number()
+})
+
+export const GetRevenueByMonthRes = z.object({
+  code: z.number(),
+  data: z.array(RevenueByMonthSchema),
+  message: z.string()
+})
+
+export type GetRevenueByMonthResType = z.TypeOf<typeof GetRevenueByMonthRes>
+
+export const NumberOrderByBuildingSchema = z.object({
+  buildingNumber: z.number(),
+  address: z.string(),
+  numberOrders: z.number()
+})
+
+export const GetNumberOrderByBuildingRes = z.object({
+  code: z.number(),
+  data: z.array(NumberOrderByBuildingSchema),
+  message: z.string()
+})
+
+export type GetNumberOrderByBuildingResType = z.TypeOf<typeof GetNumberOrderByBuildingRes>

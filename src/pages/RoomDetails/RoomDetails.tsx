@@ -122,7 +122,7 @@ export default function RoomDetail() {
       }}
     >
       <Helmet>
-        <title> {bookingData?.roomType?.name} | POD System</title>
+        <title> {bookingData?.roomType?.name || 'Loại phòng'} | POD System</title>
         <meta name='description' content='Chọn Phòng Hoàn Hảo Cho Mọi Dịp - Từ Họp Nhóm Đến Làm Việc Cá Nhân' />
       </Helmet>
       <Grid container size={12} spacing={6}>

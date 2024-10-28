@@ -7,18 +7,99 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding'
 import Grid from '@mui/material/Grid2'
+import { useCountServedRooms } from '~/queries/useRoom'
+import { useCountCurrentOrder, useCountOrder } from '~/queries/useOrder'
+import { useState } from 'react'
+import moment, { Moment } from 'moment'
+import { CountOrderReqType } from '~/schemaValidations/order.schema'
+import { useCountCurrentCustomer, useCountCustomer } from '~/queries/useAccount'
+import { CountCustomerReqType } from '~/schemaValidations/account.schema'
+import { useGetRevenue, useGetRevenueCurrentDay } from '~/queries/useOrderDetail'
+import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 
 export default function DashboardMain() {
-  const resetDateFilter = () => {}
+  const [startTime, setStartTime] = useState<Moment | null>(null)
+  const [endTime, setEndTime] = useState<Moment | null>(null)
+  const resetDateFilter = () => {
+    setStartTime(null)
+    setEndTime(null)
+  }
+
+  const countOrderParam: CountOrderReqType = {
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null,
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : null
+  }
+  const countCustomerParam: CountCustomerReqType = {
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
+  }
+  const getRevenueParam: GetRevenueReqType = {
+    startTime: startTime ? startTime.format('DD/MM/YYYY[T]hh:mm[T]A') : '',
+    endTime: endTime ? endTime.format('DD/MM/YYYY[T]hh:mm[T]A') : ''
+  }
+
+  /**
+   * Call api count served room
+   */
+  const { data } = useCountServedRooms()
+  const numberServedRooms = data?.data.data
+
+  /**
+   * Call api count order
+   */
+  const { data: numberCurrentOrderRes } = useCountCurrentOrder()
+  const { data: numberOrderRes } = useCountOrder(countOrderParam)
+  const numberOrder = startTime && endTime ? numberOrderRes?.data.data : numberCurrentOrderRes?.data.data
+
+  /**
+   * Call api count customer
+   */
+  const { data: numberCurrentCustomerRes } = useCountCurrentCustomer()
+  const { data: numberCustomerRes } = useCountCustomer(countCustomerParam)
+  const numberCustomer = startTime && endTime ? numberCustomerRes?.data.data : numberCurrentCustomerRes?.data.data
+
+  /**
+   * Call api calculate revenue
+   */
+  const { data: revenueCurrentDay } = useGetRevenueCurrentDay()
+  const { data: revenueRes } = useGetRevenue(getRevenueParam)
+  const revenue = startTime && endTime ? revenueRes?.data.data : revenueCurrentDay?.data.data
+
+  const handleDateChange = (date: Moment | null, isStartTime: boolean) => {
+    if (date) {
+      const formattedDate = date.format('DD/MM/YYYY[T]hh:mm[T]A')
+      if (isStartTime) {
+        setStartTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
+      } else {
+        setEndTime(moment(formattedDate, 'DD/MM/YYYY[T]hh:mm[T]A'))
+      }
+    } else {
+      if (isStartTime) {
+        setStartTime(null)
+      } else {
+        setEndTime(null)
+      }
+    }
+  }
 
   return (
     <div>
       <Box display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
         <Box>
-          <DateTimePicker label='Từ ngày' />
+          <DateTimePicker
+            label='Từ ngày'
+            value={startTime}
+            onChange={(newValue) => handleDateChange(newValue, true)}
+            format='DD/MM/YYYY hh:mm A'
+          />
         </Box>
         <Box>
-          <DateTimePicker label='Đến ngày' />
+          <DateTimePicker
+            label='Đến ngày'
+            value={endTime}
+            onChange={(newValue) => handleDateChange(newValue, false)}
+            format='DD/MM/YYYY hh:mm A'
+          />
         </Box>
         <Button variant='outlined' onClick={resetDateFilter}>
           Reset
@@ -47,7 +128,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {revenue?.toLocaleString('vi-VN')} VNĐ
                 </Typography>
               </CardContent>
             </Card>
@@ -74,7 +155,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberCustomer}
                 </Typography>
                 <Typography variant='caption' sx={{ color: '#43a047' }}>
                   Đặt phòng
@@ -104,7 +185,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberOrder}
                 </Typography>
                 <Typography variant='caption' sx={{ color: '#fb8c00' }}>
                   Đã thanh toán
@@ -134,7 +215,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  0
+                  {numberServedRooms}
                 </Typography>
               </CardContent>
             </Card>

@@ -1,7 +1,6 @@
 import { Avatar, Box, Button, Divider, InputLabel, MenuItem, Select, useTheme } from '@mui/material'
 import moment from 'moment'
 import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
-import { tokens } from '~/themes/theme'
 import { getHour } from '~/utils/utils'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
@@ -23,7 +22,6 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }))
 export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetailFullInfoResType['data'] }) {
   const theme = useTheme()
-  const colors = tokens('light')
   const priceTotalAmenities =
     orderDetail?.amenities.reduce((total, amenity) => total + amenity.price * amenity.quantity, 0) || 0
   console.log(orderDetail?.servicePackage.discountPercentage)
@@ -179,11 +177,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
             </Typography>
           </Box>
           <Box sx={{ width: '100%', padding: '20px' }}>
-            <Button
-              onClick={handleClickOpen}
-              fullWidth
-              sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
-            >
+            <Button onClick={handleClickOpen} fullWidth variant='outlined'>
               Hủy đặt phòng
             </Button>
             <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
@@ -251,7 +245,9 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                 <Button onClick={handleClose} variant='outlined'>
                   Đóng
                 </Button>
-                <Button variant='contained'>Tiếp tục hủy</Button>
+                <Button variant='contained' color='error'>
+                  Xác nhận
+                </Button>
               </DialogActions>
             </BootstrapDialog>
           </Box>

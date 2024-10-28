@@ -25,29 +25,7 @@ export const Confirmed: React.FC = () => {
   const sendMailMutation = useSendMailMutation()
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
-
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
-
-  const { isLoading } = useQuery({
-    queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
-    queryFn: async () => {
-      const response = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
-      if (!response) throw new Error('No response from API')
-
-      if (response.status === 'OK' && orderCreated === 0) {
-        setOrderCreated(1)
-        setStatus(true)
-        if (!bookingContext) throw new Error('Booking context is undefined')
-
-        await createOrder(bookingContext.bookingData)
-        return response
-      } else {
-        setStatus(false)
-        throw new Error(response.message || 'Transaction not successful')
-      }
-    },
-    enabled: !!vnp_BankCode && !!vnp_ResponseCode
-  })
   const hanldeSendMail = useCallback(() => {
     bookingContext!.bookingData.timeSlots.forEach(async (timeSlot) => {
       await sendMailMutation.mutateAsync({
@@ -60,6 +38,27 @@ export const Confirmed: React.FC = () => {
     })
     toast.success('Hệ thống vừa gửi tin nhắn đặt lịch cho quý khách')
   }, [bookingContext, sendMailMutation, userData])
+  const { isLoading } = useQuery({
+    queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
+    queryFn: async () => {
+      const response = await fetchTransactionInfo(vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode)
+      if (!response) throw new Error('No response from API')
+
+      if (response.status === 'OK' && orderCreated === 0) {
+        setOrderCreated(1)
+        setStatus(true)
+        if (!bookingContext) throw new Error('Booking context is undefined')
+        // await createOrder(bookingContext.bookingData)
+        // await hanldeSendMail()
+        await Promise.all([createOrder(bookingContext.bookingData), hanldeSendMail()])
+        return response
+      } else {
+        setStatus(false)
+        throw new Error(response.message || 'Transaction not successful')
+      }
+    },
+    enabled: !!vnp_BankCode && !!vnp_ResponseCode
+  })
 
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
@@ -88,9 +87,6 @@ export const Confirmed: React.FC = () => {
 
   const handleReturn = () => {
     localStorage.setItem('bookingData', JSON.stringify({}))
-    if (status === true) {
-      hanldeSendMail()
-    }
     navigate('/')
   }
 

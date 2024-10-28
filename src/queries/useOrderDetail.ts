@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { orderDetailApiRequest } from '~/apis/orderDetail'
-import { GetListOrderDetailQueryType } from '~/schemaValidations/orderDetail.schema'
+import { GetListOrderDetailQueryType, GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 
 export const useGetListOrderDetail = (query: GetListOrderDetailQueryType) => {
   return useQuery({
@@ -13,5 +13,34 @@ export const useGetOrderDetail = (orderDetailId: string) => {
   return useQuery({
     queryKey: ['order-detail', orderDetailId],
     queryFn: () => orderDetailApiRequest.getOrderDetail(orderDetailId)
+  })
+}
+
+export const useGetRevenue = (query: GetRevenueReqType) => {
+  return useQuery({
+    queryKey: ['order-detail-revenue', query],
+    queryFn: () => orderDetailApiRequest.getRevenue(query),
+    enabled: !!query.startTime && !!query.endTime
+  })
+}
+
+export const useGetRevenueCurrentDay = () => {
+  return useQuery({
+    queryKey: ['order-detail-revenue-current-day'],
+    queryFn: () => orderDetailApiRequest.getRevenueCurrentDay()
+  })
+}
+
+export const useGetRevenueByMonth = () => {
+  return useQuery({
+    queryKey: ['order-detail-revenue-by-month'],
+    queryFn: () => orderDetailApiRequest.getRevenueByMonth()
+  })
+}
+
+export const useGetNumberOrderByBuilding = () => {
+  return useQuery({
+    queryKey: ['order-detail-number-order-by-month'],
+    queryFn: () => orderDetailApiRequest.getNumberOrdersByBuilding()
   })
 }
