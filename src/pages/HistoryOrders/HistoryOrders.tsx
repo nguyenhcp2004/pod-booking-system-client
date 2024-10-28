@@ -7,6 +7,7 @@ import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
 import { useAppContext } from '~/contexts/AppProvider'
 import { getDayNumber, getHour, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
 import { useNavigate } from 'react-router-dom'
+import { useGetListOrderByAccountId } from '~/queries/useOrder'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -22,7 +23,7 @@ const getStatusColor = (status: string) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function BookingCard({ booking, index }: { booking: OrderDetailType; index: number }) {
+function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selectedTag: string }) {
   const navigate = useNavigate()
   // const priceQuantityTotal = booking.amenities.reduce((total, amenity) => {
   //   total += amenity.price * amenity.quantity
@@ -75,8 +76,8 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
                   <Chip
-                    label={booking.status === 'Successfully' ? 'Đã xác nhận đặt phòng' : 'Phòng đã được hủy'}
-                    color={getStatusColor(booking.status)}
+                    label={selectedTag === 'Successfully' ? 'Đã xác nhận đặt phòng' : 'Phòng đã được hủy'}
+                    color={getStatusColor(selectedTag)}
                     sx={{ fontWeight: 'bold' }}
                   />
                   <Typography variant='h5' component='div' sx={{ mt: 1 }}>
@@ -165,8 +166,15 @@ export default function HistoryOrders() {
     customerId: account?.id as string,
     status: selectedTag
   })
+  const { data: orders } = useGetListOrderByAccountId({
+    page: page,
+    take: 5,
+    accountId: account?.id as string,
+    status: selectedTag
+  })
   const listOrders = data?.data
-  console.log(listOrders?.data)
+  console.log(orders?.data.data)
+
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)
   }
@@ -236,7 +244,7 @@ export default function HistoryOrders() {
         height={{ xs: 'auto', md: '100%' }}
       >
         {listOrders ? (
-          listOrders.data.map((booking, index) => <BookingCard key={booking.id} booking={booking} index={index} />)
+          listOrders.data.map((booking) => <BookingCard key={booking.id} booking={booking} selectedTag={selectedTag} />)
         ) : (
           <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>Không có dữ liệu để hiển thị.</Typography>
         )}
