@@ -22,7 +22,7 @@ export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetail
         <Grid container spacing={2}>
           <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
             <TextField
-              id='outlined-required'
+              id='name'
               label='Tên'
               defaultValue={customer?.name}
               fullWidth
@@ -33,7 +33,7 @@ export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetail
           </Grid>
           <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
             <TextField
-              id='outlined-required'
+              id='phoneNumber'
               label='Số điện thoại'
               defaultValue={'09xxxxxxxx'}
               fullWidth
@@ -44,7 +44,7 @@ export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetail
           </Grid>
           <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '25px !important' }}>
             <TextField
-              id='outlined-required'
+              id='email'
               label='Email'
               defaultValue={customer?.email}
               fullWidth

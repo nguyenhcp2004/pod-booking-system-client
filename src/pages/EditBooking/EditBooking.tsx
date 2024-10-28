@@ -17,6 +17,10 @@ export default function EditBooking() {
   const orderDetail = data?.data.data
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
     setLoaded(true)
   }, [])
   return (
@@ -38,7 +42,7 @@ export default function EditBooking() {
                   sx={{ paddingRight: '12px', mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}
                 >
                   <CustomerInfo orderDetail={orderDetail} />
-                  <Contact />
+                  <Contact orderDetail={orderDetail} />
                 </Grid>
               </Grid>
             </Box>

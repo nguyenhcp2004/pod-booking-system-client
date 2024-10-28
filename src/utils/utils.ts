@@ -221,3 +221,7 @@ export const getDayNumber = (dateString: string) => {
 export const getHour = (dateString: string) => {
   return moment(dateString).format('HH') // Kết quả là "07"
 }
+
+export const getDayBefore = (dateString: string) => {
+  return moment(dateString).subtract(1, 'days').format('DD')
+}
