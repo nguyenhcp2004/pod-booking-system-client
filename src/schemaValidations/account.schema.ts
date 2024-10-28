@@ -90,6 +90,7 @@ export const CreateAccountBody = z.object({
   name: z.string().min(2, { message: 'Tên người dùng ít nhất phải có 2 kí tự' }),
   email: z.string().min(1, { message: 'Email không được bỏ trống' }).email('Chỗ này phải là email hợp lệ'),
   password: z.string().min(6, { message: 'Mật khẩu phải có ít nhất 6 kí tự' }),
+  buildingNumber: z.number().gte(0, { message: 'Số tòa nhà không được âm' }).optional(),
   role: z.string(),
   status: z.number()
 })

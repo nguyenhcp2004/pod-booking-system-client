@@ -194,6 +194,9 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
               </Grid>
             </>
           ) : (
+            <></>
+          )}
+          {role === AccountRole.Manager || role === AccountRole.Staff ? (
             <>
               <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
                 <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -212,6 +215,8 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                 </Grid>
               </Grid>
             </>
+          ) : (
+            <></>
           )}
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
