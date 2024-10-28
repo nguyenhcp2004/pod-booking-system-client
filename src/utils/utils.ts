@@ -3,7 +3,6 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios'
 import moment from 'moment'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
-import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
 import { ErrorResponse } from '~/schemaValidations/auth.schema'
 import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
@@ -25,6 +24,10 @@ export function isAxiosUnprocessableEntityError<FormError>(error: unknown): erro
 
 export function isAxiosUnauthorizedError<UnauthorizedError>(error: unknown): error is AxiosError<UnauthorizedError> {
   return isAxiosError(error) && error.response?.status === HttpStatusCode.Unauthorized
+}
+
+export function isAxiosForbiddenError<ForbiddenError>(error: unknown): error is AxiosError<ForbiddenError> {
+  return isAxiosError(error) && error.response?.status === HttpStatusCode.Forbidden
 }
 
 export const checkAndRefreshToken = async (param?: {
@@ -72,6 +75,7 @@ export const checkAndRefreshToken = async (param?: {
 export const handleErrorApi = <T extends FieldValues>({
   error,
   setError,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   duration
 }: {
   error: unknown
@@ -88,10 +92,6 @@ export const handleErrorApi = <T extends FieldValues>({
         })
       })
     }
-  } else {
-    toast.error('Lỗi không xác định', {
-      autoClose: duration ?? 3000
-    })
   }
 }
 

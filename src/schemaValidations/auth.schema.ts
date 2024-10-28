@@ -17,6 +17,10 @@ export const Account = z.object({
   name: z.string(),
   email: z.string(),
   avatar: z.string(),
+  phoneNumber: z.string(),
+  balance: z.number(),
+  rankingName: z.string(),
+  point: z.number(),
   role: z.string(),
   buildingNumber: z.number()
 })
