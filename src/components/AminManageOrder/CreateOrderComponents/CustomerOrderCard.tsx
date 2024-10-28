@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Account } from '~/apis/orderApi'
 import { useSearchAccounts } from '~/queries/useOrder'
 import { BookingInfo, RoomContextType } from '~/contexts/BookingContext'
+import moment from 'moment'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 interface CustomerOrderCardProps {
   customer: Account | null
@@ -14,7 +16,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
   const [searchCustomer, setSearchCustomer] = useState<string>('')
   const [listCustomer, setListCustomer] = useState<Account[]>([])
   const [showCustomerList, setShowCustomerList] = useState(false)
-
+  const today = moment()
   const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
   const theme = useTheme()
 
@@ -95,10 +97,22 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
         </Typography>
         <Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Typography variant='body1' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body1'
+              sx={{
+                marginBottom: 1
+              }}
+            >
               Danh sách phòng:
             </Typography>
-            <Typography variant='body2' sx={{ marginBottom: 1 }}>
+            <Typography
+              variant='body2'
+              sx={{
+                marginBottom: 1,
+                fontWeight: bookingData?.selectedRooms.length > 0 ? 'normal' : 'bold',
+                color: bookingData?.selectedRooms.length > 0 ? 'inherit' : 'red'
+              }}
+            >
               {bookingData?.selectedRooms.map((room: RoomContextType) => room.name).join(', ') || 'Chưa chọn phòng'}
             </Typography>
           </Box>
@@ -114,7 +128,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 color: bookingData?.date ? 'inherit' : 'red'
               }}
             >
-              {bookingData?.date || 'Chưa chọn ngày'}
+              {moment(bookingData?.date).format(DEFAULT_DATE_FORMAT) || moment(today).format(DEFAULT_DATE_FORMAT)}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -129,7 +143,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 color: bookingData?.timeSlots.length > 0 ? 'inherit' : 'red'
               }}
             >
-              {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn slot'}
+              {bookingData?.timeSlots.length > 0 ? bookingData?.timeSlots.join(', ') : 'Chưa chọn khung giờ'}
             </Typography>
           </Box>
         </Box>
