@@ -11,6 +11,7 @@ import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
 import { Helmet } from 'react-helmet-async'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { slotType } from '~/contexts/BookingContext'
+import { useGetAllBuilding } from '~/queries/useBuilding'
 
 export default function Component() {
   const [page, setPage] = useState(1)
@@ -23,6 +24,9 @@ export default function Component() {
     take: 4
   })
   const { data, refetch } = useGetFilterRoomType(filterQuery)
+
+  const { data: allBuildingRes } = useGetAllBuilding()
+  const allBuilding = allBuildingRes?.data.data
 
   const [location, setLocation] = useState<string | null>(null)
   const [roomType, setRoomType] = useState<string | null>(null)
@@ -126,9 +130,11 @@ export default function Component() {
             <FormControl fullWidth>
               <InputLabel id='location-label'>Địa chỉ</InputLabel>
               <Select labelId='location-label' value={location || ''} label='Địa chỉ' onChange={handleLocationChange}>
-                <MenuItem value='Thủ Đức'>TP.Thủ Đức</MenuItem>
-                <MenuItem value='Hồ Chí Minh'>TP.Hồ Chí Minh</MenuItem>
-                <MenuItem value='Nha Trang'>TP.Nha Trang</MenuItem>
+                {allBuilding?.map((building) => (
+                  <MenuItem key={building.id} value={building.address}>
+                    {building.address}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
