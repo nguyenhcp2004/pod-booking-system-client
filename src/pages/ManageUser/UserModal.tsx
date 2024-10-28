@@ -28,14 +28,19 @@ import { handleErrorApi } from '~/utils/utils'
 import { ACTION } from '~/constants/mock'
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { z } from 'zod'
+import { useGetAllBuilding } from '~/queries/useBuilding'
 
 const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: () => void; action: string }) => {
   const [open, setOpen] = useState(false)
   const [role, setRole] = useState(ACTION.CREATE ? AccountRole.Customer.toString() : row?.role)
+  const [buildingNumber, setBuildingNumber] = useState(ACTION.CREATE ? 0 : row.buildingNumber)
   const [status, setStatus] = useState<number>(ACTION.CREATE ? 1 : row?.status) // Default to active (1)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const createAccount = useCreateAccountMutation()
   const updateAccount = useUpdateAccountByAdmin()
+
+  const { data: allBuildingRes } = useGetAllBuilding()
+  const allBuilding = allBuildingRes?.data.data
 
   const handleRoleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value as string)
@@ -43,6 +48,10 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
 
   const handleStatusChange = (event: SelectChangeEvent<number>) => {
     setStatus(event.target.value as number)
+  }
+
+  const handleBuildingNumberChange = (event: SelectChangeEvent<number>) => {
+    setBuildingNumber(event.target.value as number)
   }
 
   const handleClickOpen = () => {
@@ -107,6 +116,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
           return
         }
         result = await createAccount.mutateAsync(payLoadCreate)
+        console.log(result)
       }
       toast.success(result?.data.message, {
         autoClose: 3000
@@ -200,18 +210,23 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
             <>
               <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
                 <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography>Số tòa nhà</Typography>
+                  <Typography>Chi nhánh</Typography>
                 </Grid>
                 <Grid size={9}>
-                  <TextField
-                    type='number'
+                  <Select
+                    name='buildingNumber'
                     fullWidth
                     size='small'
-                    name='buildingNumber'
-                    defaultValue={row?.buildingNumber}
+                    value={buildingNumber}
+                    onChange={handleBuildingNumberChange}
                     error={!!errors.buildingNumber}
-                    helperText={errors.buildingNumber}
-                  />
+                  >
+                    {allBuilding?.map((building) => (
+                      <MenuItem key={building.id} value={building.id}>
+                        {building.address}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </Grid>
               </Grid>
             </>

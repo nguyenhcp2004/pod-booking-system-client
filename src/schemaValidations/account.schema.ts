@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Account } from '~/schemaValidations/auth.schema'
+import { BuildingSchema } from './building.schema'
 
 export const GetMeBody = z
   .object({
@@ -31,16 +32,6 @@ const AccountSchema = z.object({
   status: z.number()
 })
 
-const Building = z.object({
-  id: z.number(),
-  address: z.string(),
-  description: z.string(),
-  hotlineNumber: z.string(),
-  status: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string()
-})
-
 const GetAccountManagementSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -49,7 +40,7 @@ const GetAccountManagementSchema = z.object({
   point: z.number(),
   role: z.string(),
   balance: z.number(),
-  building: Building,
+  building: BuildingSchema,
   rankingName: z.string(),
   createdAt: z.string(),
   status: z.number()
