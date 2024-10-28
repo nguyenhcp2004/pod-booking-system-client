@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Divider, InputLabel, MenuItem, Select, useTheme } from '@mui/material'
 import moment from 'moment'
 import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
-import { getHour } from '~/utils/utils'
+import { getDayNumber, getHour, getMonthNumber } from '~/utils/utils'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -231,9 +231,11 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     Miễn phí hủy phòng
                   </Typography>
                   <Typography gutterBottom>
-                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến 10 tháng 11, 2022 và không phải trả gì!
-                    Bất kỳ việc hủy phòng nào ghi nhận được sau ngày 10 tháng 11, 2022 sẽ phải trả phí cho toàn bộ thời
-                    gian ở. Nếu quý khách không đến hoặc hủy phòng, thì sẽ không được hoàn tiến.
+                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến {getDayNumber(orderDetail.startTime)}{' '}
+                    tháng {getMonthNumber(orderDetail.startTime)}, năm 2024 và không phải trả gì! Bất kỳ việc hủy phòng
+                    nào ghi nhận được sau ngày {getDayNumber(orderDetail.startTime)} tháng{' '}
+                    {getMonthNumber(orderDetail.startTime)}, 2024 sẽ phải trả phí cho toàn bộ thời gian ở. Nếu quý khách
+                    không đến hoặc hủy phòng, thì sẽ không được hoàn tiến.
                   </Typography>
                 </Box>
               </DialogContent>
