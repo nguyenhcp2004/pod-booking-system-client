@@ -89,3 +89,21 @@ export const GetFilteredBuildingQuery = z.object({
 })
 
 export type GetFilteredBuildingQueryType = z.TypeOf<typeof GetFilteredBuildingQuery>
+
+export const BuildingSchema = z.object({
+  id: z.number(),
+  address: z.string(),
+  description: z.string(),
+  hotlineNumber: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+})
+
+export const GetAllBuildingRes = z.object({
+  code: z.number(),
+  data: z.array(BuildingSchema),
+  message: z.string()
+})
+
+export type GetAllBuildingsResType = z.TypeOf<typeof GetAllBuildingRes>

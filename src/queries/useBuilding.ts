@@ -36,3 +36,10 @@ export const useGetFilterBuilding = (query: GetFilteredBuildingQueryType) => {
     queryFn: () => buildingApiRequest.getFilteredBuilding(query)
   })
 }
+
+export const useGetAllBuilding = () => {
+  return useQuery({
+    queryKey: ['all-building'],
+    queryFn: () => buildingApiRequest.getAllBuilding()
+  })
+}
