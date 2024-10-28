@@ -50,6 +50,7 @@ export default function ManageUser() {
   //TODO: Có thể viết refetch trong folder queries để gọn code
   useEffect(() => {
     refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel])
 
   const handleToggleStatus = (id: GridRowId) => async () => {
@@ -151,11 +152,12 @@ export default function ManageUser() {
       editable: false
     },
     {
-      field: 'buildingNumber',
-      headerName: 'Số tòa nhà',
+      field: 'building',
+      headerName: 'Địa chỉ tòa nhà',
       width: 120,
       type: 'number',
       editable: true,
+      renderCell: (params) => <>{params.value?.address || '--'}</>,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], buildingNumber: props.value }

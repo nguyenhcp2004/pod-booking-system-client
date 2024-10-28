@@ -31,11 +31,35 @@ const AccountSchema = z.object({
   status: z.number()
 })
 
+const Building = z.object({
+  id: z.number(),
+  address: z.string(),
+  description: z.string(),
+  hotlineNumber: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+})
+
+const GetAccountManagementSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  avatar: z.string(),
+  point: z.number(),
+  role: z.string(),
+  balance: z.number(),
+  building: Building,
+  rankingName: z.string(),
+  createdAt: z.string(),
+  status: z.number()
+})
+
 export type AccountSchemaType = z.TypeOf<typeof AccountSchema>
 
 export const ManageAccountRes = z.object({
   code: z.number(),
-  data: z.array(AccountSchema),
+  data: z.array(GetAccountManagementSchema),
   currentPage: z.number(),
   totalPage: z.number(),
   recorderPerPage: z.number(),
