@@ -11,6 +11,7 @@ export default function Oauth() {
   const [searchParams] = useSearchParams()
   const accessToken = searchParams.get('accessToken')
   const refreshToken = searchParams.get('refreshToken')
+  const message = searchParams.get('message')
   const locationHook = useLocation()
   useEffect(() => {
     if (accessToken && refreshToken) {
@@ -21,7 +22,7 @@ export default function Oauth() {
         setAuth(true)
         setTimeout(() => {
           toast.success('Đăng nhập google thành công', {
-            autoClose: 2000
+            autoClose: 3000
           })
         })
         location.href = locationHook.state?.from || '/'
@@ -30,14 +31,14 @@ export default function Oauth() {
     } else {
       if (count.current === 0) {
         setTimeout(() => {
-          toast.error('Có lỗi xảy ra', {
-            autoClose: 2000
+          toast.error(message || 'Có lỗi xảy ra', {
+            autoClose: 3000
           })
         })
         navigate('/login')
       }
       count.current++
     }
-  }, [accessToken, refreshToken, navigate, setAuth, locationHook])
+  }, [accessToken, refreshToken, navigate, setAuth, locationHook, message])
   return null
 }

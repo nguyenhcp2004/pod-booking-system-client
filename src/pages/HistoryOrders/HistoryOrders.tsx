@@ -93,6 +93,7 @@ function BookingCard({ booking, index }: { booking: OrderDetailType; index: numb
               alt={booking.roomName}
               sx={{
                 height: '100%',
+                width: '100%',
                 objectFit: 'cover',
                 borderRadius: '16px',
                 transition: 'transform 0.3s ease-in-out',
@@ -240,7 +241,7 @@ export default function HistoryOrders() {
     setPage(newPage)
   }
   return (
-    <Box sx={{ width: '100%', padding: '24px 104px', backgroundColor: '#F9FAFB' }}>
+    <Box sx={{ width: '100%', height: '100%', padding: '24px 104px', backgroundColor: '#F9FAFB' }}>
       <Typography variant='h4' gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', mb: 4 }}>
         Lịch sử đặt phòng
       </Typography>
