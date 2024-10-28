@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
+import { CanceledReason } from '~/constants/type'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -205,18 +206,13 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     <MenuItem value='' disabled>
                       Chọn một trong số các lý do sau
                     </MenuItem>
-                    <MenuItem value={1}>Đặt phòng không được xác nhận kịp thời</MenuItem>
-                    <MenuItem value={2}>Không thật sự tin tưởng vào uy tín của dịch vụ chúng tôi</MenuItem>
-                    <MenuItem value={3}>Lo lắng về sự an toàn cho vị trí phòng đặt</MenuItem>
-                    <MenuItem value={4}>Quyết định chọn phòng khác không có trên FlexiPod</MenuItem>
-                    <MenuItem value={5}>Không thích chính sách hủy phòng</MenuItem>
-                    <MenuItem value={6}>Không hài lòng với cách thanh toán</MenuItem>
-                    <MenuItem value={7}>Buộc phải hủy phòng hay hoãn lịch</MenuItem>
-                    <MenuItem value={8}>Tìm thấy giá thấp hơn trên mạng</MenuItem>
-                    <MenuItem value={9}>Tìm được giá thấp hơn qua dịch vụ địa phương</MenuItem>
-                    <MenuItem value={10}>Sẽ đặt phòng khác trên website của chúng tôi</MenuItem>
-                    <MenuItem value={11}>Sẽ đặt phòng trực tiếp với chi nhánh</MenuItem>
-                    <MenuItem value={12}>Khác</MenuItem>
+                    {Object.values(CanceledReason).map((key, index) => {
+                      return (
+                        <MenuItem key={index} value={key}>
+                          {key}
+                        </MenuItem>
+                      )
+                    })}
                   </Select>
                 </Box>
                 <Box sx={{ marginBottom: 2 }}>
