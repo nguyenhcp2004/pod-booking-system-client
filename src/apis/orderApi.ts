@@ -267,7 +267,8 @@ export const orderApiRequest = {
     return http.get<GetListOrderByAccountIdResType>(`/order/${query.accountId}?${stringified}`)
   },
   getOrderInfo: (orderId: string) => http.get<GetOrderInfoResType>(`/order/order-info/${orderId}`),
-  updateOrderStatus: (body: { id: string; status: string }) => http.put<OrderUpdateStatusResType>(`/order`, body)
+  updateOrderStatus: (body: { id: string; status: string; cancelReason: string }) =>
+    http.put<OrderUpdateStatusResType>(`/order`, body)
 }
 
 export default orderApiRequest

@@ -88,7 +88,8 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
     try {
       await updateOrderMutation.mutateAsync({
         id: orderDetail.id,
-        status: 'Rejected'
+        status: 'Rejected',
+        cancelReason
       })
       toast.success('Đã hủy phòng thành công')
       await queryClient.invalidateQueries({ queryKey: ['order-of-account'] })
