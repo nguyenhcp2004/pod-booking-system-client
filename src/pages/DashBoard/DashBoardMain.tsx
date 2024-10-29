@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 
 import { RoomBarChart } from '~/pages/DashBoard/BarChart'
-import { RevenueLineChart } from '~/pages/DashBoard/RevenueLineChart'
+import { RevenueBarChart } from '~/pages/DashBoard/RevenueBarChart'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
@@ -368,7 +368,7 @@ export default function DashboardMain() {
 
       <Grid container spacing={2} marginTop={2}>
         <Grid size={{ xs: 12, md: 7 }}>
-          <RevenueLineChart chartParams={getRevenueChartParam} />
+          <RevenueBarChart chartParams={getRevenueChartParam} view={selectMode} />
         </Grid>
         <Grid size={{ xs: 12, md: 5 }}>
           <RoomBarChart />
