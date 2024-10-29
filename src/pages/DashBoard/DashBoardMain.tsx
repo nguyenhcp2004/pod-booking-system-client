@@ -59,8 +59,8 @@ export default function DashboardMain() {
   const [quarter, setQuarter] = useState<number>(quarterList[0].key)
 
   useEffect(() => {
-    const start = selectTime.clone()
-    const end = selectTime.clone()
+    const start = selectMode === 'QUARTER' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
+    const end = selectMode === 'QUARTER' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
     if (selectMode === 'DATE') {
       setStartTime(start.startOf('day'))
       setEndTime(end.endOf('day'))
@@ -68,14 +68,14 @@ export default function DashboardMain() {
       setStartTime(start.startOf('month'))
       setEndTime(end.endOf('month'))
     } else if (selectMode === 'QUARTER') {
-      setStartTime(moment(quarter).startOf('quarter'))
-      setEndTime(moment(quarter).endOf('quarter'))
+      setStartTime(start.startOf('quarter'))
+      setEndTime(end.endOf('quarter'))
     }
   }, [selectTime, selectMode, quarter])
 
-  useEffect(() => {
-    console.log(startTime?.format('DD/MM/YYYY HH:mm'), endTime?.format('DD/MM/YYYY HH:mm'))
-  }, [startTime, endTime])
+  // useEffect(() => {
+  //   console.log(startTime?.format('DD/MM/YYYY HH:mm'), endTime?.format('DD/MM/YYYY HH:mm'))
+  // }, [startTime, endTime])
 
   const pickerMode = useMemo(() => {
     switch (selectMode) {
