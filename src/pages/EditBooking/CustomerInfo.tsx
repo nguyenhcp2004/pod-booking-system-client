@@ -1,11 +1,11 @@
 import { Box, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
+import { useAppContext } from '~/contexts/AppProvider'
 import { tokens } from '~/themes/theme'
 
-export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetailFullInfoResType['data'] }) {
+export default function CustomerInfo() {
   const colors = tokens('light')
-  const customer = orderDetail?.customer
+  const { account: customer } = useAppContext()
   return (
     <Box
       sx={{
@@ -35,7 +35,7 @@ export default function CustomerInfo({ orderDetail }: { orderDetail: OrderDetail
             <TextField
               id='phoneNumber'
               label='Số điện thoại'
-              defaultValue={'09xxxxxxxx'}
+              defaultValue={customer?.phoneNumber || '09xxxxxxxx'}
               fullWidth
               InputProps={{
                 readOnly: true
