@@ -5,7 +5,8 @@ import {
   CountOrderReqType,
   CountOrderResType,
   GetListOrderByAccountIdQueryType,
-  GetListOrderByAccountIdResType
+  GetListOrderByAccountIdResType,
+  GetOrderInfoResType
 } from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
@@ -263,7 +264,8 @@ export const orderApiRequest = {
     }
     const stringified = queryString.stringify(queryObject)
     return http.get<GetListOrderByAccountIdResType>(`/order/${query.accountId}?${stringified}`)
-  }
+  },
+  getOrderInfo: (orderId: string) => http.get<GetOrderInfoResType>(`/order/order-info/${orderId}`)
 }
 
 export default orderApiRequest

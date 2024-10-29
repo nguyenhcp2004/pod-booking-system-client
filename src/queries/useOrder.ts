@@ -129,3 +129,10 @@ export const useGetListOrderByAccountId = (query: GetListOrderByAccountIdQueryTy
     queryFn: () => orderApiRequest.getListOrderByAccountId(query)
   })
 }
+
+export const useGetOrderInfo = (orderId: string) => {
+  return useQuery({
+    queryKey: ['order-info', orderId],
+    queryFn: () => orderApiRequest.getOrderInfo(orderId)
+  })
+}

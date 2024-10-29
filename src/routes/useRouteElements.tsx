@@ -148,7 +148,7 @@ export default function useRouteElements() {
               element: <OrderAmenityDetail />
             },
             {
-              path: '/edit-booking/:orderDetailId',
+              path: '/edit-booking/:orderId',
               element: <EditBooking />
             }
           ]

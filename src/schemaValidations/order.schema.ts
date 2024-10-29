@@ -52,6 +52,7 @@ const orderDetailSchema = z.object({
   id: z.string(),
   roomId: z.number(),
   roomName: z.string(),
+  roomTypeName: z.string(),
   roomImage: z.string(),
   roomPrice: z.number(),
   status: z.string(),
@@ -72,19 +73,19 @@ const orderDetailSchema = z.object({
   )
 })
 
-export const OrderdSchema = z.object({
+export const OrderSchema = z.object({
   id: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   orderDetails: z.array(orderDetailSchema)
 })
 
-export type OrderdSchemaType = z.TypeOf<typeof OrderdSchema>
+export type OrderSchemaType = z.TypeOf<typeof OrderSchema>
 
 export const GetListOrderByAccountIdRes = z.object({
   code: z.number(),
   message: z.string(),
-  data: z.array(OrderdSchema),
+  data: z.array(OrderSchema),
   currentPage: z.number(),
   totalPage: z.number(),
   recordPerPage: z.number(),
@@ -92,3 +93,11 @@ export const GetListOrderByAccountIdRes = z.object({
 })
 
 export type GetListOrderByAccountIdResType = z.TypeOf<typeof GetListOrderByAccountIdRes>
+
+export const GetOrderInfoRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: OrderSchema
+})
+
+export type GetOrderInfoResType = z.TypeOf<typeof GetOrderInfoRes>

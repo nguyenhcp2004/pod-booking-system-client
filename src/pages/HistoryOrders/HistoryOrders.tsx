@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import { useAppContext } from '~/contexts/AppProvider'
 import { getDayNumber, getHour, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useGetListOrderByAccountId } from '~/queries/useOrder'
-import { OrderdSchemaType } from '~/schemaValidations/order.schema'
+import { OrderSchemaType } from '~/schemaValidations/order.schema'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -21,14 +21,12 @@ const getStatusColor = (status: string) => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function BookingCard({ booking, selectedTag }: { booking: OrderdSchemaType; selectedTag: string }) {
+function BookingCard({ booking, selectedTag }: { booking: OrderSchemaType; selectedTag: string }) {
   const navigate = useNavigate()
   const handleClick = () => {
     navigate(`/edit-booking/${booking.id}`)
   }
   const hasAmenities = booking.orderDetails.some((detail) => detail.amenities.length !== 0)
-  const uniqueRoomNames = [...new Set(booking.orderDetails.map((order) => order.roomName))]
 
   return (
     <Card
@@ -77,7 +75,7 @@ function BookingCard({ booking, selectedTag }: { booking: OrderdSchemaType; sele
                     sx={{ fontWeight: 'bold' }}
                   />
                   <Typography variant='h5' component='div' sx={{ mt: 1 }}>
-                    {uniqueRoomNames.join(', ')}
+                    {booking.orderDetails[0].roomTypeName}
                   </Typography>
                 </Box>
                 {/* Status, Check-in, and Check-out tags */}
@@ -132,9 +130,11 @@ function BookingCard({ booking, selectedTag }: { booking: OrderdSchemaType; sele
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
               <Box sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}></Box>
-              <Button variant='contained' onClick={handleClick}>
-                Xem chi tiết hóa đơn
-              </Button>
+              <Link to={`/edit-booking/${booking.id}`}>
+                <Button variant='contained' onClick={handleClick}>
+                  Xem chi tiết hóa đơn
+                </Button>
+              </Link>
             </Box>
           </CardContent>
         </Grid>
@@ -235,7 +235,6 @@ export default function HistoryOrders() {
         height={{ xs: 'auto', md: '100%' }}
       >
         {orders ? (
-          // eslint-disable-next-line prettier/prettier
           orders.data.data.map((booking, index) => (
             <BookingCard key={index} booking={booking} selectedTag={selectedTag} />
           ))
