@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
 import { formatDate, formatStartEndTime } from '~/utils/utils'
+import { AccountType } from '~/schemaValidations/auth.schema'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -99,9 +100,12 @@ export const Confirmed: React.FC = () => {
   )
   const discount = Math.round((bookedRoom.servicePackage.discountPercentage * amenitiesTotal) / 100)
 
+  const accountString = localStorage.getItem('account')
+  const account: AccountType = accountString ? JSON.parse(accountString) : null
+
   const bookingInfo = {
     orderDetailId: bookedRoom.orderDetailId,
-    customerName: 'Phạm Thị Anh Đào',
+    customerName: account.name,
     totalPrice: amenitiesTotal - discount,
     roomType: bookedRoom.roomType.name,
     pricePerHour: bookedRoom.roomType.price,

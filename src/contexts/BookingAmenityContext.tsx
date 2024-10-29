@@ -29,7 +29,7 @@ interface BookingAmenityProviderProps {
   children: ReactNode
 }
 
-const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
+export const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
 export const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
 
 export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ children }) => {
