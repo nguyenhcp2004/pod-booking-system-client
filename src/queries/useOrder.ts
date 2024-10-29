@@ -136,3 +136,9 @@ export const useGetOrderInfo = (orderId: string) => {
     queryFn: () => orderApiRequest.getOrderInfo(orderId)
   })
 }
+
+export const useUpdateOrderStatusMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.updateOrderStatus
+  })
+}

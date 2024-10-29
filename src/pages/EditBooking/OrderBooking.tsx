@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, Divider, InputLabel, MenuItem, Select, useTheme } from '@mui/material'
 import moment from 'moment'
-import { getDayBefore, getHour, getMonthNumber } from '~/utils/utils'
+import { getDayBefore, getHour, getMonthNumber, handleErrorApi } from '~/utils/utils'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -14,7 +14,10 @@ import { CanceledReason } from '~/constants/type'
 import { GetOrderInfoResType } from '~/schemaValidations/order.schema'
 import { formatCurrency } from '~/utils/currency'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
-
+import { toast } from 'react-toastify'
+import { useUpdateOrderStatusMutation } from '~/queries/useOrder'
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(3)
@@ -25,8 +28,14 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }))
 export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInfoResType['data'] }) {
   const theme = useTheme()
+  const navigate = useNavigate()
   const roomHaveAmenities = orderDetail.orderDetails.filter((od) => od.amenities.length > 0)
   const [open, setOpen] = useState(false)
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [error, setError] = useState('')
+  const updateOrderMutation = useUpdateOrderStatusMutation()
+  const queryClient = useQueryClient()
   const totalPriceRoom = orderDetail.orderDetails.reduce((total, orderDetail) => {
     return total + orderDetail.roomPrice
   }, 0)
@@ -43,10 +52,50 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
     priceBeforeDiscount * (1 - (orderDetail.orderDetails[0].servicePackage.discountPercentage ?? 0) / 100)
 
   const handleClickOpen = () => {
+    const startTime = moment(orderDetail.orderDetails[0].startTime)
+    const today = moment()
+
+    if (!today.isBefore(startTime.clone().subtract(1, 'days'))) {
+      toast.error('Đã quá hạn hủy đơn')
+      return
+    }
     setOpen(true)
+  }
+
+  const handleClickOpenConfirm = () => {
+    setOpenConfirm(true)
   }
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false)
+  }
+
+  const handleConfirm = async () => {
+    if (!cancelReason) {
+      setError('Vui lòng chọn lý do hủy phòng')
+    } else {
+      setError('')
+      setOpen(false)
+      handleClickOpenConfirm()
+    }
+  }
+
+  const handleCancel = async () => {
+    if (updateOrderMutation.isPending) return
+    try {
+      await updateOrderMutation.mutateAsync({
+        id: orderDetail.id,
+        status: 'Rejected'
+      })
+      toast.success('Đã hủy phòng thành công')
+      await queryClient.invalidateQueries({ queryKey: ['order-of-account'] })
+      navigate('/history-orders')
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   return (
@@ -221,7 +270,13 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
                   <InputLabel variant='standard' sx={{ fontWeight: 'bold', marginBottom: 0.8 }}>
                     Lý do hủy phòng:
                   </InputLabel>
-                  <Select fullWidth size='small' displayEmpty defaultValue=''>
+                  <Select
+                    fullWidth
+                    size='small'
+                    displayEmpty
+                    defaultValue=''
+                    onChange={(e) => setCancelReason(e.target.value)}
+                  >
                     <MenuItem value='' disabled>
                       Chọn một trong số các lý do sau
                     </MenuItem>
@@ -233,6 +288,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
                       )
                     })}
                   </Select>
+                  {error && <Typography color='error'>{error}</Typography>}
                 </Box>
                 <Box sx={{ marginBottom: 2 }}>
                   <Typography sx={{ fontWeight: 'bold', marginBottom: 0.8 }} gutterBottom>
@@ -263,7 +319,37 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
                 <Button onClick={handleClose} variant='outlined'>
                   Đóng
                 </Button>
-                <Button variant='contained' color='error'>
+                <Button variant='contained' color='error' onClick={handleConfirm}>
+                  Xác nhận
+                </Button>
+              </DialogActions>
+            </BootstrapDialog>
+            <BootstrapDialog onClose={handleCloseConfirm} aria-labelledby='customized-dialog-title' open={openConfirm}>
+              <DialogTitle sx={{ m: 0, p: 2, fontWeight: 'bold', fontSize: '1.5rem' }} id='customized-dialog-title'>
+                Hủy đặt phòng
+              </DialogTitle>
+              <IconButton
+                aria-label='close'
+                onClick={handleClose}
+                sx={(theme) => ({
+                  position: 'absolute',
+                  right: 8,
+                  top: 8,
+                  color: theme.palette.grey[500]
+                })}
+              >
+                <CloseIcon />
+              </IconButton>
+              <DialogContent dividers>
+                <Box sx={{ marginBottom: 2 }}>
+                  <Typography gutterBottom>Bạn có chắc chắn muốn hủy bỏ đặt phòng này không?</Typography>
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseConfirm} variant='outlined'>
+                  Giữ đặt phòng này
+                </Button>
+                <Button variant='contained' color='error' onClick={handleCancel}>
                   Xác nhận
                 </Button>
               </DialogActions>

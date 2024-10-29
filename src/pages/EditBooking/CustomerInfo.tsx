@@ -35,7 +35,7 @@ export default function CustomerInfo() {
             <TextField
               id='phoneNumber'
               label='Số điện thoại'
-              defaultValue={'09xxxxxxxx'}
+              defaultValue={customer?.phoneNumber || '09xxxxxxxx'}
               fullWidth
               InputProps={{
                 readOnly: true

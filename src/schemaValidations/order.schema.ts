@@ -101,3 +101,20 @@ export const GetOrderInfoRes = z.object({
 })
 
 export type GetOrderInfoResType = z.TypeOf<typeof GetOrderInfoRes>
+
+export const CancelBookingSchema = z.object({
+  cancelReason: z.string().min(1, 'Vui lòng chọn lý do hủy phòng')
+})
+
+export const OrderUpdateStatusRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z.object({
+    id: z.string(),
+    accountId: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string()
+  })
+})
+
+export type OrderUpdateStatusResType = z.TypeOf<typeof OrderUpdateStatusRes>

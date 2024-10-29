@@ -239,7 +239,7 @@ export default function HistoryOrders() {
             <BookingCard key={index} booking={booking} selectedTag={selectedTag} />
           ))
         ) : (
-          <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>Không có dữ liệu để hiển thị.</Typography>
+          <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>Đang tải dữ liệu...</Typography>
         )}
       </Box>
 
