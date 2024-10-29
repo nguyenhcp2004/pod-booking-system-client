@@ -3,6 +3,9 @@ import { BookingInfo } from '~/contexts/BookingContext'
 import RoomAmenitiesCard from '~/components/BookingDetails/RoomAmenitiesCard'
 import { Dispatch, SetStateAction } from 'react'
 import { calTotalPrice } from '~/utils/order'
+import { formatCurrency } from '~/utils/currency'
+import moment from 'moment'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 interface BookingDetailsCustomProps {
   bookingData: BookingInfo
@@ -12,7 +15,7 @@ interface BookingDetailsCustomProps {
 const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   if (!bookingData) return null
-
+  const today = moment()
   const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
   const removeAmenity = (amenity: string) => {
     setBookingData?.((prev) => {
@@ -50,7 +53,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
             </Typography>
             <Box display='flex' sx={{ marginTop: '4px' }}>
               <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                {bookingData.roomType?.price.toLocaleString()} VND
+                {formatCurrency(bookingData?.roomType?.price ?? 0)}
               </Typography>
               <Typography variant='subtitle2'>/tiếng</Typography>
             </Box>
@@ -70,11 +73,13 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
                 <Typography variant='body2' fontWeight='bold'>
                   Ngày:
                 </Typography>
-                <Typography variant='body2'>{bookingData.date}</Typography>
+                <Typography variant='body2'>
+                  {moment(bookingData?.date).format(DEFAULT_DATE_FORMAT) || moment(today).format(DEFAULT_DATE_FORMAT)}
+                </Typography>
               </Box>
               <Box display='flex' gap='3px'>
                 <Typography variant='body2' fontWeight='bold'>
-                  Slot:
+                  Khung giờ:
                 </Typography>
                 <Typography variant='body2'>{bookingData.timeSlots.join(', ')}</Typography>
               </Box>
@@ -117,7 +122,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
             Tổng các phòng:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).totalRoomPrice.toLocaleString()} VND
+            {formatCurrency(calTotalPrice(bookingData).totalRoomPrice)}
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
@@ -125,7 +130,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
             Tổng các dịch vụ:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).totalAmenitiesPrice.toLocaleString()} VND
+            {formatCurrency(calTotalPrice(bookingData).totalAmenitiesPrice)}
           </Typography>
         </Box>
         <Box display='flex' justifyContent='space-between'>
@@ -133,7 +138,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
             Giảm giá: ({bookingData.servicePackage?.name} {bookingData.servicePackage?.discountPercentage}%)
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {calTotalPrice(bookingData).discount.toLocaleString()} VND
+            {formatCurrency(calTotalPrice(bookingData).discount)}
           </Typography>
         </Box>
       </Box>
@@ -143,7 +148,7 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
           Tổng đơn:
         </Typography>
         <Typography variant='subtitle2' fontWeight='bold'>
-          {calTotalPrice(bookingData).total.toLocaleString()} VND
+          {formatCurrency(calTotalPrice(bookingData).total)}
         </Typography>
       </Box>
     </Box>

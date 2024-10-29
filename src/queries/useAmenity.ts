@@ -13,6 +13,16 @@ export const useGetAmenities = () => {
   })
 }
 
+export const useGetActiveAmenities = () => {
+  return useQuery<AmenityType[]>({
+    queryKey: ['amenities'],
+    queryFn: async () => {
+      const response = await amenityApiRequest.getAllActiveAmenities()
+      return response.data.data
+    }
+  })
+}
+
 export const useGetListAmenity = (query: Pagination) => {
   return useQuery({
     queryKey: ['amenity', { query }],
