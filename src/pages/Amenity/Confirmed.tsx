@@ -8,12 +8,13 @@ import { Helmet } from 'react-helmet-async'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
 import { formatDate, formatStartEndTime } from '~/utils/utils'
+import { AccountType } from '~/schemaValidations/auth.schema'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
-  const { selectedAmenities, bookedRoom, clearAmenities } = useBookingAmenityContext()
+  const { selectedAmenities, bookedRoom, setBookedRoom, clearAmenities } = useBookingAmenityContext()
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityMutation()
 
   const [status, setStatus] = useState<boolean | null>(null)
@@ -56,8 +57,9 @@ export const Confirmed: React.FC = () => {
 
   const handleReturn = () => {
     console.log('Back to homepage')
-    localStorage.setItem('bookingAmenities', JSON.stringify({}))
-    localStorage.setItem('bookedRoom', JSON.stringify({}))
+    setBookedRoom(null)
+    localStorage.removeItem('bookingAmenities')
+    localStorage.removeItem('bookedRoom')
     clearAmenities()
     navigate('/')
   }
@@ -87,7 +89,7 @@ export const Confirmed: React.FC = () => {
       >
         <Typography variant='h5'>No booking data available</Typography>
         <Button variant='contained' onClick={handleReturn}>
-          Back to homepage
+          Trở về trang chủ
         </Button>
       </Paper>
     )
@@ -98,9 +100,12 @@ export const Confirmed: React.FC = () => {
   )
   const discount = Math.round((bookedRoom.servicePackage.discountPercentage * amenitiesTotal) / 100)
 
+  const accountString = localStorage.getItem('account')
+  const account: AccountType = accountString ? JSON.parse(accountString) : null
+
   const bookingInfo = {
     orderDetailId: bookedRoom.orderDetailId,
-    customerName: 'Phạm Thị Anh Đào',
+    customerName: account.name,
     totalPrice: amenitiesTotal - discount,
     roomType: bookedRoom.roomType.name,
     pricePerHour: bookedRoom.roomType.price,
@@ -109,7 +114,7 @@ export const Confirmed: React.FC = () => {
     timeSlots: formatStartEndTime(bookedRoom.startTime, bookedRoom.endTime),
     amenities: selectedAmenities.map((amenity) => amenity.name).join(', '),
     package: bookedRoom.servicePackage.name,
-    imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
+    imageSrc: bookedRoom.image
   }
 
   return (
