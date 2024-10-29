@@ -3,14 +3,14 @@ import { LineChart } from '@mui/x-charts/LineChart'
 import moment, { Moment } from 'moment'
 import { useMemo } from 'react'
 import { useGetRevenueByMonth } from '~/queries/useOrderDetail'
-import { GetRevenueByMonthBody } from '~/schemaValidations/orderDetail.schema'
+import { GetRevenueChartBodyType } from '~/schemaValidations/orderDetail.schema'
 
 interface RevenueByMonthDto {
   date: string
   revenue: number
 }
 
-export function RevenueLineChart({ chartParams }: { chartParams: GetRevenueByMonthBody }) {
+export function RevenueLineChart({ chartParams }: { chartParams: GetRevenueChartBodyType }) {
   const { data: revenueByMonthRes, isLoading, error } = useGetRevenueByMonth(chartParams)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

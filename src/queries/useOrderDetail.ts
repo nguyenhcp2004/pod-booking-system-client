@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { orderDetailApiRequest } from '~/apis/orderDetail'
 import {
   GetListOrderDetailQueryType,
-  GetRevenueByMonthBody,
+  GetRevenueChartBodyType,
   GetRevenueReqType
 } from '~/schemaValidations/orderDetail.schema'
 
@@ -35,10 +35,10 @@ export const useGetRevenueCurrentDay = () => {
   })
 }
 
-export const useGetRevenueByMonth = (query: GetRevenueByMonthBody) => {
+export const useGetRevenueByMonth = (query: GetRevenueChartBodyType) => {
   return useQuery({
     queryKey: ['order-detail-revenue-by-month', query],
-    queryFn: () => orderDetailApiRequest.getRevenueByMonth(query)
+    queryFn: () => orderDetailApiRequest.getRevenueChart(query)
   })
 }
 

@@ -5,9 +5,9 @@ import {
   OrderDetailFullInfoResType,
   GetRevenueReqType,
   GetRevenueResType,
-  GetRevenueByMonthResType,
   GetNumberOrderByBuildingResType,
-  GetRevenueByMonthBody
+  GetRevenueChartBodyType,
+  GetRevenueChartResType
 } from '~/schemaValidations/orderDetail.schema'
 import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
@@ -33,9 +33,9 @@ export const orderDetailApiRequest = {
     }
     return http.get<GetRevenueResType>(`/order-detail/revenue?${queryString}`)
   },
-  getRevenueByMonth: (query: GetRevenueByMonthBody) => {
+  getRevenueChart: (query: GetRevenueChartBodyType) => {
     const stringified = queryString.stringify(query)
-    return http.get<GetRevenueByMonthResType>(`/order-detail/revenue-by-month?${stringified}`)
+    return http.get<GetRevenueChartResType>(`/order-detail/revenue-chart?${stringified}`)
   },
   getNumberOrdersByBuilding: () => {
     return http.get<GetNumberOrderByBuildingResType>('/order-detail/number-order-by-building')
