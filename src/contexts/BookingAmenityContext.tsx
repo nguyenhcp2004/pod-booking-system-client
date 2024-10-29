@@ -16,6 +16,7 @@ interface BookingAmenityContextType {
 
 const BookingAmenityContext = createContext<BookingAmenityContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBookingAmenityContext = () => {
   const context = useContext(BookingAmenityContext)
   if (!context) {
@@ -53,6 +54,13 @@ export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ 
       localStorage.removeItem(LOCAL_STORAGE_KEY_ROOM)
     }
   }, [bookedRoom])
+
+  useEffect(() => {
+    const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
+    if (!savedRoom) {
+      setBookedRoom(null)
+    }
+  }, [])
 
   const addAmenity = (amenity: AmenityType) => {
     setSelectedAmenities((prevAmenities) => {

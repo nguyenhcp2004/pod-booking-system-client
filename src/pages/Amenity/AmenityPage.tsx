@@ -168,7 +168,6 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                       value={selectedBookingSlot}
                       label='Chọn khung giờ đã đặt'
                       onChange={handleSelectBookingSlot}
-                      disabled={bookingSlots.length === 1}
                     >
                       {bookingSlots.map((slot) => (
                         <MenuItem key={slot} value={slot}>
