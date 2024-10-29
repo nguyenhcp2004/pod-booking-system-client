@@ -16,9 +16,9 @@ export type CountOrderReqType = z.TypeOf<typeof CountOrderReq>
 
 export const GetListOrderByAccountIdQuery = z.object({
   accountId: z.string(),
-  page: z.number().optional(),
-  take: z.number().optional(),
-  status: z.string().optional()
+  page: z.number(),
+  take: z.number(),
+  status: z.string()
 })
 export type GetListOrderByAccountIdQueryType = z.TypeOf<typeof GetListOrderByAccountIdQuery>
 
@@ -52,6 +52,7 @@ const orderDetailSchema = z.object({
   id: z.string(),
   roomId: z.number(),
   roomName: z.string(),
+  roomImage: z.string(),
   roomPrice: z.number(),
   status: z.string(),
   startTime: z.string().datetime(),
@@ -77,6 +78,8 @@ export const OrderdSchema = z.object({
   updatedAt: z.string().datetime(),
   orderDetails: z.array(orderDetailSchema)
 })
+
+export type OrderdSchemaType = z.TypeOf<typeof OrderdSchema>
 
 export const GetListOrderByAccountIdRes = z.object({
   code: z.number(),

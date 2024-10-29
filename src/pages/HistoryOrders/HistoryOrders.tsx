@@ -1,13 +1,12 @@
 import { Typography, Box, Card, CardContent, CardMedia, Chip, Divider, Pagination, Button } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useEffect, useState } from 'react'
-import { useGetListOrderDetail } from '~/queries/useOrderDetail'
 import { formatCurrency } from '~/utils/currency'
-import { OrderDetailType } from '~/schemaValidations/orderDetail.schema'
 import { useAppContext } from '~/contexts/AppProvider'
 import { getDayNumber, getHour, getMonthNumber, getWeekdayNumber } from '~/utils/utils'
 import { useNavigate } from 'react-router-dom'
 import { useGetListOrderByAccountId } from '~/queries/useOrder'
+import { OrderdSchemaType } from '~/schemaValidations/order.schema'
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -23,20 +22,17 @@ const getStatusColor = (status: string) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selectedTag: string }) {
+function BookingCard({ booking, selectedTag }: { booking: OrderdSchemaType; selectedTag: string }) {
   const navigate = useNavigate()
-  // const priceQuantityTotal = booking.amenities.reduce((total, amenity) => {
-  //   total += amenity.price * amenity.quantity
-  //   return total
-  // }, 0)
-
-  // const priceTotal = priceQuantityTotal + booking.priceRoom
   const handleClick = () => {
     navigate(`/edit-booking/${booking.id}`)
   }
+  const hasAmenities = booking.orderDetails.some((detail) => detail.amenities.length !== 0)
+  const uniqueRoomNames = [...new Set(booking.orderDetails.map((order) => order.roomName))]
 
   return (
     <Card
+      key={booking.id}
       sx={{
         height: { xs: 'auto', md: '320px' },
         mb: 4,
@@ -55,8 +51,8 @@ function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selec
           <Box sx={{ height: '100%' }}>
             <CardMedia
               component='img'
-              src={booking.roomImage}
-              alt={booking.roomName}
+              src={booking.orderDetails[0].roomImage}
+              alt={booking.orderDetails[0].roomName}
               sx={{
                 height: '100%',
                 width: '100%',
@@ -81,7 +77,7 @@ function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selec
                     sx={{ fontWeight: 'bold' }}
                   />
                   <Typography variant='h5' component='div' sx={{ mt: 1 }}>
-                    {booking.roomName}
+                    {uniqueRoomNames.join(', ')}
                   </Typography>
                 </Box>
                 {/* Status, Check-in, and Check-out tags */}
@@ -92,11 +88,11 @@ function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selec
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
-                        {getDayNumber(booking.startTime)}
+                        {getDayNumber(booking.orderDetails[0].startTime)}
                       </Typography>
                       <Box gap={0.5} padding={0.5}>
-                        <Box>thg {getMonthNumber(booking.startTime)}</Box>
-                        <Box>Th {getWeekdayNumber(booking.startTime)}</Box>
+                        <Box>thg {getMonthNumber(booking.orderDetails[0].startTime)}</Box>
+                        <Box>Th {getWeekdayNumber(booking.orderDetails[0].startTime)}</Box>
                       </Box>
                     </Box>
                   </Box>
@@ -107,11 +103,11 @@ function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selec
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography variant='body1' sx={{ flex: 1, fontSize: '2rem', textAlign: 'center' }}>
-                        {getDayNumber(booking.endTime)}
+                        {getDayNumber(booking.orderDetails[0].endTime)}
                       </Typography>
                       <Box gap={0.5} padding={0.5}>
-                        <Box>thg {getMonthNumber(booking.endTime)}</Box>
-                        <Box>Th {getWeekdayNumber(booking.endTime)}</Box>
+                        <Box>thg {getMonthNumber(booking.orderDetails[0].endTime)}</Box>
+                        <Box>Th {getWeekdayNumber(booking.orderDetails[0].endTime)}</Box>
                       </Box>
                     </Box>
                   </Box>
@@ -121,16 +117,17 @@ function BookingCard({ booking, selectedTag }: { booking: OrderDetailType; selec
                 Mã đơn: {booking.id}
               </Typography>
               <Typography color='text.secondary' gutterBottom>
-                Khung giờ: {getHour(booking.startTime)}:00-{getHour(booking.endTime)}:00
+                Khung giờ: {getHour(booking.orderDetails[0].startTime)}:00-
+                {getHour(booking.orderDetails[0].endTime)}:00
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Typography variant='h6' component='div' sx={{ mr: 1 }}>
-                  Giá thuê: {formatCurrency(booking.priceRoom)}/giờ
+                  Giá thuê: {formatCurrency(booking.orderDetails[0].roomPrice)}/giờ
                 </Typography>
               </Box>
               <Divider sx={{ my: 2 }} />
               <Typography variant='subtitle1' gutterBottom>
-                Dịch vụ đặt thêm: {booking.amenities.length > 0 ? 'Có' : 'Không có'}
+                Dịch vụ đặt thêm: {hasAmenities ? 'Có' : 'Không có'}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
@@ -159,20 +156,14 @@ export default function HistoryOrders() {
       top: 0,
       behavior: 'smooth'
     })
-  }, [page])
-  const { data } = useGetListOrderDetail({
-    page: page,
-    take: 3,
-    customerId: account?.id as string,
-    status: selectedTag
-  })
+  }, [page, selectedTag])
   const { data: orders } = useGetListOrderByAccountId({
-    page: page,
+    page: page - 1,
     take: 5,
     accountId: account?.id as string,
     status: selectedTag
   })
-  const listOrders = data?.data
+  console.log(selectedTag)
   console.log(orders?.data.data)
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
@@ -243,8 +234,11 @@ export default function HistoryOrders() {
         sx={{ flexGrow: 1, minHeight: '300px', display: 'flex', flexDirection: 'column' }}
         height={{ xs: 'auto', md: '100%' }}
       >
-        {listOrders ? (
-          listOrders.data.map((booking) => <BookingCard key={booking.id} booking={booking} selectedTag={selectedTag} />)
+        {orders ? (
+          // eslint-disable-next-line prettier/prettier
+          orders.data.data.map((booking, index) => (
+            <BookingCard key={index} booking={booking} selectedTag={selectedTag} />
+          ))
         ) : (
           <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>Không có dữ liệu để hiển thị.</Typography>
         )}
@@ -252,7 +246,7 @@ export default function HistoryOrders() {
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <Pagination
-          count={listOrders?.totalPage ?? 1}
+          count={orders?.data?.totalPage ?? 1}
           page={page}
           onChange={handleChangePage}
           showFirstButton

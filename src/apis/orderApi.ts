@@ -38,6 +38,7 @@ interface OrderDetail {
   roomId: number
   roomName: string
   roomPrice: number
+  roomImage: string
   status: OrderStatus
   startTime: string
   endTime: string
