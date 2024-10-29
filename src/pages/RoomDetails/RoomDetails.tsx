@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, FormControl, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Checkbox, Chip, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import moment, { Moment } from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
@@ -166,6 +166,22 @@ export default function RoomDetail() {
                       }}
                       disableCloseOnSelect
                       limitTags={1}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index })
+                          return (
+                            <Chip
+                              size='small'
+                              variant='outlined'
+                              label={option}
+                              key={key}
+                              onClick={() => {}}
+                              {...tagProps}
+                              sx={{ margin: '0px 3px !important' }}
+                            />
+                          )
+                        })
+                      }
                       renderOption={(props, option, { selected }) => {
                         const { key, ...optionProps } = props
                         return (
