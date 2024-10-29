@@ -20,7 +20,7 @@ import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
-import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { LOCAL_STORAGE_KEY_ROOM, useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
 interface CommonProps {
   onNext: () => void
@@ -45,6 +45,14 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
 
   const [selectedRoomName, setSelectedRoomName] = useState<string>('')
   const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
+
+  useEffect(() => {
+    const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
+    if (!savedRoom) {
+      setBookedRoom(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (selectedAmenityType) {

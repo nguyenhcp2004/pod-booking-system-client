@@ -30,7 +30,7 @@ interface BookingAmenityProviderProps {
 }
 
 const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
-const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
+export const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
 
 export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ children }) => {
   const [selectedAmenities, setSelectedAmenities] = useState<AmenityType[]>(() => {
@@ -54,13 +54,6 @@ export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ 
       localStorage.removeItem(LOCAL_STORAGE_KEY_ROOM)
     }
   }, [bookedRoom])
-
-  useEffect(() => {
-    const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
-    if (!savedRoom) {
-      setBookedRoom(null)
-    }
-  }, [])
 
   const addAmenity = (amenity: AmenityType) => {
     setSelectedAmenities((prevAmenities) => {

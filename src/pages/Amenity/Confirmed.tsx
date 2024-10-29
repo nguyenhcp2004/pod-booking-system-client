@@ -110,7 +110,7 @@ export const Confirmed: React.FC = () => {
     timeSlots: formatStartEndTime(bookedRoom.startTime, bookedRoom.endTime),
     amenities: selectedAmenities.map((amenity) => amenity.name).join(', '),
     package: bookedRoom.servicePackage.name,
-    imageSrc: 'https://i.pinimg.com/736x/1a/ea/75/1aea75b50d0a133a83e550757b993db7.jpg'
+    imageSrc: bookedRoom.image
   }
 
   return (
