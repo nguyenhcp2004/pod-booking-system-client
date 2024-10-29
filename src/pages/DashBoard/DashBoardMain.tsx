@@ -33,11 +33,11 @@ import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 import { DatePicker } from '@mui/x-date-pickers'
 
 export default function DashboardMain() {
-  const [startTime, setStartTime] = useState<Moment | null>(moment().startOf('day'))
-  const [endTime, setEndTime] = useState<Moment | null>(moment().endOf('day'))
+  const [startTime, setStartTime] = useState<Moment>(moment().startOf('day'))
+  const [endTime, setEndTime] = useState<Moment>(moment().endOf('day'))
   const [selectTime, setSelectTime] = useState<Moment>(moment().startOf('day'))
 
-  const [selectMode, setSelectMode] = useState<string>('DATE')
+  const [selectMode, setSelectMode] = useState<'day' | 'month' | 'quarter'>('day')
 
   const quarterList = useMemo(() => {
     const from = moment().year(2024).startOf('year')
@@ -59,15 +59,15 @@ export default function DashboardMain() {
   const [quarter, setQuarter] = useState<number>(quarterList[0].key)
 
   useEffect(() => {
-    const start = selectMode === 'QUARTER' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
-    const end = selectMode === 'QUARTER' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
-    if (selectMode === 'DATE') {
+    const start = selectMode === 'quarter' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
+    const end = selectMode === 'quarter' ? quarterList[quarter - 1].value.clone() : selectTime.clone()
+    if (selectMode === 'day') {
       setStartTime(start.startOf('day'))
       setEndTime(end.endOf('day'))
-    } else if (selectMode === 'MONTH') {
+    } else if (selectMode === 'month') {
       setStartTime(start.startOf('month'))
       setEndTime(end.endOf('month'))
-    } else if (selectMode === 'QUARTER') {
+    } else if (selectMode === 'quarter') {
       setStartTime(start.startOf('quarter'))
       setEndTime(end.endOf('quarter'))
     }
@@ -79,19 +79,19 @@ export default function DashboardMain() {
 
   const pickerMode = useMemo(() => {
     switch (selectMode) {
-      case 'DATE':
+      case 'day':
         return {
           mode: 'day',
           label: 'Chọn ngày',
           format: 'DD/MM/YYYY'
         }
-      case 'MONTH':
+      case 'month':
         return {
           mode: 'month',
           label: 'Chọn tháng',
           format: 'MM/YYYY'
         }
-      case 'QUARTER':
+      case 'quarter':
         return {
           mode: 'quarter',
           label: 'Chọn quý',
@@ -116,11 +116,11 @@ export default function DashboardMain() {
 
   const handleNext = () => {
     const now = selectTime.clone()
-    if (selectMode === 'DATE') {
+    if (selectMode === 'day') {
       setSelectTime(now.add(1, 'day'))
-    } else if (selectMode === 'MONTH') {
+    } else if (selectMode === 'month') {
       setSelectTime(now.add(1, 'month'))
-    } else if (selectMode === 'QUARTER') {
+    } else if (selectMode === 'quarter') {
       setSelectTime(now.add(1, 'quarter'))
       setQuarter((quarter) => quarter + 1)
     }
@@ -128,11 +128,11 @@ export default function DashboardMain() {
 
   const handlePrev = () => {
     const now = selectTime.clone()
-    if (selectMode === 'DATE') {
+    if (selectMode === 'day') {
       setSelectTime(now.subtract(1, 'day'))
-    } else if (selectMode === 'MONTH') {
+    } else if (selectMode === 'month') {
       setSelectTime(now.subtract(1, 'month'))
-    } else if (selectMode === 'QUARTER') {
+    } else if (selectMode === 'quarter') {
       setSelectTime(now.subtract(1, 'quarter'))
       setQuarter((quarter) => quarter - 1)
     }
@@ -150,6 +150,14 @@ export default function DashboardMain() {
     startTime: startTime ? startTime.format('DD/MM/YYYYTHH:mm') : '',
     endTime: endTime ? endTime.format('DD/MM/YYYYTHH:mm') : ''
   }
+
+  const getRevenueChartParam = useMemo(() => {
+    return {
+      startTime: startTime.format('DD/MM/YYYYTHH:mm'),
+      endTime: endTime.format('DD/MM/YYYYTHH:mm'),
+      viewWith: selectMode
+    }
+  }, [startTime, endTime, selectMode])
 
   /**
    * Call api count served room
@@ -188,20 +196,20 @@ export default function DashboardMain() {
               size='small'
               value={selectMode}
               label='Chế độ xem'
-              onChange={(e) => setSelectMode(e.target.value as string)}
+              onChange={(e) => setSelectMode(e.target.value as 'day' | 'month' | 'quarter')}
             >
-              <MenuItem value={'DATE'}>Ngày</MenuItem>
-              <MenuItem value={'MONTH'}>Tháng</MenuItem>
-              <MenuItem value={'QUARTER'}>Quý</MenuItem>
+              <MenuItem value={'day'}>Ngày</MenuItem>
+              <MenuItem value={'month'}>Tháng</MenuItem>
+              <MenuItem value={'quarter'}>Quý</MenuItem>
             </Select>
           </FormControl>
         </Box>
         <Box minWidth={120}>
-          {selectMode !== 'QUARTER' ? (
+          {selectMode !== 'quarter' ? (
             <DatePicker
               label={pickerMode.label}
               value={selectTime}
-              views={selectMode === 'MONTH' ? ['month', 'year'] : ['year', 'month', 'day']}
+              views={selectMode === 'month' ? ['month', 'year'] : ['year', 'month', 'day']}
               onChange={(date) => {
                 if (date) setSelectTime(date)
               }}
@@ -232,10 +240,10 @@ export default function DashboardMain() {
         </Button>
 
         <ButtonGroup size='small' color='primary'>
-          <Button onClick={handlePrev} disabled={selectMode === 'QUARTER' && quarter == 1}>
+          <Button onClick={handlePrev} disabled={selectMode === 'quarter' && quarter == 1}>
             <NavigateBeforeIcon />
           </Button>
-          <Button onClick={handleNext} disabled={selectMode === 'QUARTER' && quarter == quarterList.length}>
+          <Button onClick={handleNext} disabled={selectMode === 'quarter' && quarter == quarterList.length}>
             <NavigateNextIcon />
           </Button>
         </ButtonGroup>
@@ -360,7 +368,7 @@ export default function DashboardMain() {
 
       <Grid container spacing={2} marginTop={2}>
         <Grid size={{ xs: 12, md: 7 }}>
-          <RevenueLineChart />
+          <RevenueLineChart chartParams={getRevenueChartParam} />
         </Grid>
         <Grid size={{ xs: 12, md: 5 }}>
           <RoomBarChart />

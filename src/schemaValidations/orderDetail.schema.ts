@@ -103,8 +103,14 @@ export const GetRevenueReq = z.object({
   startTime: z.string().nullable(),
   endTime: z.string().nullable()
 })
-
 export type GetRevenueReqType = z.TypeOf<typeof GetRevenueReq>
+
+export const GetRevenueByMonthBody = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+  viewWith: z.enum(['day', 'month', 'quarter'])
+})
+export type GetRevenueByMonthBody = z.TypeOf<typeof GetRevenueByMonthBody>
 
 export const RevenueByMonthSchema = z.object({
   date: z.string(),

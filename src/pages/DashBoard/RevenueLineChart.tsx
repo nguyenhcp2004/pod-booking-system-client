@@ -1,16 +1,17 @@
 import { Card, CardContent, CardHeader, Typography, CardActions } from '@mui/material'
 import { LineChart } from '@mui/x-charts/LineChart'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import { useMemo } from 'react'
 import { useGetRevenueByMonth } from '~/queries/useOrderDetail'
+import { GetRevenueByMonthBody } from '~/schemaValidations/orderDetail.schema'
 
 interface RevenueByMonthDto {
   date: string
   revenue: number
 }
 
-export function RevenueLineChart() {
-  const { data: revenueByMonthRes, isLoading, error } = useGetRevenueByMonth()
+export function RevenueLineChart({ chartParams }: { chartParams: GetRevenueByMonthBody }) {
+  const { data: revenueByMonthRes, isLoading, error } = useGetRevenueByMonth(chartParams)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const chartData: RevenueByMonthDto[] = revenueByMonthRes?.data.data || []
