@@ -15,7 +15,7 @@ export const useCreateBuildingMutation = () => {
   return useMutation({
     mutationFn: buildingApiRequest.createBuilding,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['buidlings'] })
+      queryClient.invalidateQueries({ queryKey: ['filter-building'] })
     }
   })
 }
@@ -25,7 +25,7 @@ export const useEditBuildingMutation = () => {
   return useMutation({
     mutationFn: buildingApiRequest.editBuilding,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['buidlings'] })
+      queryClient.invalidateQueries({ queryKey: ['filter-building'] })
     }
   })
 }

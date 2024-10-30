@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material'
+import { Box, TextField } from '@mui/material'
 import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import { useState } from 'react'
@@ -19,35 +19,31 @@ export default function SearchInput({ setPaginationModel }: Props) {
     setQuery(event.target.value)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      setPaginationModel((prev) => ({
-        ...prev,
-        address: query
-      }))
-      console.log('Current query:', query)
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setPaginationModel((prev) => ({ ...prev, address: query }))
   }
 
   return (
     <>
-      <TextField
-        size='small'
-        placeholder='Tìm kiếm...'
-        value={query}
-        onChange={handleInputChange}
-        onKeyUp={handleKeyPress}
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position='start'>
-                <SearchIcon />
-              </InputAdornment>
-            )
-          }
-        }}
-      />
+      <Box component={'form'} onSubmit={handleSubmit}>
+        <TextField
+          size='small'
+          placeholder='Tìm kiếm...'
+          value={query}
+          onChange={handleInputChange}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              value: query
+            }
+          }}
+        />
+      </Box>
     </>
   )
 }

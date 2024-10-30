@@ -16,6 +16,7 @@ interface BookingAmenityContextType {
 
 const BookingAmenityContext = createContext<BookingAmenityContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBookingAmenityContext = () => {
   const context = useContext(BookingAmenityContext)
   if (!context) {
@@ -28,8 +29,8 @@ interface BookingAmenityProviderProps {
   children: ReactNode
 }
 
-const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
-const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
+export const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
+export const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
 
 export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ children }) => {
   const [selectedAmenities, setSelectedAmenities] = useState<AmenityType[]>(() => {
