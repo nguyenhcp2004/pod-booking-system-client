@@ -103,21 +103,27 @@ export const GetRevenueReq = z.object({
   startTime: z.string().nullable(),
   endTime: z.string().nullable()
 })
-
 export type GetRevenueReqType = z.TypeOf<typeof GetRevenueReq>
+
+export const GetRevenueChartBody = z.object({
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+  viewWith: z.enum(['day', 'month', 'quarter'])
+})
+export type GetRevenueChartBodyType = z.TypeOf<typeof GetRevenueChartBody>
 
 export const RevenueByMonthSchema = z.object({
   date: z.string(),
   revenue: z.number()
 })
 
-export const GetRevenueByMonthRes = z.object({
+export const GetRevenueChartRes = z.object({
   code: z.number(),
   data: z.array(RevenueByMonthSchema),
   message: z.string()
 })
 
-export type GetRevenueByMonthResType = z.TypeOf<typeof GetRevenueByMonthRes>
+export type GetRevenueChartResType = z.TypeOf<typeof GetRevenueChartRes>
 
 export const NumberOrderByBuildingSchema = z.object({
   buildingNumber: z.number(),

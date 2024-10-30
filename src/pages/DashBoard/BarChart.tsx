@@ -27,7 +27,6 @@ export function RoomBarChart() {
       }))
   }, [chartData])
 
-  if (isLoading) return <Typography>Đang tải dữ liệu...</Typography>
   if (error) return <Typography>Có lỗi xảy ra: {error.message}</Typography>
 
   return (
@@ -35,7 +34,9 @@ export function RoomBarChart() {
       <CardHeader title={<Typography variant='h6'>Xếp hạng loại phòng</Typography>} subheader='Được gọi nhiều nhất' />
       <CardContent>
         <BarChart
+          loading={isLoading}
           dataset={sortedData}
+          margin={{ left: 140 }}
           yAxis={[{ scaleType: 'band', dataKey: 'address' }]}
           series={[{ dataKey: 'numberOrders', label: 'Đơn đặt' }]}
           xAxis={[
@@ -45,6 +46,10 @@ export function RoomBarChart() {
           ]}
           layout='horizontal'
           height={300}
+          slotProps={{
+            loadingOverlay: { message: 'Đang tải dữ liệu...' },
+            noDataOverlay: { message: 'Chưa có dữ liệu doanh thu' }
+          }}
         />
       </CardContent>
       <CardActions>
