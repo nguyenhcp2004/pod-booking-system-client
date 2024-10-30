@@ -43,7 +43,7 @@ export default function DashboardMain() {
     const from = moment().year(2024).startOf('year')
     const to = moment().endOf('year')
     const quarters = []
-    let current = from.clone()
+    const current = from.clone()
     while (current.isBefore(to)) {
       const quarter = current.clone()
       quarters.push({
