@@ -64,7 +64,7 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
           border: '1px solid',
           overflow: 'hidden',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          height: { xs: '100%', md: '300px' }
+          height: { xs: '100%', md: '350px' }
         }}
         elevation={0}
       >
