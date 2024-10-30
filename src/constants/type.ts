@@ -57,6 +57,7 @@ export type RoomType = {
   id: number
   name: string
   quantity: number
+  price: number
   capacity: number
   building: Building
 }
@@ -64,7 +65,6 @@ export type RoomType = {
 export type Room = {
   id: number
   name: string
-  price: number
   description: string
   image: string
   status: string
