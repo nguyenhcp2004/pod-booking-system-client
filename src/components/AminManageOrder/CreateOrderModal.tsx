@@ -20,7 +20,6 @@ import HeaderOrderComponent from './CreateOrderComponents/HeaderOrderComponent'
 import CustomerOrderCard from './CreateOrderComponents/CustomerOrderCard'
 import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
 import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
-import { useNavigate } from 'react-router-dom'
 import PaymentBox from './CreateOrderComponents/PaymentBox'
 import { toast } from 'react-toastify'
 
@@ -40,7 +39,6 @@ const initialBookingData: BookingInfo = {
 
 const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refetch }) => {
   const theme = useTheme()
-  const navigate = useNavigate()
 
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
@@ -71,11 +69,11 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
 
   const handleCardPayment = async () => {
     if (!customer) return
-    setOpenPayment(true)
     const response = await createOrderAD(bookingData, customer)
-    if (response.code === 201) {
+    if (response.code == 201) {
+      onClose()
       toast.success('Tạo đơn hàng thành công')
-      navigate('/admin/orders')
+      refetch()
     }
   }
 
@@ -140,12 +138,12 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
           <Button variant='outlined' onClick={handleOfflinePayment}>
             Thanh toán tiền mặt
           </Button>
-          <Button variant='outlined' onClick={handleCardPayment}>
+          <Button variant='outlined' onClick={() => setOpenPayment(true)}>
             Thanh toán qua thẻ
           </Button>
         </Box>
 
-        {openPayment && <PaymentBox bookingData={bookingData} />}
+        {openPayment && <PaymentBox bookingData={bookingData} handleCreateOrder={handleCardPayment} />}
 
         <Backdrop open={loading} sx={{ color: '#fff', zIndex: theme.zIndex.drawer + 1 }}>
           <CircularProgress color='inherit' />

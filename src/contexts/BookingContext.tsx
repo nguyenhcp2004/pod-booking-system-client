@@ -5,7 +5,11 @@ import { RoomTypeFix, ServicePackage } from '~/constants/type'
 export const BookingContext = createContext<BookingContextType | undefined>(undefined)
 
 export const useBookingContext = () => {
-  return useContext(BookingContext)
+  const context = useContext(BookingContext)
+  if (context === undefined) {
+    throw new Error('useBookingContext must be used within a BookingProvider')
+  }
+  return context
 }
 
 export interface Amenity {
@@ -57,7 +61,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
     return savedBookingData
       ? JSON.parse(savedBookingData)
       : {
-          roomType: mockRoomType,
+          roomType: null,
           selectedRooms: [],
           date: null,
           timeSlots: [],
@@ -70,21 +74,4 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   }, [bookingData])
 
   return <BookingContext.Provider value={{ bookingData, setBookingData }}>{children}</BookingContext.Provider>
-}
-
-const mockRoomType: RoomTypeFix = {
-  id: 1,
-  name: 'Deluxe Room',
-  quantity: 2,
-  capacity: 2,
-  price: 100000,
-  building: {
-    id: 1,
-    address: 'Thủ Đức',
-    description: 'This is a description',
-    hotlineNumber: '123456789',
-    status: 'Active',
-    createdAt: '2021-10-10',
-    updatedAt: '2021-10-10'
-  }
 }

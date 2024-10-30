@@ -17,6 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { slotType } from '~/contexts/BookingContext'
+import { formatCurrency } from '~/utils/currency'
 
 interface ViewOrderModalProps {
   open: boolean
@@ -330,7 +331,7 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
           <Divider sx={{ marginY: 2 }} />
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Typography variant='h6' sx={{ fontWeight: '500' }}>
-              Tổng tiền: {total.toLocaleString()} VNĐ
+              Tổng tiền: {formatCurrency(total)}
             </Typography>
           </Box>
         </Card>

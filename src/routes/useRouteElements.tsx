@@ -5,6 +5,7 @@ import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
 import OrderAmenityDetail from '~/pages/Amenity'
+import CancelBookingSuccess from '~/pages/CancelBookingSuccess'
 import DashBoard from '~/pages/DashBoard'
 import EditBooking from '~/pages/EditBooking'
 import ForgotPassword from '~/pages/ForgotPassword'
@@ -148,8 +149,12 @@ export default function useRouteElements() {
               element: <OrderAmenityDetail />
             },
             {
-              path: '/edit-booking/:orderDetailId',
+              path: '/edit-booking/:orderId',
               element: <EditBooking />
+            },
+            {
+              path: 'cancel-booking-success',
+              element: <CancelBookingSuccess />
             }
           ]
         }

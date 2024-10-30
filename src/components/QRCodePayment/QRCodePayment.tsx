@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react'
 
 import { Helmet } from 'react-helmet-async'
 import { calTotalPrice } from '~/utils/order'
+import { formatCurrency } from '~/utils/currency'
 
 const QRCodePayment = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60)
@@ -129,7 +130,7 @@ const QRCodePayment = () => {
       )}
 
       <Typography variant='subtitle1' color={theme.palette.primary.main} fontWeight='bold'>
-        {calTotalPrice(bookingData).total.toLocaleString()} VND
+        {formatCurrency(calTotalPrice(bookingData).total)}
       </Typography>
     </Box>
   )

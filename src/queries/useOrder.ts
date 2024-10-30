@@ -12,10 +12,16 @@ import orderApiRequest, {
   searchOrder,
   updateStaff
 } from '~/apis/orderApi'
-import { CountOrderReqType } from '~/schemaValidations/order.schema'
+import { CountOrderReqType, GetListOrderByAccountIdQueryType } from '~/schemaValidations/order.schema'
 
 //Read
-export const useOrders = (params: { startDate: string; endDate: string; page: number; size: number }) => {
+export const useOrders = (params: {
+  startDate: string
+  endDate: string
+  page: number
+  size: number
+  status?: string | null
+}) => {
   return useQuery({
     queryKey: ['orders', params],
     queryFn: () => getPageOrder(params),
@@ -114,5 +120,25 @@ export const useCountOrder = (query: CountOrderReqType) => {
     queryKey: ['count-orders', query],
     queryFn: () => orderApiRequest.countOrder(query),
     enabled: !!query.startTime && !!query.endTime
+  })
+}
+
+export const useGetListOrderByAccountId = (query: GetListOrderByAccountIdQueryType) => {
+  return useQuery({
+    queryKey: ['order-of-account', { query }],
+    queryFn: () => orderApiRequest.getListOrderByAccountId(query)
+  })
+}
+
+export const useGetOrderInfo = (orderId: string) => {
+  return useQuery({
+    queryKey: ['order-info', orderId],
+    queryFn: () => orderApiRequest.getOrderInfo(orderId)
+  })
+}
+
+export const useUpdateOrderStatusMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.updateOrderStatus
   })
 }

@@ -1,7 +1,6 @@
 import { Avatar, Box, Button, Divider, InputLabel, MenuItem, Select, useTheme } from '@mui/material'
 import moment from 'moment'
-import { OrderDetailFullInfoResType } from '~/schemaValidations/orderDetail.schema'
-import { getHour } from '~/utils/utils'
+import { getDayBefore, getHour, getMonthNumber, handleErrorApi } from '~/utils/utils'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -11,7 +10,14 @@ import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-
+import { CanceledReason } from '~/constants/type'
+import { GetOrderInfoResType } from '~/schemaValidations/order.schema'
+import { formatCurrency } from '~/utils/currency'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { toast } from 'react-toastify'
+import { useUpdateOrderStatusMutation } from '~/queries/useOrder'
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(3)
@@ -20,22 +26,77 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(2)
   }
 }))
-export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetailFullInfoResType['data'] }) {
+export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInfoResType['data'] }) {
   const theme = useTheme()
-  const priceTotalAmenities =
-    orderDetail?.amenities.reduce((total, amenity) => total + amenity.price * amenity.quantity, 0) || 0
-  console.log(orderDetail?.servicePackage.discountPercentage)
-  const roomPrice = orderDetail?.roomPrice || 0
-  const priceBeforeDiscount = roomPrice + priceTotalAmenities
-  const discount = orderDetail ? orderDetail.servicePackage.discountPercentage / 100 : 0
-  const priceTotal = (roomPrice + priceTotalAmenities) * (1 - discount)
+  const navigate = useNavigate()
+  const roomHaveAmenities = orderDetail.orderDetails.filter((od) => od.amenities.length > 0)
   const [open, setOpen] = useState(false)
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [error, setError] = useState('')
+  const updateOrderMutation = useUpdateOrderStatusMutation()
+  const queryClient = useQueryClient()
+  const totalPriceRoom = orderDetail.orderDetails.reduce((total, orderDetail) => {
+    return total + orderDetail.roomPrice
+  }, 0)
+  const totalPriceAmenity = orderDetail.orderDetails.reduce((total, orderDetail) => {
+    return (
+      total +
+      orderDetail.amenities.reduce((totalAmenity, amenity) => {
+        return totalAmenity + amenity.price * amenity.quantity
+      }, 0)
+    )
+  }, 0)
+  const priceBeforeDiscount = totalPriceRoom + totalPriceAmenity
+  const finalPrice =
+    priceBeforeDiscount * (1 - (orderDetail.orderDetails[0].servicePackage.discountPercentage ?? 0) / 100)
 
   const handleClickOpen = () => {
+    const startTime = moment(orderDetail.orderDetails[0].startTime)
+    const today = moment()
+
+    if (!today.isBefore(startTime.clone().subtract(1, 'days'))) {
+      toast.error('Đã quá hạn hủy đơn')
+      return
+    }
     setOpen(true)
+  }
+
+  const handleClickOpenConfirm = () => {
+    setOpenConfirm(true)
   }
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false)
+  }
+
+  const handleConfirm = async () => {
+    if (!cancelReason) {
+      setError('Vui lòng chọn lý do hủy phòng')
+    } else {
+      setError('')
+      setOpen(false)
+      handleClickOpenConfirm()
+    }
+  }
+
+  const handleCancel = async () => {
+    if (updateOrderMutation.isPending) return
+    try {
+      await updateOrderMutation.mutateAsync({
+        id: orderDetail.id,
+        status: 'Rejected',
+        cancelReason
+      })
+      toast.success('Đã hủy phòng thành công')
+      await queryClient.invalidateQueries({ queryKey: ['order-of-account'] })
+      navigate('/history-orders')
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   return (
@@ -48,8 +109,8 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
             </Typography>
             <Box display='flex' alignItems='center' sx={{ marginTop: '24px' }} gap='20px'>
               <Avatar
-                src={orderDetail.roomImage}
-                alt='phong 2 nguoi'
+                src={orderDetail.orderDetails[0].roomImage}
+                alt={orderDetail.orderDetails[0].roomTypeName}
                 sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
                 variant='rounded'
               />
@@ -62,11 +123,11 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                 }}
               >
                 <Typography variant='h5' fontWeight='bold'>
-                  {orderDetail?.roomName}
+                  {orderDetail.orderDetails[0].roomTypeName}
                 </Typography>
                 <Box display='flex' sx={{ marginTop: '4px' }}>
                   <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                    {orderDetail?.roomPrice.toLocaleString()} VND
+                    {formatCurrency(orderDetail.orderDetails[0].roomPrice)}
                   </Typography>
                   <Typography variant='subtitle2'>/tiếng</Typography>
                 </Box>
@@ -75,65 +136,71 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     <Typography variant='body2' fontWeight='bold'>
                       Địa chỉ:
                     </Typography>
-                    <Typography variant='body2'>{orderDetail.buildingAddress}</Typography>
+                    <Typography variant='body2'>{orderDetail.orderDetails[0].buildingAddress}</Typography>
                   </Box>
                   <Box display='flex' gap='3px'>
                     <Typography variant='body2' fontWeight='bold'>
                       Ngày:
                     </Typography>
-                    <Typography variant='body2'>{moment(orderDetail.startTime).format('DD-MM-YYYY')}</Typography>
+                    <Typography variant='body2'>
+                      {moment(orderDetail.orderDetails[0].startTime).format(DEFAULT_DATE_FORMAT)}
+                    </Typography>
                   </Box>
                   <Box display='flex' gap='3px'>
                     <Typography variant='body2' fontWeight='bold'>
                       Slot:
                     </Typography>
                     <Typography variant='body2'>
-                      {getHour(orderDetail.startTime)}:00 - {getHour(orderDetail.endTime)}:00
+                      {getHour(orderDetail.orderDetails[0].startTime)}:00 -{' '}
+                      {getHour(orderDetail.orderDetails[0].endTime)}:00
                     </Typography>
                   </Box>
                   <Box display='flex' gap='3px'>
                     <Typography variant='body2' fontWeight='bold'>
                       Gói dịch vụ:
                     </Typography>
-                    <Typography variant='body2'>{orderDetail.servicePackage.name}</Typography>
+                    <Typography variant='body2'>{orderDetail.orderDetails[0].servicePackage.name}</Typography>
                   </Box>
                 </Box>
               </Box>
             </Box>
             <Box sx={{ paddingY: '20px' }}>
-              {orderDetail.amenities.length > 0 && (
+              {roomHaveAmenities.length > 0 && (
                 <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
                   Dịch vụ bạn đã chọn
                 </Typography>
               )}
-              {orderDetail.amenities.map((amenity, index) => {
+              {roomHaveAmenities.map((room, index) => {
                 return (
                   <Box key={index}>
+                    <Typography variant='subtitle2'>{room.roomName}</Typography>
                     <Box sx={{ width: '100%' }}>
-                      <Box
-                        key={amenity.id}
-                        display='flex'
-                        justifyContent='space-between'
-                        alignItems='center'
-                        sx={{ marginTop: '20px' }}
-                      >
-                        <Typography variant='subtitle2' color={theme.palette.grey[500]} sx={{ flex: 1 }}>
-                          {amenity.name}
-                        </Typography>
-                        <Typography
-                          variant='subtitle2'
-                          color={theme.palette.grey[500]}
-                          sx={{ flex: 1 }}
-                          textAlign='center'
+                      {room.amenities.map((amenity) => (
+                        <Box
+                          key={amenity.id}
+                          display='flex'
+                          justifyContent='space-between'
+                          alignItems='center'
+                          sx={{ marginTop: '20px' }}
                         >
-                          {amenity.quantity}
-                        </Typography>
-                        <Box sx={{ flex: 1 }} display='flex' justifyContent='flex-end' gap='5px'>
-                          <Typography variant='subtitle2' fontWeight='bold'>
-                            {amenity.price.toLocaleString()} VND
+                          <Typography variant='subtitle2' color={theme.palette.grey[500]} sx={{ flex: 1 }}>
+                            {amenity.name}
                           </Typography>
+                          <Typography
+                            variant='subtitle2'
+                            color={theme.palette.grey[500]}
+                            sx={{ flex: 1 }}
+                            textAlign='center'
+                          >
+                            {amenity.quantity}
+                          </Typography>
+                          <Box sx={{ flex: 1 }} display='flex' justifyContent='flex-end' gap='5px'>
+                            <Typography variant='subtitle2' fontWeight='bold'>
+                              {formatCurrency(amenity.price)}
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
+                      ))}
                     </Box>
                   </Box>
                 )
@@ -147,7 +214,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                 Tổng giá phòng:
               </Typography>
               <Typography variant='subtitle2' fontWeight='bold'>
-                {orderDetail.roomPrice.toLocaleString()} VND
+                {formatCurrency(totalPriceRoom)}
               </Typography>
             </Box>
             <Box display='flex' justifyContent='space-between'>
@@ -155,15 +222,18 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                 Tổng các dịch vụ:
               </Typography>
               <Typography variant='subtitle2' fontWeight='bold'>
-                {priceTotalAmenities.toLocaleString()} VND
+                {formatCurrency(totalPriceAmenity)}
               </Typography>
             </Box>
             <Box display='flex' justifyContent='space-between'>
               <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-                Giảm giá: (gói {orderDetail.servicePackage.name} {orderDetail.servicePackage.discountPercentage}%)
+                Giảm giá: (gói {orderDetail.orderDetails[0].servicePackage.name}{' '}
+                {orderDetail.orderDetails[0].servicePackage.discountPercentage}%)
               </Typography>
               <Typography variant='subtitle2' fontWeight='bold'>
-                {(discount * priceBeforeDiscount).toLocaleString()} VND
+                {formatCurrency(
+                  (orderDetail.orderDetails[0].servicePackage.discountPercentage / 100) * priceBeforeDiscount
+                )}
               </Typography>
             </Box>
           </Box>
@@ -173,7 +243,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
               Tổng đơn:
             </Typography>
             <Typography variant='subtitle2' fontWeight='bold'>
-              {priceTotal.toLocaleString()} VND
+              {formatCurrency(finalPrice)}
             </Typography>
           </Box>
           <Box sx={{ width: '100%', padding: '20px' }}>
@@ -201,23 +271,25 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                   <InputLabel variant='standard' sx={{ fontWeight: 'bold', marginBottom: 0.8 }}>
                     Lý do hủy phòng:
                   </InputLabel>
-                  <Select fullWidth size='small' displayEmpty defaultValue=''>
+                  <Select
+                    fullWidth
+                    size='small'
+                    displayEmpty
+                    defaultValue=''
+                    onChange={(e) => setCancelReason(e.target.value)}
+                  >
                     <MenuItem value='' disabled>
                       Chọn một trong số các lý do sau
                     </MenuItem>
-                    <MenuItem value={1}>Đặt phòng không được xác nhận kịp thời</MenuItem>
-                    <MenuItem value={2}>Không thật sự tin tưởng vào uy tín của dịch vụ chúng tôi</MenuItem>
-                    <MenuItem value={3}>Lo lắng về sự an toàn cho vị trí phòng đặt</MenuItem>
-                    <MenuItem value={4}>Quyết định chọn phòng khác không có trên FlexiPod</MenuItem>
-                    <MenuItem value={5}>Không thích chính sách hủy phòng</MenuItem>
-                    <MenuItem value={6}>Không hài lòng với cách thanh toán</MenuItem>
-                    <MenuItem value={7}>Buộc phải hủy phòng hay hoãn lịch</MenuItem>
-                    <MenuItem value={8}>Tìm thấy giá thấp hơn trên mạng</MenuItem>
-                    <MenuItem value={9}>Tìm được giá thấp hơn qua dịch vụ địa phương</MenuItem>
-                    <MenuItem value={10}>Sẽ đặt phòng khác trên website của chúng tôi</MenuItem>
-                    <MenuItem value={11}>Sẽ đặt phòng trực tiếp với chi nhánh</MenuItem>
-                    <MenuItem value={12}>Khác</MenuItem>
+                    {Object.values(CanceledReason).map((key, index) => {
+                      return (
+                        <MenuItem key={index} value={key}>
+                          {key}
+                        </MenuItem>
+                      )
+                    })}
                   </Select>
+                  {error && <Typography color='error'>{error}</Typography>}
                 </Box>
                 <Box sx={{ marginBottom: 2 }}>
                   <Typography sx={{ fontWeight: 'bold', marginBottom: 0.8 }} gutterBottom>
@@ -235,9 +307,12 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                     Miễn phí hủy phòng
                   </Typography>
                   <Typography gutterBottom>
-                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến 10 tháng 11, 2022 và không phải trả gì!
-                    Bất kỳ việc hủy phòng nào ghi nhận được sau ngày 10 tháng 11, 2022 sẽ phải trả phí cho toàn bộ thời
-                    gian ở. Nếu quý khách không đến hoặc hủy phòng, thì sẽ không được hoàn tiến.
+                    Đặt phòng không có rủi ro! Quý khách có thể hủy bỏ cho đến ngày{' '}
+                    {getDayBefore(orderDetail.orderDetails[0].startTime)} tháng{' '}
+                    {getMonthNumber(orderDetail.orderDetails[0].startTime)}, năm 2024 và không phải trả gì! Bất kỳ việc
+                    hủy phòng nào ghi nhận được sau ngày {getDayBefore(orderDetail.orderDetails[0].startTime)} tháng{' '}
+                    {getMonthNumber(orderDetail.orderDetails[0].startTime)}, năm 2024 sẽ phải trả phí cho toàn bộ thời
+                    gian ở. Nếu quý khách không đến hoặc hủy phòng, thì sẽ không được hoàn tiền.
                   </Typography>
                 </Box>
               </DialogContent>
@@ -245,7 +320,37 @@ export default function OrderBooking({ orderDetail }: { orderDetail: OrderDetail
                 <Button onClick={handleClose} variant='outlined'>
                   Đóng
                 </Button>
-                <Button variant='contained' color='error'>
+                <Button variant='contained' color='error' onClick={handleConfirm}>
+                  Xác nhận
+                </Button>
+              </DialogActions>
+            </BootstrapDialog>
+            <BootstrapDialog onClose={handleCloseConfirm} aria-labelledby='customized-dialog-title' open={openConfirm}>
+              <DialogTitle sx={{ m: 0, p: 2, fontWeight: 'bold', fontSize: '1.5rem' }} id='customized-dialog-title'>
+                Hủy đặt phòng
+              </DialogTitle>
+              <IconButton
+                aria-label='close'
+                onClick={handleClose}
+                sx={(theme) => ({
+                  position: 'absolute',
+                  right: 8,
+                  top: 8,
+                  color: theme.palette.grey[500]
+                })}
+              >
+                <CloseIcon />
+              </IconButton>
+              <DialogContent dividers>
+                <Box sx={{ marginBottom: 2 }}>
+                  <Typography gutterBottom>Bạn có chắc chắn muốn hủy bỏ đặt phòng này không?</Typography>
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseConfirm} variant='outlined'>
+                  Giữ đặt phòng này
+                </Button>
+                <Button variant='contained' color='error' onClick={handleCancel}>
                   Xác nhận
                 </Button>
               </DialogActions>

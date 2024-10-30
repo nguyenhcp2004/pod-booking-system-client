@@ -1,10 +1,14 @@
-import { Box, Step, StepLabel, Stepper, styled } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogTitle, Step, StepLabel, Stepper, styled } from '@mui/material'
 import { listSteps } from './listSteps'
 import { useState, useEffect, useMemo } from 'react'
 import { tokens } from '~/themes/theme'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import {
+  LOCAL_STORAGE_KEY_AMENITIES,
+  LOCAL_STORAGE_KEY_ROOM,
+  useBookingAmenityContext
+} from '~/contexts/BookingAmenityContext'
 
 export interface TransactionData {
   vnp_Amount: string | null
@@ -22,6 +26,7 @@ export default function OrderAmenityDetail() {
   const colors = tokens('light')
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   const bookingAmenityContext = useBookingAmenityContext()
   if (!bookingAmenityContext) {
@@ -76,7 +81,14 @@ export default function OrderAmenityDetail() {
     if (activeStep > 1) {
       navigate(`/order-amenity-detail/${activeStep - 1}`)
       setActiveStep((prevActiveStep) => prevActiveStep - 1)
-    }
+    } else setShowConfirmDialog(true)
+  }
+
+  const handleConfirmExit = () => {
+    setShowConfirmDialog(false)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_ROOM)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_AMENITIES)
+    navigate('/')
   }
 
   const commonProps = {
@@ -121,6 +133,17 @@ export default function OrderAmenityDetail() {
         )}
       </Box>
       <Box sx={{ paddingBottom: '30px' }}>{loading ? <CurrentStepComponent {...commonProps} /> : ''}</Box>
+      <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
+        <DialogTitle>Đơn hàng chưa được tạo. Bạn có chắc chắn muốn thoát?</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setShowConfirmDialog(false)} color='primary'>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmExit} color='secondary'>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

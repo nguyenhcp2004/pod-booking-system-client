@@ -57,6 +57,7 @@ export type RoomType = {
   id: number
   name: string
   quantity: number
+  price: number
   capacity: number
   building: Building
 }
@@ -64,7 +65,6 @@ export type RoomType = {
 export type Room = {
   id: number
   name: string
-  price: number
   description: string
   image: string
   status: string
@@ -96,4 +96,19 @@ export type Amenity = {
   quantity: number
   type: string
   imageUrl: string
+}
+
+export const CanceledReason = {
+  REASON_1: 'Đặt phòng không được xác nhận kịp thời',
+  REASON_2: 'Không thật sự tin tưởng vào uy tín của dịch vụ chúng tôi',
+  REASON_3: 'Lo lắng về sự an toàn cho vị trí phòng đặt',
+  REASON_4: 'Quyết định chọn phòng khác không có trên FlexiPod',
+  REASON_5: 'Không thích chính sách hủy phòng',
+  REASON_6: 'Không hài lòng với cách thanh toán',
+  REASON_7: 'Buộc phải hủy phòng hay hoãn lịch',
+  REASON_8: 'Tìm thấy giá thấp hơn trên mạng',
+  REASON_9: 'Tìm được giá thấp hơn qua dịch vụ địa phương',
+  REASON_10: 'Sẽ đặt phòng khác trên website của chúng tôi',
+  REASON_11: 'Sẽ đặt phòng trực tiếp với chi nhánh',
+  REASON_12: 'Khác'
 }

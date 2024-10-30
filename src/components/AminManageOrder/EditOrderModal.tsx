@@ -298,7 +298,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                         ...params.InputProps,
                         readOnly: true
                       }}
-                      label='Slot'
+                      label='Khung giờ'
                       size='small'
                       disabled
                     />

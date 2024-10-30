@@ -64,7 +64,7 @@ export default function Login() {
       toast.success(result.data.message, {
         autoClose: 3000
       })
-      const redirectPath = location.state?.from?.pathname || '/'
+      const redirectPath = location.state?.from || '/'
       navigate(redirectPath)
     } catch (error) {
       handleErrorApi({ error, setError })
