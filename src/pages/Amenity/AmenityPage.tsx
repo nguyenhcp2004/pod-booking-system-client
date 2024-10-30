@@ -183,8 +183,8 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   display: 'flex',
                   flexDirection: isMobile ? 'column' : 'row',
                   justifyContent: 'space-between',
-                  padding: '20px 20px 0px 0px',
-                  gap: isMobile ? '16px' : '24px'
+                  padding: '20px 0px 0px 0px',
+                  gap: isMobile ? '12px' : '16px'
                 }}
               >
                 <FormControl fullWidth>
@@ -204,7 +204,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                 </FormControl>
                 {selectedRoomName && (
                   <FormControl fullWidth>
-                    <InputLabel id='booking-slot-label'>Chọn khung giờ đã đặt</InputLabel>
+                    <InputLabel id='booking-slot-label'>Chọn khung giờ</InputLabel>
                     <Select
                       labelId='booking-slot-label'
                       value={selectedBookingSlot}
