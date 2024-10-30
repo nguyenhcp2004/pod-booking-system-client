@@ -63,7 +63,8 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
           mb: '24px',
           border: '1px solid',
           overflow: 'hidden',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          height: { xs: '100%', md: '300px' }
         }}
         elevation={0}
       >
@@ -72,8 +73,7 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
             <CardMedia
               component='img'
               sx={{
-                width: '100%',
-                height: { xs: '200px', md: '100%' },
+                height: '100%',
                 objectFit: 'cover',
                 transition: 'transform 0.3s ease-in-out',
                 '&:hover': {
