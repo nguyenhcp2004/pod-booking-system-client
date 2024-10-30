@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -7,13 +8,13 @@ import {
   Select,
   SelectChangeEvent,
   Typography,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useEffect, useState } from 'react'
-import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
+import { tokens } from '~/themes/theme'
 import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
@@ -30,6 +31,8 @@ interface CommonProps {
 export const AmenityPage: React.FC<CommonProps> = (props) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'))
   const [errorState, setErrorState] = useState<string | null>(null)
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
@@ -88,10 +91,10 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
 
   const handleDecrement = () => {
     if (quantity > 0) {
-      // setErrorState(null)
       setQuantity((prevQuantity) => prevQuantity - 1)
     }
   }
+
   const handleIncrement = () => {
     if (!detailAmenity) {
       setErrorState('Vui lòng chọn tiện ích')
@@ -142,17 +145,48 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
     .map((room) => formatStartEndTime(room.startTime, room.endTime))
 
   return (
-    <Box sx={{ marginX: '104px' }}>
+    <Box
+      sx={{
+        marginX: { xs: '16px', sm: '32px', md: '64px', lg: '104px' },
+        marginY: { xs: '16px', sm: '24px', md: '32px' }
+      }}
+    >
       <Grid container spacing={2}>
-        <Grid size={{ lg: 6 }} sx={{ padding: '0px !important' }}>
-          <Box sx={{ marginRight: '12px', background: '#FFF', paddingRight: '12px' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px', alignItems: 'end' }}>
-              <Typography variant='h5' sx={{ color: colors.primary[500], fontWeight: 700 }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '0px !important' }}>
+          <Box
+            sx={{
+              marginRight: { xs: '0', md: '12px' },
+              background: '#FFF',
+              paddingRight: { xs: '0', md: '12px' },
+              marginBottom: { xs: '16px', md: '0' }
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '20px',
+                alignItems: 'end',
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}
+            >
+              <Typography
+                variant='h5'
+                sx={{ color: colors.primary[500], fontWeight: 700, marginBottom: { xs: '16px', sm: '0' } }}
+              >
                 Dịch vụ
               </Typography>
             </Box>
             <Box sx={{ padding: '0px 20px 20px 20px' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px 20px 0px 0px', gap: '24px' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  justifyContent: 'space-between',
+                  padding: '20px 0px 0px 0px',
+                  gap: isMobile ? '12px' : '16px'
+                }}
+              >
                 <FormControl fullWidth>
                   <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
                   <Select
@@ -170,7 +204,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                 </FormControl>
                 {selectedRoomName && (
                   <FormControl fullWidth>
-                    <InputLabel id='booking-slot-label'>Chọn khung giờ đã đặt</InputLabel>
+                    <InputLabel id='booking-slot-label'>Chọn khung giờ</InputLabel>
                     <Select
                       labelId='booking-slot-label'
                       value={selectedBookingSlot}
@@ -203,62 +237,49 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
                   Danh sách tiện ích
                 </Typography>
-                <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-                  {selectedAmenityType !== ''
-                    ? amenities.map((item) => (
-                        <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
-                          <Button
-                            variant='outlined'
-                            fullWidth
-                            sx={{
-                              padding: '10px 0px',
-                              minHeight: '50px',
-                              borderRadius: '4px',
-                              textAlign: 'center',
-                              color: 'black',
-                              borderColor: 'black',
-                              fontSize: '14px',
-                              backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                            }}
-                            onClick={() => handleSelectAmenity(item)}
-                          >
-                            {item.name}
-                          </Button>
-                        </Grid>
-                      ))
-                    : allAmenities.map((item) => (
-                        <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
-                          <Button
-                            variant='outlined'
-                            fullWidth
-                            sx={{
-                              padding: '10px 0px',
-                              minHeight: '50px',
-                              borderRadius: '4px',
-                              textAlign: 'center',
-                              color: 'black',
-                              borderColor: 'black',
-                              fontSize: '14px',
-                              backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                            }}
-                            onClick={() => handleSelectAmenity(item)}
-                          >
-                            {item.name}
-                          </Button>
-                        </Grid>
-                      ))}
+                <Grid container spacing={isMobile ? 1 : 2} sx={{ padding: '10px 0' }}>
+                  {(selectedAmenityType !== '' ? amenities : allAmenities).map((item) => (
+                    <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
+                      <Button
+                        variant='outlined'
+                        fullWidth
+                        sx={{
+                          padding: '10px 0px',
+                          minHeight: '50px',
+                          borderRadius: '4px',
+                          textAlign: 'center',
+                          color: 'black',
+                          borderColor: 'black',
+                          fontSize: '14px',
+                          backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                        }}
+                        onClick={() => handleSelectAmenity(item)}
+                      >
+                        {item.name}
+                      </Button>
+                    </Grid>
+                  ))}
                 </Grid>
               </Box>
               <Box
                 sx={{
                   display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
                   justifyContent: 'space-between',
-                  gap: '10px',
+                  alignItems: isMobile ? 'stretch' : 'center',
+                  gap: isMobile ? '16px' : '10px',
                   paddingBottom: '20px',
                   paddingTop: '20px'
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    position: 'relative',
+                    flexDirection: { xs: 'column', sm: 'row' }
+                  }}
+                >
                   {errorState && (
                     <Typography
                       variant='subtitle2'
@@ -269,7 +290,13 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   )}
                   <Typography
                     variant='subtitle2'
-                    sx={{ fontWeight: 700, fontSize: '16px', padding: '0px 20px 0px 0px', color: colors.grey[200] }}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '16px',
+                      padding: '0px 20px 0px 0px',
+                      color: colors.grey[200],
+                      marginBottom: { xs: '10px', sm: '0' }
+                    }}
                   >
                     Số lượng
                   </Typography>
@@ -350,7 +377,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
         </Grid>
 
         {bookedRoom && (
-          <Grid size={{ lg: 6 }} sx={{ paddingLeft: '12px' }}>
+          <Grid size={{ xs: 12, md: 6 }} sx={{ paddingLeft: { xs: '0', md: '12px' } }}>
             <Box sx={{ background: '#FFF' }}>
               <Box>
                 <BookingAmenityDetails />
