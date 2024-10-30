@@ -20,7 +20,7 @@ import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
-import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { LOCAL_STORAGE_KEY_ROOM, useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 
 interface CommonProps {
   onNext: () => void
@@ -42,6 +42,17 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
 
   const { bookedRoom, setBookedRoom, selectedAmenities, addAmenity } = useBookingAmenityContext()
+
+  const [selectedRoomName, setSelectedRoomName] = useState<string>('')
+  const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
+
+  useEffect(() => {
+    const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
+    if (!savedRoom) {
+      setBookedRoom(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (selectedAmenityType) {
@@ -108,12 +119,27 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
     setSelectedAmenityType(event.target.value)
   }
 
-  const handleSelectBookedRoom = (event: SelectChangeEvent<string>) => {
-    const selectedRoom = bookedRooms.find((room) => room.startTime === event.target.value)
+  const handleSelectRoomName = (event: SelectChangeEvent<string>) => {
+    const roomName = event.target.value
+    setSelectedRoomName(roomName)
+    setSelectedBookingSlot('')
+    setBookedRoom(null)
+  }
+
+  const handleSelectBookingSlot = (event: SelectChangeEvent<string>) => {
+    const selectedSlot = event.target.value
+    setSelectedBookingSlot(selectedSlot)
+    const selectedRoom = bookedRooms.find(
+      (room) => room.name === selectedRoomName && formatStartEndTime(room.startTime, room.endTime) === selectedSlot
+    )
     setBookedRoom(selectedRoom || null)
   }
 
-  // const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
+  const roomNames = [...new Set(bookedRooms.map((room) => room.name))]
+
+  const bookingSlots = bookedRooms
+    .filter((room) => room.name === selectedRoomName)
+    .map((room) => formatStartEndTime(room.startTime, room.endTime))
 
   return (
     <Box sx={{ marginX: '104px' }}>
@@ -131,17 +157,34 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   <InputLabel id='location-label'>Chọn Phòng đã đặt</InputLabel>
                   <Select
                     labelId='booked-room-label'
-                    value={bookedRoom?.startTime || ''}
+                    value={selectedRoomName}
                     label='Chọn Phòng đã đặt'
-                    onChange={handleSelectBookedRoom}
+                    onChange={handleSelectRoomName}
                   >
-                    {bookedRooms.map((room) => (
-                      <MenuItem key={room.id} value={room.startTime}>
-                        {room.name} - {formatStartEndTime(room.startTime, room.endTime)}
+                    {roomNames.map((roomName) => (
+                      <MenuItem key={roomName} value={roomName}>
+                        {roomName}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
+                {selectedRoomName && (
+                  <FormControl fullWidth>
+                    <InputLabel id='booking-slot-label'>Chọn khung giờ đã đặt</InputLabel>
+                    <Select
+                      labelId='booking-slot-label'
+                      value={selectedBookingSlot}
+                      label='Chọn khung giờ đã đặt'
+                      onChange={handleSelectBookingSlot}
+                    >
+                      {bookingSlots.map((slot) => (
+                        <MenuItem key={slot} value={slot}>
+                          {slot}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
                 <FormControl fullWidth>
                   <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
                   <Select
