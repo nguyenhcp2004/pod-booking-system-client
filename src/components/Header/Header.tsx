@@ -38,7 +38,7 @@ export default function Header() {
   return (
     <Box
       sx={{
-        paddingX: '104px',
+        paddingX: { xs: '20px', md: '104px' },
         paddingY: '24px',
         display: 'flex',
         justifyContent: 'space-between',
