@@ -50,7 +50,7 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
 
   useEffect(() => {
     unavailableRoomsRefetch()
-  }, [selected, selectedSlot])
+  }, [selected, selectedSlot, unavailableRoomsRefetch])
 
   const getData = ({ startDate }: { startDate: Moment }) => {
     const data: RoomCustomSchemaType[] = []
@@ -103,7 +103,8 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
       startDate.add(1, 'day')
     }
     return days
-  }, [from, to, selected, selectedSlot])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [from, to, selected, selectedSlot, getData])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))
@@ -118,6 +119,7 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
     setTo(moment().endOf('month').format('YYYY-MM-DD'))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderEventDetails = (event: any) => {
     return (
       <Box>

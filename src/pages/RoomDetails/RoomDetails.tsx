@@ -270,7 +270,6 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  {/* <Link to='/order-detail/1' state={{ from: location.pathname }}> */}
                   <Button variant='contained' color='primary' fullWidth disabled={!checkData} onClick={handleBooking}>
                     Đặt phòng
                   </Button>
