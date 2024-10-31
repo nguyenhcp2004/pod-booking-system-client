@@ -252,7 +252,7 @@ export default function Component() {
             </Grid>
           </Grid>
           {/* Rooms Section Card */}
-          <Grid container spacing={3}>
+          <Grid container spacing={3} size={12}>
             {data?.data.data.map((roomType: Omit<PODRoomTypeCardProps, 'date' | 'timeSlot'>) => (
               <Grid size={{ xs: 12 }} key={roomType.id}>
                 <PODRoomTypeCard
