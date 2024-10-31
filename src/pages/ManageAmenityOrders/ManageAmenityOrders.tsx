@@ -69,34 +69,7 @@ const ManageAmenityOrders = () => {
       headerName: 'ID',
       width: 50
     },
-    { field: 'orderId', headerName: 'Mã đơn', width: 150 },
-    {
-      field: 'quantity',
-      headerName: 'Số lượng tiện ích',
-      width: 150,
-      valueGetter: (_, row) => {
-        let quantity = 0
-        row.orderDetailAmenities.forEach((item: AmenityOrderType) => {
-          quantity += item.quantity
-        })
-        return quantity
-      }
-    },
-    {
-      field: 'totalPrice',
-      headerName: 'Tổng giá tiện ích',
-      width: 150,
-      valueGetter: (_, row) => {
-        let totalPrice = 0
-        row.orderDetailAmenities.forEach((item: AmenityOrderType) => {
-          totalPrice += item.price * item.quantity
-        })
-        return totalPrice
-      },
-      valueFormatter: (params) => {
-        return formatCurrency(params)
-      }
-    },
+
     { field: 'roomName', headerName: 'Tên Phòng', width: 150 },
     { field: 'buildingAddress', headerName: 'Chi nhánh' },
     { field: 'customerName', headerName: 'Khách hàng', width: 200 },
