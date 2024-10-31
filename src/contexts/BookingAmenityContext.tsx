@@ -11,10 +11,12 @@ interface BookingAmenityContextType {
   updateAmenityQuantity: (amenityId: number, quantity: number) => void
   clearAmenities: () => void
   calculateTotal: () => number
+  clearAll: () => void
 }
 
 const BookingAmenityContext = createContext<BookingAmenityContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBookingAmenityContext = () => {
   const context = useContext(BookingAmenityContext)
   if (!context) {
@@ -27,8 +29,8 @@ interface BookingAmenityProviderProps {
   children: ReactNode
 }
 
-const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
-const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
+export const LOCAL_STORAGE_KEY_AMENITIES = 'bookingAmenities'
+export const LOCAL_STORAGE_KEY_ROOM = 'bookedRoom'
 
 export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ children }) => {
   const [selectedAmenities, setSelectedAmenities] = useState<AmenityType[]>(() => {
@@ -86,6 +88,13 @@ export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ 
     return amenitiesTotal - discount
   }
 
+  const clearAll = () => {
+    setSelectedAmenities([])
+    setBookedRoom(null)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_AMENITIES)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_ROOM)
+  }
+
   const value: BookingAmenityContextType = {
     selectedAmenities,
     bookedRoom,
@@ -94,7 +103,8 @@ export const BookingAmenityProvider: React.FC<BookingAmenityProviderProps> = ({ 
     removeAmenity,
     updateAmenityQuantity,
     clearAmenities,
-    calculateTotal
+    calculateTotal,
+    clearAll
   }
 
   return <BookingAmenityContext.Provider value={value}>{children}</BookingAmenityContext.Provider>

@@ -1,6 +1,8 @@
 import queryString from 'query-string'
 import { Pagination } from '~/constants/type'
 import {
+  CountCustomerReqType,
+  CountCustomerResType,
   CreateAccountBodyType,
   GetManageAccountRes,
   GetMeResType,
@@ -10,6 +12,7 @@ import {
   UpdateAccountByAdminResType
 } from '~/schemaValidations/account.schema'
 import http from '~/utils/http'
+import { formatQueryDateTime } from '~/utils/utils'
 
 const accountApiRequest = {
   getMe: () => http.get<GetMeResType>('/accounts/me'),
@@ -23,7 +26,12 @@ const accountApiRequest = {
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
   },
-  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-mail', body)
+  sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-email', body),
+  countCurrentCustomer: () => http.get<CountCustomerResType>('/accounts/number-accounts-current-day'),
+  countCustomer: (query: CountCustomerReqType) => {
+    const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
+    return http.get<CountCustomerResType>(`/accounts/number-accounts?${queryString}`)
+  }
 }
 
 export default accountApiRequest

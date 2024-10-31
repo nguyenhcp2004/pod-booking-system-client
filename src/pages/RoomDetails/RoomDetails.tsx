@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, FormControl, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Checkbox, Chip, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import moment, { Moment } from 'moment'
 import homePageBanner from '~/assets/images/homePageBanner.png'
@@ -15,9 +15,10 @@ import { ServicePackage, Room } from '~/constants/type'
 import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
 import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 import { Helmet } from 'react-helmet-async'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -27,9 +28,17 @@ export default function RoomDetail() {
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
   const BookingContext = useBookingContext()
+  const { account } = useAppContext()
+
   const bookingData = BookingContext?.bookingData
   const setBookingData = BookingContext?.setBookingData
   const { data: servicePackage, isSuccess } = getAllServicePackage()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (servicePackage?.data.data) {
+      setSelectedPackage(servicePackage.data.data[2])
+    }
+  }, [servicePackage])
 
   useEffect(() => {
     window.scrollTo({
@@ -112,6 +121,20 @@ export default function RoomDetail() {
     })
   }, [selectedRooms, selectedDate, selectedSlots, selectedPackage, bookingData, setBookingData])
 
+  const checkData = useMemo(() => {
+    return selectedRooms.length > 0 && selectedDate && selectedSlots.length > 0 && selectedPackage
+  }, [selectedRooms, selectedDate, selectedSlots, selectedPackage])
+
+  const handleBooking = () => {
+    if (!account) {
+      navigate('/login', { state: { from: location.pathname } })
+      return
+    }
+    if (checkData) {
+      navigate('/order-detail/1', { state: { from: location.pathname } })
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -122,7 +145,7 @@ export default function RoomDetail() {
       }}
     >
       <Helmet>
-        <title> {bookingData?.roomType?.name} | POD System</title>
+        <title> {bookingData?.roomType?.name || 'Loại phòng'} | POD System</title>
         <meta name='description' content='Chọn Phòng Hoàn Hảo Cho Mọi Dịp - Từ Họp Nhóm Đến Làm Việc Cá Nhân' />
       </Helmet>
       <Grid container size={12} spacing={6}>
@@ -166,6 +189,22 @@ export default function RoomDetail() {
                       }}
                       disableCloseOnSelect
                       limitTags={1}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index })
+                          return (
+                            <Chip
+                              size='small'
+                              variant='outlined'
+                              label={option}
+                              key={key}
+                              onClick={() => {}}
+                              {...tagProps}
+                              sx={{ margin: '0px 3px !important' }}
+                            />
+                          )
+                        })
+                      }
                       renderOption={(props, option, { selected }) => {
                         const { key, ...optionProps } = props
                         return (
@@ -220,6 +259,7 @@ export default function RoomDetail() {
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       value={selectedPackage}
+                      defaultValue={servicePackage?.data.data[0] || null}
                       onChange={(_, servicePackage) => {
                         setSelectedPackage(servicePackage)
                       }}
@@ -230,11 +270,11 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Link to='/order-detail/1' state={{ from: location.pathname }}>
-                    <Button variant='contained' color='primary' fullWidth>
-                      Đặt phòng
-                    </Button>
-                  </Link>
+                  {/* <Link to='/order-detail/1' state={{ from: location.pathname }}> */}
+                  <Button variant='contained' color='primary' fullWidth disabled={!checkData} onClick={handleBooking}>
+                    Đặt phòng
+                  </Button>
+                  {/* </Link> */}
                 </Grid>
                 <Grid size={12}>
                   <Calendar selected={selectedDates} slots={selectedSlots} />

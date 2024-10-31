@@ -11,7 +11,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Button } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import { useLogoutMutation } from '~/queries/useAuth'
-import { getRefreshTokenFromLS } from '~/utils/auth'
+import { clearLS, getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
@@ -38,6 +38,7 @@ export default function OptionsMenu({ anchorEl }: Props) {
       await logoutMutation.mutateAsync({ refreshToken })
       setAccount(null)
       setAuth(false)
+      clearLS()
       navigate('/')
     } catch (error) {
       handleErrorApi({ error })

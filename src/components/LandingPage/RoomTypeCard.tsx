@@ -1,7 +1,9 @@
 import React from 'react'
-import { Card, CardMedia, Typography, Button } from '@mui/material'
+import { Card, CardMedia, Typography, Button, Box, Grow } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useNavigate } from 'react-router-dom'
+import { slotType, useBookingContext } from '~/contexts/BookingContext'
+import { motion } from 'framer-motion'
 
 export interface PODRoomTypeCardProps {
   id: number
@@ -9,6 +11,7 @@ export interface PODRoomTypeCardProps {
   price: number
   quantity: number
   capacity: number
+  image: string
   building: {
     id: number
     address: string
@@ -18,83 +21,152 @@ export interface PODRoomTypeCardProps {
     createdAt: string
     updatedAt: string
   }
+  date: string | null
+  timeSlot: slotType[]
 }
 
-const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({ id, name, price, quantity, capacity, building }) => {
+const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
+  id,
+  name,
+  price,
+  quantity,
+  capacity,
+  image,
+  building,
+  date,
+  timeSlot
+}) => {
   const navigate = useNavigate()
+  const { setBookingData } = useBookingContext()
 
   const handleBookRoom = () => {
+    setBookingData({
+      roomType: { id, name, price, quantity, capacity, building },
+      selectedRooms: [],
+      date: date,
+      timeSlots: timeSlot,
+      servicePackage: null
+    })
     navigate(`/room-details/${id}`)
   }
 
   return (
-    <Card
-      sx={{ display: 'flex', borderRadius: '16px', mb: '40px', justifyContent: 'space-between', border: '1px solid' }}
-      elevation={0}
-    >
-      <Grid container>
-        <Grid size={4}>
-          <CardMedia
-            component='img'
-            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            image='src/assets/images/roomCardImage.jpg'
-            alt={name}
-          />
-        </Grid>
-        <Grid container size={8} sx={{ padding: '24px' }}>
-          <Grid size={10} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
-            <Typography component='div' variant='subtitle1' fontWeight='bold'>
-              {name}
-            </Typography>
-            <Typography variant='subtitle2' color='text.secondary' component='div'>
-              <b>Địa chỉ:</b> {building.address}
-            </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Mô tả:</b> {building.description}
-            </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Dung Lượng:</b> {capacity}
-            </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Số lượng phòng:</b> {quantity}
-            </Typography>
-            <Typography variant='subtitle2' color='text.secondary' sx={{ mt: 1 }}>
-              <b>Tiện ích:</b> Wi-fi tốc độ cao, Điều hòa, Bàn ghế thoải mái, Ổ cắm điện
-            </Typography>
+    <Grow in={true} timeout={500}>
+      <Card
+        component={motion.div}
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          borderRadius: '16px',
+          mb: '24px',
+          border: '1px solid',
+          overflow: 'hidden',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          height: { xs: '100%', md: '350px' }
+        }}
+        elevation={0}
+      >
+        <Grid container>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <CardMedia
+              component='img'
+              sx={{
+                height: '100%',
+                objectFit: 'cover',
+                transition: 'transform 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.05)'
+                }
+              }}
+              image={image}
+              alt={name}
+            />
           </Grid>
-          <Grid
-            size={2}
-            sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}
-          >
-            <Typography variant='h6' component='div' color='primary' fontWeight='bold'>
-              {price.toLocaleString()}
-              <Typography
-                component='span'
+          <Grid container size={{ xs: 12, md: 8 }} sx={{ p: { xs: 2, md: 3 } }}>
+            <Grid size={{ xs: 12, md: 10 }} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography variant='h6' fontWeight='bold' color='primary'>
+                {name}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' fontWeight='bold'>
+                  Địa chỉ:
+                </Box>{' '}
+                {building.address}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' fontWeight='bold'>
+                  Mô tả:
+                </Box>{' '}
+                {building.description}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' fontWeight='bold'>
+                  Dung Lượng:
+                </Box>{' '}
+                {capacity} người
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' fontWeight='bold'>
+                  Số lượng phòng:
+                </Box>{' '}
+                {quantity}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' fontWeight='bold'>
+                  Tiện ích:
+                </Box>{' '}
+                Wi-fi tốc độ cao, Điều hòa, Bàn ghế thoải mái, Ổ cắm điện
+              </Typography>
+            </Grid>
+            <Grid
+              size={{ xs: 12, md: 2 }}
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'row', md: 'column' },
+                justifyContent: 'space-between',
+                alignItems: { xs: 'center', md: 'flex-end' },
+                mt: { xs: 2, md: 0 }
+              }}
+            >
+              <Typography variant='h6' color='primary' fontWeight='bold' sx={{ mb: { xs: 0, md: 2 } }}>
+                {price.toLocaleString()}
+                <Typography
+                  component='span'
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    ml: 0.5
+                  }}
+                >
+                  VND/tiếng
+                </Typography>
+              </Typography>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleBookRoom}
                 sx={{
-                  color: 'var(--Grey-grey-400, #6A6A77)',
-                  fontFamily: 'Roboto',
-                  fontSize: '16px',
-                  fontStyle: 'normal',
-                  fontWeight: 400,
-                  lineHeight: '120%',
-                  marginLeft: '4px'
+                  borderRadius: '96px',
+                  px: 3,
+                  py: 1,
+                  width: { xs: 'auto', md: '100%' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                  }
                 }}
               >
-                VND/tiếng
-              </Typography>
-            </Typography>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={handleBookRoom}
-              sx={{ borderRadius: '96px', paddingX: '22px', paddingY: '8px' }}
-            >
-              ĐẶT PHÒNG
-            </Button>
+                ĐẶT PHÒNG
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Card>
+      </Card>
+    </Grow>
   )
 }
 

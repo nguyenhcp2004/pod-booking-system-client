@@ -26,6 +26,5 @@ export const fetchTransactionInfo = async (
     vnp_ResponseCode: vnp_ResponseCode
   }
   const response = await http.get(`/payment/info`, { params: parsedRequest })
-  console.log(response.data)
   return response.data
 }

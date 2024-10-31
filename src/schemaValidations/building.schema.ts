@@ -23,9 +23,9 @@ export type GetListBuidlingResType = z.TypeOf<typeof GetListBuidlingRes>
 
 export const CreateBuildingBody = z
   .object({
-    address: z.string(),
-    description: z.string(),
-    hotlineNumber: z.string(),
+    address: z.string().min(5, 'Địa chỉ từ 5 - 100 kí tự').max(100, 'Địa chỉ từ 5 - 100 kí tự'),
+    description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự').max(150, 'Mô tả tối đa ký tự'),
+    hotlineNumber: z.string().regex(/^(0[1-9]{1}[0-9]{8})$/, 'Số điện thoại không hợp lệ'),
     status: z.string()
   })
   .strict()
@@ -57,9 +57,9 @@ export enum BuildingStatus {
 export const EditBuildingBody = z
   .object({
     id: z.number(),
-    address: z.string(),
-    description: z.string(),
-    hotlineNumber: z.string(),
+    address: z.string().min(5, 'Địa chỉ từ 5 - 100 kí tự').max(100, 'Địa chỉ từ 5 - 100 kí tự'),
+    description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự').max(150, 'Mô tả tối đa ký tự'),
+    hotlineNumber: z.string().regex(/^(0[1-9]{1}[0-9]{8})$/, 'Số điện thoại không hợp lệ'),
     status: z.string()
   })
   .strict()
@@ -89,3 +89,21 @@ export const GetFilteredBuildingQuery = z.object({
 })
 
 export type GetFilteredBuildingQueryType = z.TypeOf<typeof GetFilteredBuildingQuery>
+
+export const BuildingSchema = z.object({
+  id: z.number(),
+  address: z.string(),
+  description: z.string(),
+  hotlineNumber: z.string(),
+  status: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+})
+
+export const GetAllBuildingRes = z.object({
+  code: z.number(),
+  data: z.array(BuildingSchema),
+  message: z.string()
+})
+
+export type GetAllBuildingsResType = z.TypeOf<typeof GetAllBuildingRes>

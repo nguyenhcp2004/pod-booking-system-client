@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "lint:fix": "eslint --fix src --ext ts,tsx",
@@ -30,6 +30,7 @@
     "@types/sockjs-client": "^1.5.4",
     "@types/stompjs": "^2.3.9",
     "axios": "^1.7.7",
+    "framer-motion": "^11.11.10",
     "html-to-text": "^9.0.5",
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",

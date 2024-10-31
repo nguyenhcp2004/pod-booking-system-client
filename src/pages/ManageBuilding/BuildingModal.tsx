@@ -1,5 +1,5 @@
 import { Edit } from '@mui/icons-material'
-import { IconButton, MenuItem, Select, SelectChangeEvent, TextareaAutosize, Typography } from '@mui/material'
+import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
 import { useState } from 'react'
 import { ACTION } from '~/constants/mock'
 import { Building } from '~/constants/type'
@@ -12,13 +12,22 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid2'
 import { useCreateBuildingMutation, useEditBuildingMutation } from '~/queries/useBuilding'
-import { BuildingStatus, CreateBuildingBodyType, EditBuildingBodyType } from '~/schemaValidations/building.schema'
+import {
+  BuildingStatus,
+  CreateBuildingBody,
+  CreateBuildingBodyType,
+  EditBuildingBody,
+  EditBuildingBodyType
+} from '~/schemaValidations/building.schema'
 import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
+import { z } from 'zod'
+import BackdropCustom from '~/components/Progress/Backdrop'
 
 export default function BuildingModal({ row, action }: { row?: Building; action: string }) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState(row?.status || BuildingStatus.Active)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const createBuilding = useCreateBuildingMutation()
   const editBuildingMutation = useEditBuildingMutation()
 
@@ -32,6 +41,67 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
 
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const validateForm = (data: unknown): boolean => {
+    let validationSchema
+    if (action === ACTION.CREATE) {
+      validationSchema = CreateBuildingBody
+    } else {
+      validationSchema = EditBuildingBody
+    }
+
+    try {
+      validationSchema.parse(data)
+      setErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: { [key: string]: string } = {}
+        error.errors.forEach((err) => {
+          if (err.path) {
+            newErrors[err.path[0]] = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (createBuilding.isPending || editBuildingMutation.isPending) return
+    const formData = new FormData(event.currentTarget)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formJson = Object.fromEntries((formData as any).entries())
+    const payloadUpdate = {
+      id: row?.id,
+      ...formJson
+    }
+    try {
+      let result
+      if (action === ACTION.UPDATE) {
+        console.log(action)
+        if (!validateForm(payloadUpdate)) {
+          console.log(payloadUpdate)
+          return
+        }
+        result = await editBuildingMutation.mutateAsync(payloadUpdate as EditBuildingBodyType)
+      } else if (action === ACTION.CREATE) {
+        console.log(action)
+        if (!validateForm(formJson)) {
+          return
+        }
+        result = await createBuilding.mutateAsync(formJson as CreateBuildingBodyType)
+      }
+      toast.success(result?.data.message, {
+        autoClose: 3000
+      })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+    handleClose()
   }
   return (
     <>
@@ -50,41 +120,27 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
         onClose={handleClose}
         PaperProps={{
           component: 'form',
-          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault()
-            if (createBuilding.isPending) return
-            const formData = new FormData(event.currentTarget)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const formJson = Object.fromEntries((formData as any).entries())
-            const payload = {
-              ...row,
-              ...formJson
-            }
-            try {
-              const result =
-                ACTION.CREATE === action
-                  ? await createBuilding.mutateAsync(formJson as CreateBuildingBodyType)
-                  : await editBuildingMutation.mutateAsync(payload as EditBuildingBodyType)
-              toast.success(result.data.message, {
-                autoClose: 3000
-              })
-            } catch (error) {
-              handleErrorApi({ error })
-            }
-            handleClose()
-          }
+          onSubmit: handleSubmit
         }}
       >
+        <BackdropCustom loading={createBuilding.isPending || editBuildingMutation.isPending} />
         <DialogTitle sx={{ fontSize: '20px', fontWeight: '500' }}>
           {action === ACTION.CREATE ? 'Tạo chi nhánh' : 'Chỉnh sửa chi nhánh'}
         </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
+          <Grid container spacing={2} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography>Chi nhánh</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' name='address' defaultValue={row?.address} />
+              <TextField
+                fullWidth
+                size='small'
+                name='address'
+                defaultValue={row?.address}
+                error={!!errors.address}
+                helperText={errors.address}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -92,7 +148,14 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
               <Typography>Hotline</Typography>
             </Grid>
             <Grid size={9}>
-              <TextField fullWidth size='small' name='hotlineNumber' defaultValue={row?.hotlineNumber} />
+              <TextField
+                fullWidth
+                size='small'
+                name='hotlineNumber'
+                defaultValue={row?.hotlineNumber}
+                error={!!errors.hotlineNumber}
+                helperText={errors.hotlineNumber}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
@@ -100,13 +163,14 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
               <Typography>Mô tả</Typography>
             </Grid>
             <Grid size={9}>
-              <TextareaAutosize
+              <TextField
                 name='description'
-                style={{ width: '100%', padding: '6px', fontFamily: 'inherit', fontSize: 'inherit' }}
+                style={{ width: '100%', fontFamily: 'inherit', fontSize: 'inherit' }}
                 minRows={2}
                 maxRows={6}
-                maxLength={255}
                 defaultValue={row?.description}
+                error={!!errors.description}
+                helperText={errors.description}
               />
             </Grid>
           </Grid>
@@ -115,7 +179,14 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
               <Typography>Trạng thái</Typography>
             </Grid>
             <Grid size={9}>
-              <Select name='status' fullWidth size='small' value={status} onChange={handleChange}>
+              <Select
+                name='status'
+                fullWidth
+                size='small'
+                value={status}
+                onChange={handleChange}
+                error={!!errors.status}
+              >
                 {Object.values(BuildingStatus).map((status) => (
                   <MenuItem key={status} value={status}>
                     {status}

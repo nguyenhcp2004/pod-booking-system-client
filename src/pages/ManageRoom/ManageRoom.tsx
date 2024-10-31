@@ -92,6 +92,7 @@ export default function ManageRoom() {
       headerName: 'Trạng thái',
 
       type: 'singleSelect',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
@@ -125,6 +126,7 @@ export default function ManageRoom() {
               id: 0,
               quantity: 0,
               capacity: 0,
+              price: 0,
               building: {
                 status: '',
                 createdAt: '',

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {
+import orderApiRequest, {
   deleteOrder,
   getBuilding,
   getPageOrder,
@@ -12,9 +12,16 @@ import {
   searchOrder,
   updateStaff
 } from '~/apis/orderApi'
+import { CountOrderReqType, GetListOrderByAccountIdQueryType } from '~/schemaValidations/order.schema'
 
 //Read
-export const useOrders = (params: { startDate: string; endDate: string; page: number; size: number }) => {
+export const useOrders = (params: {
+  startDate: string
+  endDate: string
+  page: number
+  size: number
+  status?: string | null
+}) => {
   return useQuery({
     queryKey: ['orders', params],
     queryFn: () => getPageOrder(params),
@@ -98,5 +105,40 @@ export const useDeleteOrder = () => {
     onError: (error) => {
       console.error('Error deleting order:', error)
     }
+  })
+}
+
+export const useCountCurrentOrder = () => {
+  return useQuery({
+    queryKey: ['count-current-orders'],
+    queryFn: () => orderApiRequest.countCurrentOrder()
+  })
+}
+
+export const useCountOrder = (query: CountOrderReqType) => {
+  return useQuery({
+    queryKey: ['count-orders', query],
+    queryFn: () => orderApiRequest.countOrder(query),
+    enabled: !!query.startTime && !!query.endTime
+  })
+}
+
+export const useGetListOrderByAccountId = (query: GetListOrderByAccountIdQueryType) => {
+  return useQuery({
+    queryKey: ['order-of-account', { query }],
+    queryFn: () => orderApiRequest.getListOrderByAccountId(query)
+  })
+}
+
+export const useGetOrderInfo = (orderId: string) => {
+  return useQuery({
+    queryKey: ['order-info', orderId],
+    queryFn: () => orderApiRequest.getOrderInfo(orderId)
+  })
+}
+
+export const useUpdateOrderStatusMutation = () => {
+  return useMutation({
+    mutationFn: orderApiRequest.updateOrderStatus
   })
 }

@@ -4,6 +4,7 @@ import {
   CreateBuildingBodyType,
   CreateBuildingResType,
   EditBuildingBodyType,
+  GetAllBuildingsResType,
   GetFilteredBuildingQueryType,
   GetListBuidlingResType
 } from '~/schemaValidations/building.schema'
@@ -19,7 +20,8 @@ const buildingApiRequest = {
     return http.get<GetListBuidlingResType>(`/buildings/filtered-building?${stringified}`)
   },
   createBuilding: (body: CreateBuildingBodyType) => http.post<CreateBuildingResType>('/buildings', body),
-  editBuilding: (body: EditBuildingBodyType) => http.put<CreateBuildingResType>(`/buildings/${body.id}`, body)
+  editBuilding: (body: EditBuildingBodyType) => http.put<CreateBuildingResType>(`/buildings/${body.id}`, body),
+  getAllBuilding: () => http.get<GetAllBuildingsResType>('/buildings/all')
 }
 
 export default buildingApiRequest

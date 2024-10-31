@@ -6,10 +6,11 @@ import { tokens } from '~/themes/theme'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import ApartmentIcon from '@mui/icons-material/Apartment'
 import FastfoodIcon from '@mui/icons-material/Fastfood'
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
+// import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
 
 const iconSx = {
   width: '24px',
@@ -38,15 +39,20 @@ const menuItems = [
     icon: <MeetingRoomIcon sx={iconSx} />
   },
   {
+    title: 'Loại phòng',
+    to: '/admin/room-types',
+    icon: <RoomPreferencesIcon sx={iconSx} />
+  },
+  {
     title: 'Chi nhánh',
     to: '/admin/buildings',
     icon: <ApartmentIcon sx={iconSx} />
   },
-  {
-    title: 'Slot',
-    to: '/admin/slots',
-    icon: <AccessTimeFilledIcon sx={iconSx} />
-  },
+  // {
+  //   title: 'Slot',
+  //   to: '/admin/slots',
+  //   icon: <AccessTimeFilledIcon sx={iconSx} />
+  // },
   {
     title: 'Tiện ích',
     to: '/admin/amenities',

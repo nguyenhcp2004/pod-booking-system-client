@@ -178,3 +178,18 @@ export const EditRoomRes = z.object({
 })
 
 export type EditRoomResType = z.TypeOf<typeof EditRoomRes>
+
+export const CountServedRoomsRes = z.object({
+  code: z.number(),
+  data: z.number(),
+  message: z.string()
+})
+
+export type CountServedRoomsResType = z.TypeOf<typeof CountServedRoomsRes>
+
+export const GetBookedRoomsReq = z.object({
+  accountId: z.string()
+})
+
+export type GetBookedRoomsReqType = z.TypeOf<typeof GetBookedRoomsReq>
+

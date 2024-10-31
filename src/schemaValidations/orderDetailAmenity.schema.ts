@@ -6,6 +6,11 @@ export const OrderDetailAmenityBody = z.object({
   orderDetailId: z.string(),
   amenityId: z.number()
 })
+export const OrderDetailAmenityStaffBody = z.object({
+  quantity: z.number(),
+  orderDetailId: z.string(),
+  amenityId: z.number()
+})
 
 const AmenitySchema = z.object({
   id: z.number(),
@@ -29,5 +34,5 @@ export const OrderDetailAmenityRes = z.object({
 })
 
 export type OrderDetailAmenityBodyType = z.TypeOf<typeof OrderDetailAmenityBody>
-
+export type OrderDetailAmenityStaffBodyType = z.TypeOf<typeof OrderDetailAmenityStaffBody>
 export type CreateOrderDetailAmenityResType = z.TypeOf<typeof OrderDetailAmenityRes>

@@ -1,8 +1,17 @@
 import queryString from 'query-string'
 import { Building, Room, RoomTypeFix } from '~/constants/type'
 import { BookingInfo } from '~/contexts/BookingContext'
+import {
+  CountOrderReqType,
+  CountOrderResType,
+  GetListOrderByAccountIdQueryType,
+  GetListOrderByAccountIdResType,
+  GetOrderInfoResType,
+  OrderUpdateStatusResType
+} from '~/schemaValidations/order.schema'
 import http from '~/utils/http'
 import { createBookingPayload, createBookingPayloadAD, createOrderUpdateRequest } from '~/utils/order'
+import { formatQueryDateTime } from '~/utils/utils'
 
 export enum OrderStatus {
   Pending = 'Pending',
@@ -31,6 +40,7 @@ interface OrderDetail {
   roomId: number
   roomName: string
   roomPrice: number
+  roomImage: string
   status: OrderStatus
   startTime: string
   endTime: string
@@ -83,9 +93,24 @@ interface OrderResponse {
 }
 
 //Read
-export const getPageOrder = async (params: { startDate: string; endDate: string; page: number; size: number }) => {
+export const getPageOrder = async (params: {
+  startDate: string
+  endDate: string
+  page: number
+  size: number
+  status?: string | null
+}) => {
   try {
-    const query = queryString.stringify(params)
+    const queryParams: { startDate: string; endDate: string; page: number; size: number; status?: string } = {
+      startDate: params.startDate,
+      endDate: params.endDate,
+      page: params.page,
+      size: params.size
+    }
+    if (params.status !== null) {
+      queryParams.status = params.status
+    }
+    const query = queryString.stringify(queryParams)
     const response = await http.get(`/order/page?${query}`)
     return response.data
   } catch (error) {
@@ -225,3 +250,25 @@ export const deleteOrder = async (orderId: string) => {
     throw error
   }
 }
+
+export const orderApiRequest = {
+  countCurrentOrder: () => http.get<CountOrderResType>('/order/number-order-current-day'),
+  countOrder: (query: CountOrderReqType) => {
+    const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
+    return http.get<CountOrderResType>(`/order/number-order?${queryString}`)
+  },
+  getListOrderByAccountId: (query: GetListOrderByAccountIdQueryType) => {
+    const queryObject = {
+      page: query.page,
+      take: query.take,
+      status: query.status
+    }
+    const stringified = queryString.stringify(queryObject)
+    return http.get<GetListOrderByAccountIdResType>(`/order/${query.accountId}?${stringified}`)
+  },
+  getOrderInfo: (orderId: string) => http.get<GetOrderInfoResType>(`/order/order-info/${orderId}`),
+  updateOrderStatus: (body: { id: string; status: string; cancelReason: string }) =>
+    http.put<OrderUpdateStatusResType>(`/order`, body)
+}
+
+export default orderApiRequest

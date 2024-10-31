@@ -23,23 +23,28 @@ export default function ManageBuilding() {
   const [totalRowCount, setTotalRowCount] = useState<number>()
   useEffect(() => {
     if (data) {
-      setRows([...data.data.data].reverse())
+      setRows(
+        data.data.data.map((building, index) => ({
+          ...building,
+          sequentialIndex: index + 1
+        }))
+      )
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
+  useEffect(() => {
+    setPaginationFilter((prevFilter) => ({
+      ...prevFilter,
+      page: paginationModel.page + 1,
+      take: paginationModel.pageSize
+    }))
+  }, [paginationModel])
 
   const columns: GridColDef[] = [
     {
-      field: 'id',
-      headerName: 'ID',
-      width: 50,
-      valueFormatter: (params) => {
-        if (params) {
-          return `${params}`
-        } else {
-          return `${rows.length + 1}`
-        }
-      }
+      field: 'sequentialIndex',
+      headerName: 'STT',
+      width: 50
     },
     { field: 'address', headerName: 'Chi nhánh', width: 350, editable: true },
     {
