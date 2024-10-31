@@ -148,6 +148,7 @@ export const mapOrderToRow = (order: Order) => {
     createdAt: moment(order.createdAt).format('HH:mm DD-MM-YY') || 'N/A',
     updatedAt: moment(order.updatedAt).format('HH:mm DD-MM-YY') || 'N/A',
     roomName: [...new Set(order.orderDetails.map((o) => o.roomName))].join(', ') || 'N/A',
+    buildingNumber: order.orderDetails?.[0]?.buildingId || 0,
     address: order.orderDetails?.[0]?.buildingAddress || 'N/A',
     status: order.orderDetails?.[0]?.status || 'N/A',
     startTime: moment(order.orderDetails?.[0]?.startTime).format('HH:mm DD-MM') || 'N/A',
