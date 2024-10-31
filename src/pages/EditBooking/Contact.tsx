@@ -4,6 +4,7 @@ import { tokens } from '~/themes/theme'
 import ModeCommentIcon from '@mui/icons-material/ModeComment'
 import { getDayBefore, getMonthNumber } from '~/utils/utils'
 import { GetOrderInfoResType } from '~/schemaValidations/order.schema'
+import { Link } from 'react-router-dom'
 
 export default function Contact({ orderDetail }: { orderDetail: GetOrderInfoResType['data'] }) {
   const colors = tokens('light')
@@ -41,13 +42,15 @@ export default function Contact({ orderDetail }: { orderDetail: GetOrderInfoResT
         </Grid>
       </Box>
       <Box sx={{ width: '100%', padding: '20px' }}>
-        <Button
-          startIcon={<ModeCommentIcon />}
-          fullWidth
-          sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
-        >
-          Tin nhắn mới
-        </Button>
+        <Link to='https://www.facebook.com/profile.php?id=61567752789181' target='_blank'>
+          <Button
+            startIcon={<ModeCommentIcon />}
+            fullWidth
+            sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
+          >
+            Tin nhắn mới
+          </Button>
+        </Link>
       </Box>
     </Box>
   )
