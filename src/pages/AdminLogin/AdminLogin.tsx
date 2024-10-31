@@ -36,7 +36,7 @@ export default function AdminLogin() {
       toast.success(result.data.message, {
         autoClose: 3000
       })
-      navigate('/admin/dashboard')
+      navigate('/admin/orders')
     } catch (error) {
       handleErrorApi({ error, setError })
     }
