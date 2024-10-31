@@ -25,7 +25,7 @@ export default function ManageRoom() {
 
   useEffect(() => {
     if (data) {
-      setRows([...data.data.data])
+      setRows(data.data.data.map((room) => ({ ...room, building: room.roomType.building.address })))
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
@@ -37,6 +37,9 @@ export default function ManageRoom() {
       take: paginationModel.pageSize
     }))
   }, [paginationModel])
+    refetch()
+  }, [paginationModel, refetch])
+
 
   const ExpandableCell = ({ value }: GridRenderCellParams) => {
     const [expanded, setExpanded] = useState(false)
@@ -73,7 +76,8 @@ export default function ManageRoom() {
     {
       field: 'image',
       headerName: 'Ảnh',
-
+      width: 150,
+      maxWidth: 150,
       renderCell: (params: GridRenderCellParams) => (
         <img
           src={params.value as string}
@@ -85,8 +89,11 @@ export default function ManageRoom() {
     {
       field: 'roomType',
       headerName: 'Loại phòng',
-
       valueGetter: (value: RoomType) => value?.name
+    },
+    {
+      field: 'building',
+      headerName: 'Chi nhánh'
     },
     {
       field: 'status',
