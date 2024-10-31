@@ -4,6 +4,7 @@ import {
   AvailableSlotsQueryType,
   FilterRoomByTypeAndDateQueryType,
   FilterRoomByTypeAndSlotsQueryType,
+  SlotsByRoomsAndDateQueryType,
   UnavailableRoomsQueryType
 } from '~/schemaValidations/room.schema'
 
@@ -33,5 +34,12 @@ export const useGetRoomsByTypeAndDate = (query: FilterRoomByTypeAndDateQueryType
   return useQuery({
     queryKey: ['rooms-by-type-and-date'],
     queryFn: () => roomFilterApiRequest.getRoomsByTypeAndDate(query)
+  })
+}
+
+export const useGetSlotsByRoomsAndDate = (query: SlotsByRoomsAndDateQueryType) => {
+  return useQuery({
+    queryKey: ['slots-by-rooms-and-date'],
+    queryFn: () => roomFilterApiRequest.getSlotsByRoomsAndDate(query)
   })
 }

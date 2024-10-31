@@ -67,29 +67,6 @@ export default function RoomDetail() {
     setSelectedDates(dateList)
   }, [selectedDate, selectedPackage])
 
-  // const slotsFormmated = useMemo(() => {
-  //   return selectedSlots.map((slot) => {
-  //     const [startTime, endTime] = slot.split('-')
-  //     const formattedStartTime = moment(selectedDate)
-  //       .set({
-  //         hour: parseInt(startTime.split(':')[0]),
-  //         minute: parseInt(startTime.split(':')[1]),
-  //         second: 0,
-  //         millisecond: 0
-  //       })
-  //       .format('YYYY-MM-DDTHH:mm:ss')
-  //     const formattedEndTime = moment(selectedDate)
-  //       .set({
-  //         hour: parseInt(endTime.split(':')[0]),
-  //         minute: parseInt(endTime.split(':')[1]),
-  //         second: 0,
-  //         millisecond: 0
-  //       })
-  //       .format('YYYY-MM-DDTHH:mm:ss')
-  //     return `${formattedStartTime}_${formattedEndTime}`
-  //   })
-  // }, [selectedSlots, selectedDate])
-
   const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndDate({
     typeId: Number(params.id),
     date: selectedDate?.format('YYYY-MM-DD') || ''

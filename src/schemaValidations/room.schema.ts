@@ -199,3 +199,23 @@ export const GetBookedRoomsReq = z.object({
 })
 
 export type GetBookedRoomsReqType = z.TypeOf<typeof GetBookedRoomsReq>
+
+export const SlotsByRoomsAndDateQuery = z.object({
+  roomIds: z.array(z.number()),
+  date: z.string()
+})
+
+export type SlotsByRoomsAndDateQueryType = z.TypeOf<typeof SlotsByRoomsAndDateQuery>
+
+export const SlotsByRoomsAndDateRes = z.object({
+  code: z.number(),
+  data: z.array(
+    z.object({
+      startTime: z.string(),
+      endTime: z.string()
+    })
+  ),
+  message: z.string()
+})
+
+export type SlotsByRoomsAndDateResType = z.TypeOf<typeof SlotsByRoomsAndDateRes>

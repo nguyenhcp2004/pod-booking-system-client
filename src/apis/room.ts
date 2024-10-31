@@ -13,6 +13,8 @@ import {
   FilterRoomByTypeAndSlotsResType,
   GetBookedRoomsReqType,
   GetListRoomsResType,
+  SlotsByRoomsAndDateQueryType,
+  SlotsByRoomsAndDateResType,
   UnavailableRoomsQueryType,
   UnavailableRoomsResType
 } from '~/schemaValidations/room.schema'
@@ -52,6 +54,10 @@ export const roomApiRequest = {
   getRoomsByTypeAndDate: (query: FilterRoomByTypeAndDateQueryType) => {
     const stringified = queryString.stringify(query)
     return http.get<FilterRoomByTypeAndDateResType>(`/rooms/available-by-type-and-date?${stringified}`)
+  },
+  getSlotsByRoomsAndDate: (query: SlotsByRoomsAndDateQueryType) => {
+    const stringified = queryString.stringify(query)
+    return http.get<SlotsByRoomsAndDateResType>(`/rooms/slots-by-rooms-and-date?${stringified}`)
   }
 }
 
