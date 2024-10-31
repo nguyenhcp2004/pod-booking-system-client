@@ -4,6 +4,7 @@ import { AppContext } from '~/contexts/AppProvider'
 import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
+import AboutUs from '~/pages/AboutUs/AboutUs'
 import AdminLogin from '~/pages/AdminLogin'
 import OrderAmenityDetail from '~/pages/Amenity'
 import CancelBookingSuccess from '~/pages/CancelBookingSuccess'
@@ -33,6 +34,7 @@ function ProtectedRoute() {
   return isAuth ? <Outlet /> : <Navigate to='/login' />
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function ProtecteAdmindRoute() {
   const { isAuth } = useContext(AppContext)
   return isAuth ? <Outlet /> : <Navigate to='/admin/login' />
@@ -61,6 +63,10 @@ export default function useRouteElements() {
         {
           path: '/refresh-token',
           element: <RefreshToken />
+        },
+        {
+          path: '/about-us',
+          element: <AboutUs />
         }
       ]
     },
