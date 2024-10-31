@@ -39,6 +39,7 @@ const AddAmenity = () => {
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
   const { data: responseAmenityByType, refetch: amenitiesRefetch } = useGetAmenitiesByType(selectedAmenityType)
@@ -63,6 +64,7 @@ const AddAmenity = () => {
   const vnp_OrderInfo = queryParams.get('vnp_OrderInfo')
   const vnp_ResponseCode = queryParams.get('vnp_ResponseCode')
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isLoading } = useQuery({
     queryKey: ['transactionInfo', vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode],
     queryFn: async () => {

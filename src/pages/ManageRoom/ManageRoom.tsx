@@ -92,6 +92,7 @@ export default function ManageRoom() {
       headerName: 'Trạng thái',
 
       type: 'singleSelect',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
