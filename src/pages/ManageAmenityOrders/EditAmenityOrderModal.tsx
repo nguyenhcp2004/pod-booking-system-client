@@ -1,9 +1,8 @@
-import { AttachMoney, Cancel, CheckCircle, Done, Edit } from '@mui/icons-material'
+import { AttachMoney, Cancel, CheckCircle } from '@mui/icons-material'
 import { Box, Chip, Dialog, IconButton, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { GridColDef } from '@mui/x-data-grid'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import Table from '~/components/Table/Table'
 import { AMENITY_ORDER_STATUS } from '~/constants/mock'
@@ -78,6 +77,7 @@ const EditAmenityOrderModal = ({
 
       type: 'singleSelect',
       editable: true,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueOptions: Object.entries(AMENITY_ORDER_STATUS).map(([_, value]) => value),
       valueGetter: (_, row) => {
         return { status: row.status, statusDescription: row.statusDescription }

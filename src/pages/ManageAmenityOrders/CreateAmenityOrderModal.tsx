@@ -1,14 +1,9 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { useState } from 'react'
-
-import BackdropCustom from '~/components/Progress/Backdrop'
-
 import { tokens } from '~/themes/theme'
-
 import AddAmenity from './AddAmenity'
 import BookingDetails from './BookingDetails'
-
 import QRCodePaymentStaffAmenity from '~/components/QRCodePayment/QRCodePaymentStaffAmenity'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import { useCreateOrderDetailAmenityStaff } from '~/queries/useOrderDetailAmenity'

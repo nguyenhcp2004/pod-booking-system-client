@@ -74,9 +74,7 @@ export const checkAndRefreshToken = async (param?: {
 
 export const handleErrorApi = <T extends FieldValues>({
   error,
-  setError,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  duration
+  setError
 }: {
   error: unknown
   setError?: UseFormSetError<T>
