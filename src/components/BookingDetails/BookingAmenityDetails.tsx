@@ -9,6 +9,7 @@ export default function BookingAmenityDetails() {
   const { bookedRoom, selectedAmenities, calculateTotal } = useBookingAmenityContext()
 
   if (!bookedRoom) return null
+  console.log(bookedRoom)
 
   const calculateHours = (startTime: string, endTime: string) => {
     const start = new Date(startTime)

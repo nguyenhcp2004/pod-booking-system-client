@@ -100,6 +100,8 @@ export type Amenity = {
   quantity: number
   type: string
   imageUrl: string
+  isDeleted: number
+  buildingId: number
 }
 
 export const CanceledReason = {
