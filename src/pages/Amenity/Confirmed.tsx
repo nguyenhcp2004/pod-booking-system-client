@@ -9,11 +9,16 @@ import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import { useCreateOrderDetailAmenityMutation } from '~/queries/useOrderDetailAmenity'
 import { formatDate, formatStartEndTime } from '~/utils/utils'
 import { AccountType } from '~/schemaValidations/auth.schema'
+import { useSendMailOrderAmenityMutation } from '~/queries/useAccount'
+import { useAppContext } from '~/contexts/AppProvider'
+import { toast } from 'react-toastify'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
+  const sendMail = useSendMailOrderAmenityMutation()
+  const { account: user } = useAppContext()
   const { selectedAmenities, bookedRoom, setBookedRoom, clearAmenities } = useBookingAmenityContext()
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityMutation()
 
@@ -34,6 +39,11 @@ export const Confirmed: React.FC = () => {
       if (transactionResponse.status === 'OK' && orderCreated === 0) {
         setOrderCreated(orderCreated + 1)
         setStatus(true)
+        await sendMail.mutateAsync({
+          email: user?.email as string,
+          orderDetailId: bookedRoom?.orderDetailId as string
+        })
+        toast.success('Hệ thống vừa gửi hóa đơn cho bạn!')
         // Create order detail amenities
         for (const amenity of selectedAmenities) {
           await createOrderDetailAmenityMutation.mutateAsync({
