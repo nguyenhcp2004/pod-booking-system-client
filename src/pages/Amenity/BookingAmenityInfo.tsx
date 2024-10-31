@@ -94,7 +94,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Email'
-                      defaultValue='dao@gmail.com'
+                      defaultValue={account?.email || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
