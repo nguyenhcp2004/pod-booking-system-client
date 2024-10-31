@@ -13,8 +13,10 @@ export const roomTypeApiRequest = {
     return http.get<FilterRoomTypeRes>(`/room-types/filtered-room-type?${stringified}`)
   },
   getRoomTypeByAddress: (address: string) => {
-    console.log(`address: ${address}`)
     return http.get<GetRoomTypeByAddressResType>(`/room-types/room-type-within-address?address=${address}`)
+  },
+  getRoomTypeByBuildingId: (buildingId: string | number) => {
+    return http.get<GetRoomTypeByAddressResType>(`/room-types/get-by-building-id?buildingId=${buildingId}`)
   }
 }
 
