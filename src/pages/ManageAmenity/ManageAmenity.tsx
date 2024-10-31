@@ -66,7 +66,7 @@ export default function ManageBuilding() {
       try {
         await deleteAmenityMutation.mutateAsync(rowToToggle.id)
 
-        toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`, {
+        toast.success(`Trạng thái của dịch vụ ${rowToToggle.name} đã được cập nhật thành ${newStatus}`, {
           autoClose: 3000
         })
         setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))

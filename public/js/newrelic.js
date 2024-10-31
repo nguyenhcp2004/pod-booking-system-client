@@ -6,19 +6,19 @@ NREUM.init = {
 }
 
 NREUM.loader_config = {
-  accountID: '4871535',
-  trustKey: '4871535',
-  agentID: '1120345170',
-  licenseKey: 'NRJS-f6d7e671ca5f038b468',
-  applicationID: '1120345170'
+  accountID: '5142384',
+  trustKey: '5142384',
+  agentID: '601509570',
+  licenseKey: 'NRJS-5bb9a41effe6e72f849',
+  applicationID: '601509570'
 }
 NREUM.info = {
   beacon: 'bam.nr-data.net',
   errorBeacon: 'bam.nr-data.net',
-  licenseKey: 'NRJS-f6d7e671ca5f038b468',
-  applicationID: '1120345170',
+  licenseKey: 'NRJS-5bb9a41effe6e72f849',
+  applicationID: '601509570',
   sa: 1
-} /*! For license information please see nr-loader-spa-1.269.0.min.js.LICENSE.txt */
+} /*! For license information please see nr-loader-spa-1.270.1.min.js.LICENSE.txt */
 ;(() => {
   var e,
     t,
@@ -101,7 +101,7 @@ NREUM.info = {
       },
       9417: (e, t, r) => {
         'use strict'
-        r.d(t, { D0: () => h, gD: () => p, xN: () => g })
+        r.d(t, { D0: () => h, gD: () => g, xN: () => p })
         var n = r(993)
         const i = (e) => {
           if (!e || 'string' != typeof e) return !1
@@ -219,13 +219,13 @@ NREUM.info = {
           if (!l[e]) throw new Error('Configuration for '.concat(e, ' was never set'))
           return l[e]
         }
-        function g(e, t) {
+        function p(e, t) {
           if (!e) throw new Error(f)
           l[e] = (0, c.a)(t, d())
           const r = (0, s.nY)(e)
           r && (r.init = l[e])
         }
-        function p(e, t) {
+        function g(e, t) {
           if (!e) throw new Error(f)
           var r = h(e)
           if (r) {
@@ -304,7 +304,7 @@ NREUM.info = {
       9324: (e, t, r) => {
         'use strict'
         r.d(t, { F3: () => i, Xs: () => o, Yq: () => a, xv: () => n })
-        const n = '1.269.0',
+        const n = '1.270.1',
           i = 'PROD',
           o = 'CDN',
           a = '2.0.0-alpha.12'
@@ -315,8 +315,7 @@ NREUM.info = {
           A4: () => s,
           OF: () => d,
           RI: () => i,
-          Vr: () => h,
-          WN: () => g,
+          WN: () => h,
           bv: () => o,
           gm: () => a,
           lR: () => f,
@@ -348,28 +347,7 @@ NREUM.info = {
             const e = a.navigator?.userAgent?.match(/Firefox[/\s](\d+\.\d+)/)
             return Array.isArray(e) && e.length >= 2 ? +e[1] : 0
           })(),
-          h = !!a.navigator?.sendBeacon,
-          g = Date.now() - (0, n.t)()
-      },
-      4777: (e, t, r) => {
-        'use strict'
-        r.d(t, { J: () => o })
-        var n = r(944)
-        const i = { agentIdentifier: '', ee: void 0 }
-        class o {
-          constructor(e) {
-            try {
-              if ('object' != typeof e) return (0, n.R)(8)
-              ;(this.sharedContext = {}),
-                Object.assign(this.sharedContext, i),
-                Object.entries(e).forEach(([e, t]) => {
-                  Object.keys(i).includes(e) && (this.sharedContext[e] = t)
-                })
-            } catch (e) {
-              ;(0, n.R)(9, e)
-            }
-          }
-        }
+          h = Date.now() - (0, n.t)()
       },
       7295: (e, t, r) => {
         'use strict'
@@ -451,7 +429,7 @@ NREUM.info = {
               const e = o.backlog[t],
                 r = s[t]
               if (r) {
-                for (let t = 0; e && t < e.length; ++t) g(e[t], r)
+                for (let t = 0; e && t < e.length; ++t) p(e[t], r)
                 Object.entries(r).forEach(([e, t]) => {
                   Object.values(t || {}).forEach((t) => {
                     t[0]?.on && t[0]?.context() instanceof a.y && t[0].on(e, t[1])
@@ -462,7 +440,7 @@ NREUM.info = {
             o.isolatedBacklog || delete s[t], (o.backlog[t] = null), o.emit('drain-' + t, [])
           }
         }
-        function g(e, t) {
+        function p(e, t) {
           var r = e[1]
           Object.values(t[r] || {}).forEach((t) => {
             var r = e[0]
@@ -493,8 +471,8 @@ NREUM.info = {
               l = 16 === r.length && (0, o.f)(r).isolatedBacklog
             } catch (e) {}
             var f = {
-              on: g,
-              addEventListener: g,
+              on: p,
+              addEventListener: p,
               removeEventListener: function (e, t) {
                 var r = n[e]
                 if (!r) return
@@ -504,13 +482,13 @@ NREUM.info = {
                 !1 !== o && (o = !0)
                 if (u.aborted && !i) return
                 t && o && t.emit(e, r, n)
-                for (var a = h(n), c = p(e), d = c.length, l = 0; l < d; l++) c[l].apply(a, r)
-                var g = v()[s[e]]
-                g && g.push([f, e, r, a])
+                for (var a = h(n), c = g(e), d = c.length, l = 0; l < d; l++) c[l].apply(a, r)
+                var p = v()[s[e]]
+                p && p.push([f, e, r, a])
                 return a
               },
               get: m,
-              listeners: p,
+              listeners: g,
               context: h,
               buffer: function (e, t) {
                 const r = v()
@@ -544,10 +522,10 @@ NREUM.info = {
             function h(e) {
               return e && e instanceof a.y ? e : e ? (0, i.I)(e, c, () => new a.y(c)) : new a.y(c)
             }
-            function g(e, t) {
-              n[e] = p(e).concat(t)
+            function p(e, t) {
+              n[e] = g(e).concat(t)
             }
-            function p(e) {
+            function g(e) {
               return n[e] || []
             }
             function m(t) {
@@ -917,9 +895,9 @@ NREUM.info = {
           s[t.debugId] = 1
           var r = (0, i.YM)(t, !0)
           function f(e) {
-            r.inPlace(e, [u, d], '-', g)
+            r.inPlace(e, [u, d], '-', p)
           }
-          function g(e, t) {
+          function p(e, t) {
             return e[1]
           }
           return (
@@ -1200,15 +1178,15 @@ NREUM.info = {
       7378: (e, t, r) => {
         'use strict'
         r.d(t, {
-          $p: () => R,
+          $p: () => x,
           BR: () => b,
-          Kp: () => x,
+          Kp: () => R,
           L3: () => y,
           Lc: () => c,
           NC: () => o,
           SG: () => d,
           TZ: () => i,
-          U6: () => g,
+          U6: () => p,
           UT: () => m,
           d3: () => w,
           dT: () => f,
@@ -1216,7 +1194,7 @@ NREUM.info = {
           gx: () => v,
           l9: () => l,
           oW: () => h,
-          op: () => p,
+          op: () => g,
           rw: () => u,
           tH: () => E,
           uP: () => s,
@@ -1234,30 +1212,30 @@ NREUM.info = {
           l = 'remaining',
           f = 'interaction',
           h = 'spaNode',
-          g = 'jsonpNode',
-          p = 'fetch-start',
+          p = 'jsonpNode',
+          g = 'fetch-start',
           m = 'fetch-done',
           v = 'fetch-body-',
           b = 'jsonp-end',
           y = (0, n.dV)().o.ST,
           w = '-start',
-          x = '-end',
-          R = '-body',
-          T = 'cb' + x,
+          R = '-end',
+          x = '-body',
+          T = 'cb' + R,
           A = 'jsTime',
           E = 'fetch'
       },
       4234: (e, t, r) => {
         'use strict'
-        r.d(t, { W: () => i })
-        var n = r(7836)
-        class i {
-          constructor(e, t, r) {
-            ;(this.agentIdentifier = e),
-              (this.aggregator = t),
-              (this.ee = n.ee.get(e)),
-              (this.featureName = r),
-              (this.blocked = !1)
+        r.d(t, { W: () => o })
+        var n = r(7836),
+          i = r(1687)
+        class o {
+          constructor(e, t) {
+            ;(this.agentIdentifier = e), (this.ee = n.ee.get(e)), (this.featureName = t), (this.blocked = !1)
+          }
+          deregisterDrain() {
+            ;(0, i.x3)(this.agentIdentifier, this.featureName)
           }
         }
       },
@@ -1282,8 +1260,8 @@ NREUM.info = {
           l = r(944),
           f = r(3969),
           h = r(384),
-          g = r(6344)
-        const p = [
+          p = r(6344)
+        const g = [
             'setErrorHandler',
             'finished',
             'addToTrace',
@@ -1297,8 +1275,8 @@ NREUM.info = {
             'setUserId',
             'setApplicationVersion',
             'start',
-            g.G4.RECORD,
-            g.G4.PAUSE,
+            p.G4.RECORD,
+            p.G4.PAUSE,
             'log',
             'wrapLogger'
           ],
@@ -1307,20 +1285,20 @@ NREUM.info = {
           b = r(2614),
           y = r(993),
           w = r(3785),
-          x = r(2646),
-          R = r(3434)
+          R = r(2646),
+          x = r(3434)
         function T(e, t, r, n) {
           if ('object' != typeof t || !t || 'string' != typeof r || !r || 'function' != typeof t[r]) return (0, l.R)(29)
           const i = (function (e) {
               return (e || s.ee).get('logger')
             })(e),
-            o = (0, R.YM)(i),
-            a = new x.y(s.P)
+            o = (0, x.YM)(i),
+            a = new R.y(s.P)
           return (a.level = n.level), (a.customAttributes = n.customAttributes), o.inPlace(t, [r], 'wrap-logger-', a), i
         }
         function A() {
           const e = (0, h.pV)()
-          p.forEach((t) => {
+          g.forEach((t) => {
             e[t] = (...r) =>
               (function (t, ...r) {
                 let n = []
@@ -1342,36 +1320,36 @@ NREUM.info = {
           ;(e += '/'), (r.p = t ? e : 'https://' + e)
         }
         let _ = !1
-        function j(e, t = {}, p, x) {
-          let { init: R, info: j, loader_config: P, runtime: C = {}, exposed: k = !0 } = t
-          C.loaderType = p
+        function j(e, t = {}, g, R) {
+          let { init: x, info: j, loader_config: P, runtime: C = {}, exposed: k = !0 } = t
+          C.loaderType = g
           const L = (0, h.pV)()
-          j || ((R = L.init), (j = L.info), (P = L.loader_config)),
-            (0, S.xN)(e.agentIdentifier, R || {}),
+          j || ((x = L.init), (j = L.info), (P = L.loader_config)),
+            (0, S.xN)(e.agentIdentifier, x || {}),
             (0, N.a)(e.agentIdentifier, P || {}),
             (j.jsAttributes ??= {}),
             d.bv && (j.jsAttributes.isWorker = !0),
             (0, i.x1)(e.agentIdentifier, j)
-          const D = (0, S.D0)(e.agentIdentifier),
-            H = [j.beacon, j.errorBeacon]
+          const H = (0, S.D0)(e.agentIdentifier),
+            D = [j.beacon, j.errorBeacon]
           _ ||
-            (D.proxy.assets && (I(D.proxy.assets), H.push(D.proxy.assets)),
-            D.proxy.beacon && H.push(D.proxy.beacon),
+            (H.proxy.assets && (I(H.proxy.assets), D.push(H.proxy.assets)),
+            H.proxy.beacon && D.push(H.proxy.beacon),
             A(),
             (0, h.US)('activatedFeatures', O.B),
-            (e.runSoftNavOverSpa &&= !0 === D.soft_navigations.enabled && D.feature_flags.includes('soft_nav'))),
-            (C.denyList = [...(D.ajax.deny_list || []), ...(D.ajax.block_internal ? H : [])]),
+            (e.runSoftNavOverSpa &&= !0 === H.soft_navigations.enabled && H.feature_flags.includes('soft_nav'))),
+            (C.denyList = [...(H.ajax.deny_list || []), ...(H.ajax.block_internal ? D : [])]),
             (C.ptid = e.agentIdentifier),
             (0, o.V)(e.agentIdentifier, C),
             (e.ee = s.ee.get(e.agentIdentifier)),
             void 0 === e.api &&
               (e.api = (function (e, t, h = !1) {
                 t || (0, c.Ak)(e, 'api')
-                const p = {}
-                var x = s.ee.get(e),
-                  R = x.get('tracer')
+                const g = {}
+                var R = s.ee.get(e),
+                  x = R.get('tracer')
                 ;(E[e] = b.g.OFF),
-                  x.on(g.G4.REPLAY_RUNNING, (t) => {
+                  R.on(p.G4.REPLAY_RUNNING, (t) => {
                     E[e] = t
                   })
                 var A = 'api-',
@@ -1386,18 +1364,18 @@ NREUM.info = {
                   )
                 }
                 function O() {}
-                ;(p.log = function (e, { customAttributes: t = {}, level: r = y.p_.INFO } = {}) {
-                  ;(0, a.p)(f.xV, ['API/log/called'], void 0, n.K.metrics, x), (0, w.R)(x, e, t, r)
+                ;(g.log = function (e, { customAttributes: t = {}, level: r = y.p_.INFO } = {}) {
+                  ;(0, a.p)(f.xV, ['API/log/called'], void 0, n.K.metrics, R), (0, w.R)(R, e, t, r)
                 }),
-                  (p.wrapLogger = (e, t, { customAttributes: r = {}, level: i = y.p_.INFO } = {}) => {
-                    ;(0, a.p)(f.xV, ['API/wrapLogger/called'], void 0, n.K.metrics, x),
-                      T(x, e, t, { customAttributes: r, level: i })
+                  (g.wrapLogger = (e, t, { customAttributes: r = {}, level: i = y.p_.INFO } = {}) => {
+                    ;(0, a.p)(f.xV, ['API/wrapLogger/called'], void 0, n.K.metrics, R),
+                      T(R, e, t, { customAttributes: r, level: i })
                   }),
                   m.forEach((e) => {
-                    p[e] = _(A, e, !0, 'api')
+                    g[e] = _(A, e, !0, 'api')
                   }),
-                  (p.addPageAction = _(A, 'addPageAction', !0, n.K.genericEvents)),
-                  (p.setPageViewName = function (t, r) {
+                  (g.addPageAction = _(A, 'addPageAction', !0, n.K.genericEvents)),
+                  (g.setPageViewName = function (t, r) {
                     if ('string' == typeof t)
                       return (
                         '/' !== t.charAt(0) && (t = '/' + t),
@@ -1405,38 +1383,38 @@ NREUM.info = {
                         _(A, 'setPageViewName', !0)()
                       )
                   }),
-                  (p.setCustomAttribute = function (e, t, r = !1) {
+                  (g.setCustomAttribute = function (e, t, r = !1) {
                     if ('string' == typeof e) {
                       if (['string', 'number', 'boolean'].includes(typeof t) || null === t)
                         return N(e, t, 'setCustomAttribute', r)
                       ;(0, l.R)(40, typeof t)
                     } else (0, l.R)(39, typeof e)
                   }),
-                  (p.setUserId = function (e) {
+                  (g.setUserId = function (e) {
                     if ('string' == typeof e || null === e) return N('enduser.id', e, 'setUserId', !0)
                     ;(0, l.R)(41, typeof e)
                   }),
-                  (p.setApplicationVersion = function (e) {
+                  (g.setApplicationVersion = function (e) {
                     if ('string' == typeof e || null === e)
                       return N('application.version', e, 'setApplicationVersion', !1)
                     ;(0, l.R)(42, typeof e)
                   }),
-                  (p.start = () => {
+                  (g.start = () => {
                     try {
-                      ;(0, a.p)(f.xV, ['API/start/called'], void 0, n.K.metrics, x), x.emit('manual-start-all')
+                      ;(0, a.p)(f.xV, ['API/start/called'], void 0, n.K.metrics, R), R.emit('manual-start-all')
                     } catch (e) {
                       ;(0, l.R)(23, e)
                     }
                   }),
-                  (p[g.G4.RECORD] = function () {
-                    ;(0, a.p)(f.xV, ['API/recordReplay/called'], void 0, n.K.metrics, x),
-                      (0, a.p)(g.G4.RECORD, [], void 0, n.K.sessionReplay, x)
+                  (g[p.G4.RECORD] = function () {
+                    ;(0, a.p)(f.xV, ['API/recordReplay/called'], void 0, n.K.metrics, R),
+                      (0, a.p)(p.G4.RECORD, [], void 0, n.K.sessionReplay, R)
                   }),
-                  (p[g.G4.PAUSE] = function () {
-                    ;(0, a.p)(f.xV, ['API/pauseReplay/called'], void 0, n.K.metrics, x),
-                      (0, a.p)(g.G4.PAUSE, [], void 0, n.K.sessionReplay, x)
+                  (g[p.G4.PAUSE] = function () {
+                    ;(0, a.p)(f.xV, ['API/pauseReplay/called'], void 0, n.K.metrics, R),
+                      (0, a.p)(p.G4.PAUSE, [], void 0, n.K.sessionReplay, R)
                   }),
-                  (p.interaction = function (e) {
+                  (g.interaction = function (e) {
                     return new O().get('object' == typeof e ? e : {})
                   })
                 const I = (O.prototype = {
@@ -1445,17 +1423,17 @@ NREUM.info = {
                       i = this,
                       o = 'function' == typeof t
                     return (
-                      (0, a.p)(f.xV, ['API/createTracer/called'], void 0, n.K.metrics, x),
-                      h || (0, a.p)(S + 'tracer', [(0, v.t)(), e, r], i, n.K.spa, x),
+                      (0, a.p)(f.xV, ['API/createTracer/called'], void 0, n.K.metrics, R),
+                      h || (0, a.p)(S + 'tracer', [(0, v.t)(), e, r], i, n.K.spa, R),
                       function () {
-                        if ((R.emit((o ? '' : 'no-') + 'fn-start', [(0, v.t)(), i, o], r), o))
+                        if ((x.emit((o ? '' : 'no-') + 'fn-start', [(0, v.t)(), i, o], r), o))
                           try {
                             return t.apply(this, arguments)
                           } catch (e) {
                             const t = 'string' == typeof e ? new Error(e) : e
-                            throw (R.emit('fn-err', [arguments, this, t], r), t)
+                            throw (x.emit('fn-err', [arguments, this, t], r), t)
                           } finally {
-                            R.emit('fn-end', [(0, v.t)()], r)
+                            x.emit('fn-end', [(0, v.t)()], r)
                           }
                       }
                     )
@@ -1464,8 +1442,8 @@ NREUM.info = {
                 function _(e, t, r, i) {
                   return function () {
                     return (
-                      (0, a.p)(f.xV, ['API/' + t + '/called'], void 0, n.K.metrics, x),
-                      i && (0, a.p)(e + t, [(0, v.t)(), ...arguments], r ? null : this, i, x),
+                      (0, a.p)(f.xV, ['API/' + t + '/called'], void 0, n.K.metrics, R),
+                      i && (0, a.p)(e + t, [(0, v.t)(), ...arguments], r ? null : this, i, R),
                       r ? void 0 : this
                     )
                   }
@@ -1477,7 +1455,7 @@ NREUM.info = {
                       t(e), (0, c.Ze)(e, 'api')
                     })
                     .catch((e) => {
-                      ;(0, l.R)(27, e), x.abort()
+                      ;(0, l.R)(27, e), R.abort()
                     })
                 }
                 return (
@@ -1494,16 +1472,16 @@ NREUM.info = {
                   ].forEach((e) => {
                     I[e] = _(S, e, void 0, h ? n.K.softNav : n.K.spa)
                   }),
-                  (p.setCurrentRouteName = h ? _(S, 'routeName', void 0, n.K.softNav) : _(A, 'routeName', !0, n.K.spa)),
-                  (p.noticeError = function (t, r) {
+                  (g.setCurrentRouteName = h ? _(S, 'routeName', void 0, n.K.softNav) : _(A, 'routeName', !0, n.K.spa)),
+                  (g.noticeError = function (t, r) {
                     'string' == typeof t && (t = new Error(t)),
-                      (0, a.p)(f.xV, ['API/noticeError/called'], void 0, n.K.metrics, x),
-                      (0, a.p)('err', [t, (0, v.t)(), !1, r, !!E[e]], void 0, n.K.jserrors, x)
+                      (0, a.p)(f.xV, ['API/noticeError/called'], void 0, n.K.metrics, R),
+                      (0, a.p)('err', [t, (0, v.t)(), !1, r, !!E[e]], void 0, n.K.jserrors, R)
                   }),
                   d.RI ? (0, u.GG)(() => j(), !0) : j(),
-                  p
+                  g
                 )
-              })(e.agentIdentifier, x, e.runSoftNavOverSpa)),
+              })(e.agentIdentifier, R, e.runSoftNavOverSpa)),
             void 0 === e.exposed && (e.exposed = k),
             (_ = !0)
         }
@@ -1561,10 +1539,10 @@ NREUM.info = {
     }),
     (i.f = {}),
     (i.e = (e) => Promise.all(Object.keys(i.f).reduce((t, r) => (i.f[r](e, t), t), []))),
-    (i.u = (e) => ({ 212: 'nr-spa-compressor', 249: 'nr-spa-recorder', 478: 'nr-spa' })[e] + '-1.269.0.min.js'),
+    (i.u = (e) => ({ 212: 'nr-spa-compressor', 249: 'nr-spa-recorder', 478: 'nr-spa' })[e] + '-1.270.1.min.js'),
     (i.o = (e, t) => Object.prototype.hasOwnProperty.call(e, t)),
     (e = {}),
-    (t = 'NRBA-1.269.0.PROD:'),
+    (t = 'NRBA-1.270.1.PROD:'),
     (i.l = (r, n, o, a) => {
       if (e[r]) e[r].push(n)
       else {
@@ -1580,9 +1558,9 @@ NREUM.info = {
         if (!s) {
           c = !0
           var f = {
-            478: 'sha512-BDnQSqs6w93jZNuA2+ydjStO6iZUcCDM2G5ACNl42PnZebXqSDjfzp21rEmyIS/uS1Mm/KhHBftMozfaupNTFQ==',
-            249: 'sha512-+3RM3jpjuKfYqtWclSvdJHGFcW1Zs3W91YF6LLj05mh2KF2Dd4d/UbOS+Gj8JJIB3+OhK9x9MEoWBx6J1Qp+Hw==',
-            212: 'sha512-2D6xSed7GvSJDbO/jQCNsTNZTswnT4nkZPDOuerj6rroMh2F2IQsO5rZkHWXh31IDaiIxoiUn44tUfBomWqChw=='
+            478: 'sha512-OzGDefNEv1U1WnY/i5IndOrzzUVPyOsBoW6I18N4PVpcZvOUYcDYbwxpfb3o8cZQHPrpCh04PfV8m/8FPBRaqA==',
+            249: 'sha512-npSDnSvIWlH1EdNDlW5UdvOJSl75lkQhJ/hOY+u3HTSk6XbU8qcfp3sjGljy98GAm4MHZ/e4cKbInmk0DGeeWg==',
+            212: 'sha512-t24Sn2EoGCHKjdudc4jQUcIMBSZbcTcGxHzHQ38aBn6deMJwe/zhBe/B9Rf13lNWzJW33Ki9hQcKsOsQ5+j/HA=='
           }
           ;((s = document.createElement('script')).charset = 'utf-8'),
             (s.timeout = 120),
@@ -1594,11 +1572,11 @@ NREUM.info = {
         }
         e[r] = [n]
         var h = (t, n) => {
-            ;(s.onerror = s.onload = null), clearTimeout(g)
+            ;(s.onerror = s.onload = null), clearTimeout(p)
             var i = e[r]
             if ((delete e[r], s.parentNode && s.parentNode.removeChild(s), i && i.forEach((e) => e(n)), t)) return t(n)
           },
-          g = setTimeout(h.bind(null, void 0, { type: 'timeout', target: s }), 12e4)
+          p = setTimeout(h.bind(null, void 0, { type: 'timeout', target: s }), 12e4)
         ;(s.onerror = h.bind(null, s.onerror)), (s.onload = h.bind(null, s.onload)), c && document.head.appendChild(s)
       }
     }),
@@ -1649,7 +1627,7 @@ NREUM.info = {
           }
           for (t && t(r); u < a.length; u++) (o = a[u]), i.o(e, o) && e[o] && e[o][0](), (e[o] = 0)
         },
-        r = (self['webpackChunk:NRBA-1.269.0.PROD'] = self['webpackChunk:NRBA-1.269.0.PROD'] || [])
+        r = (self['webpackChunk:NRBA-1.270.1.PROD'] = self['webpackChunk:NRBA-1.270.1.PROD'] || [])
       r.forEach(t.bind(null, 0)), (r.push = t.bind(null, r.push.bind(r)))
     })(),
     (() => {
@@ -1738,63 +1716,69 @@ NREUM.info = {
         l = i(4234),
         f = i(5289),
         h = i(6154),
-        g = i(5270),
-        p = i(7767),
+        p = i(5270),
+        g = i(7767),
         m = i(6389)
       class v extends l.W {
-        constructor(e, t, r, n = !0) {
-          super(e, t, r),
-            (this.auto = n),
+        constructor(e, t, r = !0) {
+          super(e.agentIdentifier, t),
+            (this.auto = r),
             (this.abortHandler = void 0),
             (this.featAggregate = void 0),
             (this.onAggregateImported = void 0),
-            !1 === (0, a.gD)(this.agentIdentifier, ''.concat(this.featureName, '.autoStart')) && (this.auto = !1),
+            !1 === e.init[this.featureName].autoStart && (this.auto = !1),
             this.auto
-              ? (0, d.Ak)(e, r)
+              ? (0, d.Ak)(e.agentIdentifier, t)
               : this.ee.on(
                   'manual-start-all',
                   (0, m.J)(() => {
-                    ;(0, d.Ak)(this.agentIdentifier, this.featureName), (this.auto = !0), this.importAggregator()
+                    ;(0, d.Ak)(e.agentIdentifier, this.featureName), (this.auto = !0), this.importAggregator(e)
                   })
                 )
         }
-        importAggregator(t = {}) {
+        importAggregator(t, r = {}) {
           if (this.featAggregate || !this.auto) return
-          let r
+          let n
           this.onAggregateImported = new Promise((e) => {
-            r = e
+            n = e
           })
-          const n = async () => {
-            let n
+          const a = async () => {
+            let a
             try {
-              if ((0, p.V)(this.agentIdentifier)) {
+              if ((0, g.V)(this.agentIdentifier)) {
                 const { setupAgentSession: e } = await i.e(478).then(i.bind(i, 6526))
-                n = e(this.agentIdentifier)
+                a = e(this.agentIdentifier)
               }
             } catch (t) {
               ;(0, e.R)(20, t),
                 this.ee.emit('internal-error', [t]),
                 this.featureName === o.K.sessionReplay && this.abortHandler?.()
             }
+            if (t.sharedAggregator) await t.sharedAggregator
+            else {
+              t.sharedAggregator = i.e(478).then(i.bind(i, 5987))
+              const { Aggregator: e } = await t.sharedAggregator
+              t.sharedAggregator = new e()
+            }
             try {
-              if (!this.#t(this.featureName, n)) return (0, d.Ze)(this.agentIdentifier, this.featureName), void r(!1)
+              if (!this.#t(this.featureName, a)) return (0, d.Ze)(this.agentIdentifier, this.featureName), void n(!1)
               const { lazyFeatureLoader: e } = await i.e(478).then(i.bind(i, 6103)),
                 { Aggregate: o } = await e(this.featureName, 'aggregate')
-              ;(this.featAggregate = new o(this.agentIdentifier, this.aggregator, t)), r(!0)
+              ;(this.featAggregate = new o(t, r)), n(!0)
             } catch (t) {
               ;(0, e.R)(34, t),
                 this.abortHandler?.(),
                 (0, d.Ze)(this.agentIdentifier, this.featureName, !0),
-                r(!1),
+                n(!1),
                 this.ee && this.ee.abort()
             }
           }
-          h.RI ? (0, f.GG)(() => n(), !0) : n()
+          h.RI ? (0, f.GG)(() => a(), !0) : a()
         }
         #t(e, t) {
           switch (e) {
             case o.K.sessionReplay:
-              return (0, g.SR)(this.agentIdentifier) && !!t
+              return (0, p.SR)(this.agentIdentifier) && !!t
             case o.K.sessionTrace:
               return !!t
             default:
@@ -1805,136 +1789,49 @@ NREUM.info = {
       var b = i(6630)
       class y extends v {
         static featureName = b.T
-        constructor(e, t, r = !0) {
-          super(e, t, b.T, r), this.importAggregator()
+        constructor(e, t = !0) {
+          super(e, b.T, t), this.importAggregator(e)
         }
       }
-      var w = i(4777)
-      class x extends w.J {
-        constructor(e) {
-          super(e), (this.aggregatedData = {})
-        }
-        store(e, t, r, n, i) {
-          var o = this.getBucket(e, t, r, i)
-          return (
-            (o.metrics = (function (e, t) {
-              t || (t = { count: 0 })
-              return (
-                (t.count += 1),
-                Object.entries(e || {}).forEach(([e, r]) => {
-                  t[e] = R(r, t[e])
-                }),
-                t
-              )
-            })(n, o.metrics)),
-            o
-          )
-        }
-        merge(e, t, r, n, i) {
-          var o = this.getBucket(e, t, n, i)
-          if (o.metrics) {
-            var a = o.metrics
-            ;(a.count += r.count),
-              Object.keys(r || {}).forEach((e) => {
-                if ('count' !== e) {
-                  var t = a[e],
-                    n = r[e]
-                  n && !n.c
-                    ? (a[e] = R(n.t, t))
-                    : (a[e] = (function (e, t) {
-                        if (!t) return e
-                        t.c || (t = T(t.t))
-                        return (
-                          (t.min = Math.min(e.min, t.min)),
-                          (t.max = Math.max(e.max, t.max)),
-                          (t.t += e.t),
-                          (t.sos += e.sos),
-                          (t.c += e.c),
-                          t
-                        )
-                      })(n, a[e]))
-                }
-              })
-          } else o.metrics = r
-        }
-        storeMetric(e, t, r, n) {
-          var i = this.getBucket(e, t, r)
-          return (i.stats = R(n, i.stats)), i
-        }
-        getBucket(e, t, r, n) {
-          this.aggregatedData[e] || (this.aggregatedData[e] = {})
-          var i = this.aggregatedData[e][t]
-          return i || ((i = this.aggregatedData[e][t] = { params: r || {} }), n && (i.custom = n)), i
-        }
-        get(e, t) {
-          return t ? this.aggregatedData[e] && this.aggregatedData[e][t] : this.aggregatedData[e]
-        }
-        take(e) {
-          for (var t = {}, r = '', n = !1, i = 0; i < e.length; i++)
-            (t[(r = e[i])] = Object.values(this.aggregatedData[r] || {})),
-              t[r].length && (n = !0),
-              delete this.aggregatedData[r]
-          return n ? t : null
-        }
-      }
-      function R(e, t) {
-        return null == e
-          ? (function (e) {
-              e ? e.c++ : (e = { c: 1 })
-              return e
-            })(t)
-          : t
-            ? (t.c || (t = T(t.t)),
-              (t.c += 1),
-              (t.t += e),
-              (t.sos += e * e),
-              e > t.max && (t.max = e),
-              e < t.min && (t.min = e),
-              t)
-            : { t: e }
-      }
-      function T(e) {
-        return { t: e, min: e, max: e, sos: e * e, c: 1 }
-      }
-      var A = i(384)
-      var E = i(9908),
-        S = i(2843),
-        N = i(3878),
-        O = i(782),
-        I = i(1863)
-      class _ extends v {
-        static featureName = O.T
-        constructor(e, t, r = !0) {
-          super(e, t, O.T, r),
+      var w = i(384)
+      var R = i(9908),
+        x = i(2843),
+        T = i(3878),
+        A = i(782),
+        E = i(1863)
+      class S extends v {
+        static featureName = A.T
+        constructor(e, t = !0) {
+          super(e, A.T, t),
             h.RI &&
-              ((0, S.u)(() => (0, E.p)('docHidden', [(0, I.t)()], void 0, O.T, this.ee), !0),
-              (0, N.sp)('pagehide', () => (0, E.p)('winPagehide', [(0, I.t)()], void 0, O.T, this.ee)),
-              this.importAggregator())
+              ((0, x.u)(() => (0, R.p)('docHidden', [(0, E.t)()], void 0, A.T, this.ee), !0),
+              (0, T.sp)('pagehide', () => (0, R.p)('winPagehide', [(0, E.t)()], void 0, A.T, this.ee)),
+              this.importAggregator(e))
         }
       }
-      var j = i(3969)
-      class P extends v {
-        static featureName = j.TZ
-        constructor(e, t, r = !0) {
-          super(e, t, j.TZ, r), this.importAggregator()
+      var N = i(3969)
+      class O extends v {
+        static featureName = N.TZ
+        constructor(e, t = !0) {
+          super(e, N.TZ, t), this.importAggregator(e)
         }
       }
-      var C = i(6774),
-        k = i(3304)
-      class L {
+      var I = i(6774),
+        _ = i(3304)
+      class j {
         constructor(e, t, r, n, i) {
           ;(this.name = 'UncaughtError'),
-            (this.message = 'string' == typeof e ? e : (0, k.A)(e)),
+            (this.message = 'string' == typeof e ? e : (0, _.A)(e)),
             (this.sourceURL = t),
             (this.line = r),
             (this.column = n),
             (this.__newrelic = i)
         }
       }
-      function D(e) {
-        return K(e)
+      function P(e) {
+        return L(e)
           ? e
-          : new L(
+          : new j(
               void 0 !== e?.message ? e.message : e,
               e?.filename || e?.sourceURL,
               e?.lineno || e?.line,
@@ -1942,39 +1839,39 @@ NREUM.info = {
               e?.__newrelic
             )
       }
-      function H(e) {
+      function C(e) {
         let t = 'Unhandled Promise Rejection'
-        if (K(e?.reason))
+        if (L(e?.reason))
           try {
-            return (e.reason.message = t + ': ' + e.reason.message), D(e.reason)
+            return (e.reason.message = t + ': ' + e.reason.message), P(e.reason)
           } catch (t) {
-            return D(e.reason)
+            return P(e.reason)
           }
-        if (void 0 === e.reason) return D(t)
-        const r = D(e.reason)
+        if (void 0 === e.reason) return P(t)
+        const r = P(e.reason)
         return (r.message = t + ': ' + r?.message), r
       }
-      function M(e) {
+      function k(e) {
         if (e.error instanceof SyntaxError && !/:\d+$/.test(e.error.stack?.trim())) {
-          const t = new L(e.message, e.filename, e.lineno, e.colno, e.error.__newrelic)
+          const t = new j(e.message, e.filename, e.lineno, e.colno, e.error.__newrelic)
           return (t.name = SyntaxError.name), t
         }
-        return K(e.error) ? e.error : D(e)
+        return L(e.error) ? e.error : P(e)
       }
-      function K(e) {
+      function L(e) {
         return e instanceof Error && !!e.stack
       }
-      class U extends v {
-        static featureName = C.T
+      class H extends v {
+        static featureName = I.T
         #r = !1
-        constructor(e, r, n = !0) {
-          super(e, r, C.T, n)
+        constructor(e, r = !0) {
+          super(e, I.T, r)
           try {
             this.removeOnAbort = new AbortController()
           } catch (e) {}
           this.ee.on('internal-error', (e) => {
             this.abortHandler &&
-              (0, E.p)('ierr', [D(e), (0, I.t)(), !0, {}, this.#r], void 0, this.featureName, this.ee)
+              (0, R.p)('ierr', [P(e), (0, E.t)(), !0, {}, this.#r], void 0, this.featureName, this.ee)
           }),
             this.ee.on(t.G4.REPLAY_RUNNING, (e) => {
               this.#r = e
@@ -1983,71 +1880,70 @@ NREUM.info = {
               'unhandledrejection',
               (e) => {
                 this.abortHandler &&
-                  (0, E.p)(
+                  (0, R.p)(
                     'err',
-                    [H(e), (0, I.t)(), !1, { unhandledPromiseRejection: 1 }, this.#r],
+                    [C(e), (0, E.t)(), !1, { unhandledPromiseRejection: 1 }, this.#r],
                     void 0,
                     this.featureName,
                     this.ee
                   )
               },
-              (0, N.jT)(!1, this.removeOnAbort?.signal)
+              (0, T.jT)(!1, this.removeOnAbort?.signal)
             ),
             h.gm.addEventListener(
               'error',
               (e) => {
                 this.abortHandler &&
-                  (0, E.p)('err', [M(e), (0, I.t)(), !1, {}, this.#r], void 0, this.featureName, this.ee)
+                  (0, R.p)('err', [k(e), (0, E.t)(), !1, {}, this.#r], void 0, this.featureName, this.ee)
               },
-              (0, N.jT)(!1, this.removeOnAbort?.signal)
+              (0, T.jT)(!1, this.removeOnAbort?.signal)
             ),
             (this.abortHandler = this.#n),
-            this.importAggregator()
+            this.importAggregator(e)
         }
         #n() {
           this.removeOnAbort?.abort(), (this.abortHandler = void 0)
         }
       }
-      var V = i(5603),
-        G = i(8990)
-      let B = 1
-      const F = 'nr@id'
-      function W(e) {
+      var D = i(8990)
+      let M = 1
+      const K = 'nr@id'
+      function U(e) {
         const t = typeof e
         return !e || ('object' !== t && 'function' !== t)
           ? -1
           : e === h.gm
             ? 0
-            : (0, G.I)(e, F, function () {
-                return B++
+            : (0, D.I)(e, K, function () {
+                return M++
               })
       }
-      function z(e) {
+      function V(e) {
         if ('string' == typeof e && e.length) return e.length
         if ('object' == typeof e) {
           if ('undefined' != typeof ArrayBuffer && e instanceof ArrayBuffer && e.byteLength) return e.byteLength
           if ('undefined' != typeof Blob && e instanceof Blob && e.size) return e.size
           if (!('undefined' != typeof FormData && e instanceof FormData))
             try {
-              return (0, k.A)(e).length
+              return (0, _.A)(e).length
             } catch (e) {
               return
             }
         }
       }
-      var q = i(8139),
-        Z = i(7836),
-        Y = i(3434)
-      const X = {},
-        J = ['open', 'send']
-      function Q(t) {
-        var r = t || Z.ee
+      var G = i(8139),
+        F = i(7836),
+        B = i(3434)
+      const W = {},
+        z = ['open', 'send']
+      function q(t) {
+        var r = t || F.ee
         const n = (function (e) {
-          return (e || Z.ee).get('xhr')
+          return (e || F.ee).get('xhr')
         })(r)
-        if (X[n.debugId]++) return n
-        ;(X[n.debugId] = 1), (0, q.u)(r)
-        var i = (0, Y.YM)(n),
+        if (W[n.debugId]++) return n
+        ;(W[n.debugId] = 1), (0, G.u)(r)
+        var i = (0, B.YM)(n),
           o = h.gm.XMLHttpRequest,
           a = h.gm.MutationObserver,
           s = h.gm.Promise,
@@ -2068,7 +1964,7 @@ NREUM.info = {
                     e.readyState > 3 && !s.resolved && ((s.resolved = !0), n.emit('xhr-resolved', [], e)),
                       i.inPlace(e, d, 'fn-', y)
                   }),
-                  (0, N.jT)(!1)
+                  (0, T.jT)(!1)
                 )
             } catch (t) {
               ;(0, e.R)(15, t)
@@ -2079,7 +1975,7 @@ NREUM.info = {
             var s
             return r
           })
-        function g(e, t) {
+        function p(e, t) {
           i.inPlace(t, ['onreadystatechange'], 'fn-', y)
         }
         if (
@@ -2087,17 +1983,17 @@ NREUM.info = {
             for (var r in e) t[r] = e[r]
           })(o, f),
           (f.prototype = o.prototype),
-          i.inPlace(f.prototype, J, '-xhr-', y),
+          i.inPlace(f.prototype, z, '-xhr-', y),
           n.on('send-xhr-start', function (e, t) {
-            g(e, t),
+            p(e, t),
               (function (e) {
-                l.push(e), a && (p ? p.then(b) : c ? c(b) : ((m = -m), (v.data = m)))
+                l.push(e), a && (g ? g.then(b) : c ? c(b) : ((m = -m), (v.data = m)))
               })(t)
           }),
-          n.on('open-xhr-start', g),
+          n.on('open-xhr-start', p),
           a)
         ) {
-          var p = s && s.resolve()
+          var g = s && s.resolve()
           if (!c && !s) {
             var m = 1,
               v = document.createTextNode(m)
@@ -2108,7 +2004,7 @@ NREUM.info = {
             ;(e[0] && e[0].type === u) || b()
           })
         function b() {
-          for (var e = 0; e < l.length; e++) g(0, l[e])
+          for (var e = 0; e < l.length; e++) p(0, l[e])
           l.length && (l = [])
         }
         function y(e, t) {
@@ -2116,19 +2012,19 @@ NREUM.info = {
         }
         return n
       }
-      var ee = 'fetch-',
-        te = ee + 'body-',
-        re = ['arrayBuffer', 'blob', 'json', 'text', 'formData'],
-        ne = h.gm.Request,
-        ie = h.gm.Response,
-        oe = 'prototype'
-      const ae = {}
-      function se(e) {
+      var Z = 'fetch-',
+        Y = Z + 'body-',
+        X = ['arrayBuffer', 'blob', 'json', 'text', 'formData'],
+        J = h.gm.Request,
+        Q = h.gm.Response,
+        ee = 'prototype'
+      const te = {}
+      function re(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('fetch')
+          return (e || F.ee).get('fetch')
         })(e)
-        if (!(ne && ie && h.gm.fetch)) return t
-        if (ae[t.debugId]++) return t
+        if (!(J && Q && h.gm.fetch)) return t
+        if (te[t.debugId]++) return t
         function r(e, r, n) {
           var i = e[r]
           'function' == typeof i &&
@@ -2136,7 +2032,7 @@ NREUM.info = {
               var e,
                 r = [...arguments],
                 o = {}
-              t.emit(n + 'before-start', [r], o), o[Z.P] && o[Z.P].dt && (e = o[Z.P].dt)
+              t.emit(n + 'before-start', [r], o), o[F.P] && o[F.P].dt && (e = o[F.P].dt)
               var a = i.apply(this, r)
               return (
                 t.emit(n + 'start', [r, e], a),
@@ -2152,29 +2048,30 @@ NREUM.info = {
             })
         }
         return (
-          (ae[t.debugId] = 1),
-          re.forEach((e) => {
-            r(ne[oe], e, te), r(ie[oe], e, te)
+          (te[t.debugId] = 1),
+          X.forEach((e) => {
+            r(J[ee], e, Y), r(Q[ee], e, Y)
           }),
-          r(h.gm, 'fetch', ee),
-          t.on(ee + 'end', function (e, r) {
+          r(h.gm, 'fetch', Z),
+          t.on(Z + 'end', function (e, r) {
             var n = this
             if (r) {
               var i = r.headers.get('content-length')
-              null !== i && (n.rxSize = i), t.emit(ee + 'done', [null, r], n)
-            } else t.emit(ee + 'done', [e], n)
+              null !== i && (n.rxSize = i), t.emit(Z + 'done', [null, r], n)
+            } else t.emit(Z + 'done', [e], n)
           }),
           t
         )
       }
-      var ce = i(7485)
-      class ue {
+      var ne = i(7485),
+        ie = i(5603)
+      class oe {
         constructor(e) {
           this.agentIdentifier = e
         }
         generateTracePayload(e) {
           if (!this.shouldGenerateTrace(e)) return null
-          var t = (0, V.o)(this.agentIdentifier)
+          var t = (0, ie.o)(this.agentIdentifier)
           if (!t) return null
           var n = (t.accountID || '').toString() || null,
             i = (t.agentID || '').toString() || null,
@@ -2203,7 +2100,7 @@ NREUM.info = {
         generateTraceHeader(e, t, r, n, i, o) {
           if (!('function' == typeof h.gm?.btoa)) return null
           var a = { v: [0, 1], d: { ty: 'Browser', ac: n, ap: i, id: e, tr: t, ti: r } }
-          return o && n !== o && (a.d.tk = o), btoa((0, k.A)(a))
+          return o && n !== o && (a.d.tk = o), btoa((0, _.A)(a))
         }
         shouldGenerateTrace(e) {
           return this.isDtEnabled() && this.isAllowedOrigin(e)
@@ -2219,7 +2116,7 @@ NREUM.info = {
             t = !0
           else if (r.allowed_origins instanceof Array)
             for (var n = 0; n < r.allowed_origins.length; n++) {
-              var i = (0, ce.D)(r.allowed_origins[n])
+              var i = (0, ne.D)(r.allowed_origins[n])
               if (e.hostname === i.hostname && e.protocol === i.protocol && e.port === i.port) {
                 t = !0
                 break
@@ -2244,29 +2141,31 @@ NREUM.info = {
           return !!e && !!e.cors_use_tracecontext_headers
         }
       }
-      var de = i(9300),
-        le = i(7295),
-        fe = ['load', 'error', 'abort', 'timeout'],
-        he = fe.length,
-        ge = (0, A.dV)().o.REQ,
-        pe = (0, A.dV)().o.XHR
-      class me extends v {
-        static featureName = de.T
-        constructor(e, t, r = !0) {
-          super(e, t, de.T, r), (this.dt = new ue(e)), (this.handler = (e, t, r, n) => (0, E.p)(e, t, r, n, this.ee))
+      var ae = i(9300),
+        se = i(7295),
+        ce = ['load', 'error', 'abort', 'timeout'],
+        ue = ce.length,
+        de = (0, w.dV)().o.REQ,
+        le = (0, w.dV)().o.XHR
+      class fe extends v {
+        static featureName = ae.T
+        constructor(e, t = !0) {
+          super(e, ae.T, t),
+            (this.dt = new oe(e.agentIdentifier)),
+            (this.handler = (e, t, r, n) => (0, R.p)(e, t, r, n, this.ee))
           try {
             const e = { xmlhttprequest: 'xhr', fetch: 'fetch', beacon: 'beacon' }
             h.gm?.performance?.getEntriesByType('resource').forEach((t) => {
               if (t.initiatorType in e && 0 !== t.responseStatus) {
                 const r = { status: t.responseStatus },
                   n = { rxSize: t.transferSize, duration: Math.floor(t.duration), cbTime: 0 }
-                ve(r, t.name),
+                he(r, t.name),
                   this.handler('xhr', [r, n, t.startTime, t.responseEnd, e[t.initiatorType]], void 0, o.K.ajax)
               }
             })
           } catch (e) {}
-          se(this.ee),
-            Q(this.ee),
+          re(this.ee),
+            q(this.ee),
             (function (e, t, r, n) {
               function i(e) {
                 var t = this
@@ -2283,9 +2182,9 @@ NREUM.info = {
                   e.addEventListener(
                     'load',
                     function (r) {
-                      R(t, e)
+                      A(t, e)
                     },
-                    (0, N.jT)(!1)
+                    (0, T.jT)(!1)
                   ),
                   h.lR ||
                     e.addEventListener(
@@ -2293,24 +2192,23 @@ NREUM.info = {
                       function (e) {
                         t.lastSize = e.loaded
                       },
-                      (0, N.jT)(!1)
+                      (0, T.jT)(!1)
                     )
               }
               function a(e) {
-                ;(this.params = { method: e[0] }), ve(this, e[1]), (this.metrics = {})
+                ;(this.params = { method: e[0] }), he(this, e[1]), (this.metrics = {})
               }
               function s(t, r) {
-                var i = (0, V.o)(e)
-                i.xpid && this.sameOrigin && r.setRequestHeader('X-NewRelic-ID', i.xpid)
-                var o = n.generateTracePayload(this.parsedOrigin)
-                if (o) {
-                  var a = !1
-                  o.newrelicHeader && (r.setRequestHeader('newrelic', o.newrelicHeader), (a = !0)),
-                    o.traceContextParentHeader &&
-                      (r.setRequestHeader('traceparent', o.traceContextParentHeader),
-                      o.traceContextStateHeader && r.setRequestHeader('tracestate', o.traceContextStateHeader),
-                      (a = !0)),
-                    a && (this.dt = o)
+                e.loader_config.xpid && this.sameOrigin && r.setRequestHeader('X-NewRelic-ID', e.loader_config.xpid)
+                var i = n.generateTracePayload(this.parsedOrigin)
+                if (i) {
+                  var o = !1
+                  i.newrelicHeader && (r.setRequestHeader('newrelic', i.newrelicHeader), (o = !0)),
+                    i.traceContextParentHeader &&
+                      (r.setRequestHeader('traceparent', i.traceContextParentHeader),
+                      i.traceContextStateHeader && r.setRequestHeader('tracestate', i.traceContextStateHeader),
+                      (o = !0)),
+                    o && (this.dt = i)
                 }
               }
               function c(e, r) {
@@ -2318,10 +2216,10 @@ NREUM.info = {
                   i = e[0],
                   o = this
                 if (n && i) {
-                  var a = z(i)
+                  var a = V(i)
                   a && (n.txSize = a)
                 }
-                ;(this.startTime = (0, I.t)()),
+                ;(this.startTime = (0, E.t)()),
                   (this.body = i),
                   (this.listener = function (e) {
                     try {
@@ -2337,7 +2235,7 @@ NREUM.info = {
                       } catch (e) {}
                     }
                   })
-                for (var s = 0; s < he; s++) r.addEventListener(fe[s], this.listener, (0, N.jT)(!1))
+                for (var s = 0; s < ue; s++) r.addEventListener(ce[s], this.listener, (0, T.jT)(!1))
               }
               function u(e, t, r) {
                 ;(this.cbTime += e),
@@ -2348,29 +2246,29 @@ NREUM.info = {
                     this.end(r)
               }
               function d(e, t) {
-                var r = '' + W(e) + !!t
+                var r = '' + U(e) + !!t
                 this.xhrGuids && !this.xhrGuids[r] && ((this.xhrGuids[r] = !0), (this.totalCbs += 1))
               }
               function l(e, t) {
-                var r = '' + W(e) + !!t
+                var r = '' + U(e) + !!t
                 this.xhrGuids && this.xhrGuids[r] && (delete this.xhrGuids[r], (this.totalCbs -= 1))
               }
               function f() {
-                this.endTime = (0, I.t)()
-              }
-              function g(e, r) {
-                r instanceof pe && 'load' === e[0] && t.emit('xhr-load-added', [e[1], e[2]], r)
+                this.endTime = (0, E.t)()
               }
               function p(e, r) {
-                r instanceof pe && 'load' === e[0] && t.emit('xhr-load-removed', [e[1], e[2]], r)
+                r instanceof le && 'load' === e[0] && t.emit('xhr-load-added', [e[1], e[2]], r)
+              }
+              function g(e, r) {
+                r instanceof le && 'load' === e[0] && t.emit('xhr-load-removed', [e[1], e[2]], r)
               }
               function m(e, t, r) {
-                t instanceof pe &&
+                t instanceof le &&
                   ('onload' === r && (this.onload = !0),
-                  ('load' === (e[0] && e[0].type) || this.onload) && (this.xhrCbStart = (0, I.t)()))
+                  ('load' === (e[0] && e[0].type) || this.onload) && (this.xhrCbStart = (0, E.t)()))
               }
               function v(e, r) {
-                this.xhrCbStart && t.emit('xhr-cb-time', [(0, I.t)() - this.xhrCbStart, this.onload, r], r)
+                this.xhrCbStart && t.emit('xhr-cb-time', [(0, E.t)() - this.xhrCbStart, this.onload, r], r)
               }
               function b(e) {
                 var t,
@@ -2385,7 +2283,7 @@ NREUM.info = {
                         : 'function' == typeof e[0].toString && (t = e[0].toString()),
                   'string' == typeof t && 0 !== t.length)
                 ) {
-                  t && ((this.parsedOrigin = (0, ce.D)(t)), (this.sameOrigin = this.parsedOrigin.sameOrigin))
+                  t && ((this.parsedOrigin = (0, ne.D)(t)), (this.sameOrigin = this.parsedOrigin.sameOrigin))
                   var i = n.generateTracePayload(this.parsedOrigin)
                   if (i && (i.newrelicHeader || i.traceContextParentHeader))
                     if (e[0] && e[0].headers) s(e[0].headers, i) && (this.dt = i)
@@ -2412,7 +2310,7 @@ NREUM.info = {
               function y(e, t) {
                 ;(this.params = {}),
                   (this.metrics = {}),
-                  (this.startTime = (0, I.t)()),
+                  (this.startTime = (0, E.t)()),
                   (this.dt = t),
                   e.length >= 1 && (this.target = e[0]),
                   e.length >= 2 && (this.opts = e[1])
@@ -2421,19 +2319,19 @@ NREUM.info = {
                   i = this.target
                 'string' == typeof i
                   ? (r = i)
-                  : 'object' == typeof i && i instanceof ge
+                  : 'object' == typeof i && i instanceof de
                     ? (r = i.url)
                     : h.gm?.URL && 'object' == typeof i && i instanceof URL && (r = i.href),
-                  ve(this, r)
-                var o = ('' + ((i && i instanceof ge && i.method) || n.method || 'GET')).toUpperCase()
-                ;(this.params.method = o), (this.body = n.body), (this.txSize = z(n.body) || 0)
+                  he(this, r)
+                var o = ('' + ((i && i instanceof de && i.method) || n.method || 'GET')).toUpperCase()
+                ;(this.params.method = o), (this.body = n.body), (this.txSize = V(n.body) || 0)
               }
               function w(e, t) {
-                if (((this.endTime = (0, I.t)()), this.params || (this.params = {}), (0, le.iW)(this.params))) return
+                if (((this.endTime = (0, E.t)()), this.params || (this.params = {}), (0, se.iW)(this.params))) return
                 let n
                 ;(this.params.status = t ? t.status : 0),
                   'string' == typeof this.rxSize && this.rxSize.length > 0 && (n = +this.rxSize)
-                const i = { txSize: this.txSize, rxSize: n, duration: (0, I.t)() - this.startTime }
+                const i = { txSize: this.txSize, rxSize: n, duration: (0, E.t)() - this.startTime }
                 r('xhr', [this.params, i, this.startTime, this.endTime, 'fetch'], this, o.K.ajax)
               }
               function x(e) {
@@ -2441,31 +2339,31 @@ NREUM.info = {
                   n = this.metrics
                 if (!this.ended) {
                   this.ended = !0
-                  for (let t = 0; t < he; t++) e.removeEventListener(fe[t], this.listener, !1)
+                  for (let t = 0; t < ue; t++) e.removeEventListener(ce[t], this.listener, !1)
                   t.aborted ||
-                    (0, le.iW)(t) ||
-                    ((n.duration = (0, I.t)() - this.startTime),
-                    this.loadCazptureCalled || 4 !== e.readyState ? null == t.status && (t.status = 0) : R(this, e),
+                    (0, se.iW)(t) ||
+                    ((n.duration = (0, E.t)() - this.startTime),
+                    this.loadCazptureCalled || 4 !== e.readyState ? null == t.status && (t.status = 0) : A(this, e),
                     (n.cbTime = this.cbTime),
                     r('xhr', [t, n, this.startTime, this.endTime, 'xhr'], this, o.K.ajax))
                 }
               }
-              function R(e, r) {
+              function A(e, r) {
                 e.params.status = r.status
                 var n = (function (e, t) {
                   var r = e.responseType
                   return 'json' === r && null !== t
                     ? t
                     : 'arraybuffer' === r || 'blob' === r || 'json' === r
-                      ? z(e.response)
+                      ? V(e.response)
                       : 'text' === r || '' === r || void 0 === r
-                        ? z(e.responseText)
+                        ? V(e.responseText)
                         : void 0
                 })(r, e.lastSize)
                 if ((n && (e.metrics.rxSize = n), e.sameOrigin)) {
                   var i = r.getResponseHeader('X-NewRelic-App-Data')
                   i &&
-                    ((0, E.p)(j.rs, ['Ajax/CrossApplicationTracing/Header/Seen'], void 0, o.K.metrics, t),
+                    ((0, R.p)(N.rs, ['Ajax/CrossApplicationTracing/Header/Seen'], void 0, o.K.metrics, t),
                     (e.params.cat = i.split(', ').pop()))
                 }
                 e.loadCaptureCalled = !0
@@ -2478,19 +2376,19 @@ NREUM.info = {
                 t.on('xhr-load-added', d),
                 t.on('xhr-load-removed', l),
                 t.on('xhr-resolved', f),
-                t.on('addEventListener-end', g),
-                t.on('removeEventListener-end', p),
+                t.on('addEventListener-end', p),
+                t.on('removeEventListener-end', g),
                 t.on('fn-end', v),
                 t.on('fetch-before-start', b),
                 t.on('fetch-start', y),
                 t.on('fn-start', m),
                 t.on('fetch-done', w)
             })(e, this.ee, this.handler, this.dt),
-            this.importAggregator()
+            this.importAggregator(e)
         }
       }
-      function ve(e, t) {
-        var r = (0, ce.D)(t),
+      function he(e, t) {
+        var r = (0, ne.D)(t),
           n = e.params || e
         ;(n.hostname = r.hostname),
           (n.port = r.port),
@@ -2500,83 +2398,84 @@ NREUM.info = {
           (e.parsedOrigin = r),
           (e.sameOrigin = r.sameOrigin)
       }
-      const be = {},
-        ye = ['pushState', 'replaceState']
-      function we(e) {
+      const pe = {},
+        ge = ['pushState', 'replaceState']
+      function me(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('history')
+          return (e || F.ee).get('history')
         })(e)
-        return !h.RI || be[t.debugId]++ || ((be[t.debugId] = 1), (0, Y.YM)(t).inPlace(window.history, ye, '-')), t
+        return !h.RI || pe[t.debugId]++ || ((pe[t.debugId] = 1), (0, B.YM)(t).inPlace(window.history, ge, '-')), t
       }
-      var xe = i(3738)
-      const { He: Re, bD: Te, d3: Ae, Kp: Ee, TZ: Se, Lc: Ne, uP: Oe, Rz: Ie } = xe
-      class _e extends v {
-        static featureName = Se
-        constructor(e, t, r = !0) {
-          super(e, t, Se, r)
-          if (!(0, p.V)(this.agentIdentifier)) return void (0, d.x3)(this.agentIdentifier, this.featureName)
-          const n = this.ee
-          let i
-          we(n),
-            (this.eventsEE = (0, q.u)(n)),
-            this.eventsEE.on(Oe, function (e, t) {
-              this.bstStart = (0, I.t)()
+      var ve = i(3738)
+      const { He: be, bD: ye, d3: we, Kp: Re, TZ: xe, Lc: Te, uP: Ae, Rz: Ee } = ve
+      class Se extends v {
+        static featureName = xe
+        constructor(e, t = !0) {
+          super(e, xe, t)
+          if (!(0, g.V)(this.agentIdentifier)) return void this.deregisterDrain()
+          const r = this.ee
+          let n
+          me(r),
+            (this.eventsEE = (0, G.u)(r)),
+            this.eventsEE.on(Ae, function (e, t) {
+              this.bstStart = (0, E.t)()
             }),
-            this.eventsEE.on(Ne, function (e, t) {
-              ;(0, E.p)('bst', [e[0], t, this.bstStart, (0, I.t)()], void 0, o.K.sessionTrace, n)
+            this.eventsEE.on(Te, function (e, t) {
+              ;(0, R.p)('bst', [e[0], t, this.bstStart, (0, E.t)()], void 0, o.K.sessionTrace, r)
             }),
-            n.on(Ie + Ae, function (e) {
-              ;(this.time = (0, I.t)()), (this.startPath = location.pathname + location.hash)
+            r.on(Ee + we, function (e) {
+              ;(this.time = (0, E.t)()), (this.startPath = location.pathname + location.hash)
             }),
-            n.on(Ie + Ee, function (e) {
-              ;(0, E.p)(
+            r.on(Ee + Re, function (e) {
+              ;(0, R.p)(
                 'bstHist',
                 [location.pathname + location.hash, this.startPath, this.time],
                 void 0,
                 o.K.sessionTrace,
-                n
+                r
               )
             })
           try {
-            ;(i = new PerformanceObserver((e) => {
+            ;(n = new PerformanceObserver((e) => {
               const t = e.getEntries()
-              ;(0, E.p)(Re, [t], void 0, o.K.sessionTrace, n)
+              ;(0, R.p)(be, [t], void 0, o.K.sessionTrace, r)
             })),
-              i.observe({ type: Te, buffered: !0 })
+              n.observe({ type: ye, buffered: !0 })
           } catch (e) {}
-          this.importAggregator({ resourceObserver: i })
+          this.importAggregator(e, { resourceObserver: n })
         }
       }
-      var je = i(2614)
-      class Pe extends v {
+      var Ne = i(2614)
+      class Oe extends v {
         static featureName = t.TZ
         #i
-        constructor(e, r, n = !0) {
-          let i
-          super(e, r, t.TZ, n), (this.replayRunning = !1)
+        #o
+        constructor(e, r = !0) {
+          let n
+          super(e, t.TZ, r), (this.replayRunning = !1), (this.#o = e)
           try {
-            i = JSON.parse(localStorage.getItem(''.concat(je.H3, '_').concat(je.uh)))
+            n = JSON.parse(localStorage.getItem(''.concat(Ne.H3, '_').concat(Ne.uh)))
           } catch (e) {}
-          ;(0, g.SR)(e) && this.ee.on(t.G4.RECORD, () => this.#o()),
-            this.#a(i) ? ((this.#i = i?.sessionReplayMode), this.#s()) : this.importAggregator(),
+          ;(0, p.SR)(e.agentIdentifier) && this.ee.on(t.G4.RECORD, () => this.#a()),
+            this.#s(n) ? ((this.#i = n?.sessionReplayMode), this.#c()) : this.importAggregator(e),
             this.ee.on('err', (e) => {
               this.replayRunning &&
-                ((this.errorNoticed = !0), (0, E.p)(t.G4.ERROR_DURING_REPLAY, [e], void 0, this.featureName, this.ee))
+                ((this.errorNoticed = !0), (0, R.p)(t.G4.ERROR_DURING_REPLAY, [e], void 0, this.featureName, this.ee))
             }),
             this.ee.on(t.G4.REPLAY_RUNNING, (e) => {
               this.replayRunning = e
             })
         }
-        #a(e) {
+        #s(e) {
           return (
-            (e && (e.sessionReplayMode === je.g.FULL || e.sessionReplayMode === je.g.ERROR)) ||
-            (0, g.Aw)(this.agentIdentifier)
+            (e && (e.sessionReplayMode === Ne.g.FULL || e.sessionReplayMode === Ne.g.ERROR)) ||
+            (0, p.Aw)(this.agentIdentifier)
           )
         }
-        #c = !1
-        async #s(e) {
-          if (!this.#c) {
-            this.#c = !0
+        #u = !1
+        async #c(e) {
+          if (!this.#u) {
+            this.#u = !0
             try {
               const { Recorder: t } = await Promise.all([i.e(478), i.e(249)]).then(i.bind(i, 2496))
               ;(this.recorder ??= new t({
@@ -2588,76 +2487,76 @@ NREUM.info = {
                 this.recorder.startRecording(),
                 (this.abortHandler = this.recorder.stopRecording)
             } catch (e) {}
-            this.importAggregator({ recorder: this.recorder, errorNoticed: this.errorNoticed })
+            this.importAggregator(this.#o, { recorder: this.recorder, errorNoticed: this.errorNoticed })
           }
         }
-        #o() {
+        #a() {
           this.featAggregate
-            ? this.featAggregate.mode !== je.g.FULL && this.featAggregate.initializeRecording(je.g.FULL, !0)
-            : ((this.#i = je.g.FULL),
-              this.#s(t.Qb.API),
+            ? this.featAggregate.mode !== Ne.g.FULL && this.featAggregate.initializeRecording(Ne.g.FULL, !0)
+            : ((this.#i = Ne.g.FULL),
+              this.#c(t.Qb.API),
               this.recorder &&
-                this.recorder.parent.mode !== je.g.FULL &&
-                ((this.recorder.parent.mode = je.g.FULL),
+                this.recorder.parent.mode !== Ne.g.FULL &&
+                ((this.recorder.parent.mode = Ne.g.FULL),
                 this.recorder.stopRecording(),
                 this.recorder.startRecording(),
                 (this.abortHandler = this.recorder.stopRecording)))
         }
       }
-      var Ce = i(3962)
-      class ke extends v {
-        static featureName = Ce.TZ
-        constructor(e, t, r = !0) {
-          if ((super(e, t, Ce.TZ, r), !h.RI || !(0, A.dV)().o.MO)) return
-          const n = we(this.ee),
-            i = (0, q.u)(this.ee),
-            o = () => (0, E.p)('newURL', [(0, I.t)(), '' + window.location], void 0, this.featureName, this.ee)
-          n.on('pushState-end', o), n.on('replaceState-end', o)
+      var Ie = i(3962)
+      class _e extends v {
+        static featureName = Ie.TZ
+        constructor(e, t = !0) {
+          if ((super(e, Ie.TZ, t), !h.RI || !(0, w.dV)().o.MO)) return
+          const r = me(this.ee),
+            n = (0, G.u)(this.ee),
+            i = () => (0, R.p)('newURL', [(0, E.t)(), '' + window.location], void 0, this.featureName, this.ee)
+          r.on('pushState-end', i), r.on('replaceState-end', i)
           try {
             this.removeOnAbort = new AbortController()
           } catch (e) {}
-          ;(0, N.sp)(
+          ;(0, T.sp)(
             'popstate',
-            (e) => (0, E.p)('newURL', [e.timeStamp, '' + window.location], void 0, this.featureName, this.ee),
+            (e) => (0, R.p)('newURL', [e.timeStamp, '' + window.location], void 0, this.featureName, this.ee),
             !0,
             this.removeOnAbort?.signal
           )
-          let a = !1
-          const s = new ((0, A.dV)().o.MO)((e, t) => {
-              a ||
-                ((a = !0),
+          let o = !1
+          const a = new ((0, w.dV)().o.MO)((e, t) => {
+              o ||
+                ((o = !0),
                 requestAnimationFrame(() => {
-                  ;(0, E.p)('newDom', [(0, I.t)()], void 0, this.featureName, this.ee), (a = !1)
+                  ;(0, R.p)('newDom', [(0, E.t)()], void 0, this.featureName, this.ee), (o = !1)
                 }))
             }),
-            c = (0, m.s)(
+            s = (0, m.s)(
               (e) => {
-                ;(0, E.p)('newUIEvent', [e], void 0, this.featureName, this.ee),
-                  s.observe(document.body, { attributes: !0, childList: !0, subtree: !0, characterData: !0 })
+                ;(0, R.p)('newUIEvent', [e], void 0, this.featureName, this.ee),
+                  a.observe(document.body, { attributes: !0, childList: !0, subtree: !0, characterData: !0 })
               },
               100,
               { leading: !0 }
             )
-          i.on('fn-start', ([e]) => {
-            Ce.tC.includes(e?.type) && c(e)
+          n.on('fn-start', ([e]) => {
+            Ie.tC.includes(e?.type) && s(e)
           })
-          for (let e of Ce.tC) document.addEventListener(e, () => {})
+          for (let e of Ie.tC) document.addEventListener(e, () => {})
           ;(this.abortHandler = function () {
-            this.removeOnAbort?.abort(), s.disconnect(), (this.abortHandler = void 0)
+            this.removeOnAbort?.abort(), a.disconnect(), (this.abortHandler = void 0)
           }),
-            this.importAggregator({ domObserver: s })
+            this.importAggregator(e, { domObserver: a })
         }
       }
-      var Le = i(7378)
-      const De = {},
-        He = ['appendChild', 'insertBefore', 'replaceChild']
-      function Me(e) {
+      var je = i(7378)
+      const Pe = {},
+        Ce = ['appendChild', 'insertBefore', 'replaceChild']
+      function ke(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('jsonp')
+          return (e || F.ee).get('jsonp')
         })(e)
-        if (!h.RI || De[t.debugId]) return t
-        De[t.debugId] = !0
-        var r = (0, Y.YM)(t),
+        if (!h.RI || Pe[t.debugId]) return t
+        Pe[t.debugId] = !0
+        var r = (0, B.YM)(t),
           n = /[?&](?:callback|cb)=([^&#]+)/,
           i = /(.*)\.([^.]+)/,
           o = /^(\w+)(\.|$)(.*)$/
@@ -2668,7 +2567,7 @@ NREUM.info = {
           return a(r[3], t[n])
         }
         return (
-          r.inPlace(Node.prototype, He, 'dom-'),
+          r.inPlace(Node.prototype, Ce, 'dom-'),
           t.on('dom-start', function (e) {
             !(function (e) {
               if (!e || 'string' != typeof e.nodeName || 'script' !== e.nodeName.toLowerCase()) return
@@ -2685,33 +2584,33 @@ NREUM.info = {
               var d = {}
               function l() {
                 t.emit('jsonp-end', [], d),
-                  e.removeEventListener('load', l, (0, N.jT)(!1)),
-                  e.removeEventListener('error', f, (0, N.jT)(!1))
+                  e.removeEventListener('load', l, (0, T.jT)(!1)),
+                  e.removeEventListener('error', f, (0, T.jT)(!1))
               }
               function f() {
                 t.emit('jsonp-error', [], d),
                   t.emit('jsonp-end', [], d),
-                  e.removeEventListener('load', l, (0, N.jT)(!1)),
-                  e.removeEventListener('error', f, (0, N.jT)(!1))
+                  e.removeEventListener('load', l, (0, T.jT)(!1)),
+                  e.removeEventListener('error', f, (0, T.jT)(!1))
               }
               r.inPlace(u.parent, [u.key], 'cb-', d),
-                e.addEventListener('load', l, (0, N.jT)(!1)),
-                e.addEventListener('error', f, (0, N.jT)(!1)),
+                e.addEventListener('load', l, (0, T.jT)(!1)),
+                e.addEventListener('error', f, (0, T.jT)(!1)),
                 t.emit('new-jsonp', [e.src], d)
             })(e[0])
           }),
           t
         )
       }
-      const Ke = {}
-      function Ue(e) {
+      const Le = {}
+      function He(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('promise')
+          return (e || F.ee).get('promise')
         })(e)
-        if (Ke[t.debugId]) return t
-        Ke[t.debugId] = !0
+        if (Le[t.debugId]) return t
+        Le[t.debugId] = !0
         var r = t.context,
-          n = (0, Y.YM)(t),
+          n = (0, B.YM)(t),
           i = h.gm.Promise
         return (
           i &&
@@ -2765,7 +2664,7 @@ NREUM.info = {
                 const s = o.apply(this, e)
                 return (a.nextPromise = s), t.emit('propagate', [i, !0], s, !1, !1), s
               }),
-                (i.prototype.then[Y.Jt] = o),
+                (i.prototype.then[B.Jt] = o),
                 t.on('executor-start', function (e) {
                   ;(e[0] = n(e[0], 'resolve-', this, null, !1)), (e[1] = n(e[1], 'resolve-', this, null, !1))
                 }),
@@ -2786,40 +2685,40 @@ NREUM.info = {
           t
         )
       }
-      const Ve = {},
-        Ge = 'setTimeout',
-        Be = 'setInterval',
-        Fe = 'clearTimeout',
-        We = '-start',
-        ze = [Ge, 'setImmediate', Be, Fe, 'clearImmediate']
-      function qe(e) {
+      const De = {},
+        Me = 'setTimeout',
+        Ke = 'setInterval',
+        Ue = 'clearTimeout',
+        Ve = '-start',
+        Ge = [Me, 'setImmediate', Ke, Ue, 'clearImmediate']
+      function Fe(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('timer')
+          return (e || F.ee).get('timer')
         })(e)
-        if (Ve[t.debugId]++) return t
-        Ve[t.debugId] = 1
-        var r = (0, Y.YM)(t)
+        if (De[t.debugId]++) return t
+        De[t.debugId] = 1
+        var r = (0, B.YM)(t)
         return (
-          r.inPlace(h.gm, ze.slice(0, 2), Ge + '-'),
-          r.inPlace(h.gm, ze.slice(2, 3), Be + '-'),
-          r.inPlace(h.gm, ze.slice(3), Fe + '-'),
-          t.on(Be + We, function (e, t, n) {
+          r.inPlace(h.gm, Ge.slice(0, 2), Me + '-'),
+          r.inPlace(h.gm, Ge.slice(2, 3), Ke + '-'),
+          r.inPlace(h.gm, Ge.slice(3), Ue + '-'),
+          t.on(Ke + Ve, function (e, t, n) {
             e[0] = r(e[0], 'fn-', null, n)
           }),
-          t.on(Ge + We, function (e, t, n) {
+          t.on(Me + Ve, function (e, t, n) {
             ;(this.method = n), (this.timerDuration = isNaN(e[1]) ? 0 : +e[1]), (e[0] = r(e[0], 'fn-', this, n))
           }),
           t
         )
       }
-      const Ze = {}
-      function Ye(e) {
+      const Be = {}
+      function We(e) {
         const t = (function (e) {
-          return (e || Z.ee).get('mutation')
+          return (e || F.ee).get('mutation')
         })(e)
-        if (!h.RI || Ze[t.debugId]) return t
-        Ze[t.debugId] = !0
-        var r = (0, Y.YM)(t),
+        if (!h.RI || Be[t.debugId]) return t
+        Be[t.debugId] = !0
+        var r = (0, B.YM)(t),
           n = h.gm.MutationObserver
         return (
           n &&
@@ -2830,118 +2729,117 @@ NREUM.info = {
           t
         )
       }
-      const { TZ: Xe, d3: Je, Kp: Qe, $p: $e, wW: et, e5: tt, tH: rt, uP: nt, rw: it, Lc: ot } = Le
-      class at extends v {
-        static featureName = Xe
-        constructor(e, t, r = !0) {
-          if ((super(e, t, Xe, r), !h.RI)) return
+      const { TZ: ze, d3: qe, Kp: Ze, $p: Ye, wW: Xe, e5: Je, tH: Qe, uP: $e, rw: et, Lc: tt } = je
+      class rt extends v {
+        static featureName = ze
+        constructor(e, t = !0) {
+          if ((super(e, ze, t), !h.RI)) return
           try {
             this.removeOnAbort = new AbortController()
           } catch (e) {}
-          let n,
-            i = 0
-          const o = this.ee.get('tracer'),
-            a = Me(this.ee),
-            s = Ue(this.ee),
-            c = qe(this.ee),
-            u = Q(this.ee),
-            d = this.ee.get('events'),
-            l = se(this.ee),
-            f = we(this.ee),
-            g = Ye(this.ee)
+          let r,
+            n = 0
+          const i = this.ee.get('tracer'),
+            o = ke(this.ee),
+            a = He(this.ee),
+            s = Fe(this.ee),
+            c = q(this.ee),
+            u = this.ee.get('events'),
+            d = re(this.ee),
+            l = me(this.ee),
+            f = We(this.ee)
           function p(e, t) {
-            f.emit('newURL', ['' + window.location, t])
+            l.emit('newURL', ['' + window.location, t])
+          }
+          function g() {
+            n++, (r = window.location.hash), (this[$e] = (0, E.t)())
           }
           function m() {
-            i++, (n = window.location.hash), (this[nt] = (0, I.t)())
+            n--, window.location.hash !== r && p(0, !0)
+            var e = (0, E.t)()
+            ;(this[Je] = ~~this[Je] + e - this[$e]), (this[tt] = e)
           }
-          function v() {
-            i--, window.location.hash !== n && p(0, !0)
-            var e = (0, I.t)()
-            ;(this[tt] = ~~this[tt] + e - this[nt]), (this[ot] = e)
-          }
-          function b(e, t) {
+          function v(e, t) {
             e.on(t, function () {
-              this[t] = (0, I.t)()
+              this[t] = (0, E.t)()
             })
           }
-          this.ee.on(nt, m),
-            s.on(it, m),
-            a.on(it, m),
-            this.ee.on(ot, v),
-            s.on(et, v),
-            a.on(et, v),
+          this.ee.on($e, g),
+            a.on(et, g),
+            o.on(et, g),
+            this.ee.on(tt, m),
+            a.on(Xe, m),
+            o.on(Xe, m),
             this.ee.on('fn-err', (...t) => {
-              t[2]?.__newrelic?.[e] || (0, E.p)('function-err', [...t], void 0, this.featureName, this.ee)
+              t[2]?.__newrelic?.[e.agentIdentifier] ||
+                (0, R.p)('function-err', [...t], void 0, this.featureName, this.ee)
             }),
-            this.ee.buffer([nt, ot, 'xhr-resolved'], this.featureName),
-            d.buffer([nt], this.featureName),
-            c.buffer(['setTimeout' + Qe, 'clearTimeout' + Je, nt], this.featureName),
-            u.buffer([nt, 'new-xhr', 'send-xhr' + Je], this.featureName),
-            l.buffer([rt + Je, rt + '-done', rt + $e + Je, rt + $e + Qe], this.featureName),
-            f.buffer(['newURL'], this.featureName),
-            g.buffer([nt], this.featureName),
-            s.buffer(['propagate', it, et, 'executor-err', 'resolve' + Je], this.featureName),
-            o.buffer([nt, 'no-' + nt], this.featureName),
-            a.buffer(['new-jsonp', 'cb-start', 'jsonp-error', 'jsonp-end'], this.featureName),
-            b(l, rt + Je),
-            b(l, rt + '-done'),
-            b(a, 'new-jsonp'),
-            b(a, 'jsonp-end'),
-            b(a, 'cb-start'),
-            f.on('pushState-end', p),
-            f.on('replaceState-end', p),
-            window.addEventListener('hashchange', p, (0, N.jT)(!0, this.removeOnAbort?.signal)),
-            window.addEventListener('load', p, (0, N.jT)(!0, this.removeOnAbort?.signal)),
+            this.ee.buffer([$e, tt, 'xhr-resolved'], this.featureName),
+            u.buffer([$e], this.featureName),
+            s.buffer(['setTimeout' + Ze, 'clearTimeout' + qe, $e], this.featureName),
+            c.buffer([$e, 'new-xhr', 'send-xhr' + qe], this.featureName),
+            d.buffer([Qe + qe, Qe + '-done', Qe + Ye + qe, Qe + Ye + Ze], this.featureName),
+            l.buffer(['newURL'], this.featureName),
+            f.buffer([$e], this.featureName),
+            a.buffer(['propagate', et, Xe, 'executor-err', 'resolve' + qe], this.featureName),
+            i.buffer([$e, 'no-' + $e], this.featureName),
+            o.buffer(['new-jsonp', 'cb-start', 'jsonp-error', 'jsonp-end'], this.featureName),
+            v(d, Qe + qe),
+            v(d, Qe + '-done'),
+            v(o, 'new-jsonp'),
+            v(o, 'jsonp-end'),
+            v(o, 'cb-start'),
+            l.on('pushState-end', p),
+            l.on('replaceState-end', p),
+            window.addEventListener('hashchange', p, (0, T.jT)(!0, this.removeOnAbort?.signal)),
+            window.addEventListener('load', p, (0, T.jT)(!0, this.removeOnAbort?.signal)),
             window.addEventListener(
               'popstate',
               function () {
-                p(0, i > 1)
+                p(0, n > 1)
               },
-              (0, N.jT)(!0, this.removeOnAbort?.signal)
+              (0, T.jT)(!0, this.removeOnAbort?.signal)
             ),
             (this.abortHandler = this.#n),
-            this.importAggregator()
+            this.importAggregator(e)
         }
         #n() {
           this.removeOnAbort?.abort(), (this.abortHandler = void 0)
         }
       }
-      var st = i(3333)
-      class ct extends v {
-        static featureName = st.TZ
-        constructor(e, t, r = !0) {
-          super(e, t, st.TZ, r)
-          const n = (0, a.D0)(this.agentIdentifier),
-            i = [n.page_action.enabled, n.user_actions.enabled]
+      var nt = i(3333)
+      class it extends v {
+        static featureName = nt.TZ
+        constructor(e, t = !0) {
+          super(e, nt.TZ, t)
+          const r = [e.init.page_action.enabled, e.init.user_actions.enabled]
           h.RI &&
-            n.user_actions.enabled &&
-            (st.Zp.forEach((e) => (0, N.sp)(e, (e) => (0, E.p)('ua', [e], void 0, this.featureName, this.ee), !0)),
-            st.qN.forEach((e) => (0, N.sp)(e, (e) => (0, E.p)('ua', [e], void 0, this.featureName, this.ee)))),
-            i.some((e) => e) ? this.importAggregator() : (0, d.x3)(this.agentIdentifier, this.featureName)
+            e.init.user_actions.enabled &&
+            (nt.Zp.forEach((e) => (0, T.sp)(e, (e) => (0, R.p)('ua', [e], void 0, this.featureName, this.ee), !0)),
+            nt.qN.forEach((e) => (0, T.sp)(e, (e) => (0, R.p)('ua', [e], void 0, this.featureName, this.ee)))),
+            r.some((e) => e) ? this.importAggregator(e) : this.deregisterDrain()
         }
       }
-      var ut = i(993),
-        dt = i(3785)
-      class lt extends v {
-        static featureName = ut.TZ
-        constructor(e, t, r = !0) {
-          super(e, t, ut.TZ, r)
-          const n = this.ee
+      var ot = i(993),
+        at = i(3785)
+      class st extends v {
+        static featureName = ot.TZ
+        constructor(e, t = !0) {
+          super(e, ot.TZ, t)
+          const r = this.ee
           this.ee.on('wrap-logger-end', function ([e]) {
-            const { level: t, customAttributes: r } = this
-            ;(0, dt.R)(n, e, r, t)
+            const { level: t, customAttributes: n } = this
+            ;(0, at.R)(r, e, n, t)
           }),
-            this.importAggregator()
+            this.importAggregator(e)
         }
       }
       new (class extends n {
         constructor(t, r) {
           super(r),
             h.gm
-              ? ((this.sharedAggregator = new x({ agentIdentifier: this.agentIdentifier })),
-                (this.features = {}),
-                (0, A.bQ)(this.agentIdentifier, this),
+              ? ((this.features = {}),
+                (0, w.bQ)(this.agentIdentifier, this),
                 (this.desiredFeatures = new Set(t.features || [])),
                 this.desiredFeatures.add(y),
                 (this.runSoftNavOverSpa = [...this.desiredFeatures].some((e) => e.featureName === o.K.softNav)),
@@ -2976,18 +2874,18 @@ NREUM.info = {
                   }
                 })(r.featureName).filter((e) => !(e in this.features))
                 n.length > 0 && (0, e.R)(36, { targetFeature: r.featureName, missingDependencies: n }),
-                  (this.features[r.featureName] = new r(this.agentIdentifier, this.sharedAggregator))
+                  (this.features[r.featureName] = new r(this))
               })
           } catch (t) {
             ;(0, e.R)(22, t)
             for (const e in this.features) this.features[e].abortHandler?.()
-            const r = (0, A.Zm)()
+            const r = (0, w.Zm)()
             delete r.initializedAgents[this.agentIdentifier]?.api,
               delete r.initializedAgents[this.agentIdentifier]?.features,
               delete this.sharedAggregator
             return r.ee.get(this.agentIdentifier).abort(), !1
           }
         }
-      })({ features: [me, y, _, _e, Pe, P, U, ct, lt, ke, at], loaderType: 'spa' })
+      })({ features: [fe, y, S, Se, Oe, O, H, it, st, _e, rt], loaderType: 'spa' })
     })()
 })()

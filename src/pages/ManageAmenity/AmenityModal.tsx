@@ -1,6 +1,6 @@
 import { Edit } from '@mui/icons-material'
 import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ACTION } from '~/constants/mock'
 import { Amenity } from '~/constants/type'
 import AddIcon from '@mui/icons-material/Add'
@@ -15,6 +15,8 @@ import { useCreateAmenityMutation, useEditAmenityMutation } from '~/queries/useA
 import { AmenityTypeEnum, CreateAmenityBodyType, EditAmenityBodyType } from '~/schemaValidations/amenity.schema'
 import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
+import buildingApiRequest from '~/apis/building'
+import { useAppContext } from '~/contexts/AppProvider'
 
 interface AmenityFormData {
   name: string
@@ -25,10 +27,12 @@ interface AmenityFormData {
 export default function BuildingModal({ row, action }: { row?: Amenity; action: string }) {
   const [open, setOpen] = useState(false)
   const [type, setType] = useState(row?.type || AmenityTypeEnum.Food)
-  const [formErrors, setFormErrors] = useState({ name: '', price: '', quantity: '' }) // Track form errors
-
+  const [formErrors, setFormErrors] = useState({ name: '', price: '', quantity: '' })
+  const [buildings, setBuildings] = useState<{ id: number; address: string }[]>([])
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('') // New state for buildingId
   const createAmenity = useCreateAmenityMutation()
   const editAmenityMutation = useEditAmenityMutation()
+  const { account: account } = useAppContext()
 
   const handleChange = (event: SelectChangeEvent) => {
     setType(event.target.value as AmenityTypeEnum)
@@ -40,8 +44,24 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
 
   const handleClose = () => {
     setOpen(false)
-    setFormErrors({ name: '', price: '', quantity: '' }) // Reset form errors
+    setFormErrors({ name: '', price: '', quantity: '' })
+    setSelectedBuildingId('')
   }
+
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const response = await buildingApiRequest.getAllBuilding()
+        setBuildings(response.data.data)
+      } catch (error) {
+        console.error('Failed to fetch buildings:', error)
+      }
+    }
+
+    if (open) {
+      fetchBuildings()
+    }
+  }, [open])
 
   // Validation helper
   const validateForm = (data: AmenityFormData) => {
@@ -74,7 +94,10 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries()) as unknown as CreateAmenityBodyType | EditAmenityBodyType
 
+    console.log('Form Data:', formJson) // Log the form data
+
     if (!validateForm(formJson)) {
+      console.log('Validation Errors:', formErrors) // Log validation errors if present
       return
     }
 
@@ -181,6 +204,45 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
                   </MenuItem>
                 ))}
               </Select>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} sx={{ my: 2 }} alignContent='center' justifyContent='center'>
+            <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography>Chi nhánh</Typography>
+            </Grid>
+            <Grid size={9}>
+              {account?.role === 'Admin' ? (
+                <Select
+                  name='buildingId'
+                  fullWidth
+                  size='small'
+                  value={selectedBuildingId}
+                  onChange={(e) => setSelectedBuildingId(e.target.value)}
+                  disabled={action === ACTION.UPDATE} // Disable if updating
+                >
+                  {buildings.map((building) => (
+                    <MenuItem key={building.id} value={building.id}>
+                      {building.address}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Select
+                  name='buildingId'
+                  fullWidth
+                  size='small'
+                  value={buildings.find((building) => building.id === account?.buildingNumber)?.id || ''}
+                  disabled
+                >
+                  {buildings
+                    .filter((building) => building.id === account?.buildingNumber)
+                    .map((building) => (
+                      <MenuItem key={building.id} value={building.id}>
+                        {building.address}
+                      </MenuItem>
+                    ))}
+                </Select>
+              )}
             </Grid>
           </Grid>
         </DialogContent>
