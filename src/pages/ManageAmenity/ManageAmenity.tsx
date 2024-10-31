@@ -1,14 +1,7 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
 import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
 import { Box, Chip, Typography, useTheme } from '@mui/material'
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRowId,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridValidRowModel
-} from '@mui/x-data-grid'
+import { GridActionsCellItem, GridColDef, GridRowId, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useRef, useState } from 'react'
 import Table from '~/components/Table/Table'
 import AmenityModal from '~/pages/ManageAmenity/AmenityModal'
@@ -19,16 +12,20 @@ import { handleErrorApi } from '~/utils/utils'
 import { useDeleteAmenityMutation } from '~/queries/useAmenity'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import moment from 'moment'
+import SearchForManage from '~/components/SearchInput/SearchForManage'
+import { PaginationSearchQuery } from '~/constants/type'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
-  const { data, refetch, isLoading } = useGetListAmenity({
+  const [paginationFilter, setPaginationFilter] = useState({
     page: paginationModel.page + 1,
-    take: paginationModel.pageSize
+    take: paginationModel.pageSize,
+    searchParams: ''
   })
+  const { data, isLoading } = useGetListAmenity(paginationFilter as PaginationSearchQuery)
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
   const theme = useTheme()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
@@ -56,8 +53,12 @@ export default function ManageBuilding() {
   }, [data])
 
   useEffect(() => {
-    refetch()
-  }, [paginationModel, refetch])
+    setPaginationFilter((prevFilter) => ({
+      ...prevFilter,
+      page: paginationModel.page + 1,
+      take: paginationModel.pageSize
+    }))
+  }, [paginationModel])
 
   const handleToggleStatus = (id: GridRowId) => async () => {
     const rowToToggle = rows.find((row) => row.id === id)
@@ -208,7 +209,7 @@ export default function ManageBuilding() {
     return (
       <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
         <AmenityModal action={ACTION.CREATE} />
-        <GridToolbarQuickFilter />
+        <SearchForManage setPaginationModel={setPaginationFilter} />
       </GridToolbarContainer>
     )
   }

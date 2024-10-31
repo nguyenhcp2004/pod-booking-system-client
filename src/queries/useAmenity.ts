@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import amenityApiRequest from '~/apis/amenity'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 
 export const useGetAmenities = () => {
@@ -23,7 +23,7 @@ export const useGetActiveAmenities = () => {
   })
 }
 
-export const useGetListAmenity = (query: Pagination) => {
+export const useGetListAmenity = (query: PaginationSearchQuery) => {
   return useQuery({
     queryKey: ['amenity', { query }],
     queryFn: () => amenityApiRequest.getListAmenity(query)
