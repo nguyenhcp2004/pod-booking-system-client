@@ -11,6 +11,7 @@ import CancelBookingSuccess from '~/pages/CancelBookingSuccess'
 import DashBoard from '~/pages/DashBoard'
 import EditBooking from '~/pages/EditBooking'
 import ForgotPassword from '~/pages/ForgotPassword'
+import HelpCenter from '~/pages/HelpCenter'
 import HistoryOrders from '~/pages/HistoryOrders'
 import Home from '~/pages/Home/Home'
 import Login from '~/pages/Login'
@@ -67,6 +68,10 @@ export default function useRouteElements() {
         {
           path: '/about-us',
           element: <AboutUs />
+        },
+        {
+          path: '/contact-us',
+          element: <HelpCenter />
         }
       ]
     },
