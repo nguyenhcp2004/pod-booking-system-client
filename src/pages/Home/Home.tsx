@@ -21,7 +21,7 @@ import { FilterRoomTypeQuery } from '~/schemaValidations/roomType.schema'
 import { Helmet } from 'react-helmet-async'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { slotType } from '~/contexts/BookingContext'
-import { useGetAllBuilding } from '~/queries/useBuilding'
+import { useGetBuildingOptions } from '~/queries/useBuilding'
 import { motion } from 'framer-motion'
 import { useGetRoomTypeByAddress } from '~/queries/useRoomType'
 
@@ -37,7 +37,7 @@ export default function Component() {
   })
   const { data, refetch } = useGetFilterRoomType(filterQuery)
 
-  const { data: allBuildingRes } = useGetAllBuilding()
+  const { data: allBuildingRes } = useGetBuildingOptions()
   const allBuilding = allBuildingRes?.data.data
 
   const [location, setLocation] = useState<string | null>(null)
