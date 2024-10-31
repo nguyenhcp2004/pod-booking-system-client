@@ -240,4 +240,3 @@ export function transformBookedRoomToRoom(bookedRoom: BookedRoomSchemaType) {
 export function transformBookedRoomsToRooms(bookedRooms: BookedRoomSchemaType[]) {
   return bookedRooms.map(transformBookedRoomToRoom)
 }
-

@@ -37,9 +37,6 @@ export default function ManageRoom() {
       take: paginationModel.pageSize
     }))
   }, [paginationModel])
-    refetch()
-  }, [paginationModel, refetch])
-
 
   const ExpandableCell = ({ value }: GridRenderCellParams) => {
     const [expanded, setExpanded] = useState(false)
