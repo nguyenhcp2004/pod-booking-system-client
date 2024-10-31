@@ -90,7 +90,7 @@ export default function ManageUser() {
       field: 'name',
       headerName: 'Tên',
       width: 150,
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], name: props.value }
@@ -139,7 +139,7 @@ export default function ManageUser() {
           }
         />
       ),
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], role: props.value }
@@ -161,7 +161,7 @@ export default function ManageUser() {
       headerName: 'Địa chỉ tòa nhà',
       width: 120,
       type: 'number',
-      editable: true,
+      editable: false,
       renderCell: (params) => <>{params.value?.address || '--'}</>,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
@@ -185,7 +185,7 @@ export default function ManageUser() {
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
       ),
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], status: props.value }
