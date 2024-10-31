@@ -7,7 +7,7 @@ import {
   AmenityListResType,
   DeleteAmenityResType
 } from '~/schemaValidations/amenity.schema'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import queryString from 'query-string'
 
 const amenityApiRequest = {
@@ -17,7 +17,7 @@ const amenityApiRequest = {
   getAllActiveAmenities: () => {
     return http.get<AmenityListResType>('/amenity/allActive')
   },
-  getListAmenity: (query: Pagination) => {
+  getListAmenity: (query: PaginationSearchQuery) => {
     const stringified = queryString.stringify(query)
     return http.get<GetListAmenityResType>(`/amenity?${stringified}`)
   },

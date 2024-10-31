@@ -15,7 +15,7 @@ const QRCodePaymentAmenity = () => {
   const { bookedRoom, calculateTotal } = useBookingAmenityContext()
   const theme = useTheme()
 
-  const total = calculateTotal() * 1000
+  const total = calculateTotal()
 
   const { mutate: createPaymentUrl } = useMutation({
     mutationFn: async (amount: number) => {

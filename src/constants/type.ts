@@ -87,6 +87,12 @@ export type Pagination = {
   take: number
 }
 
+export type PaginationSearchQuery = {
+  page: number
+  take: number
+  searchParams: string
+}
+
 export type Amenity = {
   id: number
   name: string
@@ -94,6 +100,8 @@ export type Amenity = {
   quantity: number
   type: string
   imageUrl: string
+  isDeleted: number
+  buildingId: number
 }
 
 export const CanceledReason = {

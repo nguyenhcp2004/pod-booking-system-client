@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid2'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { tokens } from '~/themes/theme'
-import { useGetAmenitiesByType, useGetAvailableAmenity } from '~/queries/useAmenity'
+import { useGetAvailableAmenity } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
@@ -38,9 +38,6 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
 
-  const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
-  const amenities: AmenityType[] = response?.data.data ?? []
-
   const { data: responseBookedRooms } = useGetBookedRooms()
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
 
@@ -50,15 +47,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
 
   const [allAmenities, setAllAmenities] = useState<AmenityType[]>([])
-  const { data: responseAllAmenities, refetch: refetchAllAmenities } = useGetAvailableAmenity(
-    bookedRoom?.roomType.building.id || 1
-  )
-
-  useEffect(() => {
-    if (bookedRoom?.roomType.building.id) {
-      refetchAllAmenities()
-    }
-  }, [bookedRoom, refetchAllAmenities])
+  const { data: responseAllAmenities } = useGetAvailableAmenity(bookedRoom?.roomType.building.id || 1)
 
   useEffect(() => {
     if (responseAllAmenities?.data.data) {
@@ -75,12 +64,16 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    if (selectedAmenityType) {
-      refetch()
-    }
     setDetailAmenity(null)
     setQuantity(0)
-  }, [selectedAmenityType, refetch])
+  }, [selectedAmenityType])
+
+  const filteredAmenities = useMemo(() => {
+    if (selectedAmenityType === '') {
+      return allAmenities
+    }
+    return allAmenities.filter((amenity) => amenity.type === selectedAmenityType)
+  }, [allAmenities, selectedAmenityType])
 
   const handleAddAmentity = () => {
     if (!detailAmenity) {
@@ -92,7 +85,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
       return
     }
     if (!bookedRoom) {
-      setErrorState('Vui lòng chọn phòng đã đặt')
+      setErrorState('Vui lòng chọn phòng và giờ đã đặt')
       return
     }
 
@@ -160,8 +153,6 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const bookingSlots = bookedRooms
     .filter((room) => room.name === selectedRoomName)
     .map((room) => formatStartEndTime(room.startTime, room.endTime))
-
-  const displayedAmenities = selectedAmenityType !== '' ? amenities : allAmenities
 
   return (
     <Box
@@ -246,8 +237,9 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                     label='Chọn loại tiện ích'
                     onChange={handleAmenityTypeChange}
                   >
-                    <MenuItem value='Food'>Food</MenuItem>
-                    <MenuItem value='Office'>Office</MenuItem>
+                    <MenuItem value=''>Tất cả</MenuItem>
+                    <MenuItem value='Food'>Thức ăn</MenuItem>
+                    <MenuItem value='Office'>Thiết bị</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -257,8 +249,8 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={isMobile ? 1 : 2} sx={{ padding: '10px 0' }}>
-                  {displayedAmenities.length > 0 ? (
-                    displayedAmenities.map((item) => (
+                  {filteredAmenities.length > 0 ? (
+                    filteredAmenities.map((item) => (
                       <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
                         <Button
                           variant='outlined'

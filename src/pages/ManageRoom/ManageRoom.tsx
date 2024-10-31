@@ -2,39 +2,40 @@ import { Box, Chip, Link, Typography } from '@mui/material'
 import { ACTION, ROOM_STATUS } from '~/constants/mock'
 import { useGetListRooms } from '~/queries/useRoom'
 import Table from '~/components/Table/Table'
-import { RoomType } from '~/constants/type'
+import { PaginationSearchQuery, RoomType } from '~/constants/type'
 import { useEffect, useState } from 'react'
 import RoomModal from './RoomModal'
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridValidRowModel
-} from '@mui/x-data-grid'
+import { GridColDef, GridRenderCellParams, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
+import SearchForManage from '~/components/SearchInput/SearchForManage'
 
 export default function ManageRoom() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
+  const [paginationFilter, setPaginationFilter] = useState({
+    page: paginationModel.page + 1,
+    take: paginationModel.pageSize,
+    searchParams: ''
+  })
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
 
-  const { data, refetch, isFetching } = useGetListRooms({
-    page: paginationModel.page + 1,
-    take: paginationModel.pageSize
-  })
+  const { data, refetch, isFetching } = useGetListRooms(paginationFilter as PaginationSearchQuery)
 
   useEffect(() => {
     if (data) {
-      setRows([...data.data.data])
+      setRows(data.data.data.map((room) => ({ ...room, building: room.roomType.building.address })))
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
 
   useEffect(() => {
-    refetch()
+    setPaginationFilter((prevFilter) => ({
+      ...prevFilter,
+      page: paginationModel.page + 1,
+      take: paginationModel.pageSize
+    }))
   }, [paginationModel])
 
   const ExpandableCell = ({ value }: GridRenderCellParams) => {
@@ -72,7 +73,8 @@ export default function ManageRoom() {
     {
       field: 'image',
       headerName: 'Ảnh',
-
+      width: 150,
+      maxWidth: 150,
       renderCell: (params: GridRenderCellParams) => (
         <img
           src={params.value as string}
@@ -84,8 +86,11 @@ export default function ManageRoom() {
     {
       field: 'roomType',
       headerName: 'Loại phòng',
-
       valueGetter: (value: RoomType) => value?.name
+    },
+    {
+      field: 'building',
+      headerName: 'Chi nhánh'
     },
     {
       field: 'status',
@@ -144,7 +149,8 @@ export default function ManageRoom() {
           refetch={refetch}
           action={ACTION.CREATE}
         />
-        <GridToolbarQuickFilter />
+        <SearchForManage setPaginationModel={setPaginationFilter} />
+        {/* <GridToolbarQuickFilter /> */}
       </GridToolbarContainer>
     )
   }

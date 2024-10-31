@@ -35,7 +35,8 @@ export const GetListAmenityRes = z.object({
       quantity: z.number(),
       type: z.string(),
       imageUrl: z.string(),
-      isDeleted: z.number()
+      isDeleted: z.number(),
+      buildingNumber: z.number()
     })
   )
 })
@@ -49,7 +50,8 @@ export const CreateAmenityBody = z
     quantity: z.number(),
     type: z.string(),
     imageUrl: z.string(),
-    isDeleted: z.number()
+    isDeleted: z.number(),
+    buildingNumber: z.number()
   })
   .strict()
 
@@ -65,7 +67,8 @@ export const CreateAmenityRes = z.object({
     quantity: z.number(),
     type: z.string(),
     imageUrl: z.string(),
-    isDeleted: z.number()
+    isDeleted: z.number(),
+    buildingNumber: z.number()
   })
 })
 
@@ -84,7 +87,8 @@ export const EditAmenityBody = z
     quantity: z.number(),
     type: z.string(),
     imageUrl: z.string(),
-    isDeleted: z.number()
+    isDeleted: z.number(),
+    buildingNumber: z.number()
   })
   .strict()
 
@@ -100,7 +104,8 @@ export const EditAmenityRes = z.object({
     quantity: z.number(),
     type: z.string(),
     imageUrl: z.string(),
-    isDeleted: z.number()
+    isDeleted: z.number(),
+    buildingNumber: z.number()
   })
 })
 
@@ -112,7 +117,8 @@ export const DeleteAmenityBody = z
     price: z.number(),
     quantity: z.number(),
     type: z.string(),
-    isDeleted: z.number()
+    isDeleted: z.number(),
+    buildingNumber: z.number()
   })
   .strict()
 
@@ -127,7 +133,8 @@ export const DeleteAmenityRes = z.object({
       price: z.number(),
       quantity: z.number(),
       type: z.string(),
-      isDeleted: z.number()
+      isDeleted: z.number(),
+      buildingNumber: z.number()
     })
     .nullable()
 })
