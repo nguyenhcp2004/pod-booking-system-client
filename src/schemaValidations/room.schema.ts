@@ -192,4 +192,3 @@ export const GetBookedRoomsReq = z.object({
 })
 
 export type GetBookedRoomsReqType = z.TypeOf<typeof GetBookedRoomsReq>
-
