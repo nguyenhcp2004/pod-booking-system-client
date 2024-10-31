@@ -23,7 +23,8 @@ export default function FAQList() {
         <AccordionDetails>
           <Typography>
             Để hủy miễn phí, bạn cần phải hủy trước ngày quy định trong đơn đặt phòng. Sau thời gian này, bạn sẽ bị tính
-            phí hủy phòng.
+            phí hủy phòng. Đối với gói đặt tháng thì bạn không thể hủy vì khoản tiền quá lớn, bạn có thể liên hệ với hệ
+            thống để nhận hỗ trợ dời phòng.
           </Typography>
         </AccordionDetails>
       </Accordion>

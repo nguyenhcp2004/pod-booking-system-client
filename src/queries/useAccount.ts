@@ -49,6 +49,12 @@ export const useSendMailOrderMutation = () => {
   })
 }
 
+export const useSendMailOrderAmenityMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.sendMailOrderAmenity
+  })
+}
+
 export const useCountCurrentCustomer = () => {
   return useQuery({
     queryKey: ['count-current-customers'],
