@@ -14,11 +14,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { ServicePackage, Room } from '~/constants/type'
 import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
-import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
+import { useGetRoomsByTypeAndDate, useGetSlotsByRoomsAndDate, useGetUnavailableRooms } from '~/queries/useFilterRoom'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 import { Helmet } from 'react-helmet-async'
 import { useAppContext } from '~/contexts/AppProvider'
+import { toast } from 'react-toastify'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -33,13 +34,35 @@ export default function RoomDetail() {
   const bookingData = BookingContext?.bookingData
   const setBookingData = BookingContext?.setBookingData
   const { data: servicePackage, isSuccess } = getAllServicePackage()
+  const {
+    data: unavailableRooms,
+    refetch: unavailableRoomsRefetch,
+    isFetching
+  } = useGetUnavailableRooms({
+    roomIds: selectedRooms?.map((room) => room.id) || [],
+    startTime: selectedDates[0]?.format('YYYY-MM-DDT00:01:00'),
+    endTime: selectedDates[selectedDates.length - 1]?.format('YYYY-MM-DDT23:59:00')
+  })
+  // const roomsError = useMemo(() => {
+  //   const error =
+  //     unavailableRooms?.data.data.filter((room) => {
+  //       return room.slots.length >= 1
+  //     }) || []
+
+  //   if (error.length > 0) {
+  //     toast.error('Phòng đã đầy')
+  //   }
+  //   return error
+  // }, [unavailableRooms])
   const navigate = useNavigate()
   useEffect(() => {
     if (servicePackage?.data.data) {
       setSelectedPackage(servicePackage.data.data[2])
     }
   }, [servicePackage])
-
+  useEffect(() => {
+    unavailableRoomsRefetch()
+  }, [selectedDates, selectedRooms, unavailableRoomsRefetch])
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -51,7 +74,6 @@ export default function RoomDetail() {
     const dateList = []
     if (selectedDate) {
       dateList.push(selectedDate)
-
       if (selectedPackage) {
         if (selectedPackage.id == '1') {
           dateList.push(moment(selectedDate).add(1, 'week'))
@@ -67,37 +89,43 @@ export default function RoomDetail() {
     setSelectedDates(dateList)
   }, [selectedDate, selectedPackage])
 
-  const slotsFormmated = useMemo(() => {
-    return selectedSlots.map((slot) => {
-      const [startTime, endTime] = slot.split('-')
-      const formattedStartTime = moment(selectedDate)
-        .set({
-          hour: parseInt(startTime.split(':')[0]),
-          minute: parseInt(startTime.split(':')[1]),
-          second: 0,
-          millisecond: 0
-        })
-        .format('YYYY-MM-DDTHH:mm:ss')
-      const formattedEndTime = moment(selectedDate)
-        .set({
-          hour: parseInt(endTime.split(':')[0]),
-          minute: parseInt(endTime.split(':')[1]),
-          second: 0,
-          millisecond: 0
-        })
-        .format('YYYY-MM-DDTHH:mm:ss')
-      return `${formattedStartTime}_${formattedEndTime}`
-    })
-  }, [selectedSlots, selectedDate])
-
-  const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndSlots({
+  const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndDate({
     typeId: Number(params.id),
-    slots: slotsFormmated
+    date: selectedDate?.format('YYYY-MM-DD') || ''
   })
+
+  const { data: slotData, refetch: slotListRefetch } = useGetSlotsByRoomsAndDate({
+    roomIds: selectedRooms.map((room) => room.id),
+    date: selectedDate?.format('YYYY-MM-DD') || ''
+  })
+
+  const slotList = useMemo(() => {
+    return (
+      slotData?.data.data.map((slot) => {
+        return moment(slot.startTime).format('HH:mm') + ' - ' + moment(slot.endTime).format('HH:mm')
+      }) || SLOT
+    )
+  }, [slotData])
 
   useEffect(() => {
     roomListRefetch()
-  }, [selectedSlots, selectedDate, roomListRefetch])
+  }, [selectedDate, roomListRefetch])
+
+  useEffect(() => {
+    slotListRefetch()
+  }, [selectedRooms, selectedDate, slotListRefetch])
+
+  useEffect(() => {
+    setSelectedSlots((currentSlots) => currentSlots.filter((slot) => slotList.includes(slot)))
+  }, [slotList])
+
+  useEffect(() => {
+    if (roomList?.data.data) {
+      setSelectedRooms((currentRooms) => {
+        return currentRooms.filter((room) => roomList.data.data.find((r) => r.id === room.id))
+      })
+    }
+  }, [roomList])
 
   useEffect(() => {
     setBookingData?.((prev: BookingInfo) => {
@@ -172,6 +200,7 @@ export default function RoomDetail() {
                 <Grid size={{ xs: 12, md: 5 }}>
                   <DatePicker
                     label='Ngày đặt'
+                    minDate={moment()}
                     value={selectedDate}
                     onChange={(date) => setSelectedDate(date)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -182,13 +211,12 @@ export default function RoomDetail() {
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       multiple
-                      options={SLOT}
-                      value={selectedSlots}
-                      onChange={(_, slots) => {
-                        setSelectedSlots(slots as slotType[])
+                      options={roomList?.data.data || []}
+                      limitTags={2}
+                      value={selectedRooms}
+                      onChange={(_, rooms) => {
+                        return setSelectedRooms(rooms)
                       }}
-                      disableCloseOnSelect
-                      limitTags={1}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => {
                           const { key, ...tagProps } = getTagProps({ index })
@@ -196,7 +224,7 @@ export default function RoomDetail() {
                             <Chip
                               size='small'
                               variant='outlined'
-                              label={option}
+                              label={option.name}
                               key={key}
                               onClick={() => {}}
                               {...tagProps}
@@ -216,37 +244,6 @@ export default function RoomDetail() {
                               checked={selected}
                               size='small'
                             />
-                            {option}
-                          </li>
-                        )
-                      }}
-                      renderInput={(params) => <TextField {...params} label='Slot' size='small' />}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth size='small'>
-                    <Autocomplete
-                      multiple
-                      options={roomList?.data.data || []}
-                      limitTags={2}
-                      disableCloseOnSelect
-                      value={selectedRooms}
-                      onChange={(_, rooms) => {
-                        return setSelectedRooms(rooms)
-                      }}
-                      getOptionLabel={(option) => option.name}
-                      renderOption={(props, option, { selected }) => {
-                        const { key, ...optionProps } = props
-                        return (
-                          <li key={key} {...optionProps}>
-                            <Checkbox
-                              icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
-                              checkedIcon={<CheckBoxIcon fontSize='small' />}
-                              style={{ marginRight: 8 }}
-                              checked={selected}
-                              size='small'
-                            />
                             {option.name}
                           </li>
                         )
@@ -255,11 +252,57 @@ export default function RoomDetail() {
                     />
                   </FormControl>
                 </Grid>
+                {selectedRooms.length > 0 && (
+                  <Grid size={12}>
+                    <FormControl fullWidth size='small'>
+                      <Autocomplete
+                        multiple
+                        options={slotList}
+                        value={selectedSlots}
+                        onChange={(_, slots) => {
+                          setSelectedSlots(slots as slotType[])
+                        }}
+                        limitTags={1}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => {
+                            const { key, ...tagProps } = getTagProps({ index })
+                            return (
+                              <Chip
+                                size='small'
+                                variant='outlined'
+                                label={option}
+                                key={key}
+                                onClick={() => {}}
+                                {...tagProps}
+                                sx={{ margin: '0px 3px !important' }}
+                              />
+                            )
+                          })
+                        }
+                        renderOption={(props, option, { selected }) => {
+                          const { key, ...optionProps } = props
+                          return (
+                            <li key={key} {...optionProps}>
+                              <Checkbox
+                                icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                                checkedIcon={<CheckBoxIcon fontSize='small' />}
+                                style={{ marginRight: 8 }}
+                                checked={selected}
+                                size='small'
+                              />
+                              {option}
+                            </li>
+                          )
+                        }}
+                        renderInput={(params) => <TextField {...params} label='Chọn khung giờ' size='small' />}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
                 <Grid size={12}>
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       value={selectedPackage}
-                      defaultValue={servicePackage?.data.data[0] || null}
                       onChange={(_, servicePackage) => {
                         setSelectedPackage(servicePackage)
                       }}
@@ -270,14 +313,19 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  {/* <Link to='/order-detail/1' state={{ from: location.pathname }}> */}
-                  <Button variant='contained' color='primary' fullWidth disabled={!checkData} onClick={handleBooking}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    fullWidth
+                    disabled={!checkData || isFetching}
+                    onClick={handleBooking}
+                  >
                     Đặt phòng
                   </Button>
                   {/* </Link> */}
                 </Grid>
                 <Grid size={12}>
-                  <Calendar selected={selectedDates} slots={selectedSlots} />
+                  <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
                 </Grid>
               </Grid>
             </Box>
