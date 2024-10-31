@@ -33,6 +33,11 @@ function ProtectedRoute() {
   return isAuth ? <Outlet /> : <Navigate to='/login' />
 }
 
+function ProtecteAdmindRoute() {
+  const { isAuth } = useContext(AppContext)
+  return isAuth ? <Outlet /> : <Navigate to='/admin/login' />
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 function RejectedRoute() {
   const { isAuth } = useContext(AppContext)
@@ -61,46 +66,94 @@ export default function useRouteElements() {
     },
     {
       path: '',
-      element: <AdminLayout />,
+      element: <ProtecteAdmindRoute />,
       children: [
         {
-          path: '/admin/dashboard',
-          element: <DashBoard />
-        },
-        {
-          path: '/admin/rooms',
-          element: <ManageRoom />
-        },
-        {
-          path: '/admin/buildings',
-          element: <ManageBuilding />
-        },
-        {
-          path: '/admin/users',
-          element: <ManageUser />
-        },
-        {
-          path: '/admin/orders',
-          element: <ManageOrder />
-        },
-        {
-          path: '/admin/amenities',
-          element: <ManageAmenity />
-        },
-        {
-          path: '/admin/room-types',
-          element: <ManageRoomType />
-        },
-        {
-          path: '/admin/amenity-orders',
-          element: <ManageAmenityOrders />
-        },
-        {
-          path: '/admin/amenity-orders/payment',
-          element: <Confirmed />
+          path: '',
+          element: <AdminLayout />,
+          children: [
+            {
+              path: '/admin/dashboard',
+              element: <DashBoard />
+            },
+            {
+              path: '/admin/rooms',
+              element: <ManageRoom />
+            },
+            {
+              path: '/admin/buildings',
+              element: <ManageBuilding />
+            },
+            {
+              path: '/admin/users',
+              element: <ManageUser />
+            },
+            {
+              path: '/admin/orders',
+              element: <ManageOrder />
+            },
+            {
+              path: '/admin/amenities',
+              element: <ManageAmenity />
+            },
+            {
+              path: '/admin/room-types',
+              element: <ManageRoomType />
+            },
+            {
+              path: '/admin/amenity-orders',
+              element: <ManageAmenityOrders />
+            },
+            {
+              path: '/admin/amenity-orders/payment',
+              element: <Confirmed />
+            }
+          ]
         }
       ]
     },
+    // {
+    //   path: '',
+    //   element: <AdminLayout />,
+    //   children: [
+    //     {
+    //       path: '/admin/dashboard',
+    //       element: <DashBoard />
+    //     },
+    //     {
+    //       path: '/admin/rooms',
+    //       element: <ManageRoom />
+    //     },
+    //     {
+    //       path: '/admin/buildings',
+    //       element: <ManageBuilding />
+    //     },
+    //     {
+    //       path: '/admin/users',
+    //       element: <ManageUser />
+    //     },
+    //     {
+    //       path: '/admin/orders',
+    //       element: <ManageOrder />
+    //     },
+    //     {
+    //       path: '/admin/amenities',
+    //       element: <ManageAmenity />
+    //     },
+    //     {
+    //       path: '/admin/room-types',
+    //       element: <ManageRoomType />
+    //     },
+    //     {
+    //       path: '/admin/amenity-orders',
+    //       element: <ManageAmenityOrders />
+    //     },
+    //     {
+    //       path: '/admin/amenity-orders/payment',
+    //       element: <Confirmed />
+    //     }
+    //   ]
+    // },
     {
       path: '',
       element: <RejectedRoute />,
