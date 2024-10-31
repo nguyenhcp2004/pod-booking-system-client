@@ -48,3 +48,10 @@ export const useGetRoomTypeByAddress = (address: string) => {
     queryFn: () => roomTypeApiRequest.getRoomTypeByAddress(address)
   })
 }
+
+export const useGetRoomTypeByBuildingId = (buildingId: number) => {
+  return useQuery({
+    queryKey: ['room-type-by-building-id'],
+    queryFn: () => roomTypeApiRequest.getRoomTypeByBuildingId(buildingId)
+  })
+}

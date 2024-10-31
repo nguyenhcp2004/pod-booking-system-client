@@ -1,15 +1,14 @@
 import { useCreateRoomMutation, useEditRoomMutation } from '~/queries/useRoom'
-import { useGetFilterRoomType } from '~/queries/useFilterRoomType'
 import { RoomSchemaType } from '~/schemaValidations/room.schema'
 import UploadImage from '~/components/UploadImage/UploadImage'
 import BackdropCustom from '~/components/Progress/Backdrop'
-import { ACTION, ROOM_STATUS } from '~/constants/mock'
+import { ACOUNT_ROLE, ACTION, ROOM_STATUS } from '~/constants/mock'
 import { handleErrorApi } from '~/utils/utils'
 import AddIcon from '@mui/icons-material/Add'
 import Edit from '@mui/icons-material/Edit'
 import { toast } from 'react-toastify'
 import Grid from '@mui/material/Grid2'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -24,15 +23,35 @@ import {
   SelectChangeEvent,
   TextField
 } from '@mui/material'
+import { useGetAllBuilding } from '~/queries/useBuilding'
+import { useGetRoomTypeByBuildingId } from '~/queries/useRoomType'
+import { useAppContext } from '~/contexts/AppProvider'
 
 const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () => void; action: string }) => {
+  const { account } = useAppContext()
+  console.log(account?.buildingNumber)
   const [open, setOpen] = useState(false)
   const [image, setImage] = useState<string | null>(row?.image)
   const [status, setStatus] = useState(row?.status)
   const [roomTypeId, setRoomTypeid] = useState(row?.roomType?.id === 0 ? '' : row?.roomType?.id.toString())
-  const { data: listRoomType } = useGetFilterRoomType({ take: 100, page: 1 })
+  const [buildingId, setBuildingId] = useState(
+    account?.role === ACOUNT_ROLE.MANAGER
+      ? account.buildingNumber
+      : row?.roomType?.building?.id === 0
+        ? ''
+        : row?.roomType?.building?.id.toString()
+  )
+
+  const { data: listBuilding } = useGetAllBuilding()
+  const { data: listRoomType, refetch: roomTypeRefetch } = useGetRoomTypeByBuildingId(Number(buildingId))
+  useEffect(() => {
+    if (buildingId) {
+      roomTypeRefetch()
+    }
+  }, [buildingId, roomTypeRefetch])
   const editRoomMutation = useEditRoomMutation()
   const createRoomMutation = useCreateRoomMutation()
+
   const handleChangeRoomType = (event: SelectChangeEvent) => {
     setRoomTypeid(event.target.value)
   }
@@ -40,12 +59,18 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
   const handleChangeStatus = (event: SelectChangeEvent) => {
     setStatus(event.target.value)
   }
+  const handleChangeBuilding = (event: SelectChangeEvent) => {
+    setBuildingId(event.target.value)
+  }
   const handleClickOpen = () => {
     setOpen(true)
   }
 
   const handleClose = () => {
     setOpen(false)
+    setImage(null)
+    setRoomTypeid('')
+    setBuildingId('')
   }
 
   return (
@@ -78,13 +103,20 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
               ...formJson,
               image: image ?? '',
               roomTypeId: roomTypeId,
+              buildingId: buildingId,
               status: status
             }
             try {
               const result =
                 action === ACTION.UPDATE
-                  ? await editRoomMutation.mutateAsync(payload)
-                  : await createRoomMutation.mutateAsync(payload)
+                  ? await editRoomMutation.mutateAsync({
+                      ...payload,
+                      buildingId: buildingId.toString()
+                    })
+                  : await createRoomMutation.mutateAsync({
+                      ...payload,
+                      buildingId: buildingId.toString()
+                    })
               toast.success(result.data.message, {
                 autoClose: 3000
               })
@@ -113,6 +145,23 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
             </Grid>
             <Grid size={6}>
               <FormControl fullWidth size='small' required>
+                <InputLabel>Chi nhánh</InputLabel>
+                <Select
+                  label='Chi nhánh'
+                  value={buildingId?.toString()}
+                  onChange={handleChangeBuilding}
+                  disabled={account?.role === ACOUNT_ROLE.MANAGER}
+                >
+                  {listBuilding?.data.data.map((building) => (
+                    <MenuItem key={building?.id} value={building?.id}>
+                      {building?.address}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={12}>
+              <FormControl fullWidth size='small' required>
                 <InputLabel>Loại phòng</InputLabel>
                 <Select label='Loại phòng' value={roomTypeId?.toString()} onChange={handleChangeRoomType}>
                   {listRoomType?.data.data.map((roomType) => (
@@ -123,6 +172,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid size={12}>
               <FormControl fullWidth size='small' required>
                 <InputLabel>Trạng thái</InputLabel>

@@ -15,3 +15,10 @@ export const AMENITY_ORDER_STATUS = {
   DELIVERED: 'Delivered',
   CANCELED: 'Canceled'
 }
+
+export const ACOUNT_ROLE = {
+  ADMIN: 'Admin',
+  CUSTOMER: 'Customer',
+  MANAGER: 'Manager',
+  STAFF: 'Staff'
+}

@@ -171,8 +171,16 @@ export default function Component() {
           <Grid container size={12} spacing={2} sx={{ mb: 4 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FormControl fullWidth>
-                <InputLabel id='location-label'>Địa chỉ</InputLabel>
-                <Select labelId='location-label' value={location || ''} label='Địa chỉ' onChange={handleLocationChange}>
+                <InputLabel size='small' id='location-label'>
+                  Địa chỉ
+                </InputLabel>
+                <Select
+                  size='small'
+                  labelId='location-label'
+                  value={location || ''}
+                  label='Địa chỉ'
+                  onChange={handleLocationChange}
+                >
                   {allBuilding?.map((building) => (
                     <MenuItem key={building.id} value={building.address}>
                       {building.address}
@@ -183,8 +191,11 @@ export default function Component() {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FormControl fullWidth>
-                <InputLabel id='room-type-label'>Loại phòng</InputLabel>
+                <InputLabel size='small' id='room-type-label'>
+                  Loại phòng
+                </InputLabel>
                 <Select
+                  size='small'
                   labelId='room-type-label'
                   value={roomType || ''}
                   label='Loại phòng'
@@ -200,17 +211,22 @@ export default function Component() {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DatePicker
+                slotProps={{ textField: { size: 'small', fullWidth: true } }}
                 value={date}
                 onChange={handleDateChange}
                 sx={{ width: '100%' }}
                 label='Ngày đặt'
                 format={DEFAULT_DATE_FORMAT}
+                minDate={moment()}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <FormControl fullWidth>
-                <InputLabel id='time-slot-label'>Khung giờ</InputLabel>
+                <InputLabel size='small' id='time-slot-label'>
+                  Khung giờ
+                </InputLabel>
                 <Select
+                  size='small'
                   labelId='time-slot-label'
                   value={timeSlot || ''}
                   label='Khung giờ'
@@ -228,7 +244,7 @@ export default function Component() {
             </Grid>
           </Grid>
           {/* Rooms Section Card */}
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {data?.data.data.map((roomType: Omit<PODRoomTypeCardProps, 'date' | 'timeSlot'>) => (
               <Grid size={{ xs: 12 }} key={roomType.id}>
                 <PODRoomTypeCard
