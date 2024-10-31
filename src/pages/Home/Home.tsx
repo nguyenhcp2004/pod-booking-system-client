@@ -121,7 +121,10 @@ export default function Component() {
                 Tiện lợi, riêng tư
               </Typography>
               <Typography variant='subtitle1' color='neutral' sx={{ mt: 2 }}>
-                Không gian tích hợp đa dạng dịch vụ giúp thúc đẩy công việc của bạn phát triển một cách tối đa.
+                Không gian làm việc linh hoạt với đa dạng dịch vụ hỗ trợ, từ các phòng họp tiện nghi đến dịch vụ chăm
+                sóc khách hàng tận tâm, tạo điều kiện tốt nhất để bạn tập trung và phát triển công việc một cách tối đa.
+                Chúng tôi không chỉ mang đến nơi làm việc mà còn cung cấp giải pháp toàn diện, giúp bạn dễ dàng kết nối,
+                sáng tạo, và tối ưu hiệu suất trong từng bước tiến.
               </Typography>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>

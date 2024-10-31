@@ -3,6 +3,7 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios'
 import moment from 'moment'
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import authApiRequest from '~/apis/auth'
 import { ErrorResponse } from '~/schemaValidations/auth.schema'
 import { GetListBuidlingResType } from '~/schemaValidations/building.schema'
@@ -74,13 +75,10 @@ export const checkAndRefreshToken = async (param?: {
 
 export const handleErrorApi = <T extends FieldValues>({
   error,
-  setError,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  duration
+  setError
 }: {
   error: unknown
   setError?: UseFormSetError<T>
-  duration?: number
 }) => {
   if (isAxiosUnprocessableEntityError<ErrorResponse<T>>(error) && setError) {
     const formError = error.response?.data.data
@@ -91,6 +89,8 @@ export const handleErrorApi = <T extends FieldValues>({
           type: 'Server'
         })
       })
+    } else {
+      toast.error(error.response?.data.message ?? 'Lỗi không xác định')
     }
   }
 }

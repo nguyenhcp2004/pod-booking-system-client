@@ -46,8 +46,8 @@ export default function Header() {
   const menuItems = [
     { text: 'Trang chủ', link: '/' },
     { text: 'Tiện Ích', link: '/order-amenity-detail/1' },
-    { text: 'Liên hệ', link: '#' },
-    { text: 'Về chúng tôi', link: '#' }
+    { text: 'Liên hệ', link: '/contact-us' },
+    { text: 'Về chúng tôi', link: '/about-us' }
   ]
 
   if (account) {
@@ -99,7 +99,8 @@ export default function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 999,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: { xs: 2, md: 6 } }}>

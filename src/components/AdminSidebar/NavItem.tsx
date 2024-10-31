@@ -6,7 +6,7 @@ import { tokens } from '~/themes/theme'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import ApartmentIcon from '@mui/icons-material/Apartment'
 import FastfoodIcon from '@mui/icons-material/Fastfood'
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
+// import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
@@ -48,11 +48,11 @@ const menuItems = [
     to: '/admin/buildings',
     icon: <ApartmentIcon sx={iconSx} />
   },
-  {
-    title: 'Slot',
-    to: '/admin/slots',
-    icon: <AccessTimeFilledIcon sx={iconSx} />
-  },
+  // {
+  //   title: 'Slot',
+  //   to: '/admin/slots',
+  //   icon: <AccessTimeFilledIcon sx={iconSx} />
+  // },
   {
     title: 'Tiện ích',
     to: '/admin/amenities',

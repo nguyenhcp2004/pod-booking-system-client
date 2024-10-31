@@ -1,6 +1,8 @@
 import { jwtDecode } from 'jwt-decode'
 import { TokenPayload } from '~/constants/type'
 import { AccountType } from '~/schemaValidations/auth.schema'
+
+export const LocalStorageEventTarget = new EventTarget()
 export const setAccessTokenToLS = (accessToken: string) => {
   localStorage.setItem('accessToken', accessToken)
 }
@@ -21,6 +23,8 @@ export const clearLS = () => {
   localStorage.removeItem('bookedRoom')
   localStorage.removeItem('bookingAmenities')
   localStorage.removeItem('roomTypeFilterStateLandingPage')
+  const clearLSEvent = new Event('clearLS')
+  LocalStorageEventTarget.dispatchEvent(clearLSEvent)
 }
 
 export const getAccessTokenFromLS = () => {

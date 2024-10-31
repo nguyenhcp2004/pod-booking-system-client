@@ -2,26 +2,16 @@ import { Box, Button, IconButton, Typography } from '@mui/material'
 import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
-import {
-  useCreateOrderDetailAmenityMutation,
-  useCreateOrderDetailAmenityStaff,
-  useGetListAmenityOrders
-} from '~/queries/useOrderDetailAmenity'
+import { useGetListAmenityOrders } from '~/queries/useOrderDetailAmenity'
 import { formatCurrency } from '~/utils/currency'
-import AmenityOrderModal from './CreateAmenityOrderModal'
 import moment, { Moment } from 'moment'
 import { DatePicker } from '@mui/x-date-pickers'
-
 import { AmenityOrderType, OrderDetailAmenityType } from '~/schemaValidations/amenityOrder.schema'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import EditAmenityOrderModal from './EditAmenityOrderModal'
 import { Add, Edit } from '@mui/icons-material'
-import { useLocation, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { fetchTransactionInfo } from '~/apis/paymentApi'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
 import CreateAmenityOrderModal from './CreateAmenityOrderModal'
-import { toast } from 'react-toastify'
 
 const ManageAmenityOrders = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -79,34 +69,7 @@ const ManageAmenityOrders = () => {
       headerName: 'ID',
       width: 50
     },
-    { field: 'orderId', headerName: 'Mã đơn', width: 150 },
-    {
-      field: 'quantity',
-      headerName: 'Số lượng tiện ích',
-      width: 150,
-      valueGetter: (_, row) => {
-        let quantity = 0
-        row.orderDetailAmenities.forEach((item: AmenityOrderType) => {
-          quantity += item.quantity
-        })
-        return quantity
-      }
-    },
-    {
-      field: 'totalPrice',
-      headerName: 'Tổng giá tiện ích',
-      width: 150,
-      valueGetter: (_, row) => {
-        let totalPrice = 0
-        row.orderDetailAmenities.forEach((item: AmenityOrderType) => {
-          totalPrice += item.price * item.quantity
-        })
-        return totalPrice
-      },
-      valueFormatter: (params) => {
-        return formatCurrency(params)
-      }
-    },
+
     { field: 'roomName', headerName: 'Tên Phòng', width: 150 },
     { field: 'buildingAddress', headerName: 'Chi nhánh' },
     { field: 'customerName', headerName: 'Khách hàng', width: 200 },

@@ -59,8 +59,9 @@ export default function Footer() {
           display={{ xs: 'none', md: 'flex' }}
           sx={{
             width: '500px',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'flex-end',
+            gap: 2,
             alignSelf: 'stretch'
           }}
         >
@@ -73,7 +74,7 @@ export default function Footer() {
               color: tokens('light').grey[50]
             }}
           >
-            Privacy Policy
+            Điều khoản và điều kiện
           </Button>
           <Button
             sx={{
@@ -84,29 +85,7 @@ export default function Footer() {
               color: tokens('light').grey[50]
             }}
           >
-            Terms & Conditions
-          </Button>
-          <Button
-            sx={{
-              textTransform: 'uppercase',
-              lineHeight: '22px',
-              letterSpacing: '0.46px',
-              fontWeight: '500',
-              color: tokens('light').grey[50]
-            }}
-          >
-            Cookie Policy
-          </Button>
-          <Button
-            sx={{
-              textTransform: 'uppercase',
-              lineHeight: '22px',
-              letterSpacing: '0.46px',
-              fontWeight: '500',
-              color: tokens('light').grey[50]
-            }}
-          >
-            Contact
+            Thông báo về bảo mật
           </Button>
         </Box>
       </Box>

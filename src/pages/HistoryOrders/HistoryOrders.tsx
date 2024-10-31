@@ -174,7 +174,8 @@ export default function HistoryOrders() {
       sx={{
         width: '100%',
         height: '100%',
-        padding: '24px 180px',
+        paddingY: '24px',
+        paddingX: { xs: '16px', sm: '32px', md: '64px', lg: '104px' },
         backgroundColor: '#F9FAFB',
         display: 'flex',
         flexDirection: 'column'

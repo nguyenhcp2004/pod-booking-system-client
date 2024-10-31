@@ -11,11 +11,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Button } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import { useLogoutMutation } from '~/queries/useAuth'
-import { getRefreshTokenFromLS } from '~/utils/auth'
+import { clearLS, getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
-import { useEffect } from 'react'
 
 interface Props {
   anchorEl: HTMLElement | null
@@ -38,26 +37,13 @@ export default function OptionsMenu({ anchorEl }: Props) {
       await logoutMutation.mutateAsync({ refreshToken })
       setAccount(null)
       setAuth(false)
+      clearLS()
       navigate('/')
     } catch (error) {
       handleErrorApi({ error })
     }
   }
-  useEffect(() => {
-    const handleStorageChange = () => {
-      if (!getRefreshTokenFromLS()) {
-        setAccount(null)
-        setAuth(false)
-        navigate('/')
-      }
-    }
 
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-    }
-  }, [navigate, setAuth, setAccount])
   return (
     <>
       <Button
