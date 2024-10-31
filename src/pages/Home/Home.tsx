@@ -80,6 +80,7 @@ export default function Component() {
     const newLocation = event.target.value
     setLocation(newLocation)
     setFilterQuery((prev) => ({ ...prev, address: newLocation }))
+    setRoomType('')
   }
 
   const handleRoomTypeChange = (event: SelectChangeEvent<string>) => {
@@ -181,6 +182,7 @@ export default function Component() {
                   label='Địa chỉ'
                   onChange={handleLocationChange}
                 >
+                  <MenuItem value={''}>Tất cả</MenuItem>
                   {allBuilding?.map((building) => (
                     <MenuItem key={building.id} value={building.address}>
                       {building.address}
@@ -200,6 +202,7 @@ export default function Component() {
                   value={roomType || ''}
                   label='Loại phòng'
                   onChange={handleRoomTypeChange}
+                  disabled={!location}
                 >
                   {roomTypeByAddress?.data.data.map((roomType) => (
                     <MenuItem key={roomType.id} value={`Phòng ${roomType.capacity} người`}>
