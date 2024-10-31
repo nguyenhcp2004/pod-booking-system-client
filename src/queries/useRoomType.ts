@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createRoomTypeApi, deleteRoomTypeApi, updateRoomTypeApi } from '~/apis/roomType'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import roomTypeApiRequest, { createRoomTypeApi, deleteRoomTypeApi, updateRoomTypeApi } from '~/apis/roomType'
 import { RoomTypeRequest } from '~/schemaValidations/roomType.schema'
 
 export const useCreateRoomType = () => {
@@ -39,5 +39,12 @@ export const useDeleteRoomType = () => {
     onError: (error) => {
       console.error('Error deleting room type:', error)
     }
+  })
+}
+
+export const useGetRoomTypeByAddress = (address: string) => {
+  return useQuery({
+    queryKey: ['room-type-by-address'],
+    queryFn: () => roomTypeApiRequest.getRoomTypeByAddress(address)
   })
 }

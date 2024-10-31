@@ -23,6 +23,7 @@ import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import { slotType } from '~/contexts/BookingContext'
 import { useGetAllBuilding } from '~/queries/useBuilding'
 import { motion } from 'framer-motion'
+import { useGetRoomTypeByAddress } from '~/queries/useRoomType'
 
 export default function Component() {
   const [page, setPage] = useState(1)
@@ -43,6 +44,14 @@ export default function Component() {
   const [roomType, setRoomType] = useState<string | null>(null)
   const [date, setDate] = useState<Moment | null>(moment())
   const [timeSlot, setTimeSlot] = useState<slotType | null>(null)
+
+  const { data: roomTypeByAddress, refetch: refetchRoomTypeByAddress } = useGetRoomTypeByAddress(location || ' ')
+
+  useEffect(() => {
+    if (location) {
+      refetchRoomTypeByAddress()
+    }
+  }, [location, refetchRoomTypeByAddress])
 
   useEffect(() => {
     setFilterQuery((prev) => ({ ...prev, page }))
@@ -181,11 +190,11 @@ export default function Component() {
                   label='Loại phòng'
                   onChange={handleRoomTypeChange}
                 >
-                  <MenuItem value='Phòng 2 người'>Phòng 2 người</MenuItem>
-                  <MenuItem value='Phòng 4 người'>Phòng 4 người</MenuItem>
-                  <MenuItem value='Phòng 6 người'>Phòng 6 người</MenuItem>
-                  <MenuItem value='Phòng 8 người'>Phòng 8 người</MenuItem>
-                  <MenuItem value='Phòng 10 người'>Phòng 10 người</MenuItem>
+                  {roomTypeByAddress?.data.data.map((roomType) => (
+                    <MenuItem key={roomType.id} value={`Phòng ${roomType.capacity} người`}>
+                      Phòng {roomType.capacity} người
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
