@@ -69,13 +69,20 @@ export const FilterRoomByTypeAndSlotsQuery = z.object({
 
 export type FilterRoomByTypeAndSlotsQueryType = z.TypeOf<typeof FilterRoomByTypeAndSlotsQuery>
 
-export const FilterRoomByTypeAndSlotsRes = z.object({
+export const FilterRoomByTypeAndDateQuery = z.object({
+  typeId: z.number(),
+  date: z.string()
+})
+
+export type FilterRoomByTypeAndDateQueryType = z.TypeOf<typeof FilterRoomByTypeAndDateQuery>
+
+export const FilterRoom = z.object({
   code: z.number(),
   data: z.array(RoomSchema),
   message: z.string()
 })
-export type FilterRoomByTypeAndSlotsResType = z.TypeOf<typeof FilterRoomByTypeAndSlotsRes>
-
+export type FilterRoomByTypeAndSlotsResType = z.TypeOf<typeof FilterRoom>
+export type FilterRoomByTypeAndDateResType = z.TypeOf<typeof FilterRoom>
 export const AvailableSlotsQuery = z.object({
   roomIds: z.array(z.number()),
   slots: z.array(z.string())
@@ -192,4 +199,3 @@ export const GetBookedRoomsReq = z.object({
 })
 
 export type GetBookedRoomsReqType = z.TypeOf<typeof GetBookedRoomsReq>
-

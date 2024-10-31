@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ServicePackage, Room } from '~/constants/type'
 import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
-import { useGetRoomsByTypeAndSlots } from '~/queries/useFilterRoom'
+import { useGetRoomsByTypeAndDate } from '~/queries/useFilterRoom'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 import { Helmet } from 'react-helmet-async'
@@ -67,32 +67,32 @@ export default function RoomDetail() {
     setSelectedDates(dateList)
   }, [selectedDate, selectedPackage])
 
-  const slotsFormmated = useMemo(() => {
-    return selectedSlots.map((slot) => {
-      const [startTime, endTime] = slot.split('-')
-      const formattedStartTime = moment(selectedDate)
-        .set({
-          hour: parseInt(startTime.split(':')[0]),
-          minute: parseInt(startTime.split(':')[1]),
-          second: 0,
-          millisecond: 0
-        })
-        .format('YYYY-MM-DDTHH:mm:ss')
-      const formattedEndTime = moment(selectedDate)
-        .set({
-          hour: parseInt(endTime.split(':')[0]),
-          minute: parseInt(endTime.split(':')[1]),
-          second: 0,
-          millisecond: 0
-        })
-        .format('YYYY-MM-DDTHH:mm:ss')
-      return `${formattedStartTime}_${formattedEndTime}`
-    })
-  }, [selectedSlots, selectedDate])
+  // const slotsFormmated = useMemo(() => {
+  //   return selectedSlots.map((slot) => {
+  //     const [startTime, endTime] = slot.split('-')
+  //     const formattedStartTime = moment(selectedDate)
+  //       .set({
+  //         hour: parseInt(startTime.split(':')[0]),
+  //         minute: parseInt(startTime.split(':')[1]),
+  //         second: 0,
+  //         millisecond: 0
+  //       })
+  //       .format('YYYY-MM-DDTHH:mm:ss')
+  //     const formattedEndTime = moment(selectedDate)
+  //       .set({
+  //         hour: parseInt(endTime.split(':')[0]),
+  //         minute: parseInt(endTime.split(':')[1]),
+  //         second: 0,
+  //         millisecond: 0
+  //       })
+  //       .format('YYYY-MM-DDTHH:mm:ss')
+  //     return `${formattedStartTime}_${formattedEndTime}`
+  //   })
+  // }, [selectedSlots, selectedDate])
 
-  const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndSlots({
+  const { data: roomList, refetch: roomListRefetch } = useGetRoomsByTypeAndDate({
     typeId: Number(params.id),
-    slots: slotsFormmated
+    date: selectedDate?.format('YYYY-MM-DD') || ''
   })
 
   useEffect(() => {
@@ -172,6 +172,7 @@ export default function RoomDetail() {
                 <Grid size={{ xs: 12, md: 5 }}>
                   <DatePicker
                     label='Ngày đặt'
+                    minDate={moment()}
                     value={selectedDate}
                     onChange={(date) => setSelectedDate(date)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -179,6 +180,37 @@ export default function RoomDetail() {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 7 }}>
+                  <FormControl fullWidth size='small'>
+                    <Autocomplete
+                      multiple
+                      options={roomList?.data.data || []}
+                      limitTags={2}
+                      disableCloseOnSelect
+                      value={selectedRooms}
+                      onChange={(_, rooms) => {
+                        return setSelectedRooms(rooms)
+                      }}
+                      getOptionLabel={(option) => option.name}
+                      renderOption={(props, option, { selected }) => {
+                        const { key, ...optionProps } = props
+                        return (
+                          <li key={key} {...optionProps}>
+                            <Checkbox
+                              icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                              checkedIcon={<CheckBoxIcon fontSize='small' />}
+                              style={{ marginRight: 8 }}
+                              checked={selected}
+                              size='small'
+                            />
+                            {option.name}
+                          </li>
+                        )
+                      }}
+                      renderInput={(params) => <TextField {...params} label='Chọn phòng' size='small' />}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       multiple
@@ -221,37 +253,6 @@ export default function RoomDetail() {
                         )
                       }}
                       renderInput={(params) => <TextField {...params} label='Slot' size='small' />}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth size='small'>
-                    <Autocomplete
-                      multiple
-                      options={roomList?.data.data || []}
-                      limitTags={2}
-                      disableCloseOnSelect
-                      value={selectedRooms}
-                      onChange={(_, rooms) => {
-                        return setSelectedRooms(rooms)
-                      }}
-                      getOptionLabel={(option) => option.name}
-                      renderOption={(props, option, { selected }) => {
-                        const { key, ...optionProps } = props
-                        return (
-                          <li key={key} {...optionProps}>
-                            <Checkbox
-                              icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
-                              checkedIcon={<CheckBoxIcon fontSize='small' />}
-                              style={{ marginRight: 8 }}
-                              checked={selected}
-                              size='small'
-                            />
-                            {option.name}
-                          </li>
-                        )
-                      }}
-                      renderInput={(params) => <TextField {...params} label='Chọn phòng' size='small' />}
                     />
                   </FormControl>
                 </Grid>

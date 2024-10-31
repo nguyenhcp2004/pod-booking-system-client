@@ -7,6 +7,8 @@ import {
   CreateRoomResType,
   EditRoomBodyType,
   EditRoomResType,
+  FilterRoomByTypeAndDateQueryType,
+  FilterRoomByTypeAndDateResType,
   FilterRoomByTypeAndSlotsQueryType,
   FilterRoomByTypeAndSlotsResType,
   GetBookedRoomsReqType,
@@ -46,6 +48,10 @@ export const roomApiRequest = {
     if (query) {
       return http.get<BookedRoomSchemaResType>(`/rooms/booked-rooms/account?${stringified}`)
     }
+  },
+  getRoomsByTypeAndDate: (query: FilterRoomByTypeAndDateQueryType) => {
+    const stringified = queryString.stringify(query)
+    return http.get<FilterRoomByTypeAndDateResType>(`/rooms/available-by-type-and-date?${stringified}`)
   }
 }
 
