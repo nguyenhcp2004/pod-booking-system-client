@@ -53,3 +53,11 @@ export const RoomTypeRequest = z.object({
 })
 
 export type RoomTypeRequest = z.TypeOf<typeof RoomTypeRequest>
+
+export const RoomTypeByAddressRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z.array(RoomTypeSchema)
+})
+
+export type GetRoomTypeByAddressResType = z.TypeOf<typeof RoomTypeByAddressRes>

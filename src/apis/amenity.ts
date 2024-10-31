@@ -26,7 +26,10 @@ const amenityApiRequest = {
   getAmenitiesByType: (amenityType: string) => {
     return http.get<AmenityListResType>(`/amenity/type?type=${amenityType}`)
   },
-  deleteAmenity: (id: number) => http.delete<DeleteAmenityResType>(`/amenity/${id}`)
+  deleteAmenity: (id: number) => http.delete<DeleteAmenityResType>(`/amenity/${id}`),
+  getAvailableAmenityByBuilding: (buildingId: number) => {
+    return http.get<AmenityListResType>(`/amenity/available-amenity?buildingId=${buildingId}`)
+  }
 }
 
 export default amenityApiRequest

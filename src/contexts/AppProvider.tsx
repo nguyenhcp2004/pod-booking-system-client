@@ -1,12 +1,14 @@
-import { createContext, SetStateAction, useContext, useState } from 'react'
+import { createContext, SetStateAction, useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AccountType } from '~/schemaValidations/auth.schema'
-import { getAccessTokenFromLS, getAccountFromLS } from '~/utils/auth'
+import { getAccessTokenFromLS, getAccountFromLS, getRefreshTokenFromLS } from '~/utils/auth'
 
 interface AppContextInterface {
   isAuth: boolean
   setAuth: React.Dispatch<SetStateAction<boolean>>
   account: AccountType | null
   setAccount: React.Dispatch<SetStateAction<AccountType | null>>
+  reset: () => void
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -14,7 +16,8 @@ export const getInitialAppContext: () => AppContextInterface = () => ({
   isAuth: Boolean(getAccessTokenFromLS()),
   setAuth: () => null,
   account: getAccountFromLS(),
-  setAccount: () => null
+  setAccount: () => null,
+  reset: () => null
 })
 
 const initialAppContext = getInitialAppContext()
@@ -35,6 +38,27 @@ export default function AppProvider({
 }) {
   const [isAuth, setAuth] = useState<boolean>(defaultValue.isAuth)
   const [account, setAccount] = useState<AccountType | null>(defaultValue.account)
+  const navigate = useNavigate()
+  const reset = () => {
+    setAuth(false)
+    setAccount(null)
+  }
 
-  return <AppContext.Provider value={{ isAuth, setAuth, account, setAccount }}>{children}</AppContext.Provider>
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (!getRefreshTokenFromLS()) {
+        setAccount(null)
+        setAuth(false)
+        navigate('/')
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [setAuth, setAccount, navigate])
+
+  return <AppContext.Provider value={{ isAuth, setAuth, account, setAccount, reset }}>{children}</AppContext.Provider>
 }
