@@ -57,10 +57,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
     const startTime = moment(orderDetail.orderDetails[0].startTime)
     const today = moment()
 
-    if (
-      !today.isBefore(startTime.clone().subtract(1, 'days')) ||
-      orderDetail.orderDetails[0].servicePackage.name === 'Premium Package'
-    ) {
+    if (!today.isBefore(startTime.clone().subtract(1, 'days')) || orderDetail.orderDetails[0].servicePackage.id === 2) {
       toast.error('Bạn không thể hủy đơn này')
       return
     }
