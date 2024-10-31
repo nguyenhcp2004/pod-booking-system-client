@@ -231,3 +231,7 @@ export function isValidVietnamPhoneNumber(phoneNumber: string): boolean {
 export const getDayBefore = (dateString: string) => {
   return moment(dateString).subtract(1, 'days').format('DD')
 }
+
+export const getDayAndMonthBefore = (dateString: string) => {
+  return moment(dateString).subtract(1, 'days')
+}
