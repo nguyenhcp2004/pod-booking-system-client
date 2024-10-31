@@ -14,7 +14,6 @@ import {
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import React, { useState } from 'react'
-import { AccountRole } from '~/constants/type'
 import { useCreateAccountMutation, useUpdateAccountByAdmin } from '~/queries/useAccount'
 import AddIcon from '@mui/icons-material/Add'
 import {
@@ -29,6 +28,12 @@ import { ACTION } from '~/constants/mock'
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { z } from 'zod'
 import { useGetAllBuilding } from '~/queries/useBuilding'
+
+export const AccountRole = {
+  Customer: 'Customer',
+  Manager: 'Manager',
+  Staff: 'Staff'
+} as const
 
 const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: () => void; action: string }) => {
   const [open, setOpen] = useState(false)

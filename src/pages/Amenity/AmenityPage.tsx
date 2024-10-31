@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid2'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { tokens } from '~/themes/theme'
-import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
+import { useGetAmenitiesByType, useGetAvailableAmenity } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
@@ -37,17 +37,34 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
+
   const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
-  const { data: responseAllAmenities } = useGetAmenities()
-  const { data: responseBookedRooms } = useGetBookedRooms()
   const amenities: AmenityType[] = response?.data.data ?? []
-  const allAmenities: AmenityType[] = responseAllAmenities ?? []
+
+  const { data: responseBookedRooms } = useGetBookedRooms()
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
 
   const { bookedRoom, setBookedRoom, selectedAmenities, addAmenity } = useBookingAmenityContext()
 
   const [selectedRoomName, setSelectedRoomName] = useState<string>('')
   const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
+
+  const [allAmenities, setAllAmenities] = useState<AmenityType[]>([])
+  const { data: responseAllAmenities, refetch: refetchAllAmenities } = useGetAvailableAmenity(
+    bookedRoom?.roomType.building.id || 1
+  )
+
+  useEffect(() => {
+    if (bookedRoom?.roomType.building.id) {
+      refetchAllAmenities()
+    }
+  }, [bookedRoom, refetchAllAmenities])
+
+  useEffect(() => {
+    if (responseAllAmenities?.data.data) {
+      setAllAmenities(responseAllAmenities.data.data)
+    }
+  }, [responseAllAmenities])
 
   useEffect(() => {
     const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
@@ -144,6 +161,8 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
     .filter((room) => room.name === selectedRoomName)
     .map((room) => formatStartEndTime(room.startTime, room.endTime))
 
+  const displayedAmenities = selectedAmenityType !== '' ? amenities : allAmenities
+
   return (
     <Box
       sx={{
@@ -238,27 +257,35 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={isMobile ? 1 : 2} sx={{ padding: '10px 0' }}>
-                  {(selectedAmenityType !== '' ? amenities : allAmenities).map((item) => (
-                    <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
-                      <Button
-                        variant='outlined'
-                        fullWidth
-                        sx={{
-                          padding: '10px 0px',
-                          minHeight: '50px',
-                          borderRadius: '4px',
-                          textAlign: 'center',
-                          color: 'black',
-                          borderColor: 'black',
-                          fontSize: '14px',
-                          backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                        }}
-                        onClick={() => handleSelectAmenity(item)}
-                      >
-                        {item.name}
-                      </Button>
+                  {displayedAmenities.length > 0 ? (
+                    displayedAmenities.map((item) => (
+                      <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
+                        <Button
+                          variant='outlined'
+                          fullWidth
+                          sx={{
+                            padding: '10px 0px',
+                            minHeight: '50px',
+                            borderRadius: '4px',
+                            textAlign: 'center',
+                            color: 'black',
+                            borderColor: 'black',
+                            fontSize: '14px',
+                            backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                          }}
+                          onClick={() => handleSelectAmenity(item)}
+                        >
+                          {item.name}
+                        </Button>
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid size={12}>
+                      <Typography variant='body1' sx={{ textAlign: 'center', color: colors.grey[500] }}>
+                        Không có tiện ích cho chi nhánh này
+                      </Typography>
                     </Grid>
-                  ))}
+                  )}
                 </Grid>
               </Box>
               <Box

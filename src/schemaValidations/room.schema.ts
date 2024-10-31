@@ -218,3 +218,4 @@ export const SlotsByRoomsAndDateRes = z.object({
 })
 
 export type SlotsByRoomsAndDateResType = z.TypeOf<typeof SlotsByRoomsAndDateRes>
+
