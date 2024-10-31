@@ -88,6 +88,7 @@ export type Pagination = {
 }
 
 export type PaginationSearchQuery = {
+  buildingId: number
   page: number
   take: number
   searchParams: string

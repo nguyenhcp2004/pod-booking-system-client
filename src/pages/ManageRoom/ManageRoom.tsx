@@ -7,13 +7,16 @@ import { useEffect, useState } from 'react'
 import RoomModal from './RoomModal'
 import { GridColDef, GridRenderCellParams, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageRoom() {
+  const { account } = useAppContext()
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
   const [paginationFilter, setPaginationFilter] = useState({
+    buildingId: account?.buildingNumber,
     page: paginationModel.page + 1,
     take: paginationModel.pageSize,
     searchParams: ''
