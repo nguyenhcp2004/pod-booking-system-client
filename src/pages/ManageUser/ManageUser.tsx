@@ -5,7 +5,6 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridToolbarContainer,
-  GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import BlockIcon from '@mui/icons-material/Block'
