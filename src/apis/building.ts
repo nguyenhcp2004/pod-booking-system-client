@@ -21,7 +21,8 @@ const buildingApiRequest = {
   },
   createBuilding: (body: CreateBuildingBodyType) => http.post<CreateBuildingResType>('/buildings', body),
   editBuilding: (body: EditBuildingBodyType) => http.put<CreateBuildingResType>(`/buildings/${body.id}`, body),
-  getAllBuilding: () => http.get<GetAllBuildingsResType>('/buildings/all')
+  getAllBuilding: () => http.get<GetAllBuildingsResType>('/buildings/all'),
+  getBuildingOptions: () => http.get<GetAllBuildingsResType>('/buildings/buildings-option')
 }
 
 export default buildingApiRequest
