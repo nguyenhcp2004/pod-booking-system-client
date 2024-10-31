@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { z } from 'zod'
 
 const BuildingSchema = z.object({
@@ -219,3 +220,21 @@ export const SlotsByRoomsAndDateRes = z.object({
 
 export type SlotsByRoomsAndDateResType = z.TypeOf<typeof SlotsByRoomsAndDateRes>
 
+// Function to transform BookedRoom to Room
+export function transformBookedRoomToRoom(bookedRoom: BookedRoomSchemaType) {
+  return {
+    id: bookedRoom.id,
+    name: bookedRoom.name,
+    description: bookedRoom.description,
+    image: bookedRoom.image,
+    status: bookedRoom.status,
+    createdAt: moment(bookedRoom.startTime).toISOString(),
+    updatedAt: moment(bookedRoom.endTime).toISOString(),
+    roomType: bookedRoom.roomType
+  }
+}
+
+// Function to transform an array of BookedRooms to Rooms
+export function transformBookedRoomsToRooms(bookedRooms: BookedRoomSchemaType[]) {
+  return bookedRooms.map(transformBookedRoomToRoom)
+}
