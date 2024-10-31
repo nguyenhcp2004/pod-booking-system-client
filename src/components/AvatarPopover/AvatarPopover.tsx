@@ -11,13 +11,10 @@ import {
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import { useCallback, useState } from 'react'
+import { AccountType } from '~/schemaValidations/auth.schema'
 
 interface Props {
-  account: {
-    name: string
-    avatar: string
-    email: string
-  }
+  account: AccountType
 }
 
 export default function AvatarPopover({ account }: Props) {

@@ -2,13 +2,10 @@ import { IconButton } from '@mui/material'
 import Box from '@mui/material/Box'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import AvatarPopover from '~/components/AvatarPopover'
-
-const account = {
-  name: 'John Doe',
-  email: 'L6U8t@example.com',
-  avatar: 'https://i.pravatar.cc/300'
-}
+import { useAppContext } from '~/contexts/AppProvider'
+import { AccountType } from '~/schemaValidations/auth.schema'
 export default function AdminHeader() {
+  const { account } = useAppContext()
   return (
     <Box
       sx={{
@@ -28,7 +25,7 @@ export default function AdminHeader() {
         <IconButton sx={{ width: '40px', height: '40px' }}>
           <NotificationsIcon sx={{ width: '24px', height: '24px', color: 'grey.500' }} />
         </IconButton>
-        <AvatarPopover account={account} />
+        <AvatarPopover account={account as AccountType} />
       </Box>
     </Box>
   )
