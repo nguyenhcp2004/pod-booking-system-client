@@ -5,7 +5,6 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridToolbarContainer,
-  GridToolbarQuickFilter,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import BlockIcon from '@mui/icons-material/Block'
@@ -19,16 +18,20 @@ import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
 import UserModal from './UserModal'
 import { ACTION } from '~/constants/mock'
+import SearchForManage from '~/components/SearchInput/SearchForManage'
+import { PaginationSearchQuery } from '~/constants/type'
 
 export default function ManageUser() {
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
   })
-  const { data, refetch, isLoading } = useGetManageAccount({
+  const [paginationFilter, setPaginationFilter] = useState({
     page: paginationModel.page + 1,
-    take: paginationModel.pageSize
+    take: paginationModel.pageSize,
+    searchParams: ''
   })
+  const { data, refetch, isLoading } = useGetManageAccount(paginationFilter as PaginationSearchQuery)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
@@ -47,10 +50,12 @@ export default function ManageUser() {
     }
   }, [data])
 
-  //TODO: Có thể viết refetch trong folder queries để gọn code
   useEffect(() => {
-    refetch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setPaginationFilter((prevFilter) => ({
+      ...prevFilter,
+      page: paginationModel.page + 1,
+      take: paginationModel.pageSize
+    }))
   }, [paginationModel])
 
   const handleToggleStatus = (id: GridRowId) => async () => {
@@ -85,7 +90,7 @@ export default function ManageUser() {
       field: 'name',
       headerName: 'Tên',
       width: 150,
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], name: props.value }
@@ -134,7 +139,7 @@ export default function ManageUser() {
           }
         />
       ),
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], role: props.value }
@@ -156,7 +161,7 @@ export default function ManageUser() {
       headerName: 'Địa chỉ tòa nhà',
       width: 120,
       type: 'number',
-      editable: true,
+      editable: false,
       renderCell: (params) => <>{params.value?.address || '--'}</>,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
@@ -180,7 +185,7 @@ export default function ManageUser() {
       renderCell: (params) => (
         <Chip label={params.value} color={params.value === 'Hoạt động' ? 'success' : 'warning'} />
       ),
-      editable: true,
+      editable: false,
       preProcessEditCellProps: (params) => {
         const { id, props } = params
         editedRowRef.current[id] = { ...editedRowRef.current[id], status: props.value }
@@ -232,7 +237,8 @@ export default function ManageUser() {
           refetch={refetch}
           action={ACTION.CREATE}
         />
-        <GridToolbarQuickFilter />
+        <SearchForManage setPaginationModel={setPaginationFilter} />
+        {/* <GridToolbarQuickFilter /> */}
       </GridToolbarContainer>
     )
   }
