@@ -16,10 +16,10 @@ import Grid from '@mui/material/Grid2'
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import moment, { Moment } from 'moment'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import { RoomCustomSchemaType } from '~/schemaValidations/room.schema'
-import { SlotAvailable } from '~/constants/type'
+import { Room, SlotAvailable } from '~/constants/type'
 import Loading from '../Progress/Loading'
 import { useGetUnavailableRooms } from '~/queries/useFilterRoom'
 
@@ -33,7 +33,7 @@ const INITIAL_COLUMNS = [
   { id: 'saturday', label: 'T7' }
 ]
 
-const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots: string[] }) => {
+const Calendar = ({ rooms, selected, slots: selectedSlot }: { rooms: Room[]; selected: Moment[]; slots: string[] }) => {
   const [from, setFrom] = useState(moment().startOf('month').format('YYYY-MM-DD'))
   const [to, setTo] = useState(moment().endOf('month').format('YYYY-MM-DD'))
   const theme = useTheme()
@@ -44,43 +44,36 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
     refetch: unavailableRoomsRefetch,
     isFetching
   } = useGetUnavailableRooms({
+    roomIds: rooms?.map((room) => room.id) || [],
     startTime: selected[0]?.format('YYYY-MM-DDT00:01:00'),
     endTime: selected[selected.length - 1]?.format('YYYY-MM-DDT23:59:00')
   })
 
   useEffect(() => {
     unavailableRoomsRefetch()
-  }, [selected, selectedSlot])
+  }, [selected, selectedSlot, unavailableRoomsRefetch])
 
-  const getData = ({ startDate }: { startDate: Moment }) => {
+  const getData = ({ date }: { date: Moment }) => {
     const data: RoomCustomSchemaType[] = []
     unavailableRooms?.data.data.forEach((room) => {
-      if (moment(room.startTime).format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD')) {
-        const slot: RoomCustomSchemaType = {
+      const slots: SlotAvailable[] = []
+      room.slots.forEach((slot) => {
+        if (moment(slot.startTime).format('YYYY-MM-DD') === date.format('YYYY-MM-DD')) {
+          const slotFormatted = `${moment(slot.startTime).format('HH:mm')} - ${moment(slot.endTime).format('HH:mm')}`
+          if (selectedSlot.includes(slotFormatted)) {
+            slots.push({
+              startTime: slot.startTime,
+              endTime: slot.endTime
+            })
+          }
+        }
+      })
+      if (slots.length !== 0) {
+        data.push({
           roomId: room.roomId,
           roomName: room.name,
-          slots: []
-        }
-        unavailableRooms?.data.data.forEach((s) => {
-          if (moment(s.startTime).format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD') && s.roomId === room.roomId) {
-            const isAvailable = selectedSlot?.find((slot) => {
-              // console.log('slot', slot)
-              // console.log('test', `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
-              // console.log(slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`)
-              return slot === `${moment(s.startTime).format('HH:mm')} - ${moment(s.endTime).format('HH:mm')}`
-            })
-            if (isAvailable) {
-              slot.slots.push({
-                startTime: s.startTime,
-                endTime: s.endTime,
-                available: false
-              })
-            }
-          }
+          slots
         })
-        if (slot.slots.length !== 0) {
-          data.push(slot)
-        }
       }
     })
     return data
@@ -98,12 +91,13 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
           return date.format('YYYY-MM-DD') === startDate.format('YYYY-MM-DD')
         }),
 
-        data: getData({ startDate: startDate })
+        data: getData({ date: startDate })
       })
       startDate.add(1, 'day')
     }
     return days
-  }, [from, to, selected, selectedSlot])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [from, to, selected, selectedSlot, getData])
 
   const handleNextMonth = () => {
     setFrom(moment(from).add(1, 'month').startOf('month').format('YYYY-MM-DD'))
@@ -118,6 +112,7 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
     setTo(moment().endOf('month').format('YYYY-MM-DD'))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderEventDetails = (event: any) => {
     return (
       <Box>
@@ -127,18 +122,16 @@ const Calendar = ({ selected, slots: selectedSlot }: { selected: Moment[]; slots
             <Typography variant='h6'>Phòng {slot.roomName}</Typography>
             <Grid container sx={{ width: '200px' }}>
               {slot.slots.map((s: SlotAvailable, index: number) => (
-                <Box key={index}>
+                <Fragment key={index}>
                   <Grid size={6}>
                     <Typography>
                       {moment(s.startTime).format('HH:mm')} - {moment(s.endTime).format('HH:mm')}
                     </Typography>
                   </Grid>
                   <Grid size={6}>
-                    <Typography color={s.available ? colors.success[200] : colors.error[400]}>
-                      {s.available ? 'Còn chỗ' : 'Hết chỗ'}
-                    </Typography>
+                    <Typography color={colors.error[400]}>Hết chỗ</Typography>
                   </Grid>
-                </Box>
+                </Fragment>
               ))}
             </Grid>
           </Box>

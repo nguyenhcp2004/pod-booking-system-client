@@ -30,8 +30,6 @@ export type Slot = {
 export type SlotAvailable = {
   startTime: string
   endTime: string
-
-  available: boolean
 }
 
 export type Building = {
@@ -68,9 +66,9 @@ export type Room = {
   description: string
   image: string
   status: string
-  createdAt: string
-  updatedAt: string
-  roomType: RoomType
+  createdAt: string | null
+  updatedAt: string | null
+  roomType: RoomType | null
 }
 
 export type ScrollbarProps = SimplebarProps & {
