@@ -24,7 +24,7 @@ import {
 } from '~/schemaValidations/account.schema'
 import { toast } from 'react-toastify'
 import { handleErrorApi } from '~/utils/utils'
-import { ACTION } from '~/constants/mock'
+import { ACOUNT_ROLE, ACTION } from '~/constants/mock'
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { z } from 'zod'
 import { useGetAllBuilding } from '~/queries/useBuilding'
@@ -38,7 +38,13 @@ export const AccountRole = {
 const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: () => void; action: string }) => {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(ACTION.CREATE === action ? '' : row.name)
-  const [role, setRole] = useState(ACTION.CREATE === action ? AccountRole.Customer.toString() : row.role)
+  const [role, setRole] = useState(
+    ACTION.CREATE === action && row.role !== ACOUNT_ROLE.ADMIN
+      ? AccountRole.Customer.toString()
+      : row.role !== ACOUNT_ROLE.ADMIN
+        ? row.role
+        : AccountRole.Customer.toString()
+  )
   const [buildingNumber, setBuildingNumber] = useState(ACTION.CREATE === action ? 0 : row.buildingNumber)
   const [status, setStatus] = useState<number>(ACTION.CREATE === action ? 1 : row.status)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -69,7 +75,6 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
   }
 
   const handleClose = () => {
-    setName('')
     setOpen(false)
   }
 
@@ -255,23 +260,36 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
             <></>
           )}
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
-            <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>Vai trò</Typography>
-            </Grid>
-            <Grid size={9}>
-              <Select name='role' fullWidth size='small' value={role} onChange={handleRoleChange} error={!!errors.role}>
-                {Object.values(AccountRole).map((role) => (
-                  <MenuItem key={role} value={role}>
-                    {role}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.role && (
-                <Typography color='error' variant='caption'>
-                  {errors.role}
-                </Typography>
-              )}
-            </Grid>
+            {row.role !== ACOUNT_ROLE.ADMIN && ACTION.UPDATE === action ? (
+              <>
+                <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography>Vai trò</Typography>
+                </Grid>
+                <Grid size={9}>
+                  <Select
+                    name='role'
+                    fullWidth
+                    size='small'
+                    value={role}
+                    onChange={handleRoleChange}
+                    error={!!errors.role}
+                  >
+                    {Object.values(AccountRole).map((role) => (
+                      <MenuItem key={role} value={role}>
+                        {role}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.role && (
+                    <Typography color='error' variant='caption'>
+                      {errors.role}
+                    </Typography>
+                  )}
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
           </Grid>
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
             <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
