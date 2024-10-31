@@ -90,16 +90,15 @@ export const AvailableSlotsQuery = z.object({
 
 export type AvailableSlotsQueryType = z.TypeOf<typeof AvailableSlotsQuery>
 
-const SlotCustomSchema = z.object({
+const SlotSchema = z.object({
   startTime: z.string(),
-  endTime: z.string(),
-  available: z.boolean()
+  endTime: z.string()
 })
 
 export const RoomCustomSchema = z.object({
   roomId: z.number(),
   roomName: z.string(),
-  slots: z.array(SlotCustomSchema)
+  slots: z.array(SlotSchema)
 })
 
 export const RoomCustomArraySchema = z.array(RoomCustomSchema)
@@ -117,6 +116,7 @@ export const AvailableSlotsRes = z.object({
 export type AvailableSlotsResType = z.TypeOf<typeof AvailableSlotsRes>
 
 export const UnavailableRoomsQuery = z.object({
+  roomIds: z.array(z.number()),
   startTime: z.string(),
   endTime: z.string()
 })
@@ -126,8 +126,7 @@ export type UnavailableRoomsQueryType = z.TypeOf<typeof UnavailableRoomsQuery>
 export const UnavailableRoomSchema = z.object({
   roomId: z.number(),
   name: z.string(),
-  startTime: z.string(),
-  endTime: z.string()
+  slots: z.array(SlotSchema)
 })
 
 export const UnavailableRoomsRes = z.object({

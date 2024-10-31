@@ -14,11 +14,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { ServicePackage, Room } from '~/constants/type'
 import { RoomContextType, slotType } from '~/contexts/BookingContext'
 import { getAllServicePackage } from '~/queries/useServicePackage'
-import { useGetRoomsByTypeAndDate, useGetSlotsByRoomsAndDate } from '~/queries/useFilterRoom'
+import { useGetRoomsByTypeAndDate, useGetSlotsByRoomsAndDate, useGetUnavailableRooms } from '~/queries/useFilterRoom'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 import { Helmet } from 'react-helmet-async'
 import { useAppContext } from '~/contexts/AppProvider'
+import { toast } from 'react-toastify'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -33,13 +34,35 @@ export default function RoomDetail() {
   const bookingData = BookingContext?.bookingData
   const setBookingData = BookingContext?.setBookingData
   const { data: servicePackage, isSuccess } = getAllServicePackage()
+  const {
+    data: unavailableRooms,
+    refetch: unavailableRoomsRefetch,
+    isFetching
+  } = useGetUnavailableRooms({
+    roomIds: selectedRooms?.map((room) => room.id) || [],
+    startTime: selectedDates[0]?.format('YYYY-MM-DDT00:01:00'),
+    endTime: selectedDates[selectedDates.length - 1]?.format('YYYY-MM-DDT23:59:00')
+  })
+  // const roomsError = useMemo(() => {
+  //   const error =
+  //     unavailableRooms?.data.data.filter((room) => {
+  //       return room.slots.length >= 1
+  //     }) || []
+
+  //   if (error.length > 0) {
+  //     toast.error('Phòng đã đầy')
+  //   }
+  //   return error
+  // }, [unavailableRooms])
   const navigate = useNavigate()
   useEffect(() => {
     if (servicePackage?.data.data) {
       setSelectedPackage(servicePackage.data.data[2])
     }
   }, [servicePackage])
-
+  useEffect(() => {
+    unavailableRoomsRefetch()
+  }, [selectedDates, selectedRooms, unavailableRoomsRefetch])
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -290,13 +313,19 @@ export default function RoomDetail() {
                   </FormControl>
                 </Grid>
                 <Grid size={12}>
-                  <Button variant='contained' color='primary' fullWidth disabled={!checkData} onClick={handleBooking}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    fullWidth
+                    disabled={!checkData || isFetching}
+                    onClick={handleBooking}
+                  >
                     Đặt phòng
                   </Button>
                   {/* </Link> */}
                 </Grid>
                 <Grid size={12}>
-                  <Calendar selected={selectedDates} slots={selectedSlots} />
+                  <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
                 </Grid>
               </Grid>
             </Box>
