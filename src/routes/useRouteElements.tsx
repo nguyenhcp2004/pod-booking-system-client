@@ -4,6 +4,7 @@ import { AppContext } from '~/contexts/AppProvider'
 import AdminLayout from '~/layouts/AdminLayout/AdminLayout'
 import MainLayout from '~/layouts/MainLayout'
 import RegisterLayout from '~/layouts/RegisterLayout'
+import AdminLogin from '~/pages/AdminLogin'
 import OrderAmenityDetail from '~/pages/Amenity'
 import CancelBookingSuccess from '~/pages/CancelBookingSuccess'
 import DashBoard from '~/pages/DashBoard'
@@ -125,6 +126,10 @@ export default function useRouteElements() {
               element: <ForgotPassword />
             }
           ]
+        },
+        {
+          path: '/admin/login',
+          element: <AdminLogin />
         }
       ]
     },
