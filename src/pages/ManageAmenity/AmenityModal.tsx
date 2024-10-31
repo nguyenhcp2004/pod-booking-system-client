@@ -216,16 +216,13 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
                   name='buildingId'
                   fullWidth
                   size='small'
-                  onChange={action === ACTION.UPDATE ? undefined : (e) => setSelectedBuildingId(String(e.target.value))}
+                  value={selectedBuildingId || row?.buildingId || ''}
+                  onChange={(e) => setSelectedBuildingId(e.target.value as string)}
                   disabled={action === ACTION.UPDATE}
                 >
                   {buildings.map((building) => (
                     <MenuItem key={building.id} value={building.id}>
-                      {action === ACTION.UPDATE && building.id === row?.buildingId
-                        ? building.address
-                        : building.id === row?.buildingId
-                          ? building.address
-                          : ''}{' '}
+                      {building.address}
                     </MenuItem>
                   ))}
                 </Select>
