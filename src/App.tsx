@@ -11,9 +11,19 @@ import 'moment/locale/en-gb'
 import { BookingProvider } from './contexts/BookingContext'
 import { HelmetProvider } from 'react-helmet-async'
 import { BookingAmenityProvider } from './contexts/BookingAmenityContext'
+import { useAppContext } from '~/contexts/AppProvider'
+import { useEffect } from 'react'
+import { LocalStorageEventTarget } from '~/utils/auth'
 
 function App() {
   const routeElements = useRouteElements()
+  const { reset } = useAppContext()
+  useEffect(() => {
+    LocalStorageEventTarget.addEventListener('clearLS', reset)
+    return () => {
+      LocalStorageEventTarget.removeEventListener('clearLS', reset)
+    }
+  }, [reset])
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale='en-gb'>
       <HelmetProvider>
