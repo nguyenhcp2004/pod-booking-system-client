@@ -60,7 +60,6 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           borderRadius: '16px',
-          mb: '24px',
           border: '1px solid',
           overflow: 'hidden',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
@@ -68,12 +67,12 @@ const PODRoomTypeCard: React.FC<PODRoomTypeCardProps> = ({
         }}
         elevation={0}
       >
-        <Grid container>
+        <Grid container size={12} height={'100%'}>
           <Grid size={{ xs: 12, md: 4 }}>
             <CardMedia
               component='img'
               sx={{
-                height: '100%',
+                height: { xs: '100%', md: '350px' },
                 objectFit: 'cover',
                 transition: 'transform 0.3s ease-in-out',
                 '&:hover': {
