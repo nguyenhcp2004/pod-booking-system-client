@@ -153,7 +153,8 @@ export const CreateRoomBody = z.object({
   description: z.string(),
   image: z.string(),
   status: z.string(),
-  roomTypeId: z.string()
+  roomTypeId: z.string(),
+  buildingId: z.string() || z.number()
 })
 
 export type CreateRoomBodyType = z.TypeOf<typeof CreateRoomBody>
@@ -172,7 +173,8 @@ export const EditRoomBody = z.object({
   description: z.string(),
   image: z.string(),
   status: z.string(),
-  roomTypeId: z.string()
+  roomTypeId: z.string(),
+  buildingId: z.string() || z.number()
 })
 
 export type EditRoomBodyType = z.TypeOf<typeof EditRoomBody>
@@ -218,4 +220,3 @@ export const SlotsByRoomsAndDateRes = z.object({
 })
 
 export type SlotsByRoomsAndDateResType = z.TypeOf<typeof SlotsByRoomsAndDateRes>
-
