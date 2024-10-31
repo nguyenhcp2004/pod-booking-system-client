@@ -1,5 +1,5 @@
 import queryString from 'query-string'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import {
   CountCustomerReqType,
   CountCustomerResType,
@@ -16,7 +16,7 @@ import { formatQueryDateTime } from '~/utils/utils'
 
 const accountApiRequest = {
   getMe: () => http.get<GetMeResType>('/accounts/me'),
-  getListAccounts: (query: Pagination) => {
+  getListAccounts: (query: PaginationSearchQuery) => {
     const stringified = queryString.stringify(query)
     return http.get<GetManageAccountRes>(`/accounts?${stringified}`)
   },
