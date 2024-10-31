@@ -47,15 +47,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
 
   const [allAmenities, setAllAmenities] = useState<AmenityType[]>([])
-  const { data: responseAllAmenities, refetch: refetchAllAmenities } = useGetAvailableAmenity(
-    bookedRoom?.roomType.building.id || 1
-  )
-
-  useEffect(() => {
-    if (bookedRoom?.roomType.building.id) {
-      refetchAllAmenities()
-    }
-  }, [bookedRoom, refetchAllAmenities])
+  const { data: responseAllAmenities } = useGetAvailableAmenity(bookedRoom?.roomType.building.id || 1)
 
   useEffect(() => {
     if (responseAllAmenities?.data.data) {

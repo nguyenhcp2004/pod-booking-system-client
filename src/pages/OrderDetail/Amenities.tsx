@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { tokens } from '~/themes/theme'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import BookingDetails from '~/components/BookingDetails/BookingDetails'
-import { useGetAmenities } from '~/queries/useAmenity'
+import { useGetAvailableAmenity } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { Amenity, BookingContext } from '~/contexts/BookingContext'
 import { toast } from 'react-toastify'
@@ -31,7 +29,6 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const colors = tokens(theme.palette.mode)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0)
-  const { data: amenities = [] } = useGetAmenities()
   const [errorState, setErrorState] = useState<string | null>(null)
   const bookingContext = useContext(BookingContext)
   if (!bookingContext) {
@@ -40,6 +37,16 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   const { bookingData, setBookingData } = bookingContext
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [roomType, setRoomType] = useState(bookingData?.selectedRooms[0].name)
+
+  const { data: amenitiesData } = useGetAvailableAmenity(bookingData?.roomType?.building.id || 1)
+
+  const amenities = useMemo(() => amenitiesData?.data.data || [], [amenitiesData])
+
+  const filteredAmenities = useMemo(
+    () => (selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities),
+    [selectedAmenity, amenities]
+  )
+
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
 
@@ -104,8 +111,6 @@ export const Amenities: React.FC<CommonProps> = (props) => {
     setQuantity(0)
     setDetailAmenity(null)
   }
-
-  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
 
   const handleIncrement = () => {
     if (!detailAmenity) {

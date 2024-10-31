@@ -69,7 +69,7 @@ export const useDeleteAmenityMutation = () => {
 
 export const useGetAvailableAmenity = (buildingId: number) => {
   return useQuery({
-    queryKey: ['available-amenity'],
+    queryKey: ['available-amenity', { buildingId }],
     queryFn: () => amenityApiRequest.getAvailableAmenityByBuilding(buildingId)
   })
 }
