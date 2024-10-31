@@ -224,6 +224,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
                       setSelectedAmenity(e.target.value)
                     }}
                   >
+                    <MenuItem value=''>Tất cả</MenuItem>
                     {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
                       <MenuItem key={index} value={uniqueType}>
                         {amenityTranslations[uniqueType] || uniqueType}
