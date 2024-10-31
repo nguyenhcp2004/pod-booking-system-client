@@ -131,7 +131,7 @@ export default function BookingAmenityDetails() {
         </Box>
         <Box display='flex' justifyContent='space-between'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Điscount:
+            Giảm giá:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
             {discount.toLocaleString()} VND
