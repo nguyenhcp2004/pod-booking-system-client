@@ -219,11 +219,14 @@ export default function ManageOrder() {
             <MenuItem value='' disabled>
               Chọn nhân viên
             </MenuItem>
-            {staffList.map((staff) => (
-              <MenuItem key={staff.id} value={staff.id}>
-                {staff.name}
-              </MenuItem>
-            ))}
+            {staffList.map((staff) => {
+              if (staff.buildingNumber == params.row?.buildingNumber)
+                return (
+                  <MenuItem key={staff.id} value={staff.id}>
+                    {staff.name}
+                  </MenuItem>
+                )
+            })}
           </Select>
         )
       }
