@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import { useUpdateOrderStatusMutation } from '~/queries/useOrder'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
+import { useSendMailOrderMutation } from '~/queries/useAccount'
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(3)
@@ -35,6 +36,7 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
   const [cancelReason, setCancelReason] = useState('')
   const [error, setError] = useState('')
   const updateOrderMutation = useUpdateOrderStatusMutation()
+  const sendMailMutation = useSendMailOrderMutation()
   const queryClient = useQueryClient()
   const totalPriceRoom = orderDetail.orderDetails.reduce((total, orderDetail) => {
     return total + orderDetail.roomPrice
@@ -55,8 +57,8 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
     const startTime = moment(orderDetail.orderDetails[0].startTime)
     const today = moment()
 
-    if (!today.isBefore(startTime.clone().subtract(1, 'days'))) {
-      toast.error('Đã quá hạn hủy đơn')
+    if (!today.isBefore(startTime.clone().subtract(1, 'days')) || orderDetail.orderDetails[0].servicePackage.id === 2) {
+      toast.error('Bạn không thể hủy đơn này')
       return
     }
     setOpen(true)
@@ -92,7 +94,11 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
         cancelReason
       })
       toast.success('Đã hủy phòng thành công')
-      await queryClient.invalidateQueries({ queryKey: ['order-of-account'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['order-of-account'] }),
+        sendMailMutation.mutateAsync({ email: orderDetail.orderDetails[0].customer.email, orderId: orderDetail.id })
+      ])
+
       navigate('/history-orders')
     } catch (error) {
       handleErrorApi({ error })

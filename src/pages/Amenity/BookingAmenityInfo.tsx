@@ -6,8 +6,10 @@ import Calendar from '~/components/Calendar/Calendar'
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
-import { formatTime } from '~/utils/utils'
+import { formatTime, isValidVietnamPhoneNumber } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
+import { useAppContext } from '~/contexts/AppProvider'
+import { transformBookedRoomsToRooms } from '~/schemaValidations/room.schema'
 
 //import { array } from 'zod'
 interface CommonProps {
@@ -21,6 +23,10 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
 
+  const { account: account } = useAppContext()
+  const [phoneNumber, setPhoneNumber] = useState(account?.phoneNumber || '')
+  const [phoneError, setPhoneError] = useState<string | null>(null)
+
   useEffect(() => {
     if (bookedRoom) {
       const startDate = moment(bookedRoom.startTime)
@@ -28,6 +34,21 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
       setSelectedSlots([`${formatTime(bookedRoom.startTime)} - ${formatTime(bookedRoom.endTime)}`])
     }
   }, [bookedRoom])
+
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(event.target.value)
+  }
+
+  const handleNext = () => {
+    if (!isValidVietnamPhoneNumber(phoneNumber)) {
+      setPhoneError('Số điện thoại không hợp lệ')
+      return
+    }
+    setPhoneError(null)
+    props.onNext() // proceed if valid
+  }
+
+  const transformedRooms = bookedRoom ? transformBookedRoomsToRooms([bookedRoom]) : []
 
   return (
     <Box id='hehe' sx={{ height: '100%', marginX: '104px' }}>
@@ -48,7 +69,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Tên'
-                      defaultValue='Phạm Thị Anh Đào'
+                      defaultValue={account?.name || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
@@ -59,10 +80,13 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Số điện thoại'
-                      defaultValue='09xxxxxxxx'
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
                       fullWidth
+                      error={!!phoneError}
+                      helperText={phoneError}
                       InputProps={{
-                        readOnly: true
+                        readOnly: account?.phoneNumber ? true : false
                       }}
                     />
                   </Grid>
@@ -70,7 +94,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                     <TextField
                       id='outlined-required'
                       label='Email'
-                      defaultValue='dao@gmail.com'
+                      defaultValue={account?.email || ''}
                       fullWidth
                       InputProps={{
                         readOnly: true
@@ -87,7 +111,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                 </Typography>
                 <Box>
                   <Grid size={{ xs: 12 }}>
-                    <Calendar selected={selectedDates} slots={selectedSlots} />
+                    <Calendar rooms={transformedRooms} selected={selectedDates} slots={selectedSlots} />
                   </Grid>
                 </Box>
               </Box>
@@ -109,7 +133,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
           >
             <Box sx={{ width: '100%' }}>
               <Button
-                onClick={props.onNext}
+                onClick={handleNext}
                 fullWidth
                 sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
               >

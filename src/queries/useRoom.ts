@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import roomApiRequest from '~/apis/room'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import { GetBookedRoomsReqType } from '~/schemaValidations/room.schema'
 
-export const useGetListRooms = (query: Pagination) => {
+export const useGetListRooms = (query: PaginationSearchQuery) => {
   return useQuery({
-    queryKey: ['get-rooms'],
+    queryKey: ['get-rooms', { query }],
     queryFn: () => roomApiRequest.getListRooms(query)
   })
 }

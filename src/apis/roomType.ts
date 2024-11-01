@@ -1,4 +1,9 @@
-import { FilterRoomTypeQuery, FilterRoomTypeRes, RoomTypeRequest } from '~/schemaValidations/roomType.schema'
+import {
+  FilterRoomTypeQuery,
+  FilterRoomTypeRes,
+  GetRoomTypeByAddressResType,
+  RoomTypeRequest
+} from '~/schemaValidations/roomType.schema'
 import http from '~/utils/http'
 import queryString from 'query-string'
 
@@ -6,6 +11,12 @@ export const roomTypeApiRequest = {
   getListRoomTypeFiltered: (query: FilterRoomTypeQuery) => {
     const stringified = queryString.stringify(query)
     return http.get<FilterRoomTypeRes>(`/room-types/filtered-room-type?${stringified}`)
+  },
+  getRoomTypeByAddress: (address: string) => {
+    return http.get<GetRoomTypeByAddressResType>(`/room-types/room-type-within-address?address=${address}`)
+  },
+  getRoomTypeByBuildingId: (buildingId: string | number) => {
+    return http.get<GetRoomTypeByAddressResType>(`/room-types/get-by-building-id?buildingId=${buildingId}`)
   }
 }
 

@@ -1,5 +1,5 @@
 import queryString from 'query-string'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import {
   CountCustomerReqType,
   CountCustomerResType,
@@ -16,7 +16,7 @@ import { formatQueryDateTime } from '~/utils/utils'
 
 const accountApiRequest = {
   getMe: () => http.get<GetMeResType>('/accounts/me'),
-  getListAccounts: (query: Pagination) => {
+  getListAccounts: (query: PaginationSearchQuery) => {
     const stringified = queryString.stringify(query)
     return http.get<GetManageAccountRes>(`/accounts?${stringified}`)
   },
@@ -27,6 +27,10 @@ const accountApiRequest = {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
   },
   sendMail: (body: SendMailBodyType) => http.post<SendMailResType>('/accounts/send-email', body),
+  sendMailOrder: (body: { email: string; orderId: string }) =>
+    http.post<SendMailResType>('/accounts/send-email-order', body),
+  sendMailOrderAmenity: (body: { email: string; orderDetailId: string }) =>
+    http.post<SendMailResType>('/accounts/send-email-order-amenity', body),
   countCurrentCustomer: () => http.get<CountCustomerResType>('/accounts/number-accounts-current-day'),
   countCustomer: (query: CountCustomerReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)

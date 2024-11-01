@@ -3,6 +3,7 @@ import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
 import InfoIcon from '@mui/icons-material/Info'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
 import CallIcon from '@mui/icons-material/Call'
+import { Link } from 'react-router-dom'
 
 const faqs = [
   {
@@ -85,10 +86,12 @@ export default function HelpCenter() {
             </Box>
           </Box>
           <Box sx={{ mx: 2 }}>
-            <Button sx={{ my: 2, padding: 2 }} fullWidth variant='contained'>
-              {' '}
-              Liên hệ{' '}
-            </Button>
+            <Link to='https://www.facebook.com/profile.php?id=61567752789181' target='_blank'>
+              <Button sx={{ my: 2, padding: 2 }} fullWidth variant='contained'>
+                {' '}
+                Liên hệ{' '}
+              </Button>
+            </Link>
           </Box>
         </Box>
         <Typography variant='h5' fontWeight={'bold'} gutterBottom mb={2}>

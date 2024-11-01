@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
-import { Pagination } from '~/constants/type'
+import { PaginationSearchQuery } from '~/constants/type'
 import { CountCustomerReqType } from '~/schemaValidations/account.schema'
 
 export const useGetMe = () => {
@@ -10,9 +10,9 @@ export const useGetMe = () => {
   })
 }
 
-export const useGetManageAccount = (query: Pagination) => {
+export const useGetManageAccount = (query: PaginationSearchQuery) => {
   return useQuery({
-    queryKey: ['accounts'],
+    queryKey: ['accounts', { query }],
     queryFn: () => accountApiRequest.getListAccounts(query)
   })
 }
@@ -40,6 +40,18 @@ export const useCreateAccountMutation = () => {
 export const useSendMailMutation = () => {
   return useMutation({
     mutationFn: accountApiRequest.sendMail
+  })
+}
+
+export const useSendMailOrderMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.sendMailOrder
+  })
+}
+
+export const useSendMailOrderAmenityMutation = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.sendMailOrderAmenity
   })
 }
 

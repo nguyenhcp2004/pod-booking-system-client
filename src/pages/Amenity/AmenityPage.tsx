@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid2'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { tokens } from '~/themes/theme'
-import { useGetAmenities, useGetAmenitiesByType } from '~/queries/useAmenity'
+import { useGetAvailableAmenity } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { useGetBookedRooms } from '~/queries/useRoom'
 import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
@@ -37,17 +37,23 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   const [selectedAmenityType, setSelectedAmenityType] = useState<string>('')
   const [quantity, setQuantity] = useState(0)
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
-  const { data: response, refetch } = useGetAmenitiesByType(selectedAmenityType)
-  const { data: responseAllAmenities } = useGetAmenities()
+
   const { data: responseBookedRooms } = useGetBookedRooms()
-  const amenities: AmenityType[] = response?.data.data ?? []
-  const allAmenities: AmenityType[] = responseAllAmenities ?? []
   const bookedRooms: BookedRoomSchemaType[] = responseBookedRooms?.data.data ?? []
 
   const { bookedRoom, setBookedRoom, selectedAmenities, addAmenity } = useBookingAmenityContext()
 
   const [selectedRoomName, setSelectedRoomName] = useState<string>('')
   const [selectedBookingSlot, setSelectedBookingSlot] = useState<string>('')
+
+  const [allAmenities, setAllAmenities] = useState<AmenityType[]>([])
+  const { data: responseAllAmenities } = useGetAvailableAmenity(bookedRoom?.roomType.building.id || 1)
+
+  useEffect(() => {
+    if (responseAllAmenities?.data.data) {
+      setAllAmenities(responseAllAmenities.data.data)
+    }
+  }, [responseAllAmenities])
 
   useEffect(() => {
     const savedRoom = localStorage.getItem(LOCAL_STORAGE_KEY_ROOM)
@@ -58,12 +64,16 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    if (selectedAmenityType) {
-      refetch()
-    }
     setDetailAmenity(null)
     setQuantity(0)
-  }, [selectedAmenityType, refetch])
+  }, [selectedAmenityType])
+
+  const filteredAmenities = useMemo(() => {
+    if (selectedAmenityType === '') {
+      return allAmenities
+    }
+    return allAmenities.filter((amenity) => amenity.type === selectedAmenityType)
+  }, [allAmenities, selectedAmenityType])
 
   const handleAddAmentity = () => {
     if (!detailAmenity) {
@@ -75,7 +85,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
       return
     }
     if (!bookedRoom) {
-      setErrorState('Vui lòng chọn phòng đã đặt')
+      setErrorState('Vui lòng chọn phòng và giờ đã đặt')
       return
     }
 
@@ -227,8 +237,9 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                     label='Chọn loại tiện ích'
                     onChange={handleAmenityTypeChange}
                   >
-                    <MenuItem value='Food'>Food</MenuItem>
-                    <MenuItem value='Office'>Office</MenuItem>
+                    <MenuItem value=''>Tất cả</MenuItem>
+                    <MenuItem value='Food'>Thức ăn</MenuItem>
+                    <MenuItem value='Office'>Thiết bị</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -238,27 +249,35 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   Danh sách tiện ích
                 </Typography>
                 <Grid container spacing={isMobile ? 1 : 2} sx={{ padding: '10px 0' }}>
-                  {(selectedAmenityType !== '' ? amenities : allAmenities).map((item) => (
-                    <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
-                      <Button
-                        variant='outlined'
-                        fullWidth
-                        sx={{
-                          padding: '10px 0px',
-                          minHeight: '50px',
-                          borderRadius: '4px',
-                          textAlign: 'center',
-                          color: 'black',
-                          borderColor: 'black',
-                          fontSize: '14px',
-                          backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                        }}
-                        onClick={() => handleSelectAmenity(item)}
-                      >
-                        {item.name}
-                      </Button>
+                  {filteredAmenities.length > 0 ? (
+                    filteredAmenities.map((item) => (
+                      <Grid size={{ xs: 12, sm: isTablet ? 4 : 6, md: 4 }} key={item.id}>
+                        <Button
+                          variant='outlined'
+                          fullWidth
+                          sx={{
+                            padding: '10px 0px',
+                            minHeight: '50px',
+                            borderRadius: '4px',
+                            textAlign: 'center',
+                            color: 'black',
+                            borderColor: 'black',
+                            fontSize: '14px',
+                            backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                          }}
+                          onClick={() => handleSelectAmenity(item)}
+                        >
+                          {item.name}
+                        </Button>
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid size={12}>
+                      <Typography variant='body1' sx={{ textAlign: 'center', color: colors.grey[500] }}>
+                        Không có tiện ích cho chi nhánh này
+                      </Typography>
                     </Grid>
-                  ))}
+                  )}
                 </Grid>
               </Box>
               <Box

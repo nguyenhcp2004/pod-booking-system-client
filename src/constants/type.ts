@@ -30,8 +30,6 @@ export type Slot = {
 export type SlotAvailable = {
   startTime: string
   endTime: string
-
-  available: boolean
 }
 
 export type Building = {
@@ -68,9 +66,9 @@ export type Room = {
   description: string
   image: string
   status: string
-  createdAt: string
-  updatedAt: string
-  roomType: RoomType
+  createdAt: string | null
+  updatedAt: string | null
+  roomType: RoomType | null
 }
 
 export type ScrollbarProps = SimplebarProps & {
@@ -89,6 +87,13 @@ export type Pagination = {
   take: number
 }
 
+export type PaginationSearchQuery = {
+  buildingId: number
+  page: number
+  take: number
+  searchParams: string
+}
+
 export type Amenity = {
   id: number
   name: string
@@ -96,6 +101,8 @@ export type Amenity = {
   quantity: number
   type: string
   imageUrl: string
+  isDeleted: number
+  buildingId: number
 }
 
 export const CanceledReason = {
