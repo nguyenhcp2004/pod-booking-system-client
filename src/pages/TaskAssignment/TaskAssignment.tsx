@@ -36,7 +36,7 @@ const StyledHeader = styled(Box)(({ theme }) => ({
 }))
 
 const StyledTimeSlot = styled(Box)(({ theme }) => ({
-  height: 100,
+  height: 120,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -65,7 +65,8 @@ const StyledDayHeader = styled(Box)(({ theme }) => ({
 }))
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  height: 100,
+  height: 120,
+  overflowY: 'auto',
   padding: theme.spacing(1),
   position: 'relative',
   overflow: 'hidden',
@@ -104,6 +105,7 @@ export default function TaskAssignment() {
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [newEvent, setNewEvent] = useState('')
+  const [hoveredChip, setHoveredChip] = useState<string | null>(null) // State để lưu chip đang hover
 
   const handleAddEvent = (day: string, timeSlot: string) => {
     setSelectedSlot({ day, timeSlot })
@@ -148,7 +150,7 @@ export default function TaskAssignment() {
         </Typography>
       </StyledHeader>
       <Grid container>
-        <Grid size={{ xs: 2 }}>
+        <Grid size={{ xs: 1.5 }}>
           <Box sx={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)}>
               Thêm nhân viên
@@ -163,24 +165,50 @@ export default function TaskAssignment() {
           ))}
         </Grid>
         {weekDays.map((day) => (
-          <Grid size={{ xs: 1.4 }} key={day}>
+          <Grid size={{ xs: 1.5 }} key={day}>
             <StyledDayHeader>
               <Typography variant='body1'>{day}</Typography>
             </StyledDayHeader>
             {timeSlots.map((slot) => (
               <StyledPaper key={`${day}-${slot}`}>
                 {events[`${day}-${slot}`]?.map((event, index) => (
-                  <Chip
+                  <div
                     key={index}
-                    label={event}
-                    size='small'
-                    style={{
-                      backgroundColor: employeeColors.get(event),
-                      color: 'white',
-                      margin: '2px',
-                      fontWeight: 'bold'
-                    }}
-                  />
+                    onMouseEnter={() => setHoveredChip(event)}
+                    onMouseLeave={() => setHoveredChip(null)}
+                    style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}
+                  >
+                    <Chip
+                      key={index}
+                      label={event}
+                      size='small'
+                      style={{
+                        backgroundColor: employeeColors.get(event),
+                        color: 'white',
+                        margin: '2px',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                    {hoveredChip === event && (
+                      <IconButton
+                        size='small'
+                        aria-label='remove'
+                        sx={{
+                          height: 20,
+                          position: 'absolute',
+                          right: -1,
+                          top: 5,
+                          backgroundColor: 'grey.200',
+                          borderRadius: '50%',
+                          '&:hover': {
+                            backgroundColor: 'grey.200'
+                          }
+                        }}
+                      >
+                        x
+                      </IconButton>
+                    )}
+                  </div>
                 ))}
                 <IconButton
                   size='small'
