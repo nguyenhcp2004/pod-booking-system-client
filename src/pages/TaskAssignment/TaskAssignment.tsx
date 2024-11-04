@@ -9,14 +9,17 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   styled,
-  Chip
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
 
-const timeSlots = ['7h-9h', '9h-11h', '11h-13h', '13h-15h', '15h-17h', '17h-19h']
+const timeSlots = ['7h-9h', '9h-11h', '11h-13h', '13h-15h', '15h-17h', '17h-19h', '19h-21h']
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
 type Slot = {
   day: string
@@ -123,7 +126,11 @@ export default function TaskAssignment() {
       </StyledHeader>
       <Grid container>
         <Grid size={{ xs: 2 }}>
-          <Box sx={{ height: 50 }} />
+          <Box sx={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)}>
+              Thêm nhân viên
+            </Button>
+          </Box>
           {timeSlots.map((slot, index) => (
             <StyledTimeSlot key={index}>
               <Typography variant='body1' fontWeight='medium'>
@@ -178,15 +185,62 @@ export default function TaskAssignment() {
       >
         <DialogTitle>Thêm nhân viên</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin='dense'
-            label='Tên nhân viên'
-            fullWidth
-            variant='outlined'
-            value={newEvent}
-            onChange={(e) => setNewEvent(e.target.value)}
-          />
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel size='small' id='time-slot-label'>
+              Nhân viên
+            </InputLabel>
+            <Select
+              size='small'
+              labelId='time-slot-label'
+              value={selectedSlot?.timeSlot || ''}
+              label='Nhân viên'
+              onChange={(e) => console.log(e.target.value)}
+            >
+              <MenuItem value='Nguyên'>Nguyên</MenuItem>
+              <MenuItem value='Huy'>Huy</MenuItem>
+              <MenuItem value='Hoàng'>Hoàng</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel size='small' id='time-slot-label'>
+              Ngày trực
+            </InputLabel>
+            <Select
+              size='small'
+              labelId='time-slot-label'
+              value={selectedSlot?.timeSlot || ''}
+              label='Ngày trực'
+              onChange={(e) => console.log(e.target.value)}
+            >
+              <MenuItem value='Thứ 2'>Thứ 2</MenuItem>
+              <MenuItem value='Thứ 3'>Thứ 3</MenuItem>
+              <MenuItem value='Thứ 4'>Thứ 4</MenuItem>
+              <MenuItem value='Thứ 5'>Thứ 5</MenuItem>
+              <MenuItem value='Thứ 6'>Thứ 6</MenuItem>
+              <MenuItem value='Thứ 7'>Thứ 7</MenuItem>
+              <MenuItem value='Chủ nhật'>Chủ nhật</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel size='small' id='time-slot-label'>
+              Khung giờ
+            </InputLabel>
+            <Select
+              size='small'
+              labelId='time-slot-label'
+              value={selectedSlot?.timeSlot || ''}
+              label='Khung giờ'
+              onChange={(e) => console.log(e.target.value)}
+            >
+              <MenuItem value='07:00 - 09:00'>7h - 9h</MenuItem>
+              <MenuItem value='09:00 - 11:00'>9h - 11h</MenuItem>
+              <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
+              <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
+              <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
+              <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
+              <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddEventOpen(false)}>Hủy</Button>
