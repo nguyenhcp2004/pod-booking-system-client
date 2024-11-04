@@ -115,7 +115,7 @@ export default function TaskAssignment() {
   }, [events])
 
   return (
-    <Box sx={{ maxWidth: 1200, margin: 'auto', p: 3 }}>
+    <Box sx={{ maxWidth: 1200, margin: 'auto', p: 3, boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}>
       <StyledHeader>
         <Typography variant='h4' fontWeight='500'>
           Ca trực của nhân viên
