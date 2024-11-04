@@ -26,7 +26,7 @@ export default function Contact({ orderDetail }: { orderDetail: GetOrderInfoResT
           <Grid size={{ xs: 12 }} sx={{ marginBottom: 'auto', paddingTop: '1rem' }}>
             <Box>
               Để hủy miễn phí, bạn cần phải hủy <b>trước</b> ngày {getDayBefore(date.toISOString())} Tháng{' '}
-              {getMonthNumber(date.toISOString())} 23:59 giờ. Sau thời gian này, bạn sẽ không thể hủy được nữa.
+              {getMonthNumber(date.toISOString())} trước 23:59 giờ. Sau thời gian này, bạn sẽ không thể hủy được nữa.
             </Box>
           </Grid>
         </Grid>

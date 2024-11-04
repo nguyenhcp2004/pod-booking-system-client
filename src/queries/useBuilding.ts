@@ -43,3 +43,10 @@ export const useGetAllBuilding = () => {
     queryFn: () => buildingApiRequest.getAllBuilding()
   })
 }
+
+export const useGetBuildingOptions = () => {
+  return useQuery({
+    queryKey: ['all-building-options'],
+    queryFn: () => buildingApiRequest.getBuildingOptions()
+  })
+}

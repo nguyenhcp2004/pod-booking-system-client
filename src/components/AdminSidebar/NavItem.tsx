@@ -9,7 +9,7 @@ import FastfoodIcon from '@mui/icons-material/Fastfood'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
-import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
+// import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
 import { useAppContext } from '~/contexts/AppProvider'
 
 const iconSx = {
@@ -42,12 +42,12 @@ const menuItems = [
     icon: <MeetingRoomIcon sx={iconSx} />,
     role: ['Admin', 'Manager']
   },
-  {
-    title: 'Loại phòng',
-    to: '/admin/room-types',
-    icon: <RoomPreferencesIcon sx={iconSx} />,
-    role: ['Admin', 'Manager']
-  },
+  // {
+  //   title: 'Loại phòng',
+  //   to: '/admin/room-types',
+  //   icon: <RoomPreferencesIcon sx={iconSx} />,
+  //   role: ['Admin', 'Manager']
+  // },
   {
     title: 'Chi nhánh',
     to: '/admin/buildings',
