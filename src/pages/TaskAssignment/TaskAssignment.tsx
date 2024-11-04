@@ -41,9 +41,15 @@ const StyledTimeSlot = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   borderBottom: `1px solid ${theme.palette.divider}`,
-  background: theme.palette.grey[50],
+  background: theme.palette.grey[200],
+  color: theme.palette.text.primary,
+  transition: 'all 0.3s ease',
   '&:nth-of-type(odd)': {
-    background: theme.palette.grey[100]
+    background: theme.palette.grey[300]
+  },
+  '&:hover': {
+    background: theme.palette.grey[400],
+    transform: 'scale(1.02)'
   }
 }))
 
@@ -54,7 +60,8 @@ const StyledDayHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   borderBottom: `1px solid ${theme.palette.divider}`,
-  fontWeight: 'bold'
+  fontWeight: theme.typography.fontWeightBold,
+  backgroundColor: theme.palette.background.paper
 }))
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -84,8 +91,16 @@ const chipColors = [
   '#7986CB'
 ]
 
+const shift = {
+  'T2-7h-9h': ['Nguyen Van A', 'Tran Thi B'],
+  'T3-7h-9h': ['Le Van C', 'Nguyen Van D'],
+  'T4-7h-9h': ['Pham Thi E'],
+  'T5-7h-9h': ['Nguyen Van F', 'Do Thi G'],
+  'T6-7h-9h': ['Hoang Van H']
+}
+
 export default function TaskAssignment() {
-  const [events, setEvents] = useState<Record<string, string[]>>({})
+  const [events, setEvents] = useState<Record<string, string[]>>(shift)
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [newEvent, setNewEvent] = useState('')
@@ -106,7 +121,6 @@ export default function TaskAssignment() {
       setIsAddEventOpen(false)
     }
   }
-  console.log(events)
 
   const employeeColors = useMemo(() => {
     const colorMap = new Map()
@@ -118,7 +132,16 @@ export default function TaskAssignment() {
   }, [events])
 
   return (
-    <Box sx={{ maxWidth: 1200, margin: 'auto', p: 3, boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.25)' }}>
+    <Box
+      sx={{
+        maxWidth: 1200,
+        margin: 'auto',
+        p: 3,
+        boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.25)',
+        borderRadius: 2,
+        backgroundColor: '#f5f5f5'
+      }}
+    >
       <StyledHeader>
         <Typography variant='h4' fontWeight='500'>
           Ca trực của nhân viên
@@ -192,9 +215,11 @@ export default function TaskAssignment() {
             <Select
               size='small'
               labelId='time-slot-label'
-              value={selectedSlot?.timeSlot || ''}
+              value={newEvent}
               label='Nhân viên'
-              onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => {
+                setNewEvent(e.target.value)
+              }}
             >
               <MenuItem value='Nguyên'>Nguyên</MenuItem>
               <MenuItem value='Huy'>Huy</MenuItem>
@@ -208,17 +233,19 @@ export default function TaskAssignment() {
             <Select
               size='small'
               labelId='time-slot-label'
-              value={selectedSlot?.timeSlot || ''}
+              value={selectedSlot?.day || ''}
               label='Ngày trực'
-              onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => {
+                setSelectedSlot({ day: e.target.value, timeSlot: selectedSlot?.timeSlot || '' })
+              }}
             >
-              <MenuItem value='Thứ 2'>Thứ 2</MenuItem>
-              <MenuItem value='Thứ 3'>Thứ 3</MenuItem>
-              <MenuItem value='Thứ 4'>Thứ 4</MenuItem>
-              <MenuItem value='Thứ 5'>Thứ 5</MenuItem>
-              <MenuItem value='Thứ 6'>Thứ 6</MenuItem>
-              <MenuItem value='Thứ 7'>Thứ 7</MenuItem>
-              <MenuItem value='Chủ nhật'>Chủ nhật</MenuItem>
+              <MenuItem value='T2'>Thứ 2</MenuItem>
+              <MenuItem value='T3'>Thứ 3</MenuItem>
+              <MenuItem value='T4'>Thứ 4</MenuItem>
+              <MenuItem value='T5'>Thứ 5</MenuItem>
+              <MenuItem value='T6'>Thứ 6</MenuItem>
+              <MenuItem value='T7'>Thứ 7</MenuItem>
+              <MenuItem value='CN'>Chủ nhật</MenuItem>
             </Select>
           </FormControl>
           <FormControl fullWidth sx={{ my: 2 }}>
@@ -230,15 +257,17 @@ export default function TaskAssignment() {
               labelId='time-slot-label'
               value={selectedSlot?.timeSlot || ''}
               label='Khung giờ'
-              onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => {
+                setSelectedSlot({ day: selectedSlot?.day || '', timeSlot: e.target.value })
+              }}
             >
-              <MenuItem value='07:00 - 09:00'>7h - 9h</MenuItem>
-              <MenuItem value='09:00 - 11:00'>9h - 11h</MenuItem>
-              <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
-              <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
-              <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
-              <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
-              <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
+              <MenuItem value='7h-9h'>7h - 9h</MenuItem>
+              <MenuItem value='9h-11h'>9h - 11h</MenuItem>
+              <MenuItem value='11h-13h'>11h - 13h</MenuItem>
+              <MenuItem value='13h-15h'>13h - 15h</MenuItem>
+              <MenuItem value='15h-17h'>15h - 17h</MenuItem>
+              <MenuItem value='17h-19h'>17h - 19h</MenuItem>
+              <MenuItem value='19h-21h'>19h - 21h</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
