@@ -1,3 +1,6 @@
+import { AddImageToRoomBodyType } from '~/schemaValidations/roomImage.schema'
+import http from '~/utils/http'
+
 const CLOUD_NAME: string = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string
 const UPLOAD_PRESET: string = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string
 const imageApiRequets = {
@@ -16,6 +19,12 @@ const imageApiRequets = {
       .catch((error) => {
         console.error('There was an error!', error)
       })
+  },
+  getImagesByRoomId: (roomId: number) => {
+    return http.get(`/room-images/${roomId}`)
+  },
+  addImageToRoom: (body: AddImageToRoomBodyType) => {
+    return http.post(`/room-images/${body.roomId}`, { images: body.image })
   }
 }
 export default imageApiRequets
