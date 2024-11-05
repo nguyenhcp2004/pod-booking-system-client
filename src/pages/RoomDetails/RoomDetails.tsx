@@ -84,7 +84,7 @@ export default function RoomDetail() {
           dateList.push(moment(selectedDate).add(2, 'week'))
           dateList.push(moment(selectedDate).add(3, 'week'))
         } else if (selectedPackage.id == '4') {
-          for (let i = 0; i < 30; i++) {
+          for (let i = 1; i < 30; i++) {
             dateList.push(moment(selectedDate).add(i, 'days'))
           }
         }
