@@ -57,7 +57,7 @@ export default function RoomDetail() {
   const navigate = useNavigate()
   useEffect(() => {
     if (servicePackage?.data.data) {
-      setSelectedPackage(servicePackage.data.data[2])
+      setSelectedPackage(servicePackage.data.data[0])
     }
   }, [servicePackage])
   useEffect(() => {
@@ -75,12 +75,16 @@ export default function RoomDetail() {
     if (selectedDate) {
       dateList.push(selectedDate)
       if (selectedPackage) {
-        if (selectedPackage.id == '1') {
+        if (selectedPackage.id == '2') {
+          for (let i = 0; i < 7; i++) {
+            dateList.push(moment(selectedDate).add(i, 'days'))
+          }
+        } else if (selectedPackage.id == '3') {
           dateList.push(moment(selectedDate).add(1, 'week'))
           dateList.push(moment(selectedDate).add(2, 'week'))
           dateList.push(moment(selectedDate).add(3, 'week'))
-        } else if (selectedPackage.id == '2') {
-          for (let i = 0; i < 30; i++) {
+        } else if (selectedPackage.id == '4') {
+          for (let i = 1; i < 30; i++) {
             dateList.push(moment(selectedDate).add(i, 'days'))
           }
         }
