@@ -5,9 +5,9 @@ import { BookingInfo, slotType } from '~/contexts/BookingContext'
 export const createDateTimeFromSlot = (date: string, slot: slotType) => {
   const [startTimeString, endTimeString] = slot.split(' - ')
 
-  const date2 = moment(date).format('YYYY-MM-DD')
-  const startTime = new Date(`${date2}T${startTimeString}:00`)
-  const endTime = new Date(`${date2}T${endTimeString}:00`)
+  const dateFormat = moment(date).format('YYYY-MM-DD')
+  const startTime = new Date(`${dateFormat}T${startTimeString}:00`)
+  const endTime = new Date(`${dateFormat}T${endTimeString}:00`)
 
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat('sv-SE', {
