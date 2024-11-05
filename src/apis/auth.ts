@@ -25,7 +25,8 @@ const authApiRequest = {
     this.refreshTokenRequest = null
     return result
   },
-  logout: (body: LogoutBodyType) => http.post<LogoutResType>('/auth/logout', body)
+  logout: (body: LogoutBodyType) => http.post<LogoutResType>('/auth/logout', body),
+  register: (body: { email: string; name: string; password: string }) => http.post<LoginResType>('/auth/register', body)
 }
 
 export default authApiRequest

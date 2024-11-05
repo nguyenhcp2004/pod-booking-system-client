@@ -28,6 +28,7 @@ import OrderDetail from '~/pages/OrderDetail'
 import RefreshToken from '~/pages/RefreshToken/RefreshToken'
 import Register from '~/pages/Register'
 import RoomDetails from '~/pages/RoomDetails/RoomDetails'
+import TaskAssignment from '~/pages/TaskAssignment'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -118,6 +119,10 @@ export default function useRouteElements() {
             {
               path: '/admin/amenity-orders/payment',
               element: <Confirmed />
+            },
+            {
+              path: '/admin/assignments',
+              element: <TaskAssignment />
             }
           ]
         }
