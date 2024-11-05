@@ -72,7 +72,7 @@ const Calendar = ({ rooms, selected, slots: selectedSlot }: { rooms: Room[]; sel
         data.push({
           roomId: room.roomId,
           roomName: room.name,
-          slots
+          slots: slots.reverse()
         })
       }
     })
