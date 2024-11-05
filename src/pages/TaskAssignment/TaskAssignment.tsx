@@ -1,15 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Box,
   Typography,
-  Paper,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  styled,
   Chip,
   FormControl,
   InputLabel,
@@ -18,6 +16,11 @@ import {
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
+import { useGetAllAssignment } from '~/queries/useAssignment'
+import { StyledHeader } from '~/pages/TaskAssignment/StyledHeader'
+import { StyledDayHeader } from '~/pages/TaskAssignment/StyledDayHeader'
+import { StyledPaper } from '~/pages/TaskAssignment/StyledPaper'
+import { StyledTimeSlot } from '~/pages/TaskAssignment/StyledTimeSlot'
 
 const timeSlots = [
   '7:00 - 9:00',
@@ -34,59 +37,6 @@ type Slot = {
   timeSlot: string
 }
 
-const StyledHeader = styled(Box)(({ theme }) => ({
-  background: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(2, 3),
-  borderRadius: theme.shape.borderRadius,
-  marginBottom: theme.spacing(3),
-  boxShadow: theme.shadows[3]
-}))
-
-const StyledTimeSlot = styled(Box)(({ theme }) => ({
-  height: 120,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  background: theme.palette.grey[200],
-  color: theme.palette.text.primary,
-  transition: 'all 0.3s ease',
-  '&:nth-of-type(odd)': {
-    background: theme.palette.grey[300]
-  },
-  '&:hover': {
-    background: theme.palette.grey[400],
-    transform: 'scale(1.02)'
-  }
-}))
-
-const StyledDayHeader = styled(Box)(({ theme }) => ({
-  height: 50,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  fontWeight: theme.typography.fontWeightBold,
-  backgroundColor: theme.palette.background.paper
-}))
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  height: 120,
-  overflowY: 'auto',
-  padding: theme.spacing(1),
-  position: 'relative',
-  overflow: 'hidden',
-  boxShadow: 'none',
-  border: `1px solid ${theme.palette.divider}`,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    boxShadow: theme.shadows[2],
-    '& .add-event': { opacity: 1 }
-  }
-}))
-
 const chipColors = [
   '#FF6B6B',
   '#4ECDC4',
@@ -100,21 +50,35 @@ const chipColors = [
   '#7986CB'
 ]
 
-const shift = {
-  'T2-7:00 - 9:00': ['Nguyen Van A', 'Tran Thi B'],
-  'T3-7:00 - 9:00': ['Le Van C', 'Nguyen Van D'],
-  'T4-7:00 - 9:00': ['Pham Thi E'],
-  'T5-7:00 - 9:00': ['Nguyen Van F', 'Do Thi G'],
-  'T6-7:00 - 9:00': ['Hoang Van H']
+type Shift = {
+  [key: string]: { id: string; name: string }[]
 }
 
 export default function TaskAssignment() {
-  const [events, setEvents] = useState<Record<string, string[]>>(shift)
+  const { data } = useGetAllAssignment()
+  const [events, setEvents] = useState<Shift>({})
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [newEvent, setNewEvent] = useState('')
   const [hoveredChip, setHoveredChip] = useState<string | null>(null) // State để lưu chip đang hover
-  console.log(events)
+
+  useEffect(() => {
+    if (data) {
+      const shift = data.data.data.reduce((acc, item) => {
+        const key = `${item.weekDate}-${item.slot}`
+        const staff = { id: item.id, name: item.nameStaff }
+
+        if (!acc[key]) {
+          acc[key] = []
+        }
+        acc[key].push(staff)
+
+        return acc
+      }, {} as Shift)
+
+      setEvents(shift)
+    }
+  }, [data])
   const handleAddEvent = (day: string, timeSlot: string) => {
     setSelectedSlot({ day, timeSlot })
     setIsAddEventOpen(true)
@@ -123,10 +87,14 @@ export default function TaskAssignment() {
   const handleSaveEvent = () => {
     if (newEvent.trim() !== '') {
       const key = `${selectedSlot?.day}-${selectedSlot?.timeSlot}`
+      const newId = Date.now().toString() // hoặc sử dụng uuid để tạo id
+      const newEventObj = { id: newId, name: newEvent }
+
       setEvents((prev) => ({
         ...prev,
-        [key]: [...(prev[key] || []), newEvent]
+        [key]: [...(prev[key] || []), newEventObj]
       }))
+
       setNewEvent('')
       setIsAddEventOpen(false)
     }
@@ -182,13 +150,13 @@ export default function TaskAssignment() {
                 {events[`${day}-${slot}`]?.map((event, index) => (
                   <div
                     key={index}
-                    onMouseEnter={() => setHoveredChip(event)}
+                    onMouseEnter={() => setHoveredChip(event.id)}
                     onMouseLeave={() => setHoveredChip(null)}
                     style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}
                   >
                     <Chip
                       key={index}
-                      label={event}
+                      label={event.name}
                       size='small'
                       style={{
                         backgroundColor: employeeColors.get(event),
@@ -197,7 +165,7 @@ export default function TaskAssignment() {
                         fontWeight: 'bold'
                       }}
                     />
-                    {hoveredChip === event && (
+                    {hoveredChip === event.id && (
                       <IconButton
                         size='small'
                         aria-label='remove'
