@@ -14,6 +14,7 @@ import { calTotalPrice } from '~/utils/order'
 import { formatDateAndSlot } from '~/utils/utils'
 import { useAppContext } from '~/contexts/AppProvider'
 import { toast } from 'react-toastify'
+import { formatCurrency } from '~/utils/currency'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -142,7 +143,7 @@ export const Confirmed: React.FC = () => {
                     Tổng đơn
                   </Typography>
                   <Typography variant='subtitle2' fontWeight='bold'>
-                    {calTotalPrice(bookingData).total.toLocaleString()} VND
+                    {formatCurrency(calTotalPrice(bookingData).total)}
                   </Typography>
                 </Box>
                 <Divider />
@@ -162,7 +163,7 @@ export const Confirmed: React.FC = () => {
                 </Typography>
                 <Box display='flex' sx={{ mt: '4px' }}>
                   <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                    {bookingData.roomType?.price.toLocaleString()} VND
+                    {formatCurrency(bookingData.roomType?.price || 0)}
                   </Typography>
                   <Typography variant='subtitle2'>/tiếng</Typography>
                 </Box>

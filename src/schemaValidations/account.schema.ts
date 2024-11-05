@@ -69,6 +69,24 @@ export const UpdateAccountByAdminBody = z.object({
 
 export type UpdateAccountByAdminBodyType = z.TypeOf<typeof UpdateAccountByAdminBody>
 
+export const UpdateAccountPhoneNumber = z.object({
+  id: z.string(),
+  phoneNumber: z
+    .string()
+    .startsWith('0')
+    .min(10, { message: 'Số điện thoại không hợp lệ' })
+    .max(11, { message: 'Số điện thoại không hợp lệ' })
+})
+
+export type UpdateAccountPhoneNumberType = z.TypeOf<typeof UpdateAccountPhoneNumber>
+
+export const UpdateAccountPhoneNumberRes = z.object({
+  code: z.number(),
+  message: z.string()
+})
+
+export type UpdateAccountPhoneNumberResType = z.TypeOf<typeof UpdateAccountPhoneNumberRes>
+
 export const UpdateAccountByAdminRes = z.object({
   code: z.number(),
   message: z.string(),

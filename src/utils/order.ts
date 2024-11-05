@@ -201,7 +201,7 @@ export const createOrderUpdateRequest = (currentOrder: Order, updatedOrder: Orde
 }
 
 export const calTotalPrice = (bookingData: BookingInfo) => {
-  let packageRepeat = 0
+  let packageRepeat = 1
   if (bookingData?.servicePackage) {
     switch (bookingData?.servicePackage?.id.toString()) {
       case '1':

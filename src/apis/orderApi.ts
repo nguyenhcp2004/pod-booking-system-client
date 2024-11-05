@@ -192,6 +192,26 @@ export const searchAccounts = async (keyword: string): Promise<Account[]> => {
   }
 }
 
+export const getStaff = async (): Promise<Account[]> => {
+  try {
+    const response = await http.get('/accounts/staff')
+    return response.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+export const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<Room[]> => {
+  try {
+    const response = await http.get(`/rooms/type/${roomId}`)
+    return response.data
+  } catch (error) {
+    console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
 //Update
 export const updateOrderApi = async (order: Order, updateOrder: Order | null) => {
   if (updateOrder != null) {
@@ -210,32 +230,12 @@ export const updateOrderApi = async (order: Order, updateOrder: Order | null) =>
   }
 }
 
-export const getStaff = async (): Promise<Account[]> => {
-  try {
-    const response = await http.get('/accounts/staff')
-    return response.data
-  } catch (error) {
-    console.error('Error getting staff:', error)
-    throw error
-  }
-}
-
 export const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
   try {
     const response = await http.put(`/order`, request)
     return response.data
   } catch (error) {
     console.error('Error updating staff:', error)
-    throw error
-  }
-}
-
-export const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<Room[]> => {
-  try {
-    const response = await http.get(`/rooms/type/${roomId}`)
-    return response.data
-  } catch (error) {
-    console.error('Error getting staff:', error)
     throw error
   }
 }

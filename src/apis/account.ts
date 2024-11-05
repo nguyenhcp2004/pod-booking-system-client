@@ -9,7 +9,8 @@ import {
   SendMailBodyType,
   SendMailResType,
   UpdateAccountByAdminBodyType,
-  UpdateAccountByAdminResType
+  UpdateAccountByAdminResType,
+  UpdateAccountPhoneNumberType
 } from '~/schemaValidations/account.schema'
 import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
@@ -22,6 +23,9 @@ const accountApiRequest = {
   },
   updateAccountByAdmin: (body: UpdateAccountByAdminBodyType) => {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/${body.id}`, body)
+  },
+  updateAccountPhoneNumber: (body: UpdateAccountPhoneNumberType) => {
+    return http.patch<UpdateAccountByAdminResType>(`/accounts/phoneNumber`, body)
   },
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
