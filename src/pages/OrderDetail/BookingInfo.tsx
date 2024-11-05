@@ -44,12 +44,16 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
       setSelectedSlots(bookingData.timeSlots)
       const selectedPackage = bookingData.servicePackage
       if (selectedPackage) {
-        if (selectedPackage.id == '1') {
+        if (selectedPackage.id == '2') {
+          for (let i = 0; i < 7; i++) {
+            dateList.push(moment(initialDate).add(i, 'days'))
+          }
+        } else if (selectedPackage.id == '3') {
           dateList.push(moment(initialDate).add(1, 'week'))
           dateList.push(moment(initialDate).add(2, 'week'))
           dateList.push(moment(initialDate).add(3, 'week'))
-        } else if (selectedPackage.id == '2') {
-          for (let i = 1; i <= 30; i++) {
+        } else if (selectedPackage.id == '4') {
+          for (let i = 0; i < 30; i++) {
             dateList.push(moment(initialDate).add(i, 'days'))
           }
         }
