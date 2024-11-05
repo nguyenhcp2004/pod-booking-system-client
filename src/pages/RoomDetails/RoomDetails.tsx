@@ -57,7 +57,7 @@ export default function RoomDetail() {
   const navigate = useNavigate()
   useEffect(() => {
     if (servicePackage?.data.data) {
-      setSelectedPackage(servicePackage.data.data[2])
+      setSelectedPackage(servicePackage.data.data[0])
     }
   }, [servicePackage])
   useEffect(() => {
