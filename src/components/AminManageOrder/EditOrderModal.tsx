@@ -52,6 +52,25 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
   }, [allRoom])
 
   useEffect(() => {
+    const dateList = []
+    if (selectedDate) {
+      dateList.push(selectedDate)
+      if (order?.orderDetails[0].servicePackage) {
+        if (order?.orderDetails[0].servicePackage.id == '1') {
+          dateList.push(moment(selectedDate).add(1, 'week'))
+          dateList.push(moment(selectedDate).add(2, 'week'))
+          dateList.push(moment(selectedDate).add(3, 'week'))
+        } else if (order?.orderDetails[0].servicePackage.id == '2') {
+          for (let i = 0; i < 30; i++) {
+            dateList.push(moment(selectedDate).add(i, 'days'))
+          }
+        }
+      }
+    }
+    setSelectedDates(dateList)
+  }, [selectedDate, order])
+
+  useEffect(() => {
     if (order) {
       setUpdateOrder(order)
     }
@@ -374,7 +393,11 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
             xs={12}
             sx={{ paddingRight: '12px', marginTop: '10px', bgcolor: 'white', padding: 2, borderRadius: '5px' }}
           >
-            <Calendar selected={selectedDates} slots={selectedSlots} />
+            <Calendar
+              rooms={[listRoom.find((room) => room.id == order.orderDetails[0].roomId) || listRoom[0]]}
+              selected={selectedDates}
+              slots={selectedSlots}
+            />
           </Grid>
           <Grid item lg={6} md={6} xs={12} sx={{ paddingLeft: '12px', marginTop: '10px' }}>
             <Box sx={{ padding: 3, bgcolor: 'white', borderRadius: '5px' }}>
