@@ -1,6 +1,5 @@
 import { useCreateRoomMutation, useEditRoomMutation } from '~/queries/useRoom'
 import { RoomSchemaType } from '~/schemaValidations/room.schema'
-import UploadImage from '~/components/UploadImage/UploadImage'
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { ACOUNT_ROLE, ACTION, ROOM_STATUS } from '~/constants/mock'
 import { handleErrorApi } from '~/utils/utils'
@@ -26,31 +25,35 @@ import {
 import { useGetAllBuilding } from '~/queries/useBuilding'
 import { useGetRoomTypeByBuildingId } from '~/queries/useRoomType'
 import { useAppContext } from '~/contexts/AppProvider'
+import UploadImage from '~/components/UploadImage/UploadImage'
+import { useUploadImageToCloud } from '~/queries/useImage'
 
 const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () => void; action: string }) => {
   const { account } = useAppContext()
-  console.log(account?.buildingNumber)
   const [open, setOpen] = useState(false)
-  const [image, setImage] = useState<string | null>(row?.image)
+  const [images, setSelectedImages] = useState<File[]>([])
   const [status, setStatus] = useState(row?.status)
   const [roomTypeId, setRoomTypeid] = useState(row?.roomType?.id === 0 ? '' : row?.roomType?.id.toString())
   const [buildingId, setBuildingId] = useState(
-    account?.role === ACOUNT_ROLE.MANAGER
-      ? account.buildingNumber
-      : row?.roomType?.building?.id === 0
-        ? ''
-        : row?.roomType?.building?.id.toString()
+    row?.roomType?.building?.id === 0
+      ? account?.role === ACOUNT_ROLE.MANAGER
+        ? account.buildingNumber
+        : ''
+      : row?.roomType?.building?.id.toString()
   )
 
   const { data: listBuilding } = useGetAllBuilding()
   const { data: listRoomType, refetch: roomTypeRefetch } = useGetRoomTypeByBuildingId(Number(buildingId))
-  useEffect(() => {
-    if (buildingId) {
-      roomTypeRefetch()
-    }
-  }, [buildingId, roomTypeRefetch])
+
+  const uploadImage = useUploadImageToCloud()
   const editRoomMutation = useEditRoomMutation()
   const createRoomMutation = useCreateRoomMutation()
+
+  const handleUpload = () => {
+    images.forEach((file) => {
+      uploadImage.mutateAsync(file)
+    })
+  }
 
   const handleChangeRoomType = (event: SelectChangeEvent) => {
     setRoomTypeid(event.target.value)
@@ -63,14 +66,13 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
     setBuildingId(event.target.value)
   }
   const handleClickOpen = () => {
-    setOpen(true)
+    roomTypeRefetch().then(() => {
+      setOpen(true)
+    })
   }
 
   const handleClose = () => {
     setOpen(false)
-    setImage(null)
-    setRoomTypeid('')
-    setBuildingId('')
   }
 
   return (
@@ -96,12 +98,11 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault()
             const formData = new FormData(event.currentTarget)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const formJson = Object.fromEntries((formData as any).entries())
+            const formJson = Object.fromEntries((formData as FormData).entries())
             const payload = {
               ...row,
               ...formJson,
-              image: image ?? '',
+              image: '',
               roomTypeId: roomTypeId,
               buildingId: buildingId,
               status: status
@@ -199,7 +200,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
               />
             </Grid>
             <Grid size={12}>
-              <UploadImage image={image || ''} setImage={setImage} />
+              <UploadImage selectedFiles={images} setSelectedFiles={setSelectedImages} />
             </Grid>
           </Grid>
         </DialogContent>
