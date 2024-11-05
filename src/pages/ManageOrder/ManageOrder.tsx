@@ -127,7 +127,7 @@ export default function ManageOrder() {
 
   useEffect(() => {
     if (orderData) {
-      const rowsData = orderData.data.data.map(mapOrderToRow)
+      const rowsData = orderData.data.map(mapOrderToRow)
       setRows([...rowsData])
       setRowCount(orderData.data.totalRecord)
     }
@@ -136,13 +136,13 @@ export default function ManageOrder() {
   useEffect(() => {
     if (searchKeyword.trim().length > 0) {
       if (searchData) {
-        const searchRowsData = searchData.data.data.map(mapOrderToRow)
+        const searchRowsData = searchData.data.map(mapOrderToRow)
         setRows([...searchRowsData])
         setRowCount(searchData?.data?.totalRecord || 0)
       }
     } else {
       if (orderData) {
-        const rowsData = orderData.data.data.map(mapOrderToRow)
+        const rowsData = orderData.data.map(mapOrderToRow)
         setRows([...rowsData])
         setRowCount(orderData.data.totalRecord)
       }

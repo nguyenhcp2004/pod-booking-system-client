@@ -26,7 +26,7 @@ export const useGetUnavailableRooms = (query: UnavailableRoomsQueryType) => {
   return useQuery({
     queryKey: ['unavailable-rooms'],
     queryFn: () => roomFilterApiRequest.getUnavailableRooms(query),
-    enabled: !!query.startTime && !!query.endTime
+    enabled: false
   })
 }
 

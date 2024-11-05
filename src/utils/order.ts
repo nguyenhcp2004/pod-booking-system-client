@@ -5,8 +5,9 @@ import { BookingInfo, slotType } from '~/contexts/BookingContext'
 export const createDateTimeFromSlot = (date: string, slot: slotType) => {
   const [startTimeString, endTimeString] = slot.split(' - ')
 
-  const startTime = new Date(`${date}T${startTimeString}:00`)
-  const endTime = new Date(`${date}T${endTimeString}:00`)
+  const dateFormat = moment(date).format('YYYY-MM-DD')
+  const startTime = new Date(`${dateFormat}T${startTimeString}:00`)
+  const endTime = new Date(`${dateFormat}T${endTimeString}:00`)
 
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat('sv-SE', {
@@ -204,13 +205,16 @@ export const calTotalPrice = (bookingData: BookingInfo) => {
   if (bookingData?.servicePackage) {
     switch (bookingData?.servicePackage?.id.toString()) {
       case '1':
-        packageRepeat = 4
+        packageRepeat = 1
         break
       case '2':
-        packageRepeat = 30
+        packageRepeat = 7
         break
       case '3':
-        packageRepeat = 1
+        packageRepeat = 4
+        break
+      case '4':
+        packageRepeat = 30
         break
     }
   }
