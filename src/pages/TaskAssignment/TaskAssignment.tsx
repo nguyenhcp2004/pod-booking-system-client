@@ -19,7 +19,15 @@ import {
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
 
-const timeSlots = ['7h-9h', '9h-11h', '11h-13h', '13h-15h', '15h-17h', '17h-19h', '19h-21h']
+const timeSlots = [
+  '7:00 - 9:00',
+  '9:00 - 11:00',
+  '11:00 - 13:00',
+  '13:00 - 15:00',
+  '15:00 - 17:00',
+  '17:00 - 19:00',
+  '19:00 - 21:00'
+]
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
 type Slot = {
   day: string
@@ -93,11 +101,11 @@ const chipColors = [
 ]
 
 const shift = {
-  'T2-7h-9h': ['Nguyen Van A', 'Tran Thi B'],
-  'T3-7h-9h': ['Le Van C', 'Nguyen Van D'],
-  'T4-7h-9h': ['Pham Thi E'],
-  'T5-7h-9h': ['Nguyen Van F', 'Do Thi G'],
-  'T6-7h-9h': ['Hoang Van H']
+  'T2-7:00 - 9:00': ['Nguyen Van A', 'Tran Thi B'],
+  'T3-7:00 - 9:00': ['Le Van C', 'Nguyen Van D'],
+  'T4-7:00 - 9:00': ['Pham Thi E'],
+  'T5-7:00 - 9:00': ['Nguyen Van F', 'Do Thi G'],
+  'T6-7:00 - 9:00': ['Hoang Van H']
 }
 
 export default function TaskAssignment() {
@@ -106,7 +114,7 @@ export default function TaskAssignment() {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [newEvent, setNewEvent] = useState('')
   const [hoveredChip, setHoveredChip] = useState<string | null>(null) // State để lưu chip đang hover
-
+  console.log(events)
   const handleAddEvent = (day: string, timeSlot: string) => {
     setSelectedSlot({ day, timeSlot })
     setIsAddEventOpen(true)
@@ -289,13 +297,13 @@ export default function TaskAssignment() {
                 setSelectedSlot({ day: selectedSlot?.day || '', timeSlot: e.target.value })
               }}
             >
-              <MenuItem value='7h-9h'>7h - 9h</MenuItem>
-              <MenuItem value='9h-11h'>9h - 11h</MenuItem>
-              <MenuItem value='11h-13h'>11h - 13h</MenuItem>
-              <MenuItem value='13h-15h'>13h - 15h</MenuItem>
-              <MenuItem value='15h-17h'>15h - 17h</MenuItem>
-              <MenuItem value='17h-19h'>17h - 19h</MenuItem>
-              <MenuItem value='19h-21h'>19h - 21h</MenuItem>
+              <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
+              <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
+              <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
+              <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
+              <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
+              <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
+              <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
