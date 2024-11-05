@@ -112,6 +112,11 @@ const Calendar = ({ rooms, selected, slots: selectedSlot }: { rooms: Room[]; sel
     setTo(moment().endOf('month').format('YYYY-MM-DD'))
   }
 
+  useEffect(() => {
+    setFrom(moment(selected[0]).startOf('month').format('YYYY-MM-DD'))
+    setTo(moment(selected[0]).endOf('month').format('YYYY-MM-DD'))
+  }, [selected])
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderEventDetails = (event: any) => {
     return (
