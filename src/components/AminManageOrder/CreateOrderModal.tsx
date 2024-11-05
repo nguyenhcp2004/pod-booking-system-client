@@ -22,6 +22,7 @@ import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
 import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
 import PaymentBox from './CreateOrderComponents/PaymentBox'
 import { toast } from 'react-toastify'
+import { Room } from '~/constants/type'
 
 interface CreateOrderModalProps {
   open: boolean
@@ -46,6 +47,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
   const [bookingData, setBookingData] = useState<BookingInfo>(initialBookingData)
   const [openPayment, setOpenPayment] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
 
   useEffect(() => {
     setBookingData(initialBookingData)
@@ -54,6 +56,22 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
     setLoading(false)
     setSelectedSlots([])
   }, [open])
+
+  useEffect(() => {
+    bookingData.selectedRooms.map((bookedRoom) => {
+      const temp: Room = {
+        id: bookedRoom.id,
+        name: bookedRoom.name,
+        description: '',
+        image: '',
+        status: '',
+        createdAt: moment().toISOString(),
+        updatedAt: moment().toISOString(),
+        roomType: null
+      }
+      setSelectedRooms((prev) => [...prev, temp])
+    })
+  }, [bookingData])
 
   const handleOfflinePayment = async () => {
     setLoading(true)
@@ -109,7 +127,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
 
         <Grid container spacing={2}>
           <Grid item lg={6} md={6}>
-            <Calendar selected={selectedDates} slots={selectedSlots} />
+            <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
           </Grid>
 
           <Grid item lg={6} md={6} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
