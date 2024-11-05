@@ -5,12 +5,41 @@ export const LoginBody = z
     email: z.string().email({ message: 'Email không hợp lệ.' }),
     password: z
       .string()
-      .min(6, { message: 'Password từ 6 kí tự trở lên.' })
-      .max(30, { message: 'Password không hợp lệ.' })
+      .min(6, { message: 'Password từ 6 - 30 kí tự.' })
+      .max(30, { message: 'Password từ 6 - 30 kí tự.' })
   })
   .strict()
 
 export type LoginBodyType = z.TypeOf<typeof LoginBody>
+
+export const RegisterBody = z
+  .object({
+    name: z
+      .string()
+      .min(5, { message: 'Tên người dùng phải có ít nhất 5 kí tự.' })
+      .max(30, { message: 'Tên người dùng phải là 5 - 30 kí tự.' }),
+    email: z.string().email({ message: 'Email không hợp lệ.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Mật khẩu từ 6 - 30 kí tự.' })
+      .max(30, { message: 'Mật khẩu từ 6 - 30 kí tự.' }),
+    confirmPassword: z
+      .string()
+      .min(6, 'Xác nhận mật khẩu từ 6 - 30 kí tự.')
+      .max(30, 'Xác nhận mật khẩu từ 6 - 30 kí tự.')
+  })
+  .strict()
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Mật khẩu không khớp',
+        path: ['confirmPassword']
+      })
+    }
+  })
+
+export type RegisterBodyType = z.TypeOf<typeof RegisterBody>
 
 export const Account = z.object({
   id: z.string(),
