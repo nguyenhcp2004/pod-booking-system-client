@@ -9,12 +9,14 @@ import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { toast } from 'react-toastify'
-import { useLoginMutation } from '~/queries/useAuth'
+import { useRegisterMutation } from '~/queries/useAuth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RegisterBody, RegisterBodyType } from '~/schemaValidations/auth.schema'
 import Link from '@mui/material/Link'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
+import { useAppContext } from '~/contexts/AppProvider'
+import { handleErrorApi } from '~/utils/utils'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,10 +35,12 @@ const Card = styled(MuiCard)(({ theme }) => ({
   })
 }))
 export default function Register() {
+  const { setAuth, setAccount } = useAppContext()
   const {
     control,
     formState: { errors },
-    handleSubmit
+    handleSubmit,
+    setError
   } = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
@@ -46,18 +50,20 @@ export default function Register() {
     }
   })
   const navigate = useNavigate()
-  const loginMutation = useLoginMutation()
+  const registerMutation = useRegisterMutation()
 
   const onSubmit = handleSubmit(async (data) => {
-    if (loginMutation.isPending) return
+    if (registerMutation.isPending) return
     try {
-      const result = await loginMutation.mutateAsync(data)
-      toast.success(result.data.message, {
+      const result = await registerMutation.mutateAsync(data)
+      setAuth(true)
+      setAccount(result.data.data.account)
+      toast.success('Chào mừng đến với FlexiPod', {
         autoClose: 3000
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
+      handleErrorApi({ error, setError })
     }
   })
   return (
