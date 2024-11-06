@@ -4,6 +4,7 @@ import {
   CountCustomerReqType,
   CountCustomerResType,
   CreateAccountBodyType,
+  GetListStaffResType,
   GetManageAccountRes,
   GetMeResType,
   SendMailBodyType,
@@ -35,7 +36,8 @@ const accountApiRequest = {
   countCustomer: (query: CountCustomerReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     return http.get<CountCustomerResType>(`/accounts/number-accounts?${queryString}`)
-  }
+  },
+  getListStaff: () => http.get<GetListStaffResType>('/accounts/staff')
 }
 
 export default accountApiRequest

@@ -12,7 +12,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  FormHelperText
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
@@ -21,6 +22,10 @@ import { StyledHeader } from '~/pages/TaskAssignment/StyledHeader'
 import { StyledDayHeader } from '~/pages/TaskAssignment/StyledDayHeader'
 import { StyledPaper } from '~/pages/TaskAssignment/StyledPaper'
 import { StyledTimeSlot } from '~/pages/TaskAssignment/StyledTimeSlot'
+import { useGetListStaff } from '~/queries/useAccount'
+import { Controller, useForm } from 'react-hook-form'
+import { CreateAssignmentBody, CreateAssignmentBodyType } from '~/schemaValidations/assignment.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const timeSlots = [
   '7:00 - 9:00',
@@ -32,22 +37,18 @@ const timeSlots = [
   '19:00 - 21:00'
 ]
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
-type Slot = {
-  day: string
-  timeSlot: string
-}
 
 const chipColors = [
   '#FF6B6B',
   '#4ECDC4',
-  '#45B7D1',
-  '#FFA07A',
-  '#98D8C8',
-  '#F06292',
+  '#FFB74D',
+  '#7986CB',
   '#AED581',
   '#FFD54F',
+  '#F06292',
   '#4DB6AC',
-  '#7986CB'
+  '#BA68C8',
+  '#A7C7E7'
 ]
 
 type Shift = {
@@ -56,11 +57,39 @@ type Shift = {
 
 export default function TaskAssignment() {
   const { data } = useGetAllAssignment()
+  const { data: staffs } = useGetListStaff()
   const [events, setEvents] = useState<Shift>({})
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
-  const [newEvent, setNewEvent] = useState('')
-  const [hoveredChip, setHoveredChip] = useState<string | null>(null) // State để lưu chip đang hover
+  const employeeColors = useMemo(() => {
+    const colorMap = new Map()
+    const allEmployeeNames = Array.from(
+      new Set(
+        Object.values(events)
+          .flat()
+          .map((event) => event.name)
+      )
+    )
+
+    allEmployeeNames.forEach((employeeName, index) => {
+      colorMap.set(employeeName, chipColors[index % chipColors.length])
+    })
+
+    return colorMap
+  }, [events])
+  const [hoveredChip, setHoveredChip] = useState<string | null>(null)
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    setValue
+  } = useForm<CreateAssignmentBodyType>({
+    resolver: zodResolver(CreateAssignmentBody),
+    defaultValues: {
+      staffId: '',
+      slot: '',
+      weekDate: ''
+    }
+  })
 
   useEffect(() => {
     if (data) {
@@ -80,35 +109,35 @@ export default function TaskAssignment() {
     }
   }, [data])
   const handleAddEvent = (day: string, timeSlot: string) => {
-    setSelectedSlot({ day, timeSlot })
+    setValue('slot', timeSlot || '')
+    setValue('weekDate', day || '')
     setIsAddEventOpen(true)
   }
 
-  const handleSaveEvent = () => {
-    if (newEvent.trim() !== '') {
-      const key = `${selectedSlot?.day}-${selectedSlot?.timeSlot}`
-      const newId = Date.now().toString() // hoặc sử dụng uuid để tạo id
-      const newEventObj = { id: newId, name: newEvent }
+  const handleSaveEvent = handleSubmit((data) => {
+    if (data) {
+      const key = `${data.weekDate}-${data.slot}`
+      const newId = Date.now().toString()
+      const newEventObj = { id: newId, name: data.staffId }
 
       setEvents((prev) => ({
         ...prev,
         [key]: [...(prev[key] || []), newEventObj]
       }))
 
-      setNewEvent('')
+      setValue('staffId', '')
+      setValue('slot', '')
+      setValue('weekDate', '')
       setIsAddEventOpen(false)
     }
+  })
+
+  const handleClose = () => {
+    setValue('staffId', '')
+    setValue('slot', '')
+    setValue('weekDate', '')
+    setIsAddEventOpen(false)
   }
-
-  const employeeColors = useMemo(() => {
-    const colorMap = new Map()
-    const allEmployees = new Set(Object.values(events).flat())
-    Array.from(allEmployees).forEach((employee, index) => {
-      colorMap.set(employee, chipColors[index % chipColors.length])
-    })
-    return colorMap
-  }, [events])
-
   return (
     <Box
       sx={{
@@ -159,7 +188,7 @@ export default function TaskAssignment() {
                       label={event.name}
                       size='small'
                       style={{
-                        backgroundColor: employeeColors.get(event),
+                        backgroundColor: employeeColors.get(event.name),
                         color: 'white',
                         margin: '2px',
                         fontWeight: 'bold'
@@ -212,71 +241,78 @@ export default function TaskAssignment() {
       >
         <DialogTitle>Thêm nhân viên</DialogTitle>
         <DialogContent>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Nhân viên
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={newEvent}
-              label='Nhân viên'
-              onChange={(e) => {
-                setNewEvent(e.target.value)
-              }}
-            >
-              <MenuItem value='Nguyên'>Nguyên</MenuItem>
-              <MenuItem value='Huy'>Huy</MenuItem>
-              <MenuItem value='Hoàng'>Hoàng</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Ngày trực
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={selectedSlot?.day || ''}
-              label='Ngày trực'
-              onChange={(e) => {
-                setSelectedSlot({ day: e.target.value, timeSlot: selectedSlot?.timeSlot || '' })
-              }}
-            >
-              <MenuItem value='T2'>Thứ 2</MenuItem>
-              <MenuItem value='T3'>Thứ 3</MenuItem>
-              <MenuItem value='T4'>Thứ 4</MenuItem>
-              <MenuItem value='T5'>Thứ 5</MenuItem>
-              <MenuItem value='T6'>Thứ 6</MenuItem>
-              <MenuItem value='T7'>Thứ 7</MenuItem>
-              <MenuItem value='CN'>Chủ nhật</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Khung giờ
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={selectedSlot?.timeSlot || ''}
-              label='Khung giờ'
-              onChange={(e) => {
-                setSelectedSlot({ day: selectedSlot?.day || '', timeSlot: e.target.value })
-              }}
-            >
-              <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
-              <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
-              <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
-              <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
-              <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
-              <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
-              <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
-            </Select>
-          </FormControl>
+          <Box component='form'>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel size='small' id='time-slot-label'>
+                Nhân viên
+              </InputLabel>
+              <Controller
+                control={control}
+                name='staffId'
+                render={({ field }) => (
+                  <>
+                    <Select size='small' labelId='time-slot-label' label='Nhân viên' {...field}>
+                      {staffs?.data.data.map((staff) => (
+                        <MenuItem key={staff.id} value={staff.name}>
+                          {staff.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.staffId && <FormHelperText error>{errors.staffId?.message || ''}</FormHelperText>}
+                  </>
+                )}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel size='small' id='time-slot-label'>
+                Ngày trực
+              </InputLabel>
+              <Controller
+                control={control}
+                name='weekDate'
+                render={({ field }) => (
+                  <>
+                    <Select size='small' labelId='time-slot-label' {...field} label='Ngày trực'>
+                      <MenuItem value='T2'>Thứ 2</MenuItem>
+                      <MenuItem value='T3'>Thứ 3</MenuItem>
+                      <MenuItem value='T4'>Thứ 4</MenuItem>
+                      <MenuItem value='T5'>Thứ 5</MenuItem>
+                      <MenuItem value='T6'>Thứ 6</MenuItem>
+                      <MenuItem value='T7'>Thứ 7</MenuItem>
+                      <MenuItem value='CN'>Chủ nhật</MenuItem>
+                    </Select>
+                    {errors.weekDate && <FormHelperText error>{errors.weekDate?.message || ''}</FormHelperText>}
+                  </>
+                )}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel size='small' id='time-slot-label'>
+                Khung giờ
+              </InputLabel>
+              <Controller
+                control={control}
+                name='slot'
+                render={({ field }) => (
+                  <>
+                    <Select size='small' labelId='time-slot-label' {...field} label='Khung giờ'>
+                      <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
+                      <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
+                      <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
+                      <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
+                      <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
+                      <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
+                      <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
+                    </Select>
+                    {errors.slot && <FormHelperText error>{errors.slot?.message || ''}</FormHelperText>}
+                  </>
+                )}
+              />
+            </FormControl>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsAddEventOpen(false)}>Hủy</Button>
+          <Button onClick={handleClose}>Hủy</Button>
           <Button onClick={handleSaveEvent} variant='contained'>
             Thêm
           </Button>

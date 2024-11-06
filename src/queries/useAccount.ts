@@ -69,3 +69,10 @@ export const useCountCustomer = (query: CountCustomerReqType) => {
     enabled: !!query.startTime && !!query.endTime
   })
 }
+
+export const useGetListStaff = () => {
+  return useQuery({
+    queryKey: ['staffs'],
+    queryFn: accountApiRequest.getListStaff
+  })
+}
