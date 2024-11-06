@@ -4,6 +4,7 @@ import {
   CountCustomerReqType,
   CountCustomerResType,
   CreateAccountBodyType,
+  GetListStaffResType,
   GetManageAccountRes,
   GetMeResType,
   SendMailBodyType,
@@ -11,6 +12,7 @@ import {
   UpdateAccountByAdminBodyType,
   UpdateAccountByAdminResType
 } from '~/schemaValidations/account.schema'
+import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
 
@@ -35,6 +37,10 @@ const accountApiRequest = {
   countCustomer: (query: CountCustomerReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     return http.get<CountCustomerResType>(`/accounts/number-accounts?${queryString}`)
+  },
+  getListStaff: (query: GetAssignmentsQueryType) => {
+    const stringified = queryString.stringify(query)
+    return http.get<GetListStaffResType>(`/accounts/staff?${stringified}`)
   }
 }
 

@@ -1,23 +1,34 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Box,
   Typography,
-  Paper,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  styled,
   Chip,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  FormHelperText,
+  DialogContentText
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
+import { useCreateAssignment, useDeleteAssignment, useGetAllAssignment } from '~/queries/useAssignment'
+import { StyledHeader } from '~/pages/TaskAssignment/StyledHeader'
+import { StyledDayHeader } from '~/pages/TaskAssignment/StyledDayHeader'
+import { StyledPaper } from '~/pages/TaskAssignment/StyledPaper'
+import { StyledTimeSlot } from '~/pages/TaskAssignment/StyledTimeSlot'
+import { useGetListStaff } from '~/queries/useAccount'
+import { Controller, useForm } from 'react-hook-form'
+import { CreateAssignmentBody, CreateAssignmentBodyType } from '~/schemaValidations/assignment.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { handleErrorApi } from '~/utils/utils'
+import { toast } from 'react-toastify'
 
 const timeSlots = [
   '7:00 - 9:00',
@@ -29,118 +40,128 @@ const timeSlots = [
   '19:00 - 21:00'
 ]
 const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
-type Slot = {
-  day: string
-  timeSlot: string
-}
-
-const StyledHeader = styled(Box)(({ theme }) => ({
-  background: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(2, 3),
-  borderRadius: theme.shape.borderRadius,
-  marginBottom: theme.spacing(3),
-  boxShadow: theme.shadows[3]
-}))
-
-const StyledTimeSlot = styled(Box)(({ theme }) => ({
-  height: 120,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  background: theme.palette.grey[200],
-  color: theme.palette.text.primary,
-  transition: 'all 0.3s ease',
-  '&:nth-of-type(odd)': {
-    background: theme.palette.grey[300]
-  },
-  '&:hover': {
-    background: theme.palette.grey[400],
-    transform: 'scale(1.02)'
-  }
-}))
-
-const StyledDayHeader = styled(Box)(({ theme }) => ({
-  height: 50,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  fontWeight: theme.typography.fontWeightBold,
-  backgroundColor: theme.palette.background.paper
-}))
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  height: 120,
-  overflowY: 'auto',
-  padding: theme.spacing(1),
-  position: 'relative',
-  overflow: 'hidden',
-  boxShadow: 'none',
-  border: `1px solid ${theme.palette.divider}`,
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    boxShadow: theme.shadows[2],
-    '& .add-event': { opacity: 1 }
-  }
-}))
 
 const chipColors = [
   '#FF6B6B',
   '#4ECDC4',
-  '#45B7D1',
-  '#FFA07A',
-  '#98D8C8',
-  '#F06292',
+  '#FFB74D',
+  '#7986CB',
   '#AED581',
   '#FFD54F',
+  '#F06292',
   '#4DB6AC',
-  '#7986CB'
+  '#BA68C8',
+  '#A7C7E7'
 ]
 
-const shift = {
-  'T2-7:00 - 9:00': ['Nguyen Van A', 'Tran Thi B'],
-  'T3-7:00 - 9:00': ['Le Van C', 'Nguyen Van D'],
-  'T4-7:00 - 9:00': ['Pham Thi E'],
-  'T5-7:00 - 9:00': ['Nguyen Van F', 'Do Thi G'],
-  'T6-7:00 - 9:00': ['Hoang Van H']
+type Shift = {
+  [key: string]: { id: string; name: string }[]
 }
 
 export default function TaskAssignment() {
-  const [events, setEvents] = useState<Record<string, string[]>>(shift)
+  const { data } = useGetAllAssignment()
+  const {
+    control,
+    watch,
+    formState: { errors },
+    handleSubmit,
+    setValue
+  } = useForm<CreateAssignmentBodyType>({
+    resolver: zodResolver(CreateAssignmentBody),
+    defaultValues: {
+      staffId: '',
+      slot: '',
+      weekDate: ''
+    }
+  })
+  const { data: staffs } = useGetListStaff({ slot: watch('slot'), weekDate: watch('weekDate') })
+  const createAssignmentMutation = useCreateAssignment()
+  const [events, setEvents] = useState<Shift>({})
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
-  const [newEvent, setNewEvent] = useState('')
-  const [hoveredChip, setHoveredChip] = useState<string | null>(null) // State để lưu chip đang hover
-  console.log(events)
+  const [open, setOpen] = useState(false)
+  const deleteAssignmentMutation = useDeleteAssignment()
+  const [staff, setStaff] = useState<{ id: string; name: string }>()
+  const staffColors = useMemo(() => {
+    const colorMap = new Map()
+    const allStaffNames = Array.from(
+      new Set(
+        Object.values(events)
+          .flat()
+          .map((event) => event.name)
+      )
+    )
+
+    allStaffNames.forEach((staffName, index) => {
+      colorMap.set(staffName, chipColors[index % chipColors.length])
+    })
+
+    return colorMap
+  }, [events])
+  const [hoveredChip, setHoveredChip] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (data) {
+      const shift = data.data.data.reduce((acc, item) => {
+        const key = `${item.weekDate}-${item.slot}`
+        const staff = { id: item.id, name: item.nameStaff }
+
+        if (!acc[key]) {
+          acc[key] = []
+        }
+        acc[key].push(staff)
+
+        return acc
+      }, {} as Shift)
+
+      setEvents(shift)
+    }
+  }, [data])
   const handleAddEvent = (day: string, timeSlot: string) => {
-    setSelectedSlot({ day, timeSlot })
+    setValue('slot', timeSlot || '')
+    setValue('weekDate', day || '')
     setIsAddEventOpen(true)
   }
 
-  const handleSaveEvent = () => {
-    if (newEvent.trim() !== '') {
-      const key = `${selectedSlot?.day}-${selectedSlot?.timeSlot}`
-      setEvents((prev) => ({
-        ...prev,
-        [key]: [...(prev[key] || []), newEvent]
-      }))
-      setNewEvent('')
+  const handleSaveEvent = handleSubmit(async (data) => {
+    if (createAssignmentMutation.isPending) return
+    try {
+      await createAssignmentMutation.mutateAsync(data)
+      toast.success('Thêm nhân viên vào ca trực thành công')
+      setValue('staffId', '')
+      setValue('slot', '')
+      setValue('weekDate', '')
       setIsAddEventOpen(false)
+    } catch (error) {
+      handleErrorApi({ error })
     }
+  })
+
+  const handleClose = () => {
+    setValue('staffId', '')
+    setValue('slot', '')
+    setValue('weekDate', '')
+    setIsAddEventOpen(false)
   }
 
-  const employeeColors = useMemo(() => {
-    const colorMap = new Map()
-    const allEmployees = new Set(Object.values(events).flat())
-    Array.from(allEmployees).forEach((employee, index) => {
-      colorMap.set(employee, chipColors[index % chipColors.length])
-    })
-    return colorMap
-  }, [events])
+  const handleOpenDialog = (assignment: { id: string; name: string }) => {
+    setStaff(assignment)
+    setOpen(true)
+  }
 
+  const handleCloseDialog = () => {
+    setOpen(false)
+  }
+
+  const handleDeleteAssignment = async () => {
+    if (deleteAssignmentMutation.isPending) return
+    try {
+      await deleteAssignmentMutation.mutateAsync({ id: staff?.id as string })
+      toast.success('Đã xóa nhân viên khỏi ca trực')
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
   return (
     <Box
       sx={{
@@ -158,6 +179,36 @@ export default function TaskAssignment() {
         </Typography>
       </StyledHeader>
       <Grid container>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby='alert-dialog-title'
+          aria-describedby='alert-dialog-description'
+        >
+          <DialogTitle id='alert-dialog-title'>Xóa nhân viên</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-description'>
+              Bạn có muốn xóa nhân viên{' '}
+              <Chip
+                label={staff?.name}
+                size='small'
+                style={{
+                  backgroundColor: staffColors.get(staff?.name),
+                  color: 'white',
+                  margin: '2px',
+                  fontWeight: 'bold'
+                }}
+              />{' '}
+              khỏi ca trực
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Hủy</Button>
+            <Button variant='contained' color='error' onClick={handleDeleteAssignment} autoFocus>
+              Xóa
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Grid size={{ xs: 1.5 }}>
           <Box sx={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)}>
@@ -182,25 +233,26 @@ export default function TaskAssignment() {
                 {events[`${day}-${slot}`]?.map((event, index) => (
                   <div
                     key={index}
-                    onMouseEnter={() => setHoveredChip(event)}
+                    onMouseEnter={() => setHoveredChip(event.id)}
                     onMouseLeave={() => setHoveredChip(null)}
                     style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}
                   >
                     <Chip
                       key={index}
-                      label={event}
+                      label={event.name}
                       size='small'
                       style={{
-                        backgroundColor: employeeColors.get(event),
+                        backgroundColor: staffColors.get(event.name),
                         color: 'white',
                         margin: '2px',
                         fontWeight: 'bold'
                       }}
                     />
-                    {hoveredChip === event && (
+                    {hoveredChip === event.id && (
                       <IconButton
                         size='small'
                         aria-label='remove'
+                        onClick={() => handleOpenDialog(event)}
                         sx={{
                           height: 20,
                           position: 'absolute',
@@ -244,71 +296,80 @@ export default function TaskAssignment() {
       >
         <DialogTitle>Thêm nhân viên</DialogTitle>
         <DialogContent>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Nhân viên
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={newEvent}
-              label='Nhân viên'
-              onChange={(e) => {
-                setNewEvent(e.target.value)
-              }}
-            >
-              <MenuItem value='Nguyên'>Nguyên</MenuItem>
-              <MenuItem value='Huy'>Huy</MenuItem>
-              <MenuItem value='Hoàng'>Hoàng</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Ngày trực
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={selectedSlot?.day || ''}
-              label='Ngày trực'
-              onChange={(e) => {
-                setSelectedSlot({ day: e.target.value, timeSlot: selectedSlot?.timeSlot || '' })
-              }}
-            >
-              <MenuItem value='T2'>Thứ 2</MenuItem>
-              <MenuItem value='T3'>Thứ 3</MenuItem>
-              <MenuItem value='T4'>Thứ 4</MenuItem>
-              <MenuItem value='T5'>Thứ 5</MenuItem>
-              <MenuItem value='T6'>Thứ 6</MenuItem>
-              <MenuItem value='T7'>Thứ 7</MenuItem>
-              <MenuItem value='CN'>Chủ nhật</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ my: 2 }}>
-            <InputLabel size='small' id='time-slot-label'>
-              Khung giờ
-            </InputLabel>
-            <Select
-              size='small'
-              labelId='time-slot-label'
-              value={selectedSlot?.timeSlot || ''}
-              label='Khung giờ'
-              onChange={(e) => {
-                setSelectedSlot({ day: selectedSlot?.day || '', timeSlot: e.target.value })
-              }}
-            >
-              <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
-              <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
-              <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
-              <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
-              <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
-              <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
-              <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
-            </Select>
-          </FormControl>
+          <Box component='form'>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel size='small' id='time-slot-label'>
+                Ngày trực
+              </InputLabel>
+              <Controller
+                control={control}
+                name='weekDate'
+                render={({ field }) => (
+                  <>
+                    <Select size='small' labelId='time-slot-label' {...field} label='Ngày trực'>
+                      <MenuItem value='T2'>Thứ 2</MenuItem>
+                      <MenuItem value='T3'>Thứ 3</MenuItem>
+                      <MenuItem value='T4'>Thứ 4</MenuItem>
+                      <MenuItem value='T5'>Thứ 5</MenuItem>
+                      <MenuItem value='T6'>Thứ 6</MenuItem>
+                      <MenuItem value='T7'>Thứ 7</MenuItem>
+                      <MenuItem value='CN'>Chủ nhật</MenuItem>
+                    </Select>
+                    {errors.weekDate && <FormHelperText error>{errors.weekDate?.message || ''}</FormHelperText>}
+                  </>
+                )}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel size='small' id='time-slot-label'>
+                Khung giờ
+              </InputLabel>
+              <Controller
+                control={control}
+                name='slot'
+                render={({ field }) => (
+                  <>
+                    <Select size='small' labelId='time-slot-label' {...field} label='Khung giờ'>
+                      <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
+                      <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
+                      <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
+                      <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
+                      <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
+                      <MenuItem value='17:00 - 19:00'>17h - 19h</MenuItem>
+                      <MenuItem value='19:00 - 21:00'>19h - 21h</MenuItem>
+                    </Select>
+                    {errors.slot && <FormHelperText error>{errors.slot?.message || ''}</FormHelperText>}
+                  </>
+                )}
+              />
+            </FormControl>
+            {watch('slot') && watch('weekDate') && (
+              <FormControl fullWidth sx={{ my: 2 }}>
+                <InputLabel size='small' id='time-slot-label'>
+                  Nhân viên
+                </InputLabel>
+                <Controller
+                  control={control}
+                  name='staffId'
+                  render={({ field }) => (
+                    <>
+                      <Select size='small' labelId='time-slot-label' label='Nhân viên' {...field}>
+                        {staffs?.data.data.map((staff) => (
+                          <MenuItem key={staff.id} value={staff.id}>
+                            {staff.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.staffId && <FormHelperText error>{errors.staffId?.message || ''}</FormHelperText>}
+                    </>
+                  )}
+                />
+              </FormControl>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsAddEventOpen(false)}>Hủy</Button>
+          <Button onClick={handleClose}>Hủy</Button>
           <Button onClick={handleSaveEvent} variant='contained'>
             Thêm
           </Button>
