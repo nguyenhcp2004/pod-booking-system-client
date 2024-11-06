@@ -26,12 +26,7 @@ import { useGetAllBuilding } from '~/queries/useBuilding'
 import { useGetRoomTypeByBuildingId } from '~/queries/useRoomType'
 import { useAppContext } from '~/contexts/AppProvider'
 import UploadImage from '~/components/UploadImage/UploadImage'
-import {
-  useAddImageToRoomMutation,
-  useDeleteImageMutation,
-  useGetImagesByRoomId,
-  useUploadImageToCloud
-} from '~/queries/useImage'
+import { useAddImageToRoomMutation, useGetImagesByRoomId, useUploadImageToCloud } from '~/queries/useImage'
 import { Image } from '~/constants/type'
 
 const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () => void; action: string }) => {
@@ -253,7 +248,6 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
           <Button type='submit' color='success'>
             {action === ACTION.CREATE ? 'Tạo' : 'Lưu'}
           </Button>
-          {/* <Button onClick={handleUpload}>test</Button> */}
         </DialogActions>
       </Dialog>
     </>
