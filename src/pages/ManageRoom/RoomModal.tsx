@@ -26,12 +26,19 @@ import { useGetAllBuilding } from '~/queries/useBuilding'
 import { useGetRoomTypeByBuildingId } from '~/queries/useRoomType'
 import { useAppContext } from '~/contexts/AppProvider'
 import UploadImage from '~/components/UploadImage/UploadImage'
-import { useUploadImageToCloud } from '~/queries/useImage'
+import {
+  useAddImageToRoomMutation,
+  useDeleteImageMutation,
+  useGetImagesByRoomId,
+  useUploadImageToCloud
+} from '~/queries/useImage'
+import { Image } from '~/constants/type'
 
 const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () => void; action: string }) => {
   const { account } = useAppContext()
   const [open, setOpen] = useState(false)
-  const [images, setSelectedImages] = useState<File[]>([])
+  const [images, setImages] = useState<Image[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [status, setStatus] = useState(row?.status)
   const [roomTypeId, setRoomTypeid] = useState(row?.roomType?.id === 0 ? '' : row?.roomType?.id.toString())
   const [buildingId, setBuildingId] = useState(
@@ -48,10 +55,31 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
   const uploadImage = useUploadImageToCloud()
   const editRoomMutation = useEditRoomMutation()
   const createRoomMutation = useCreateRoomMutation()
+  const addImageToRoomMutation = useAddImageToRoomMutation()
 
-  const handleUpload = () => {
-    images.forEach((file) => {
-      uploadImage.mutateAsync(file)
+  const { data: imagesData, refetch: imagesRefetch } = useGetImagesByRoomId(row?.id)
+
+  useEffect(() => {
+    if (imagesData) {
+      setImages(imagesData.data.data)
+    }
+  }, [imagesData])
+
+  useEffect(() => {
+    if (buildingId) {
+      roomTypeRefetch()
+    }
+  }, [buildingId])
+
+  const handleUpload = async ({ roomId }: { roomId: number }) => {
+    const uploadImagePromise: Promise<any>[] = selectedFiles.map((file) =>
+      uploadImage.mutateAsync(file).then((data) => data)
+    )
+    return Promise.all(uploadImagePromise).then((data) => {
+      addImageToRoomMutation.mutateAsync({
+        roomId: roomId,
+        image: data
+      })
     })
   }
 
@@ -110,18 +138,32 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
             try {
               const result =
                 action === ACTION.UPDATE
-                  ? await editRoomMutation.mutateAsync({
-                      ...payload,
-                      buildingId: buildingId.toString()
-                    })
-                  : await createRoomMutation.mutateAsync({
-                      ...payload,
-                      buildingId: buildingId.toString()
-                    })
+                  ? await editRoomMutation
+                      .mutateAsync({
+                        ...payload,
+                        buildingId: buildingId.toString()
+                      })
+                      .then((data) => {
+                        handleUpload({ roomId: row.id }).then(() => {
+                          imagesRefetch()
+                        })
+                        return data
+                      })
+                  : await createRoomMutation
+                      .mutateAsync({
+                        ...payload,
+                        buildingId: buildingId.toString()
+                      })
+                      .then((data) => {
+                        handleUpload({ roomId: data.data.data.id }).then(() => {
+                          imagesRefetch()
+                        })
+                        return data
+                      })
+              refetch()
               toast.success(result.data.message, {
                 autoClose: 3000
               })
-              refetch()
             } catch (error) {
               handleErrorApi({ error })
             }
@@ -200,7 +242,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
               />
             </Grid>
             <Grid size={12}>
-              <UploadImage selectedFiles={images} setSelectedFiles={setSelectedImages} />
+              <UploadImage images={images} setSelectedFiles={setSelectedFiles} refetch={imagesRefetch} />
             </Grid>
           </Grid>
         </DialogContent>
@@ -211,6 +253,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
           <Button type='submit' color='success'>
             {action === ACTION.CREATE ? 'Tạo' : 'Lưu'}
           </Button>
+          {/* <Button onClick={handleUpload}>test</Button> */}
         </DialogActions>
       </Dialog>
     </>
