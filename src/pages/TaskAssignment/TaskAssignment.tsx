@@ -13,11 +13,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  DialogContentText
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
-import { useGetAllAssignment } from '~/queries/useAssignment'
+import { useDeleteAssignment, useGetAllAssignment } from '~/queries/useAssignment'
 import { StyledHeader } from '~/pages/TaskAssignment/StyledHeader'
 import { StyledDayHeader } from '~/pages/TaskAssignment/StyledDayHeader'
 import { StyledPaper } from '~/pages/TaskAssignment/StyledPaper'
@@ -26,6 +27,8 @@ import { useGetListStaff } from '~/queries/useAccount'
 import { Controller, useForm } from 'react-hook-form'
 import { CreateAssignmentBody, CreateAssignmentBodyType } from '~/schemaValidations/assignment.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { handleErrorApi } from '~/utils/utils'
+import { toast } from 'react-toastify'
 
 const timeSlots = [
   '7:00 - 9:00',
@@ -60,9 +63,12 @@ export default function TaskAssignment() {
   const { data: staffs } = useGetListStaff()
   const [events, setEvents] = useState<Shift>({})
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
-  const employeeColors = useMemo(() => {
+  const [open, setOpen] = useState(false)
+  const deleteAssignmentMutation = useDeleteAssignment()
+  const [staff, setStaff] = useState<{ id: string; name: string }>()
+  const staffColors = useMemo(() => {
     const colorMap = new Map()
-    const allEmployeeNames = Array.from(
+    const allStaffNames = Array.from(
       new Set(
         Object.values(events)
           .flat()
@@ -70,8 +76,8 @@ export default function TaskAssignment() {
       )
     )
 
-    allEmployeeNames.forEach((employeeName, index) => {
-      colorMap.set(employeeName, chipColors[index % chipColors.length])
+    allStaffNames.forEach((staffName, index) => {
+      colorMap.set(staffName, chipColors[index % chipColors.length])
     })
 
     return colorMap
@@ -138,6 +144,26 @@ export default function TaskAssignment() {
     setValue('weekDate', '')
     setIsAddEventOpen(false)
   }
+
+  const handleOpenDialog = (assignment: { id: string; name: string }) => {
+    setStaff(assignment)
+    setOpen(true)
+  }
+
+  const handleCloseDialog = () => {
+    setOpen(false)
+  }
+
+  const handleDeleteAssignment = async () => {
+    if (deleteAssignmentMutation.isPending) return
+    try {
+      await deleteAssignmentMutation.mutateAsync({ id: staff?.id as string })
+      toast.success('Đã xóa nhân viên khỏi ca trực')
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
   return (
     <Box
       sx={{
@@ -155,6 +181,36 @@ export default function TaskAssignment() {
         </Typography>
       </StyledHeader>
       <Grid container>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby='alert-dialog-title'
+          aria-describedby='alert-dialog-description'
+        >
+          <DialogTitle id='alert-dialog-title'>Xóa nhân viên</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-description'>
+              Bạn có muốn xóa nhân viên{' '}
+              <Chip
+                label={staff?.name}
+                size='small'
+                style={{
+                  backgroundColor: staffColors.get(staff?.name),
+                  color: 'white',
+                  margin: '2px',
+                  fontWeight: 'bold'
+                }}
+              />{' '}
+              khỏi ca trực
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Hủy</Button>
+            <Button variant='contained' color='error' onClick={handleDeleteAssignment} autoFocus>
+              Xóa
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Grid size={{ xs: 1.5 }}>
           <Box sx={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)}>
@@ -188,7 +244,7 @@ export default function TaskAssignment() {
                       label={event.name}
                       size='small'
                       style={{
-                        backgroundColor: employeeColors.get(event.name),
+                        backgroundColor: staffColors.get(event.name),
                         color: 'white',
                         margin: '2px',
                         fontWeight: 'bold'
@@ -198,6 +254,7 @@ export default function TaskAssignment() {
                       <IconButton
                         size='small'
                         aria-label='remove'
+                        onClick={() => handleOpenDialog(event)}
                         sx={{
                           height: 20,
                           position: 'absolute',

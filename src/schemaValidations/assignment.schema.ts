@@ -15,6 +15,13 @@ export const GetAssignmentsRes = z.object({
 
 export type GetAssignmentsResType = z.TypeOf<typeof GetAssignmentsRes>
 
+export const DeleteAssignmentsRes = z.object({
+  code: z.number(),
+  message: z.string()
+})
+
+export type DeleteAssignmentsResType = z.TypeOf<typeof DeleteAssignmentsRes>
+
 export const CreateAssignmentBody = z
   .object({
     staffId: z.string().min(1, 'Tên nhân viên là bắt buộc'),
@@ -24,3 +31,10 @@ export const CreateAssignmentBody = z
   .strict()
 
 export type CreateAssignmentBodyType = z.TypeOf<typeof CreateAssignmentBody>
+
+export const GetAssignmentsQuery = z.object({
+  slot: z.string().optional(),
+  weekDate: z.string().optional()
+})
+
+export type GetAssignmentsQueryType = z.TypeOf<typeof GetAssignmentsQuery>
