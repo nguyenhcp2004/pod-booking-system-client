@@ -13,15 +13,26 @@ export const useUploadImageToCloud = () => {
 export const useGetImagesByRoomId = (roomId: number) => {
   return useQuery({
     queryKey: ['get-image-by-room-id', { roomId }],
-    queryFn: () => imageApiRequets.getImagesByRoomId(roomId)
+    queryFn: () => imageApiRequets.getImagesByRoomId(roomId),
+    enabled: !!roomId
   })
 }
-export const useAddImageToRoom = () => {
+export const useAddImageToRoomMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: imageApiRequets.addImageToRoom,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['add-image-to-room'] })
+    }
+  })
+}
+
+export const useDeleteImageMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: imageApiRequets.deleteImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delete-image'] })
     }
   })
 }
