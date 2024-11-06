@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
 import { PaginationSearchQuery } from '~/constants/type'
 import { CountCustomerReqType } from '~/schemaValidations/account.schema'
+import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 
 export const useGetMe = () => {
   return useQuery({
@@ -70,9 +71,9 @@ export const useCountCustomer = (query: CountCustomerReqType) => {
   })
 }
 
-export const useGetListStaff = () => {
+export const useGetListStaff = (query: GetAssignmentsQueryType) => {
   return useQuery({
-    queryKey: ['staffs'],
-    queryFn: accountApiRequest.getListStaff
+    queryKey: ['staffs', { query }],
+    queryFn: () => accountApiRequest.getListStaff(query)
   })
 }

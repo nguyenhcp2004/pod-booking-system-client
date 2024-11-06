@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import Grid from '@mui/material/Grid2'
-import { useDeleteAssignment, useGetAllAssignment } from '~/queries/useAssignment'
+import { useCreateAssignment, useDeleteAssignment, useGetAllAssignment } from '~/queries/useAssignment'
 import { StyledHeader } from '~/pages/TaskAssignment/StyledHeader'
 import { StyledDayHeader } from '~/pages/TaskAssignment/StyledDayHeader'
 import { StyledPaper } from '~/pages/TaskAssignment/StyledPaper'
@@ -60,7 +60,22 @@ type Shift = {
 
 export default function TaskAssignment() {
   const { data } = useGetAllAssignment()
-  const { data: staffs } = useGetListStaff()
+  const {
+    control,
+    watch,
+    formState: { errors },
+    handleSubmit,
+    setValue
+  } = useForm<CreateAssignmentBodyType>({
+    resolver: zodResolver(CreateAssignmentBody),
+    defaultValues: {
+      staffId: '',
+      slot: '',
+      weekDate: ''
+    }
+  })
+  const { data: staffs } = useGetListStaff({ slot: watch('slot'), weekDate: watch('weekDate') })
+  const createAssignmentMutation = useCreateAssignment()
   const [events, setEvents] = useState<Shift>({})
   const [isAddEventOpen, setIsAddEventOpen] = useState(false)
   const [open, setOpen] = useState(false)
@@ -83,19 +98,6 @@ export default function TaskAssignment() {
     return colorMap
   }, [events])
   const [hoveredChip, setHoveredChip] = useState<string | null>(null)
-  const {
-    control,
-    formState: { errors },
-    handleSubmit,
-    setValue
-  } = useForm<CreateAssignmentBodyType>({
-    resolver: zodResolver(CreateAssignmentBody),
-    defaultValues: {
-      staffId: '',
-      slot: '',
-      weekDate: ''
-    }
-  })
 
   useEffect(() => {
     if (data) {
@@ -120,21 +122,17 @@ export default function TaskAssignment() {
     setIsAddEventOpen(true)
   }
 
-  const handleSaveEvent = handleSubmit((data) => {
-    if (data) {
-      const key = `${data.weekDate}-${data.slot}`
-      const newId = Date.now().toString()
-      const newEventObj = { id: newId, name: data.staffId }
-
-      setEvents((prev) => ({
-        ...prev,
-        [key]: [...(prev[key] || []), newEventObj]
-      }))
-
+  const handleSaveEvent = handleSubmit(async (data) => {
+    if (createAssignmentMutation.isPending) return
+    try {
+      await createAssignmentMutation.mutateAsync(data)
+      toast.success('Thêm nhân viên vào ca trực thành công')
       setValue('staffId', '')
       setValue('slot', '')
       setValue('weekDate', '')
       setIsAddEventOpen(false)
+    } catch (error) {
+      handleErrorApi({ error })
     }
   })
 
@@ -301,27 +299,6 @@ export default function TaskAssignment() {
           <Box component='form'>
             <FormControl fullWidth sx={{ my: 2 }}>
               <InputLabel size='small' id='time-slot-label'>
-                Nhân viên
-              </InputLabel>
-              <Controller
-                control={control}
-                name='staffId'
-                render={({ field }) => (
-                  <>
-                    <Select size='small' labelId='time-slot-label' label='Nhân viên' {...field}>
-                      {staffs?.data.data.map((staff) => (
-                        <MenuItem key={staff.id} value={staff.name}>
-                          {staff.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.staffId && <FormHelperText error>{errors.staffId?.message || ''}</FormHelperText>}
-                  </>
-                )}
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ my: 2 }}>
-              <InputLabel size='small' id='time-slot-label'>
                 Ngày trực
               </InputLabel>
               <Controller
@@ -366,6 +343,29 @@ export default function TaskAssignment() {
                 )}
               />
             </FormControl>
+            {watch('slot') && watch('weekDate') && (
+              <FormControl fullWidth sx={{ my: 2 }}>
+                <InputLabel size='small' id='time-slot-label'>
+                  Nhân viên
+                </InputLabel>
+                <Controller
+                  control={control}
+                  name='staffId'
+                  render={({ field }) => (
+                    <>
+                      <Select size='small' labelId='time-slot-label' label='Nhân viên' {...field}>
+                        {staffs?.data.data.map((staff) => (
+                          <MenuItem key={staff.id} value={staff.id}>
+                            {staff.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.staffId && <FormHelperText error>{errors.staffId?.message || ''}</FormHelperText>}
+                    </>
+                  )}
+                />
+              </FormControl>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>

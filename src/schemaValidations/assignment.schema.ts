@@ -38,3 +38,17 @@ export const GetAssignmentsQuery = z.object({
 })
 
 export type GetAssignmentsQueryType = z.TypeOf<typeof GetAssignmentsQuery>
+
+export const CreateAssignmentRes = z.object({
+  code: z.number().int(),
+  message: z.string(),
+  data: z.object({
+    id: z.string().uuid(),
+    staffId: z.string().uuid(),
+    slot: z.string(),
+    weekDate: z.string(),
+    nameStaff: z.string().nullable()
+  })
+})
+
+export type CreateAssignmentResType = z.TypeOf<typeof CreateAssignmentRes>

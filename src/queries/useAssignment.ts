@@ -3,7 +3,7 @@ import assignmentApiRequest from '~/apis/assigment'
 
 export const useGetAllAssignment = () => {
   return useQuery({
-    queryKey: ['assignment'],
+    queryKey: ['assignments'],
     queryFn: assignmentApiRequest.getAllAssignment
   })
 }
@@ -13,7 +13,17 @@ export const useDeleteAssignment = () => {
   return useMutation({
     mutationFn: assignmentApiRequest.deleteAssignment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignment'] })
+      queryClient.invalidateQueries({ queryKey: ['assignments'] })
+    }
+  })
+}
+
+export const useCreateAssignment = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: assignmentApiRequest.createAssignment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignments'] })
     }
   })
 }
