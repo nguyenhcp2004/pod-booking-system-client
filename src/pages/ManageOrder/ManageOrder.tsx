@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
 import {
   Chip,
   Select,
@@ -11,12 +11,14 @@ import {
   TextField,
   SelectChangeEvent,
   FormControl,
-  InputLabel
+  InputLabel,
+  Stack
 } from '@mui/material'
+import Table from '~/components/Table/Table'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
-import { useOrders, useSearchOrder, useStaffAccounts, useUpdateStaff, useDeleteOrder } from '~/queries/useOrder'
+import { useOrders, useSearchOrder, useStaffAccounts, useDeleteOrder } from '~/queries/useOrder'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNoteIcon from '@mui/icons-material/EditNote'
@@ -29,8 +31,14 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
+import { Add } from '@mui/icons-material'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 export default function ManageOrder() {
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0
+  })
   const { account } = useAppContext()
   const today = moment()
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -39,9 +47,7 @@ export default function ManageOrder() {
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const [status, setStatus] = useState<OrderStatus | null>(null)
 
-  const [currentPage, setCurrentPage] = useState<number>(0)
-  const [pageSize, setPageSize] = useState<number>(10)
-  const [rowCount, setRowCount] = useState<number>(0)
+  const [rowCount, setRowCount] = useState<number>()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [staffList, setStaffList] = useState<Account[]>([])
   const [searchKeyword, setSearchKeyword] = useState<string>('')
@@ -90,17 +96,16 @@ export default function ManageOrder() {
   } = useOrders({
     startDate: formattedStartDate,
     endDate: formattedEndDate,
-    page: currentPage,
-    size: pageSize,
+    page: paginationModel.page,
+    size: paginationModel.pageSize,
     status: status !== null ? status : undefined
   })
   const { data: searchData, isFetching: isSearchFetching } = useSearchOrder({
     keyword: searchKeyword,
-    page: currentPage,
-    size: pageSize
+    page: paginationModel.page,
+    size: paginationModel.pageSize
   })
   const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
-  const { mutate: updateStaff } = useUpdateStaff()
 
   //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
   useEffect(() => {
@@ -129,7 +134,7 @@ export default function ManageOrder() {
     if (orderData) {
       const rowsData = orderData.data.map(mapOrderToRow)
       setRows([...rowsData])
-      setRowCount(orderData.data.totalRecord)
+      setRowCount(orderData.totalRecord)
     }
   }, [orderData])
 
@@ -138,13 +143,13 @@ export default function ManageOrder() {
       if (searchData) {
         const searchRowsData = searchData.data.map(mapOrderToRow)
         setRows([...searchRowsData])
-        setRowCount(searchData?.data?.totalRecord || 0)
+        setRowCount(searchData?.totalRecord || 0)
       }
     } else {
       if (orderData) {
         const rowsData = orderData.data.map(mapOrderToRow)
         setRows([...rowsData])
-        setRowCount(orderData.data.totalRecord)
+        setRowCount(orderData.totalRecord)
       }
     }
   }, [searchKeyword, orderData, searchData])
@@ -155,26 +160,48 @@ export default function ManageOrder() {
 
   if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
 
-  const handleStaffChange = (orderId: string, newStaffId: string) => {
-    const selectedStaff = staffList.find((s) => s.id === newStaffId)
-    const request = {
-      id: orderId,
-      orderHandler: {
-        id: newStaffId,
-        name: selectedStaff?.name || '',
-        orderHandler: selectedStaff
-      }
-    }
-    updateStaff({ request })
-    setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
-    toast.success('Cập nhật nhân viên thành công')
-  }
-
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'customer', headerName: 'Khách hàng', width: 200 },
-    { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
-    { field: 'slots', headerName: 'Khung giờ', width: 200 },
+    {
+      field: 'roomName',
+      headerName: 'Danh sách phòng',
+      width: 200,
+      renderCell: (params) => {
+        const rooms = params.value ? params.value.split(',') : []
+
+        return rooms.length > 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 80,
+              overflow: 'hidden',
+              width: '200px'
+            }}
+          >
+            {rooms.map((room: string, index: number) => (
+              <Chip color='default' variant='outlined' key={index} label={room.trim()} />
+            ))}
+          </Box>
+        ) : (
+          'N/A'
+        )
+      }
+    },
+    {
+      field: 'slots',
+      headerName: 'Khung giờ',
+      width: 200,
+      renderCell: (params) => (
+        <Stack direction='column' spacing={1}>
+          {params.value.split(', ').map((slot: string, index: number) => (
+            <Chip key={index} label={slot.trim()} />
+          ))}
+        </Stack>
+      )
+    },
     { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
@@ -196,38 +223,46 @@ export default function ManageOrder() {
     {
       field: 'orderHandler',
       headerName: 'Nhân viên',
-      width: 200,
+      width: 100,
       renderCell: (params) => {
-        const staffId = params.row?.staffId || null
-        return (
-          <Select
+        const handlers = params.value ? params.value.split(',') : [] // Tách chuỗi thành mảng
+
+        return handlers.length > 0 ? (
+          <Box
             sx={{
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
-            }}
-            value={staffId || ''}
-            onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
-            fullWidth
-            displayEmpty
-            renderValue={(selected) => {
-              let selectedStaff = staffList.find((staff) => staff.id === selected)
-              if (!selectedStaff) selectedStaff = params.row?.orderHandler
-              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 70,
+              overflow: 'hidden',
+              width: '150px'
             }}
           >
-            <MenuItem value='' disabled>
-              Chọn nhân viên
-            </MenuItem>
-            {staffList.map((staff) => {
-              if (staff.buildingNumber == params.row?.buildingNumber)
-                return (
-                  <MenuItem key={staff.id} value={staff.id}>
-                    {staff.name}
-                  </MenuItem>
-                )
-            })}
-          </Select>
+            {handlers.map((handler: string, index: number) => (
+              <Chip
+                key={index}
+                label={handler.trim()}
+                sx={{
+                  borderColor: theme.palette.primary.light,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  color: theme.palette.primary.light,
+                  backgroundColor: 'transparent'
+                }}
+              />
+            ))}
+          </Box>
+        ) : (
+          <Chip
+            label='Chưa có nhân viên'
+            sx={{
+              borderColor: theme.palette.error.light,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              color: theme.palette.error.light,
+              backgroundColor: 'transparent'
+            }}
+          />
         )
       }
     },
@@ -325,6 +360,7 @@ export default function ManageOrder() {
   ]
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    console.log(event.target.value)
     setSearchProcess(event.target.value)
     if (event.target.value.trim().length === 0) {
       setSearchKeyword('')
@@ -343,12 +379,14 @@ export default function ManageOrder() {
         <DatePicker
           label='Từ'
           value={selectedStartDate}
+          format={DEFAULT_DATE_FORMAT}
           onChange={(newValue) => setSelectedStartDate(newValue)}
           slotProps={{ textField: { fullWidth: true } }}
         />
         <DatePicker
           label='Đến'
           value={selectedEndDate}
+          format={DEFAULT_DATE_FORMAT}
           onChange={(newValue) => setSelectedEndDate(newValue)}
           slotProps={{ textField: { fullWidth: true } }}
         />
@@ -378,16 +416,8 @@ export default function ManageOrder() {
         </FormControl>
       </Box>
       <Box display='flex' gap={2}>
-        <GridToolbarQuickFilter
-          value={searchProcess}
-          onChange={(event) => handleSearchChange(event)}
-          sx={{
-            '& .MuiInputBase-input': {
-              color: 'white'
-            }
-          }}
-        />
-        <Button variant='contained' color='primary' onClick={() => setCreateMode(true)}>
+        <GridToolbarQuickFilter value={searchProcess} onChange={(event) => handleSearchChange(event)} />
+        <Button variant='text' color='primary' onClick={() => setCreateMode(true)} startIcon={<Add />}>
           Thêm đơn hàng
         </Button>
       </Box>
@@ -410,9 +440,10 @@ export default function ManageOrder() {
             value={searchProcess}
             onChange={(event) => handleSearchChange(event)}
             sx={{
+              backgroundColor: searchProcess.length == 0 ? 'transparent' : 'white',
               position: 'absolute',
-              top: '20px',
-              right: '170px',
+              top: '40px',
+              right: '180px',
               width: '180px',
               zIndex: 2,
               '& .MuiOutlinedInput-root': {
@@ -424,26 +455,24 @@ export default function ManageOrder() {
                 },
                 '&.Mui-focused fieldset': {
                   border: 'none'
+                },
+                '& .MuiInputBase-input': {
+                  padding: '2px 2px'
                 }
               }
             }}
           />
         </Box>
       </Box>
-      <DataGrid
-        rows={rows}
+      <Table
         columns={columns}
-        paginationModel={{ page: currentPage, pageSize: pageSize }}
-        pageSizeOptions={[5, 10]}
-        pagination
-        paginationMode='server'
-        rowCount={rowCount}
-        onPaginationModelChange={(newPaginationModel) => {
-          setCurrentPage(newPaginationModel.page)
-          setPageSize(newPaginationModel.pageSize)
-        }}
-        slots={{ toolbar: Toolbar }}
+        rows={rows}
         loading={isFetching || isSearchFetching || isStaffFetching}
+        setRows={setRows}
+        toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={rowCount}
       />
       <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} refetch={refetch} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
@@ -451,8 +480,8 @@ export default function ManageOrder() {
         open={editMode}
         onClose={() => setEditMode(false)}
         order={selectedOrder}
-        setOrders={setRows}
         staffList={staffList}
+        refetch={refetch}
       />
       <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>

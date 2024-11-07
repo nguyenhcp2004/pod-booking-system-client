@@ -1,6 +1,6 @@
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
-import React, { Dispatch, SetStateAction, useState } from 'react'
-import { Amenity, BookingInfo } from '~/contexts/BookingContext'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Amenity, BookingInfo, RoomContextType } from '~/contexts/BookingContext'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { tokens } from '~/themes/theme'
@@ -14,16 +14,23 @@ interface AddAmenityOrderProps {
   setBookingData: Dispatch<SetStateAction<BookingInfo>>
 }
 
+const amenityTranslations: Record<string, string> = {
+  Food: 'Thức ăn và đồ uống',
+  Office: 'Thiết bị',
+  All: 'Tất cả'
+}
+
 const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [room, setRoom] = useState<string | null>(null)
-  const [selectedAmenity, setSelectedAmenity] = useState<string | null>(null)
+  const [room, setRoom] = useState<RoomContextType>(bookingData.selectedRooms[0])
+  const [selectedAmenity, setSelectedAmenity] = useState<string | null>('All')
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [errorState, setErrorState] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(0)
   const { data: amenities = [] } = useGetAmenities()
-  const filteredAmenities = selectedAmenity ? amenities.filter((item) => item.type === selectedAmenity) : amenities
+  const filteredAmenities =
+    selectedAmenity === 'All' ? amenities : amenities.filter((item) => item.type === selectedAmenity)
 
   const handleIncrement = () => {
     if (!room) {
@@ -35,7 +42,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
       return
     } else {
       const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
-      const selectedRoom = bookingData.selectedRooms.filter((item) => item.name === room)[0]
+      const selectedRoom = bookingData.selectedRooms.filter((item) => item === room)[0]
       const preAmennity = selectedRoom.amenities.filter((item) => item.name === detailAmenity.name)
       if (preAmennity.length > 0) {
         if (
@@ -75,6 +82,10 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     }
   }
 
+  useEffect(() => {
+    setRoom(bookingData.selectedRooms[0])
+  }, [bookingData.selectedRooms])
+
   const handleDecrement = () => {
     if (quantity > 0) {
       setErrorState(null)
@@ -107,7 +118,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     setBookingData((prev) => ({
       ...prev,
       selectedRooms: prev.selectedRooms.map((itemRoom) => {
-        if (itemRoom.name === room) {
+        if (itemRoom === room) {
           if (itemRoom.amenities.find((item) => item.name === newAmenity.name)) {
             return {
               ...itemRoom,
@@ -146,71 +157,96 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
           Bạn vẫn có thể thêm các dịch vụ sau khi đặt
         </Typography>
       </Box>
-      <Box sx={{ padding: '0px 20px 20px 20px' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px 20px 0px 0px', gap: '24px' }}>
+      <Box sx={{ padding: '10px 0px 20px 20px' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '24px', paddingRight: '10px' }}>
           <FormControl fullWidth>
-            <InputLabel id='location-label'>Chọn Phòng</InputLabel>
+            <InputLabel id='location-label'>Phòng</InputLabel>
             <Select
               labelId='r-type-label'
-              value={room || ''}
-              label='Chọn Phòng'
-              onChange={(e) => setRoom(e.target.value)}
+              value={room?.id || ''}
+              label='Phòng'
+              onChange={(e) => {
+                setRoom(
+                  bookingData?.selectedRooms.filter((item) => item.id === (e.target.value as unknown as number))[0]
+                )
+              }}
             >
-              {bookingData?.selectedRooms.map((r, index) => (
-                <MenuItem key={index} value={r.name}>
-                  {r.name}
+              {bookingData?.selectedRooms.map((item, index) => (
+                <MenuItem key={index} value={item.id}>
+                  {item.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <InputLabel id='amenities-label'>Chọn loại dịch vụ</InputLabel>
+            <InputLabel id='amenities-label'>Loại dịch vụ</InputLabel>
             <Select
               labelId='amenities-label'
-              value={selectedAmenity || ''}
-              label='Chọn loại dịch vụ'
+              value={selectedAmenity || 'All'}
+              label='Loại dịch vụ'
               onChange={(e) => {
                 setSelectedAmenity(e.target.value)
               }}
             >
+              <MenuItem key={0} value={'All'}>
+                {amenityTranslations['All']}
+              </MenuItem>
               {Array.from(new Set(amenities.map((amenity) => amenity.type))).map((uniqueType, index) => (
-                <MenuItem key={index} value={uniqueType}>
-                  {uniqueType}
+                <MenuItem key={index + 1} value={uniqueType}>
+                  {amenityTranslations[uniqueType] || uniqueType}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Box>
 
-        <Box sx={{ padding: '49px 0px 29px 0px' }}>
+        <Box sx={{ padding: '20px 0px 29px 0px' }}>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
             Danh sách dịch vụ
           </Typography>
-          <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-            {filteredAmenities.map((item, index) => (
-              <Grid item lg={4} md={6} xs={12} key={index}>
-                <Button
-                  variant='outlined'
-                  fullWidth
-                  sx={{
-                    padding: '10px 0px',
-                    minHeight: '50px',
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                    color: 'black',
-                    borderColor: 'black',
-                    fontSize: '14px',
-                    backgroundColor: detailAmenity?.name == item.name ? colors.grey[100] : 'transparent'
-                  }}
-                  onClick={() => {
-                    handleSelectAmenity(item)
-                  }}
-                >
-                  {item.name}
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
+          <Box
+            sx={{
+              height: '300px',
+              overflowY: 'scroll',
+              '&::-webkit-scrollbar': {
+                width: '4px'
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: '#a9a9b1',
+                borderRadius: '4px'
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: 'transparent'
+              },
+              paddingRight: '10px'
+            }}
+          >
+            <Grid container spacing={4} sx={{ padding: '10px 0' }}>
+              {filteredAmenities.map((item, index) => (
+                <Grid item lg={4} md={6} xs={12} key={index}>
+                  <Button
+                    variant='outlined'
+                    fullWidth
+                    sx={{
+                      padding: '10px 0px',
+                      minHeight: '50px',
+                      borderRadius: '4px',
+                      textAlign: 'center',
+                      color: 'black',
+                      borderColor: 'black',
+                      fontSize: '14px',
+                      backgroundColor: detailAmenity?.name == item.name ? colors.grey[100] : 'transparent'
+                    }}
+                    onClick={() => {
+                      handleSelectAmenity(item)
+                    }}
+                  >
+                    {item.name}
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         </Box>
         <Box
           sx={{
@@ -218,7 +254,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             justifyContent: 'space-between',
             gap: '10px',
             paddingBottom: '20px',
-            paddingTop: '20px'
+            paddingRight: '10px'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
@@ -232,7 +268,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             )}
             <Typography
               variant='subtitle2'
-              sx={{ fontWeight: 700, fontSize: '16px', padding: '0px 20px 0px 0px', color: colors.grey[200] }}
+              sx={{ fontWeight: 700, fontSize: '16px', padding: '20px 10px 0px 0px', color: colors.grey[200] }}
             >
               Số lượng
             </Typography>
@@ -288,20 +324,21 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             {formatCurrency(Math.round(detailAmenity?.price ? detailAmenity.price * quantity : 0))}
           </Typography>
         </Box>
-        <Box sx={{ padding: '20px 0px 10px 0px' }}>
+        <Box sx={{ padding: '10px 0px 10px 0px' }}>
           <Button
             variant='outlined'
             fullWidth
             sx={{
-              minHeight: '40px',
+              minHeight: '30px',
               borderRadius: '96px',
               border: '1px solid #A9A9B1',
               boxShadow:
                 '0px 1px 3px 0px rgba(0, 0, 0, 0.12), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.20)',
               color: colors.grey[500],
-              fontSize: '15px',
+              fontSize: '12px',
               fontWeight: '500px',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              paddingRight: '10px'
             }}
             onClick={() => {
               handleAddAmentity()

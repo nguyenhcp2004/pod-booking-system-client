@@ -12,11 +12,13 @@ import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
 import { useAppContext } from '~/contexts/AppProvider'
 import { isValidVietnamPhoneNumber } from '~/utils/utils'
+import { UpdateAccountPhoneNumberType } from '~/schemaValidations/account.schema'
+import { useUpdateAccountPhoneNumber } from '~/queries/useAccount'
+import { Room } from '~/constants/type'
+import { useGetRoomsByTypeAndDate } from '~/queries/useFilterRoom'
 
-//import { array } from 'zod'
 interface CommonProps {
   onNext: () => void
-  onBack: () => void
 }
 
 export const BookingInfo: React.FC<CommonProps> = (props) => {
@@ -24,12 +26,15 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const bookingContext = useBookingContext()
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
+  const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
   const bookingData = bookingContext!.bookingData
   const socketCL = new SockJS('http://localhost:8080/ws')
   const client = Stomp.over(socketCL)
-  const { account: account } = useAppContext()
+  const { account: account, setAccount } = useAppContext()
   const [phoneNumber, setPhoneNumber] = useState(account?.phoneNumber || '')
   const [phoneError, setPhoneError] = useState<string | null>(null)
+  const updateAccountPhoneNumberMutation = useUpdateAccountPhoneNumber()
+
   useEffect(() => {
     const dateList = []
 
@@ -57,6 +62,21 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
     }
   }, [bookingData, bookingData.servicePackage?.id])
 
+  const { data: roomList } = useGetRoomsByTypeAndDate({
+    typeId: Number(bookingData?.roomType?.id),
+    date: bookingData?.date ? moment(bookingData.date).format('YYYY-MM-DD') : ''
+  })
+
+  useEffect(() => {
+    if (roomList?.data.data && bookingData.selectedRooms) {
+      setSelectedRooms(() => {
+        return roomList.data.data.filter((room) =>
+          bookingData.selectedRooms.some((selectedRoom) => selectedRoom.id === room.id)
+        )
+      })
+    }
+  }, [roomList, bookingData.selectedRooms])
+
   useEffect(() => {
     client.connect({}, () => {
       client.subscribe('/topic/payments', (data) => {
@@ -81,14 +101,25 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(event.target.value)
   }
-
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!isValidVietnamPhoneNumber(phoneNumber)) {
       setPhoneError('Số điện thoại không hợp lệ')
       return
     }
-    setPhoneError(null)
-    props.onNext() // proceed if valid
+    const updateAccountPhoneNumber: UpdateAccountPhoneNumberType = {
+      id: account?.id as string,
+      phoneNumber: phoneNumber
+    }
+
+    try {
+      await updateAccountPhoneNumberMutation.mutateAsync(updateAccountPhoneNumber)
+      setAccount({ ...account, phoneNumber: phoneNumber } as typeof account)
+      console.log(account)
+      setPhoneError(null)
+      props.onNext()
+    } catch {
+      toast.error('Cập nhật số điện thoại thất bại')
+    }
   }
 
   return (
@@ -153,7 +184,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
                 </Typography>
                 <Box>
                   <Grid size={{ xs: 12 }}>
-                    <Calendar selected={selectedDates} slots={selectedSlots} />
+                    <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
                   </Grid>
                 </Box>
               </Box>

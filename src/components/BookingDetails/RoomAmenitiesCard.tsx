@@ -2,12 +2,16 @@ import { Box, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import { RoomContextType } from '~/contexts/BookingContext'
 import ClearIcon from '@mui/icons-material/Clear'
+import { formatCurrency } from '~/utils/currency'
+import { useLocation } from 'react-router-dom'
 
 const RoomAmenitiesCard: React.FC<{ room: RoomContextType; removeAmenity: (amenity: string) => void }> = ({
   room,
   removeAmenity
 }) => {
   const theme = useTheme()
+  const location = useLocation()
+  const isEdit = location.pathname === '/order-detail/2' || location.pathname === '/order-detail/3'
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -29,20 +33,22 @@ const RoomAmenitiesCard: React.FC<{ room: RoomContextType; removeAmenity: (ameni
             </Typography>
             <Box sx={{ flex: 1 }} display='flex' justifyContent='flex-end' gap='5px'>
               <Typography variant='subtitle2' fontWeight='bold'>
-                {amenity.price.toLocaleString()} VND
+                {formatCurrency(amenity.price)}
               </Typography>
 
-              <ClearIcon
-                onClick={() => removeAmenity(amenity.name)}
-                sx={{
-                  marginTop: '-2px',
-                  color: theme.palette.grey[300],
-                  cursor: 'pointer',
-                  '&:hover': {
-                    color: theme.palette.error.main
-                  }
-                }}
-              />
+              {!isEdit && (
+                <ClearIcon
+                  onClick={() => removeAmenity(amenity.name)}
+                  sx={{
+                    marginTop: '-2px',
+                    color: theme.palette.grey[300],
+                    cursor: 'pointer',
+                    '&:hover': {
+                      color: theme.palette.error.main
+                    }
+                  }}
+                />
+              )}
             </Box>
           </Box>
         ))}

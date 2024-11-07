@@ -60,6 +60,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
   const { data: allBuilding } = useBuilding()
   const { data: roomType } = useRoomType(building?.address || '')
 
+  const now = new Date()
+  const currentHour = now.getHours()
+
+  const availableSlots = useMemo(() => {
+    if (selectedDate && selectedDate.isAfter(moment(), 'day')) {
+      return SLOT
+    } else {
+      return SLOT.filter((slot) => {
+        const startHour = parseInt(slot.split(':')[0], 10)
+        return startHour > currentHour
+      })
+    }
+  }, [selectedDate, currentHour])
+
   useEffect(() => {
     if (searchBuilding.trim()) {
       setListBuilding(searchBuildingData || [])
@@ -93,7 +107,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
       }
     }
     setSelectedDates(dateList)
-  }, [selectedDate, selectedPackage])
+  }, [selectedDate, selectedPackage, setSelectedDates])
 
   const slotsFormmated = useMemo(() => {
     return selectedSlots.map((slot) => {
@@ -279,8 +293,11 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <DatePicker
             label='Ngày đặt'
             value={selectedDate || moment()}
-            onChange={(date) => handleSelectDate(date)}
+            onChange={(date) => {
+              handleSelectDate(date)
+            }}
             format={DEFAULT_DATE_FORMAT}
+            disablePast
             slotProps={{
               textField: {
                 size: 'small',
@@ -303,17 +320,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <FormControl fullWidth size='small'>
             <Autocomplete
               multiple
-              options={SLOT}
+              options={availableSlots}
               value={selectedSlots}
               onChange={(_, slots) => {
                 handleSelectSlots(slots as slotType[])
               }}
               sx={{
-                '.MuiAutocomplete-inputRoot': {
+                '& .MuiOutlinedInput-root': {
                   minHeight: '52px'
+                },
+                '& .MuiInputLabel-root': {
+                  lineHeight: '52px',
+                  top: '-10px'
                 }
               }}
-              disableCloseOnSelect
               renderOption={(props, option, { selected }) => {
                 const { key, ...optionProps } = props
                 return (
@@ -329,20 +349,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   </li>
                 )
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label='Khung giờ'
-                  size='small'
-                  InputLabelProps={{
-                    sx: {
-                      display: 'flex',
-                      alignItems: 'center',
-                      height: '70%'
-                    }
-                  }}
-                />
-              )}
+              renderInput={(params) => <TextField {...params} label='Khung giờ' size='small' />}
             />
           </FormControl>
         </Box>

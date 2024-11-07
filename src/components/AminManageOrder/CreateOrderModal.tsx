@@ -30,10 +30,12 @@ interface CreateOrderModalProps {
   refetch: () => void
 }
 
+const today = moment()
+
 const initialBookingData: BookingInfo = {
   roomType: null,
   selectedRooms: [],
-  date: moment().format('DD-MM-YYYY').toString(),
+  date: today.toString(),
   timeSlots: [],
   servicePackage: null
 }

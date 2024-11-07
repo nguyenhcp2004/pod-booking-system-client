@@ -35,7 +35,7 @@ export interface Order {
   orderDetails: OrderDetail[]
 }
 
-interface OrderDetail {
+export interface OrderDetail {
   id: string
   roomId: number
   roomName: string
@@ -158,7 +158,7 @@ export const getBuilding = async (): Promise<Building[]> => {
     const response = await http.get('/buildings/all')
     return response.data.data
   } catch (error) {
-    console.error('Error getting staff:', error)
+    console.error('Error getting all building:', error)
     throw error
   }
 }
@@ -192,40 +192,12 @@ export const searchAccounts = async (keyword: string): Promise<Account[]> => {
   }
 }
 
-//Update
-export const updateOrderApi = async (order: Order, updateOrder: Order | null) => {
-  if (updateOrder != null) {
-    const updateRequest = createOrderUpdateRequest(order, updateOrder)
-    if (updateRequest) {
-      try {
-        const response = await http.put('/order', updateRequest)
-        return response.data
-      } catch (error) {
-        console.error('Error update page order:', error)
-        throw error
-      }
-    } else {
-      return { code: 400, message: 'Không có thay đổi nào cần gửi.' }
-    }
-  }
-}
-
 export const getStaff = async (): Promise<Account[]> => {
   try {
     const response = await http.get('/accounts/staff')
-    return response.data
+    return response.data.data
   } catch (error) {
     console.error('Error getting staff:', error)
-    throw error
-  }
-}
-
-export const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
-  try {
-    const response = await http.put(`/order`, request)
-    return response.data
-  } catch (error) {
-    console.error('Error updating staff:', error)
     throw error
   }
 }
@@ -236,6 +208,34 @@ export const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<R
     return response.data
   } catch (error) {
     console.error('Error getting staff:', error)
+    throw error
+  }
+}
+
+//Update
+export const updateOrderApi = async (order: Order, updateOrder: Order | null, allStatus: OrderStatus | null) => {
+  if (updateOrder != null) {
+    const updateRequest = createOrderUpdateRequest(order, updateOrder, allStatus)
+    if (updateRequest) {
+      try {
+        const response = await http.put('/order', updateRequest)
+        return response.data
+      } catch (error) {
+        console.error('Error update page order:', error)
+        throw error
+      }
+    } else {
+      return { code: 400 }
+    }
+  }
+}
+
+export const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
+  try {
+    const response = await http.put(`/order-detail/staff`, request)
+    return response.data
+  } catch (error) {
+    console.error('Error updating staff:', error)
     throw error
   }
 }
