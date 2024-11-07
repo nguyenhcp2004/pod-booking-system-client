@@ -107,7 +107,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
       }
     }
     setSelectedDates(dateList)
-  }, [selectedDate, selectedPackage])
+  }, [selectedDate, selectedPackage, setSelectedDates])
 
   const slotsFormmated = useMemo(() => {
     return selectedSlots.map((slot) => {
@@ -293,7 +293,9 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <DatePicker
             label='Ngày đặt'
             value={selectedDate || moment()}
-            onChange={(date) => handleSelectDate(date)}
+            onChange={(date) => {
+              handleSelectDate(date)
+            }}
             format={DEFAULT_DATE_FORMAT}
             disablePast
             slotProps={{

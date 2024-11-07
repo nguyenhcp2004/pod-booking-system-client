@@ -1,6 +1,6 @@
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography, useTheme } from '@mui/material'
-import React, { Dispatch, SetStateAction, useState } from 'react'
-import { Amenity, BookingInfo } from '~/contexts/BookingContext'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Amenity, BookingInfo, RoomContextType } from '~/contexts/BookingContext'
 import { useGetAmenities } from '~/queries/useAmenity'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import { tokens } from '~/themes/theme'
@@ -23,7 +23,7 @@ const amenityTranslations: Record<string, string> = {
 const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [room, setRoom] = useState<string | null>(bookingData?.selectedRooms[0]?.name || null)
+  const [room, setRoom] = useState<RoomContextType>(bookingData.selectedRooms[0])
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>('All')
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [errorState, setErrorState] = useState<string | null>(null)
@@ -42,7 +42,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
       return
     } else {
       const newQuantityApplyPackage = (quantity + 1) * calTotalPrice(bookingData).packageRepeat
-      const selectedRoom = bookingData.selectedRooms.filter((item) => item.name === room)[0]
+      const selectedRoom = bookingData.selectedRooms.filter((item) => item === room)[0]
       const preAmennity = selectedRoom.amenities.filter((item) => item.name === detailAmenity.name)
       if (preAmennity.length > 0) {
         if (
@@ -82,6 +82,10 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     }
   }
 
+  useEffect(() => {
+    setRoom(bookingData.selectedRooms[0])
+  }, [bookingData.selectedRooms])
+
   const handleDecrement = () => {
     if (quantity > 0) {
       setErrorState(null)
@@ -114,7 +118,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
     setBookingData((prev) => ({
       ...prev,
       selectedRooms: prev.selectedRooms.map((itemRoom) => {
-        if (itemRoom.name === room) {
+        if (itemRoom === room) {
           if (itemRoom.amenities.find((item) => item.name === newAmenity.name)) {
             return {
               ...itemRoom,
@@ -159,12 +163,16 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             <InputLabel id='location-label'>Phòng</InputLabel>
             <Select
               labelId='r-type-label'
-              value={room || bookingData?.selectedRooms[0]?.name || ''}
+              value={room?.id || ''}
               label='Phòng'
-              onChange={(e) => setRoom(e.target.value)}
+              onChange={(e) => {
+                setRoom(
+                  bookingData?.selectedRooms.filter((item) => item.id === (e.target.value as unknown as number))[0]
+                )
+              }}
             >
               {bookingData?.selectedRooms.map((item, index) => (
-                <MenuItem key={index} value={item.name}>
+                <MenuItem key={index} value={item.id}>
                   {item.name}
                 </MenuItem>
               ))}

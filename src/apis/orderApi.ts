@@ -35,7 +35,7 @@ export interface Order {
   orderDetails: OrderDetail[]
 }
 
-interface OrderDetail {
+export interface OrderDetail {
   id: string
   roomId: number
   roomName: string
@@ -158,7 +158,7 @@ export const getBuilding = async (): Promise<Building[]> => {
     const response = await http.get('/buildings/all')
     return response.data.data
   } catch (error) {
-    console.error('Error getting staff:', error)
+    console.error('Error getting all building:', error)
     throw error
   }
 }
@@ -232,7 +232,7 @@ export const updateOrderApi = async (order: Order, updateOrder: Order | null) =>
 
 export const updateStaff = async (request: OrderUpdateStaffRequest): Promise<OrderResponse> => {
   try {
-    const response = await http.put(`/order`, request)
+    const response = await http.put(`/order-detail/staff`, request)
     return response.data
   } catch (error) {
     console.error('Error updating staff:', error)
