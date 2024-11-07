@@ -23,7 +23,6 @@ const CreateAmenityOrderModal = ({
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const { clearAll, selectedAmenities, bookedRoom } = useBookingAmenityContext()
-  console.log('selectedAmenities', selectedAmenities)
   const [openPayment, setOpenPayment] = useState(false)
   const [loading, setLoading] = useState(false)
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityStaff()

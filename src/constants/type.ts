@@ -105,6 +105,11 @@ export type Amenity = {
   buildingId: number
 }
 
+export type Image = {
+  id: number
+  imageUrl: string
+}
+
 export const CanceledReason = {
   REASON_1: 'Đặt phòng không được xác nhận kịp thời',
   REASON_2: 'Không thật sự tin tưởng vào uy tín của dịch vụ chúng tôi',
