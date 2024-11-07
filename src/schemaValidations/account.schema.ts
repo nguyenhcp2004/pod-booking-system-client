@@ -134,3 +134,21 @@ export const CountCustomerReq = z.object({
 })
 
 export type CountCustomerReqType = z.TypeOf<typeof CountCustomerReq>
+
+export const StaffSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  avatar: z.string().nullable(),
+  role: z.string(),
+  buildingNumber: z.number(),
+  rankingName: z.string().nullable()
+})
+
+export const GetListStaffRes = z.object({
+  code: z.number(),
+  message: z.string(),
+  data: z.array(StaffSchema)
+})
+
+export type GetListStaffResType = z.TypeOf<typeof GetListStaffRes>
