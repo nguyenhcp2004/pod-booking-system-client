@@ -1,13 +1,15 @@
 import { createContext, SetStateAction, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AccountType } from '~/schemaValidations/auth.schema'
-import { getAccessTokenFromLS, getAccountFromLS, getRefreshTokenFromLS } from '~/utils/auth'
+import { getAccessTokenFromLS, getAccountFromLS, getRedirectPath, getRefreshTokenFromLS } from '~/utils/auth'
 
 interface AppContextInterface {
   isAuth: boolean
   setAuth: React.Dispatch<SetStateAction<boolean>>
   account: AccountType | null
   setAccount: React.Dispatch<SetStateAction<AccountType | null>>
+  redirectPath: string
+  setRedirectPath: React.Dispatch<SetStateAction<string>>
   reset: () => void
 }
 
@@ -17,6 +19,8 @@ export const getInitialAppContext: () => AppContextInterface = () => ({
   setAuth: () => null,
   account: getAccountFromLS(),
   setAccount: () => null,
+  redirectPath: getRedirectPath(),
+  setRedirectPath: () => null,
   reset: () => null
 })
 
@@ -38,6 +42,7 @@ export default function AppProvider({
 }) {
   const [isAuth, setAuth] = useState<boolean>(defaultValue.isAuth)
   const [account, setAccount] = useState<AccountType | null>(defaultValue.account)
+  const [redirectPath, setRedirectPath] = useState<string>(defaultValue.redirectPath)
   const navigate = useNavigate()
   const reset = () => {
     setAuth(false)
@@ -60,5 +65,9 @@ export default function AppProvider({
     }
   }, [setAuth, setAccount, navigate])
 
-  return <AppContext.Provider value={{ isAuth, setAuth, account, setAccount, reset }}>{children}</AppContext.Provider>
+  return (
+    <AppContext.Provider value={{ isAuth, setAuth, account, setAccount, reset, redirectPath, setRedirectPath }}>
+      {children}
+    </AppContext.Provider>
+  )
 }
