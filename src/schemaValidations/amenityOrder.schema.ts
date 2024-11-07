@@ -4,9 +4,11 @@ const OrderDetailAmenityReq = z.object({
   startDate: z.string(),
   endDate: z.string(),
   page: z.number(),
-  take: z.number()
+  take: z.number(),
+  searchParams: z.string() || ''
 })
 export type OrderDetailAmenityReqType = z.TypeOf<typeof OrderDetailAmenityReq>
+
 const AmenityOrderSchema = z.object({
   id: z.string(),
   quantity: z.number(),
