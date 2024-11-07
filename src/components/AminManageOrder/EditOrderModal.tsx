@@ -30,25 +30,25 @@ import {
   updateOrderApi
 } from '~/apis/orderApi'
 import { useRoomSameType, useUpdateStaff } from '~/queries/useOrder'
-import { GridValidRowModel } from '@mui/x-data-grid'
 import { slotType } from '~/contexts/BookingContext'
 import CloseIcon from '@mui/icons-material/Close'
 import Calendar from '../Calendar/Calendar'
 import { Room } from '~/constants/type'
 import { toast } from 'react-toastify'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 interface EditOrderModalProps {
   open: boolean
   onClose: () => void
   order: Order | null
-  setOrders: React.Dispatch<React.SetStateAction<GridValidRowModel[]>>
   staffList: Account[]
+  refetch: () => void
 }
 
-const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, setOrders, staffList }) => {
+const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, staffList, refetch }) => {
   const theme = useTheme()
-  const date = moment(order?.orderDetails[0].endTime)
-  const [selectedDate, setSelectedDate] = useState<Moment>(moment(date, 'DD/MM/YYYY'))
+  const date = moment(order?.orderDetails[0].startTime)
+  const [selectedDate, setSelectedDate] = useState<Moment>(moment(date))
   const [selectedDates, setSelectedDates] = useState<Moment[]>([])
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const [listRoom, setListRoom] = useState<Room[]>([])
@@ -56,14 +56,29 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
   const [loading, setLoading] = useState<boolean>(false)
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
   const [updateStaffList, setUpdateStaffList] = useState<OrderUpdateStaffRequest[]>([])
-  const { mutate: updateStaff } = useUpdateStaff()
+  const [allStatus, setAllStatus] = useState<OrderStatus | null>(null)
 
+  const { mutate: updateStaff } = useUpdateStaff()
   const { data: allRoom } = useRoomSameType(order?.orderDetails[0].roomId?.toString() || '0')
   useEffect(() => {
     setListRoom(allRoom || [])
   }, [allRoom])
 
   useEffect(() => {
+    if (order) {
+      setUpdateOrder(order)
+    }
+  }, [order])
+
+  useEffect(() => {
+    genderRoomList()
+  }, [order])
+
+  useEffect(() => {
+    genderDateList()
+  }, [selectedDate, order])
+
+  const genderRoomList = () => {
     order?.orderDetails.map((od) => {
       const temp: Room = {
         id: od.roomId,
@@ -77,9 +92,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
       }
       setSelectedRooms((prev) => [...prev, temp])
     })
-  }, [order])
+  }
 
-  useEffect(() => {
+  const genderDateList = () => {
     const dateList = []
     if (selectedDate) {
       dateList.push(selectedDate)
@@ -100,17 +115,15 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
       }
     }
     setSelectedDates(dateList)
-  }, [selectedDate, order])
+  }
+
+  const resertCalendar = () => {
+    genderRoomList()
+    genderDateList()
+  }
 
   useEffect(() => {
     if (order) {
-      setUpdateOrder(order)
-    }
-  }, [order, selectedDate])
-
-  useEffect(() => {
-    if (order) {
-      setSelectedDates([selectedDate])
       const listSlotFull: slotType[] = []
       if (!order || !order.orderDetails || order.orderDetails.length === 0) {
         return
@@ -212,41 +225,29 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
 
   const handleUpdateOrder = async () => {
     setLoading(true)
-    const response = await updateOrderApi(order, updateOrder)
+    const response = await updateOrderApi(order, updateOrder, allStatus)
     updateStaffList.map((item) => {
       updateStaff({ request: item })
       toast.success('Cập nhật staff thành công')
     })
     if (response.code === 200) {
-      const uniqueRoomNames = Array.from(new Set(updateOrder?.orderDetails.map((od) => od.roomName))).join(', ')
-      setOrders((prevRows) =>
-        prevRows.map((row) =>
-          row.id === order.id
-            ? {
-                ...row,
-                staffId: updateOrder?.orderDetails[0]?.orderHandler?.id,
-                status: updateOrder?.orderDetails[0]?.status,
-                roomName: uniqueRoomNames,
-                updatedAt: moment().format('HH:mm DD-MM-YY')
-              }
-            : row
-        )
-      )
-      setLoading(false)
       toast.success('Cập nhật đơn hàng thành công')
+      setLoading(false)
       onClose()
+      refetch()
     } else {
       setLoading(false)
-      toast.error(response.message)
       onClose()
     }
   }
 
-  const handleRoomChange = (room: Room, odId: string) => {
+  const handleRoomChange = (room: Room, orderDetail: OrderDetail) => {
+    setSelectedRooms([room])
+    setSelectedDates([moment(orderDetail.startTime)])
     setUpdateOrder((prev) => {
       if (!prev) return prev
       const updatedOrderDetails = prev.orderDetails.map((od) =>
-        od.id === odId
+        od.id === orderDetail.id
           ? { ...od, roomId: room.id, roomName: room.name, roomPrice: order.orderDetails[0].roomPrice }
           : od
       )
@@ -296,6 +297,38 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
             </Box>
             <Box sx={{ flex: 6 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box sx={{ flex: 1 }}>
+                  <FormControl fullWidth size='small'>
+                    <Autocomplete
+                      value={order.orderDetails[0].servicePackage}
+                      options={order.orderDetails[0].servicePackage ? [order.orderDetails[0].servicePackage] : []}
+                      getOptionLabel={(option) => option.name}
+                      disableCloseOnSelect
+                      sx={{
+                        '.MuiAutocomplete-inputRoot': {
+                          opacity: 1,
+                          pointerEvents: 'none',
+                          height: '52px'
+                        },
+                        '.MuiAutocomplete-endAdornment': {
+                          display: 'none'
+                        },
+                        paddingRight: 2
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          InputProps={{
+                            ...params.InputProps,
+                            readOnly: true
+                          }}
+                          label='Gói dịch vụ'
+                          size='small'
+                        />
+                      )}
+                    />
+                  </FormControl>
+                </Box>
                 <Box sx={{ flex: 1, paddingRIght: 2 }}>
                   <TextField
                     label='Chi nhánh'
@@ -350,7 +383,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                 </Box>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                <Box sx={{ flex: 1, paddingRight: 2 }}>
+                <Box sx={{ flex: 1 }}>
                   <FormControl fullWidth size='small'>
                     <Autocomplete
                       multiple
@@ -385,31 +418,26 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                 <Box sx={{ flex: 1, paddingLeft: 2 }}>
                   <FormControl fullWidth size='small'>
                     <Autocomplete
-                      value={order.orderDetails[0].servicePackage}
-                      options={order.orderDetails[0].servicePackage ? [order.orderDetails[0].servicePackage] : []}
-                      getOptionLabel={(option) => option.name}
-                      disableCloseOnSelect
+                      value={allStatus || ''}
+                      onChange={(_, status) => setAllStatus(status as OrderStatus)}
+                      options={orderStatus}
+                      getOptionLabel={(option) => option}
+                      renderInput={(params) => (
+                        <TextField {...params} label='Cập nhật trạng thái tất cả' size='small' />
+                      )}
                       sx={{
-                        '.MuiAutocomplete-inputRoot': {
-                          opacity: 1,
-                          pointerEvents: 'none',
+                        '& .MuiOutlinedInput-root': {
                           height: '52px'
                         },
-                        '.MuiAutocomplete-endAdornment': {
-                          display: 'none'
+                        '& .MuiInputLabel-root': {
+                          lineHeight: '52px',
+                          top: '-10px'
+                        },
+                        '& .MuiInputBase-input': {
+                          height: '52px',
+                          padding: '0 14px'
                         }
                       }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          InputProps={{
-                            ...params.InputProps,
-                            readOnly: true
-                          }}
-                          label='Gói dịch vụ'
-                          size='small'
-                        />
-                      )}
                     />
                   </FormControl>
                 </Box>
@@ -420,6 +448,11 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
         <Grid container sx={{ width: '100%' }}>
           <Grid item lg={5} md={5} xs={12} sx={{ paddingRight: '12px', marginTop: '10px' }}>
             <Box sx={{ bgcolor: 'white', padding: 2, borderRadius: '5px' }}>
+              <Box display='flex' sx={{ width: '100%' }} justifyContent='flex-end'>
+                <Button variant='text' onClick={() => resertCalendar()}>
+                  <RestartAltIcon />
+                </Button>
+              </Box>
               <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
             </Box>
           </Grid>
@@ -429,7 +462,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                 padding: 3,
                 bgcolor: 'white',
                 borderRadius: '5px',
-                maxHeight: '510px',
+                maxHeight: '540px',
                 overflowY: 'scroll',
                 '&::-webkit-scrollbar': {
                   width: '4px'
@@ -472,7 +505,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                                       return room ? room.name : 'Chọn phòng'
                                     }}
                                     onChange={(e) =>
-                                      handleRoomChange(listRoom.find((room) => room.id === e.target.value)!, item.id)
+                                      handleRoomChange(listRoom.find((room) => room.id === e.target.value)!, item)
                                     }
                                     sx={{ width: '100%' }}
                                   >
@@ -519,7 +552,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                                     onChange={(_, status) => handleStatusChange(status as OrderStatus, item)}
                                     options={orderStatus}
                                     getOptionLabel={(option) => option}
-                                    renderInput={(params) => <TextField {...params} label='Tình trạng' size='small' />}
+                                    renderInput={(params) => <TextField {...params} label='Trạng thái' size='small' />}
                                     sx={{ '.MuiAutocomplete-inputRoot': { height: '52px' } }}
                                   />
                                 </FormControl>
@@ -563,7 +596,10 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
             </Box>
           </Grid>
         </Grid>
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: 2 }}>
+          <Button variant='outlined' onClick={() => onClose()}>
+            Thoát
+          </Button>
           <Button variant='contained' onClick={handleUpdateOrder}>
             Cập nhật đơn hàng
           </Button>

@@ -11,13 +11,14 @@ import {
   TextField,
   SelectChangeEvent,
   FormControl,
-  InputLabel
+  InputLabel,
+  Stack
 } from '@mui/material'
 import Table from '~/components/Table/Table'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
-import { useOrders, useSearchOrder, useStaffAccounts, useUpdateStaff, useDeleteOrder } from '~/queries/useOrder'
+import { useOrders, useSearchOrder, useStaffAccounts, useDeleteOrder } from '~/queries/useOrder'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNoteIcon from '@mui/icons-material/EditNote'
@@ -105,7 +106,6 @@ export default function ManageOrder() {
     size: paginationModel.pageSize
   })
   const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
-  const { mutate: updateStaff } = useUpdateStaff()
 
   //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
   useEffect(() => {
@@ -160,26 +160,48 @@ export default function ManageOrder() {
 
   if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
 
-  const handleStaffChange = (orderId: string, newStaffId: string) => {
-    const selectedStaff = staffList.find((s) => s.id === newStaffId)
-    const request = {
-      id: orderId,
-      orderHandler: {
-        id: newStaffId,
-        name: selectedStaff?.name || '',
-        orderHandler: selectedStaff
-      }
-    }
-    updateStaff({ request })
-    setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
-    toast.success('Cập nhật nhân viên thành công')
-  }
-
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 250 },
     { field: 'customer', headerName: 'Khách hàng', width: 200 },
-    { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
-    { field: 'slots', headerName: 'Khung giờ', width: 200 },
+    {
+      field: 'roomName',
+      headerName: 'Danh sách phòng',
+      width: 200,
+      renderCell: (params) => {
+        const rooms = params.value ? params.value.split(',') : []
+
+        return rooms.length > 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 80,
+              overflow: 'hidden',
+              width: '200px'
+            }}
+          >
+            {rooms.map((room: string, index: number) => (
+              <Chip color='default' variant='outlined' key={index} label={room.trim()} />
+            ))}
+          </Box>
+        ) : (
+          'N/A'
+        )
+      }
+    },
+    {
+      field: 'slots',
+      headerName: 'Khung giờ',
+      width: 200,
+      renderCell: (params) => (
+        <Stack direction='column' spacing={1}>
+          {params.value.split(', ').map((slot: string, index: number) => (
+            <Chip key={index} label={slot.trim()} />
+          ))}
+        </Stack>
+      )
+    },
     { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
@@ -201,38 +223,46 @@ export default function ManageOrder() {
     {
       field: 'orderHandler',
       headerName: 'Nhân viên',
-      width: 200,
+      width: 100,
       renderCell: (params) => {
-        const staffId = params.row?.staffId || null
-        return (
-          <Select
+        const handlers = params.value ? params.value.split(',') : [] // Tách chuỗi thành mảng
+
+        return handlers.length > 0 ? (
+          <Box
             sx={{
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
-            }}
-            value={staffId || ''}
-            onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
-            fullWidth
-            displayEmpty
-            renderValue={(selected) => {
-              let selectedStaff = staffList.find((staff) => staff.id === selected)
-              if (!selectedStaff) selectedStaff = params.row?.orderHandler
-              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 70,
+              overflow: 'hidden',
+              width: '150px'
             }}
           >
-            <MenuItem value='' disabled>
-              Chọn nhân viên
-            </MenuItem>
-            {staffList.map((staff) => {
-              if (staff.buildingNumber == params.row?.buildingNumber)
-                return (
-                  <MenuItem key={staff.id} value={staff.id}>
-                    {staff.name}
-                  </MenuItem>
-                )
-            })}
-          </Select>
+            {handlers.map((handler: string, index: number) => (
+              <Chip
+                key={index}
+                label={handler.trim()}
+                sx={{
+                  borderColor: theme.palette.primary.light,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  color: theme.palette.primary.light,
+                  backgroundColor: 'transparent'
+                }}
+              />
+            ))}
+          </Box>
+        ) : (
+          <Chip
+            label='Chưa có nhân viên'
+            sx={{
+              borderColor: theme.palette.error.light,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              color: theme.palette.error.light,
+              backgroundColor: 'transparent'
+            }}
+          />
         )
       }
     },
@@ -450,8 +480,8 @@ export default function ManageOrder() {
         open={editMode}
         onClose={() => setEditMode(false)}
         order={selectedOrder}
-        setOrders={setRows}
         staffList={staffList}
+        refetch={refetch}
       />
       <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>

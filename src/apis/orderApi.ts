@@ -213,9 +213,9 @@ export const getRoomSameType = async ({ roomId }: { roomId: string }): Promise<R
 }
 
 //Update
-export const updateOrderApi = async (order: Order, updateOrder: Order | null) => {
+export const updateOrderApi = async (order: Order, updateOrder: Order | null, allStatus: OrderStatus | null) => {
   if (updateOrder != null) {
-    const updateRequest = createOrderUpdateRequest(order, updateOrder)
+    const updateRequest = createOrderUpdateRequest(order, updateOrder, allStatus)
     if (updateRequest) {
       try {
         const response = await http.put('/order', updateRequest)
@@ -225,7 +225,7 @@ export const updateOrderApi = async (order: Order, updateOrder: Order | null) =>
         throw error
       }
     } else {
-      return { code: 400, message: 'Không có thay đổi nào cần gửi.' }
+      return { code: 400 }
     }
   }
 }

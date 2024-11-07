@@ -137,19 +137,19 @@ export const mapOrderToRow = (order: Order) => {
     )
   ]
 
+  const orderHandler = [
+    ...new Set(
+      order.orderDetails
+        .map((orderDetail) => orderDetail?.orderHandler?.name) // Lấy name hoặc undefined nếu không có
+        .filter((name) => name) // Lọc bỏ các giá trị undefined hoặc null
+    )
+  ]
+
   const sortedSlots = slots.sort((a, b) => {
     const aStartTime = moment(a.split(' - ')[0], 'HH:mm')
     const bStartTime = moment(b.split(' - ')[0], 'HH:mm')
     return aStartTime.diff(bStartTime)
   })
-
-  const statusFormat =
-    order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Rejected).length > 0
-      ? OrderStatus.Rejected
-      : order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Pending).length > 0
-        ? OrderStatus.Pending
-        : OrderStatus.Successfully
-
   return {
     order: order,
     id: order.id,
@@ -159,14 +159,22 @@ export const mapOrderToRow = (order: Order) => {
     roomName: [...new Set(order.orderDetails.map((o) => o.roomName))].join(', ') || 'N/A',
     buildingNumber: order.orderDetails?.[0]?.buildingId || 0,
     address: order.orderDetails?.[0]?.buildingAddress || 'N/A',
-    status: statusFormat,
+    status: filterStatus(order),
     startTime: moment(order.orderDetails?.[0]?.startTime).format('HH:mm DD-MM') || 'N/A',
     endTime: new Date(order.orderDetails?.[0]?.endTime).toLocaleString() || 'N/A',
     servicePackage: order.orderDetails?.[0]?.servicePackage?.name || 'N/A',
-    orderHandler: order.orderDetails[0]?.orderHandler || null,
-    staffId: order.orderDetails[0]?.orderHandler?.id || null,
+    orderHandler: orderHandler.join(', ') || null,
+    staffId: [...new Set(order.orderDetails.map((o) => o?.orderHandler?.name || ''))].join(', ') || null,
     slots: sortedSlots.join(', ') || 'N/A'
   }
+}
+
+export const filterStatus = (order: Order) => {
+  return order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Rejected).length > 0
+    ? OrderStatus.Rejected
+    : order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Pending).length > 0
+      ? OrderStatus.Pending
+      : OrderStatus.Successfully
 }
 
 export interface OrderUpdateRequest {
@@ -178,31 +186,44 @@ export interface OrderUpdateRequest {
 
 export interface OrderDetailUpdateRoomRequest {
   id: string
-  roomId: number
+  roomId?: number
+  status?: string
 }
 
-export const createOrderUpdateRequest = (currentOrder: Order, updatedOrder: Order): OrderUpdateRequest | null => {
+export const createOrderUpdateRequest = (
+  currentOrder: Order,
+  updatedOrder: Order,
+  allStatus: OrderStatus | null
+): OrderUpdateRequest | null => {
   const orderDetails: OrderDetailUpdateRoomRequest[] = []
 
   updatedOrder.orderDetails.forEach((updatedDetail) => {
     const originalDetail = currentOrder.orderDetails.find((detail) => detail.id === updatedDetail.id)
 
-    if (originalDetail && originalDetail.roomId !== updatedDetail.roomId) {
-      orderDetails.push({
-        id: updatedDetail.id,
-        roomId: updatedDetail.roomId
-      })
+    if (originalDetail) {
+      if (originalDetail.roomId !== updatedDetail.roomId && originalDetail.status !== updatedDetail.status) {
+        orderDetails.push({
+          id: updatedDetail.id,
+          roomId: updatedDetail.roomId,
+          status: updatedDetail.status
+        })
+      } else if (originalDetail.roomId !== updatedDetail.roomId) {
+        orderDetails.push({
+          id: updatedDetail.id,
+          roomId: updatedDetail.roomId
+        })
+      } else if (originalDetail.status !== updatedDetail.status) {
+        orderDetails.push({
+          id: updatedDetail.id,
+          status: updatedDetail.status
+        })
+      }
     }
   })
 
   const request: OrderUpdateRequest = {
     id: updatedOrder.id,
-    ...(currentOrder.orderDetails[0].status !== updatedOrder.orderDetails[0].status && {
-      status: updatedOrder.orderDetails[0].status
-    }),
-    ...(currentOrder.orderDetails[0]?.orderHandler?.id !== updatedOrder.orderDetails[0]?.orderHandler?.id && {
-      orderHandler: updatedOrder.orderDetails[0]?.orderHandler
-    }),
+    ...(allStatus && { status: allStatus }),
     ...(orderDetails.length > 0 && { orderDetails })
   }
   return Object.keys(request).length > 1 ? request : null
