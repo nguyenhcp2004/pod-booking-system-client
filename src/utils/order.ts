@@ -142,6 +142,14 @@ export const mapOrderToRow = (order: Order) => {
     const bStartTime = moment(b.split(' - ')[0], 'HH:mm')
     return aStartTime.diff(bStartTime)
   })
+
+  const statusFormat =
+    order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Rejected).length > 0
+      ? OrderStatus.Rejected
+      : order.orderDetails.filter((orderDetail) => orderDetail.status === OrderStatus.Pending).length > 0
+        ? OrderStatus.Pending
+        : OrderStatus.Successfully
+
   return {
     order: order,
     id: order.id,
@@ -151,7 +159,7 @@ export const mapOrderToRow = (order: Order) => {
     roomName: [...new Set(order.orderDetails.map((o) => o.roomName))].join(', ') || 'N/A',
     buildingNumber: order.orderDetails?.[0]?.buildingId || 0,
     address: order.orderDetails?.[0]?.buildingAddress || 'N/A',
-    status: order.orderDetails?.[0]?.status || 'N/A',
+    status: statusFormat,
     startTime: moment(order.orderDetails?.[0]?.startTime).format('HH:mm DD-MM') || 'N/A',
     endTime: new Date(order.orderDetails?.[0]?.endTime).toLocaleString() || 'N/A',
     servicePackage: order.orderDetails?.[0]?.servicePackage?.name || 'N/A',

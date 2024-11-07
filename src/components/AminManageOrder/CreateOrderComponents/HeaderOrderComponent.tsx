@@ -60,6 +60,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
   const { data: allBuilding } = useBuilding()
   const { data: roomType } = useRoomType(building?.address || '')
 
+  const now = new Date()
+  const currentHour = now.getHours()
+
+  const availableSlots = useMemo(() => {
+    if (selectedDate && selectedDate.isAfter(moment(), 'day')) {
+      return SLOT
+    } else {
+      return SLOT.filter((slot) => {
+        const startHour = parseInt(slot.split(':')[0], 10)
+        return startHour > currentHour
+      })
+    }
+  }, [selectedDate, currentHour])
+
   useEffect(() => {
     if (searchBuilding.trim()) {
       setListBuilding(searchBuildingData || [])
@@ -281,6 +295,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             value={selectedDate || moment()}
             onChange={(date) => handleSelectDate(date)}
             format={DEFAULT_DATE_FORMAT}
+            disablePast
             slotProps={{
               textField: {
                 size: 'small',
@@ -303,7 +318,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <FormControl fullWidth size='small'>
             <Autocomplete
               multiple
-              options={SLOT}
+              options={availableSlots}
               value={selectedSlots}
               onChange={(_, slots) => {
                 handleSelectSlots(slots as slotType[])

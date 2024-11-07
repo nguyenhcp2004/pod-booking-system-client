@@ -195,7 +195,7 @@ export const searchAccounts = async (keyword: string): Promise<Account[]> => {
 export const getStaff = async (): Promise<Account[]> => {
   try {
     const response = await http.get('/accounts/staff')
-    return response.data
+    return response.data.data
   } catch (error) {
     console.error('Error getting staff:', error)
     throw error

@@ -23,7 +23,7 @@ const amenityTranslations: Record<string, string> = {
 const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
-  const [room, setRoom] = useState<string | null>(bookingData.selectedRooms[0].name)
+  const [room, setRoom] = useState<string | null>(bookingData?.selectedRooms[0]?.name || null)
   const [selectedAmenity, setSelectedAmenity] = useState<string | null>('All')
   const [detailAmenity, setDetailAmenity] = useState<AmenityType | null>(null)
   const [errorState, setErrorState] = useState<string | null>(null)
@@ -159,7 +159,7 @@ const AddAmenityOrder: React.FC<AddAmenityOrderProps> = ({ bookingData, setBooki
             <InputLabel id='location-label'>Phòng</InputLabel>
             <Select
               labelId='r-type-label'
-              value={room || bookingData.selectedRooms[0].name}
+              value={room || bookingData?.selectedRooms[0]?.name || ''}
               label='Phòng'
               onChange={(e) => setRoom(e.target.value)}
             >

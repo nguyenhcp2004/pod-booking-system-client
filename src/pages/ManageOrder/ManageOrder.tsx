@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
 import {
   Chip,
   Select,
@@ -13,6 +13,7 @@ import {
   FormControl,
   InputLabel
 } from '@mui/material'
+import Table from '~/components/Table/Table'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
@@ -29,8 +30,14 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
+import { Add } from '@mui/icons-material'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 
 export default function ManageOrder() {
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0
+  })
   const { account } = useAppContext()
   const today = moment()
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -39,9 +46,7 @@ export default function ManageOrder() {
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const [status, setStatus] = useState<OrderStatus | null>(null)
 
-  const [currentPage, setCurrentPage] = useState<number>(0)
-  const [pageSize, setPageSize] = useState<number>(10)
-  const [rowCount, setRowCount] = useState<number>(0)
+  const [rowCount, setRowCount] = useState<number>()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [staffList, setStaffList] = useState<Account[]>([])
   const [searchKeyword, setSearchKeyword] = useState<string>('')
@@ -90,14 +95,14 @@ export default function ManageOrder() {
   } = useOrders({
     startDate: formattedStartDate,
     endDate: formattedEndDate,
-    page: currentPage,
-    size: pageSize,
+    page: paginationModel.page,
+    size: paginationModel.pageSize,
     status: status !== null ? status : undefined
   })
   const { data: searchData, isFetching: isSearchFetching } = useSearchOrder({
     keyword: searchKeyword,
-    page: currentPage,
-    size: pageSize
+    page: paginationModel.page,
+    size: paginationModel.pageSize
   })
   const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
   const { mutate: updateStaff } = useUpdateStaff()
@@ -129,7 +134,7 @@ export default function ManageOrder() {
     if (orderData) {
       const rowsData = orderData.data.map(mapOrderToRow)
       setRows([...rowsData])
-      setRowCount(orderData.data.totalRecord)
+      setRowCount(orderData.totalRecord)
     }
   }, [orderData])
 
@@ -138,13 +143,13 @@ export default function ManageOrder() {
       if (searchData) {
         const searchRowsData = searchData.data.map(mapOrderToRow)
         setRows([...searchRowsData])
-        setRowCount(searchData?.data?.totalRecord || 0)
+        setRowCount(searchData?.totalRecord || 0)
       }
     } else {
       if (orderData) {
         const rowsData = orderData.data.map(mapOrderToRow)
         setRows([...rowsData])
-        setRowCount(orderData.data.totalRecord)
+        setRowCount(orderData.totalRecord)
       }
     }
   }, [searchKeyword, orderData, searchData])
@@ -325,6 +330,7 @@ export default function ManageOrder() {
   ]
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    console.log(event.target.value)
     setSearchProcess(event.target.value)
     if (event.target.value.trim().length === 0) {
       setSearchKeyword('')
@@ -343,12 +349,14 @@ export default function ManageOrder() {
         <DatePicker
           label='Từ'
           value={selectedStartDate}
+          format={DEFAULT_DATE_FORMAT}
           onChange={(newValue) => setSelectedStartDate(newValue)}
           slotProps={{ textField: { fullWidth: true } }}
         />
         <DatePicker
           label='Đến'
           value={selectedEndDate}
+          format={DEFAULT_DATE_FORMAT}
           onChange={(newValue) => setSelectedEndDate(newValue)}
           slotProps={{ textField: { fullWidth: true } }}
         />
@@ -378,16 +386,8 @@ export default function ManageOrder() {
         </FormControl>
       </Box>
       <Box display='flex' gap={2}>
-        <GridToolbarQuickFilter
-          value={searchProcess}
-          onChange={(event) => handleSearchChange(event)}
-          sx={{
-            '& .MuiInputBase-input': {
-              color: 'white'
-            }
-          }}
-        />
-        <Button variant='contained' color='primary' onClick={() => setCreateMode(true)}>
+        <GridToolbarQuickFilter value={searchProcess} onChange={(event) => handleSearchChange(event)} />
+        <Button variant='text' color='primary' onClick={() => setCreateMode(true)} startIcon={<Add />}>
           Thêm đơn hàng
         </Button>
       </Box>
@@ -410,9 +410,10 @@ export default function ManageOrder() {
             value={searchProcess}
             onChange={(event) => handleSearchChange(event)}
             sx={{
+              backgroundColor: searchProcess.length == 0 ? 'transparent' : 'white',
               position: 'absolute',
-              top: '20px',
-              right: '170px',
+              top: '40px',
+              right: '180px',
               width: '180px',
               zIndex: 2,
               '& .MuiOutlinedInput-root': {
@@ -424,26 +425,24 @@ export default function ManageOrder() {
                 },
                 '&.Mui-focused fieldset': {
                   border: 'none'
+                },
+                '& .MuiInputBase-input': {
+                  padding: '2px 2px'
                 }
               }
             }}
           />
         </Box>
       </Box>
-      <DataGrid
-        rows={rows}
+      <Table
         columns={columns}
-        paginationModel={{ page: currentPage, pageSize: pageSize }}
-        pageSizeOptions={[5, 10]}
-        pagination
-        paginationMode='server'
-        rowCount={rowCount}
-        onPaginationModelChange={(newPaginationModel) => {
-          setCurrentPage(newPaginationModel.page)
-          setPageSize(newPaginationModel.pageSize)
-        }}
-        slots={{ toolbar: Toolbar }}
+        rows={rows}
         loading={isFetching || isSearchFetching || isStaffFetching}
+        setRows={setRows}
+        toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={rowCount}
       />
       <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} refetch={refetch} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
