@@ -27,6 +27,7 @@ export const clearLS = () => {
   localStorage.removeItem('bookedRoom')
   localStorage.removeItem('bookingAmenities')
   localStorage.removeItem('roomTypeFilterStateLandingPage')
+  localStorage.removeItem('redirectPath')
   const clearLSEvent = new Event('clearLS')
   LocalStorageEventTarget.dispatchEvent(clearLSEvent)
 }

@@ -56,7 +56,7 @@ const menuItems = [
     role: ['Admin']
   },
   {
-    title: 'Tiện ích',
+    title: 'Dịch vụ',
     to: '/admin/amenities',
     icon: <FastfoodIcon sx={iconSx} />,
     role: ['Admin', 'Manager']
@@ -65,13 +65,13 @@ const menuItems = [
     title: 'Tài khoản',
     to: '/admin/users',
     icon: <PeopleAltIcon sx={iconSx} />,
-    role: ['Admin']
+    role: ['Admin', 'Manager', 'Staff']
   },
   {
     title: 'Giao Việc',
     to: '/admin/assignments',
     icon: <CalendarMonthIcon sx={iconSx} />,
-    role: ['Admin']
+    role: ['Admin', 'Manager']
   }
 ]
 
