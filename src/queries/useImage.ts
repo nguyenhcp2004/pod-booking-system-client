@@ -36,3 +36,11 @@ export const useDeleteImageMutation = () => {
     }
   })
 }
+
+export const useGetImagesByRoomTypeId = (roomTypeId: number) => {
+  return useQuery({
+    queryKey: ['get-images-by-room-type-id', { roomTypeId }],
+    queryFn: () => imageApiRequets.getImagesByRoomTypeId(roomTypeId),
+    enabled: !!roomTypeId
+  })
+}

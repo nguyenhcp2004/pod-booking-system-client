@@ -1,5 +1,9 @@
 import { Image } from '~/constants/type'
-import { AddImageToRoomBodyType, getImagesByRoomIdResponseType } from '~/schemaValidations/roomImage.schema'
+import {
+  AddImageToRoomBodyType,
+  getImagesByRoomIdResponseType,
+  getImagesByRoomTypeIdResponseType
+} from '~/schemaValidations/roomImage.schema'
 import http from '~/utils/http'
 
 const CLOUD_NAME: string = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string
@@ -23,6 +27,9 @@ const imageApiRequets = {
   },
   getImagesByRoomId: (roomId: number) => {
     return http.get<getImagesByRoomIdResponseType>(`/room-images/${roomId}`)
+  },
+  getImagesByRoomTypeId: (roomTypeId: number) => {
+    return http.get<getImagesByRoomTypeIdResponseType>(`/room-images/room-type/${roomTypeId}`)
   },
   addImageToRoom: (body: AddImageToRoomBodyType) => {
     return http.post<string>(`/room-images/${body.roomId}`, body.image)
