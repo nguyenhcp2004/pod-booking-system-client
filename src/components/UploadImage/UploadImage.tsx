@@ -1,6 +1,6 @@
-import { Box, Button, Grid, IconButton, Typography } from '@mui/material'
+import { Box, Button, IconButton, Typography } from '@mui/material'
 import { CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Image } from '~/constants/type'
 import { useDeleteImageMutation } from '~/queries/useImage'
 

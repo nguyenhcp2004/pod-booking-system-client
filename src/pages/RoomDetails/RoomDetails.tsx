@@ -44,7 +44,6 @@ export default function RoomDetail() {
     startTime: selectedDates[0]?.format('YYYY-MM-DDT00:01:00'),
     endTime: selectedDates[selectedDates.length - 1]?.format('YYYY-MM-DDT23:59:00')
   })
-
   // const roomsError = useMemo(() => {
   //   const error =
   //     unavailableRooms?.data.data.filter((room) => {
@@ -172,7 +171,6 @@ export default function RoomDetail() {
 
   const handleBooking = () => {
     if (!account) {
-      localStorage.setItem('redirectPath', location.pathname)
       navigate('/login', { state: { from: location.pathname } })
       return
     }
