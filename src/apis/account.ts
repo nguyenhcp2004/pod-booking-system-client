@@ -4,13 +4,16 @@ import {
   CountCustomerReqType,
   CountCustomerResType,
   CreateAccountBodyType,
+  GetListStaffResType,
   GetManageAccountRes,
   GetMeResType,
   SendMailBodyType,
   SendMailResType,
   UpdateAccountByAdminBodyType,
-  UpdateAccountByAdminResType
+  UpdateAccountByAdminResType,
+  UpdateAccountPhoneNumberType
 } from '~/schemaValidations/account.schema'
+import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 import http from '~/utils/http'
 import { formatQueryDateTime } from '~/utils/utils'
 
@@ -22,6 +25,9 @@ const accountApiRequest = {
   },
   updateAccountByAdmin: (body: UpdateAccountByAdminBodyType) => {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/${body.id}`, body)
+  },
+  updateAccountPhoneNumber: (body: UpdateAccountPhoneNumberType) => {
+    return http.patch<UpdateAccountByAdminResType>(`/accounts/phoneNumber`, body)
   },
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)
@@ -35,6 +41,10 @@ const accountApiRequest = {
   countCustomer: (query: CountCustomerReqType) => {
     const queryString = formatQueryDateTime(query.startTime as string, query.endTime as string)
     return http.get<CountCustomerResType>(`/accounts/number-accounts?${queryString}`)
+  },
+  getListStaff: (query: GetAssignmentsQueryType) => {
+    const stringified = queryString.stringify(query)
+    return http.get<GetListStaffResType>(`/accounts/staff?${stringified}`)
   }
 }
 

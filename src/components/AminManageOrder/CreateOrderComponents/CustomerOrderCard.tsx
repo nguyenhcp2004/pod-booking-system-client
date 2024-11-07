@@ -16,7 +16,6 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
   const [searchCustomer, setSearchCustomer] = useState<string>('')
   const [listCustomer, setListCustomer] = useState<Account[]>([])
   const [showCustomerList, setShowCustomerList] = useState(false)
-  const today = moment()
   const { data: searchCustomerData } = useSearchAccounts(searchCustomer)
   const theme = useTheme()
 
@@ -128,7 +127,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
                 color: bookingData?.date ? 'inherit' : 'red'
               }}
             >
-              {moment(bookingData?.date).format(DEFAULT_DATE_FORMAT) || moment(today).format(DEFAULT_DATE_FORMAT)}
+              {moment(bookingData?.date).format(DEFAULT_DATE_FORMAT) || 'Chưa chọn ngày'}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

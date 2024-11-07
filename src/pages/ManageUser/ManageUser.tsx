@@ -1,4 +1,15 @@
-import { Box, Chip, Typography, Avatar } from '@mui/material'
+import {
+  Box,
+  Chip,
+  Typography,
+  Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
+} from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
@@ -36,6 +47,7 @@ export default function ManageUser() {
   const [totalRowCount, setTotalRowCount] = useState<number>()
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, id: '', newStatus: '' })
 
   useEffect(() => {
     if (data?.data.data) {
@@ -58,10 +70,18 @@ export default function ManageUser() {
     }))
   }, [paginationModel])
 
-  const handleToggleStatus = (id: GridRowId) => async () => {
+  const handleToggleStatus = (id: GridRowId) => () => {
     const rowToToggle = rows.find((row) => row.id === id)
     if (rowToToggle) {
       const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
+      setConfirmDialog({ open: true, id: id as string, newStatus })
+    }
+  }
+
+  const handleConfirmToggle = async () => {
+    const { id, newStatus } = confirmDialog
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
       try {
         const body: UpdateAccountByAdminBodyType = {
           id: rowToToggle.id,
@@ -77,6 +97,7 @@ export default function ManageUser() {
         handleErrorApi({ error })
       }
     }
+    setConfirmDialog({ open: false, id: '', newStatus: '' })
   }
 
   const columns: GridColDef[] = [
@@ -260,6 +281,28 @@ export default function ManageUser() {
         setPaginationModel={setPaginationModel}
         totalRowCount={totalRowCount}
       />
+
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ open: false, id: '', newStatus: '' })}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{'Xác nhận thay đổi trạng thái'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            Bạn có chắc chắn muốn thay đổi trạng thái của người dùng này thành {confirmDialog.newStatus}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialog({ open: false, id: '', newStatus: '' })} color='primary'>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmToggle} color='primary' autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

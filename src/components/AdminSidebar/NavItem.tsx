@@ -11,6 +11,7 @@ import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
 // import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
 import { useAppContext } from '~/contexts/AppProvider'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 
 const iconSx = {
   width: '24px',
@@ -64,6 +65,12 @@ const menuItems = [
     title: 'Tài khoản',
     to: '/admin/users',
     icon: <PeopleAltIcon sx={iconSx} />,
+    role: ['Admin']
+  },
+  {
+    title: 'Giao Việc',
+    to: '/admin/assignments',
+    icon: <CalendarMonthIcon sx={iconSx} />,
     role: ['Admin']
   }
 ]
