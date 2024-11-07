@@ -22,6 +22,7 @@ import { BookedRoomSchemaType } from '~/schemaValidations/room.schema'
 import { formatStartEndTime } from '~/utils/utils'
 import BookingAmenityDetails from '~/components/BookingDetails/BookingAmenityDetails'
 import { LOCAL_STORAGE_KEY_ROOM, useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { formatCurrencyAmenityPage } from '~/utils/currency'
 
 interface CommonProps {
   onNext: () => void
@@ -368,7 +369,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   </Box>
                 </Box>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '20px', textAlign: 'center' }}>
-                  {detailAmenity?.price ? detailAmenity.price * quantity : 0} VND
+                  {formatCurrencyAmenityPage(detailAmenity?.price ? detailAmenity.price * quantity : undefined)} VND
                 </Typography>
               </Box>
               <Box sx={{ padding: '20px 0px 10px 0px' }}>

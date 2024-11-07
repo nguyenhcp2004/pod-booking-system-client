@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { AmenityType } from '~/schemaValidations/amenity.schema'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useBookingAmenityContext } from '~/contexts/BookingAmenityContext'
+import { formatCurrencyAmenityPage } from '~/utils/currency'
 
 interface AmenityCardProps {
   amenity: AmenityType
@@ -32,7 +33,7 @@ export default function AmenityCard({ amenity }: AmenityCardProps) {
         </Typography>
         <Box sx={{ flex: 1 }} display='flex' justifyContent='flex-end' gap='5px'>
           <Typography variant='subtitle2' fontWeight='bold'>
-            {amenity.price} VND
+            {formatCurrencyAmenityPage(amenity.price)} VND
           </Typography>
           {location.pathname == '/order-amenity-detail/1' && (
             <ClearIcon
