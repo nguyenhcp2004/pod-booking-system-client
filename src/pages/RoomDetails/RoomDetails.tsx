@@ -1,7 +1,6 @@
 import { Autocomplete, Box, Button, Checkbox, Chip, FormControl, TextField, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import moment, { Moment } from 'moment'
-import homePageBanner from '~/assets/images/homePageBanner.png'
 import { DatePicker } from '@mui/x-date-pickers'
 import { formatCurrency } from '~/utils/currency'
 import ImageView from '~/components/ImageView/ImageView'
@@ -19,7 +18,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { BookingInfo, useBookingContext } from '~/contexts/BookingContext'
 import { Helmet } from 'react-helmet-async'
 import { useAppContext } from '~/contexts/AppProvider'
-import { toast } from 'react-toastify'
+import { useGetImagesByRoomTypeId } from '~/queries/useImage'
+import { ImageRoomTypeType } from '~/schemaValidations/roomImage.schema'
 
 export default function RoomDetail() {
   const params = useParams<{ id: string }>()
@@ -28,6 +28,7 @@ export default function RoomDetail() {
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null)
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
+  const [images, setImages] = useState<ImageRoomTypeType[]>([])
   const BookingContext = useBookingContext()
   const { account } = useAppContext()
 
@@ -43,6 +44,7 @@ export default function RoomDetail() {
     startTime: selectedDates[0]?.format('YYYY-MM-DDT00:01:00'),
     endTime: selectedDates[selectedDates.length - 1]?.format('YYYY-MM-DDT23:59:00')
   })
+
   // const roomsError = useMemo(() => {
   //   const error =
   //     unavailableRooms?.data.data.filter((room) => {
@@ -103,6 +105,17 @@ export default function RoomDetail() {
     date: selectedDate?.format('YYYY-MM-DD') || ''
   })
 
+  const { data: imagesData } = useGetImagesByRoomTypeId(Number(params.id))
+  useEffect(() => {
+    if (imagesData) {
+      if (selectedRooms.length > 0) {
+        const roomIds = selectedRooms.map((room) => room.id)
+        setImages(imagesData.data.data.filter((image) => roomIds.includes(image.roomId)))
+      } else {
+        setImages(imagesData.data.data)
+      }
+    }
+  }, [selectedRooms, imagesData])
   const slotList = useMemo(() => {
     return (
       slotData?.data.data.map((slot) => {
@@ -183,7 +196,7 @@ export default function RoomDetail() {
       <Grid container size={12} spacing={6}>
         <Grid container size={{ xs: 12, md: 6 }} rowSpacing={1}>
           <Box sx={{ width: '100%' }}>
-            <ImageView images={selectedRooms[0]?.image ? [selectedRooms[0]?.image] : [homePageBanner]} />
+            <ImageView images={images} />
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -221,6 +234,7 @@ export default function RoomDetail() {
                       onChange={(_, rooms) => {
                         return setSelectedRooms(rooms)
                       }}
+                      getOptionLabel={(option) => option.name}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => {
                           const { key, ...tagProps } = getTagProps({ index })
