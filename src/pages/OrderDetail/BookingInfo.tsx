@@ -16,6 +16,7 @@ import { UpdateAccountPhoneNumberType } from '~/schemaValidations/account.schema
 import { useUpdateAccountPhoneNumber } from '~/queries/useAccount'
 import { Room } from '~/constants/type'
 import { useGetRoomsByTypeAndDate } from '~/queries/useFilterRoom'
+import envConfig from '~/constants/config'
 
 interface CommonProps {
   onNext: () => void
@@ -28,7 +29,7 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
   const [selectedSlots, setSelectedSlots] = useState<slotType[]>([])
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
   const bookingData = bookingContext!.bookingData
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
   const { account: account, setAccount } = useAppContext()
   const [phoneNumber, setPhoneNumber] = useState(account?.phoneNumber || '')

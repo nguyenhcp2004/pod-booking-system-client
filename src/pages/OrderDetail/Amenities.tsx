@@ -9,6 +9,7 @@ import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
 import AddAmenityOrder from '~/components/AminManageOrder/CreateOrderComponents/AddAmenityOrder'
 import { BookingContext } from '~/contexts/BookingContext'
+import envConfig from '~/constants/config'
 
 interface CommonProps {
   onNext: () => void
@@ -24,7 +25,7 @@ export const Amenities: React.FC<CommonProps> = (props) => {
   }
   const { bookingData, setBookingData } = bookingContext
 
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   useEffect(() => {

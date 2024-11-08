@@ -15,6 +15,7 @@ import { formatDateAndSlot } from '~/utils/utils'
 import { useAppContext } from '~/contexts/AppProvider'
 import { toast } from 'react-toastify'
 import { formatCurrency } from '~/utils/currency'
+import envConfig from '~/constants/config'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -61,7 +62,7 @@ export const Confirmed: React.FC = () => {
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
 
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   useEffect(() => {

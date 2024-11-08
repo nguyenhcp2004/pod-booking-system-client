@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 import { Link } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
+import envConfig from '~/constants/config'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -45,7 +46,7 @@ export default function ForgotPassword() {
           type='submit'
           fullWidth
           variant='outlined'
-          href='http://localhost:8080/oauth2/authorization/google'
+          href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

@@ -35,6 +35,7 @@ import { PaginationSearchQuery } from '~/constants/type'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
+import envConfig from '~/constants/config'
 
 export default function ManageUser() {
   const { account } = useAppContext()
@@ -53,7 +54,7 @@ export default function ManageUser() {
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
   const [confirmDialog, setConfirmDialog] = useState({ open: false, id: '', newStatus: '' })
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   useEffect(() => {
