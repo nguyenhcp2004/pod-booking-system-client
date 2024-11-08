@@ -15,12 +15,13 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridRowId,
+  GridRowParams,
   GridToolbarContainer,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import BlockIcon from '@mui/icons-material/Block'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useEffect, useRef, useState } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
 import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccount'
@@ -33,8 +34,10 @@ import SearchForManage from '~/components/SearchInput/SearchForManage'
 import { PaginationSearchQuery } from '~/constants/type'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageUser() {
+  const { account } = useAppContext()
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
@@ -248,21 +251,30 @@ export default function ManageUser() {
       headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
-      getActions: ({ row }) => {
+      getActions: ({ row }: GridRowParams): ReactElement[] => {
         const propRow = {
           ...row,
           buildingNumber: row?.building?.id || 0,
           status: row.status === 'Hoạt động' ? 1 : 0
         }
-        return [
-          <UserModal row={propRow} refetch={refetch} action={ACTION.UPDATE} />,
+        const actions: ReactElement[] = []
+
+        if (account?.role === 'Admin') {
+          actions.push(<UserModal key='edit' row={propRow} refetch={refetch} action={ACTION.UPDATE} />)
+        }
+
+        actions.push(
           <GridActionsCellItem
+            key='toggle'
             icon={row.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
             label={row.status === 'Hoạt động' ? 'Ban' : 'Unban'}
             onClick={handleToggleStatus(row.id)}
             color={row.status === 'Hoạt động' ? 'error' : 'success'}
+            disabled={account?.role !== 'Admin'}
           />
-        ]
+        )
+
+        return actions
       }
     }
   ]
