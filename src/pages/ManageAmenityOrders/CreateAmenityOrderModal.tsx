@@ -78,7 +78,7 @@ const CreateAmenityOrderModal = ({
         <Loading loading={loading} />
         <DialogTitle>
           <Typography variant='h5' fontWeight='500'>
-            Tạo đơn tiện ích
+            Tạo đơn dịch vụ
           </Typography>
         </DialogTitle>
         <DialogContent>

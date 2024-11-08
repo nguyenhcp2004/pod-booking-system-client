@@ -32,6 +32,8 @@ import UserModal from './UserModal'
 import { ACTION } from '~/constants/mock'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
 import { PaginationSearchQuery } from '~/constants/type'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
 
 export default function ManageUser() {
@@ -51,6 +53,21 @@ export default function ManageUser() {
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
   const [confirmDialog, setConfirmDialog] = useState({ open: false, id: '', newStatus: '' })
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
+
+  useEffect(() => {
+    client.connect({}, () => {
+      console.log('Connected to socket')
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (data?.data.data) {
@@ -72,6 +89,15 @@ export default function ManageUser() {
       take: paginationModel.pageSize
     }))
   }, [paginationModel])
+
+  const sendSocketLogoutMessage = () => {
+    const payload = {
+      accountId: confirmDialog.id
+    }
+    if (confirmDialog.newStatus === 'Không hoạt động') {
+      client.send('/app/logout-user', {}, JSON.stringify(payload))
+    }
+  }
 
   const handleToggleStatus = (id: GridRowId) => () => {
     const rowToToggle = rows.find((row) => row.id === id)
@@ -96,6 +122,9 @@ export default function ManageUser() {
         await updateAccountByAdminMutation.mutateAsync(body)
         toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`)
         setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
+        if (newStatus === 'Không hoạt động') {
+          sendSocketLogoutMessage()
+        }
       } catch (error) {
         handleErrorApi({ error })
       }

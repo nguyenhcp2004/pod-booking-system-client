@@ -32,7 +32,7 @@ const menuItems = [
     role: ['Admin', 'Staff', 'Manager']
   },
   {
-    title: 'Hóa đơn tiện ích',
+    title: 'Hóa đơn dịch vụ',
     to: '/admin/amenity-orders',
     icon: <ShoppingCartCheckoutIcon sx={iconSx} />,
     role: ['Admin', 'Staff', 'Manager']
