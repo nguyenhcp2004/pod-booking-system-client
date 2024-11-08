@@ -35,6 +35,7 @@ import { useAppContext } from '~/contexts/AppProvider'
 import { Add } from '@mui/icons-material'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
 import SearchIcon from '@mui/icons-material/Search'
+import envConfig from '~/constants/config'
 
 export default function ManageOrder() {
   const [paginationModel, setPaginationModel] = useState({
@@ -63,7 +64,7 @@ export default function ManageOrder() {
   const [viewMode, setViewMode] = useState<boolean>(false)
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   const handleSelectedOrder = (order: Order) => {

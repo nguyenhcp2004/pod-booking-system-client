@@ -19,6 +19,7 @@ import { useCallback, useEffect } from 'react'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { toast } from 'react-toastify'
+import envConfig from '~/constants/config'
 
 interface Props {
   anchorEl: HTMLElement | null
@@ -33,7 +34,7 @@ export default function OptionsMenu({ anchorEl }: Props) {
   const { setAuth, setAccount, account } = useAppContext()
   const navigate = useNavigate()
   const logoutMutation = useLogoutMutation()
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
   const logout = useCallback(async () => {
     if (logoutMutation.isPending) return

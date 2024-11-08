@@ -18,6 +18,7 @@ import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { handleErrorApi } from '~/utils/utils'
 import { AppContext } from '~/contexts/AppProvider'
 import { useContext } from 'react'
+import envConfig from '~/constants/config'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -160,7 +161,7 @@ export default function Login() {
           type='submit'
           fullWidth
           variant='outlined'
-          href='http://localhost:8080/oauth2/authorization/google'
+          href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

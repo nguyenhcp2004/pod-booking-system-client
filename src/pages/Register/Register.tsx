@@ -17,6 +17,7 @@ import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
 import { useAppContext } from '~/contexts/AppProvider'
 import { handleErrorApi } from '~/utils/utils'
+import envConfig from '~/constants/config'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -208,7 +209,7 @@ export default function Register() {
           type='submit'
           fullWidth
           variant='outlined'
-          href='http://localhost:8080/oauth2/authorization/google'
+          href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

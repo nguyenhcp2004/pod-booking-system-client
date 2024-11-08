@@ -7,11 +7,12 @@ import { toast } from 'react-toastify'
 import Stomp from 'stompjs'
 import { useEffect } from 'react'
 import { useBookingContext } from '~/contexts/BookingContext'
+import envConfig from '~/constants/config'
 
 export const PaymentDetail: React.FC = () => {
   const bookingContext = useBookingContext()
   const bookingData = bookingContext?.bookingData
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   useEffect(() => {
