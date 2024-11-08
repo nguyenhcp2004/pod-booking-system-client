@@ -55,7 +55,7 @@ export default function OptionsMenu({ anchorEl }: Props) {
         const payload = JSON.parse(data.body)
         if (payload.accountId === account?.id) {
           logout()
-          toast('Tài khoản của bạn bị ban')
+          toast('Tài khoản của bạn bị cấm')
         }
       })
     })

@@ -153,7 +153,7 @@ const ManageAmenityOrders = () => {
       </Box>
       <Box sx={{ display: 'flex', gap: 5 }}>
         <Button color='primary' startIcon={<Add />} onClick={handleClickCreate}>
-          Tạo đơn tiện ích
+          Tạo đơn dịch vụ
         </Button>
         <SearchForManage setPaginationModel={setPaginationFilter} />
       </Box>
@@ -164,7 +164,7 @@ const ManageAmenityOrders = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
       <Box display='flex' alignItems='center' mb={5}>
         <Typography variant='h4' fontWeight='500' flexGrow={1}>
-          Quản lí hóa đơn tiện ích
+          Quản lí hóa đơn dịch vụ
         </Typography>
       </Box>
       <Table
