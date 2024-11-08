@@ -28,6 +28,7 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
       <Box sx={{ padding: 3, bgcolor: 'white', borderRadius: '5px' }}>
         <Box sx={{ position: 'relative', marginBottom: '20px' }}>
           <TextField
+            required
             variant='outlined'
             label='Tìm kiếm khách hàng'
             value={showCustomerList ? searchCustomer : customer?.name || searchCustomer}
