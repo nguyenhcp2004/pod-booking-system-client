@@ -39,10 +39,6 @@ export const Confirmed: React.FC = () => {
       if (transactionResponse.status === 'OK' && orderCreated === 0) {
         setOrderCreated(orderCreated + 1)
         setStatus(true)
-        await sendMail.mutateAsync({
-          email: user?.email as string,
-          orderDetailId: bookedRoom?.orderDetailId as string
-        })
         toast.success('Hệ thống vừa gửi hóa đơn cho bạn!')
         // Create order detail amenities
         for (const amenity of selectedAmenities) {
@@ -53,6 +49,10 @@ export const Confirmed: React.FC = () => {
             price: amenity.price
           })
         }
+        await sendMail.mutateAsync({
+          email: user?.email as string,
+          orderDetailId: bookedRoom?.orderDetailId as string
+        })
 
         return transactionResponse
       } else {
