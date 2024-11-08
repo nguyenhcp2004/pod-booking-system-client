@@ -20,7 +20,7 @@ export default function RegisterLayout() {
             backgroundColor: 'white'
           }}
         >
-          Back to Home
+          Trang chủ
         </Button>
         <Stack
           direction={{ xs: 'column', md: 'row' }}

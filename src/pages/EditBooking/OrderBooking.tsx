@@ -257,7 +257,12 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
             </Typography>
           </Box>
           <Box sx={{ width: '100%', padding: '20px' }}>
-            <Button onClick={handleClickOpen} fullWidth variant='outlined'>
+            <Button
+              onClick={handleClickOpen}
+              fullWidth
+              variant='outlined'
+              disabled={orderDetail.orderDetails[0].status === 'Rejected'}
+            >
               Hủy đặt phòng
             </Button>
             <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
