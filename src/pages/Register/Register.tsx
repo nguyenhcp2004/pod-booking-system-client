@@ -44,6 +44,7 @@ export default function Register() {
   } = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
       confirmPassword: ''
