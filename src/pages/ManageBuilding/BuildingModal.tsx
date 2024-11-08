@@ -110,7 +110,7 @@ export default function BuildingModal({ row, action }: { row?: Building; action:
           <Edit />
         </IconButton>
       ) : (
-        <Button variant='contained' color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
+        <Button variant='text' color='primary' startIcon={<AddIcon />} onClick={handleClickOpen}>
           Thêm chi nhánh
         </Button>
       )}

@@ -171,6 +171,7 @@ export default function RoomDetail() {
 
   const handleBooking = () => {
     if (!account) {
+      localStorage.setItem('redirectPath', location.pathname)
       navigate('/login', { state: { from: location.pathname } })
       return
     }

@@ -45,7 +45,7 @@ export default function Header() {
 
   const menuItems = [
     { text: 'Trang chủ', link: '/' },
-    { text: 'Tiện Ích', link: '/order-amenity-detail/1' },
+    { text: 'Dịch vụ', link: '/order-amenity-detail/1' },
     { text: 'Liên hệ', link: '/contact-us' },
     { text: 'Về chúng tôi', link: '/about-us' }
   ]
