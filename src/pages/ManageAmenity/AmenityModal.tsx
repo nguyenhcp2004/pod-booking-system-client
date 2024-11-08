@@ -2,7 +2,7 @@ import { Edit } from '@mui/icons-material'
 import { IconButton, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { ACTION } from '~/constants/mock'
-import { Amenity } from '~/constants/type'
+import { AmenityConfig } from '~/constants/type'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -24,12 +24,12 @@ interface AmenityFormData {
   quantity: number
 }
 
-export default function BuildingModal({ row, action }: { row?: Amenity; action: string }) {
+export default function BuildingModal({ row, action }: { row?: AmenityConfig; action: string }) {
   const [open, setOpen] = useState(false)
   const [type, setType] = useState(row?.type || AmenityTypeEnum.Food)
   const [formErrors, setFormErrors] = useState({ name: '', price: '', quantity: '' })
   const [buildings, setBuildings] = useState<{ id: number; address: string }[]>([])
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('')
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string | number>(row?.building.id || '')
   const createAmenity = useCreateAmenityMutation()
   const editAmenityMutation = useEditAmenityMutation()
   const { account: account } = useAppContext()
@@ -47,6 +47,12 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
     setFormErrors({ name: '', price: '', quantity: '' })
     setSelectedBuildingId('')
   }
+
+  useEffect(() => {
+    if (row) {
+      setSelectedBuildingId(row.building.id)
+    }
+  }, [row])
 
   useEffect(() => {
     const fetchBuildings = async () => {
@@ -90,6 +96,7 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (createAmenity.isPending || editAmenityMutation.isPending) return
+    console.log(event.currentTarget)
 
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries()) as unknown as CreateAmenityBodyType | EditAmenityBodyType
@@ -119,6 +126,9 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
       handleErrorApi({ error })
     }
   }
+
+  console.log(selectedBuildingId)
+  console.log(row)
 
   return (
     <>
@@ -216,7 +226,7 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
                   name='buildingId'
                   fullWidth
                   size='small'
-                  value={selectedBuildingId || row?.buildingId || ''}
+                  value={selectedBuildingId || row?.building.id || ''}
                   onChange={(e) => setSelectedBuildingId(e.target.value as string)}
                   disabled={action === ACTION.UPDATE}
                 >
