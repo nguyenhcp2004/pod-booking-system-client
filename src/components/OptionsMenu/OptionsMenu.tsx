@@ -15,6 +15,10 @@ import { clearLS, getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
 import { useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
+import { useCallback, useEffect } from 'react'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+import { toast } from 'react-toastify'
 
 interface Props {
   anchorEl: HTMLElement | null
@@ -26,11 +30,12 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function OptionsMenu({ anchorEl }: Props) {
   const open = Boolean(anchorEl)
-  const { setAuth, setAccount } = useAppContext()
+  const { setAuth, setAccount, account } = useAppContext()
   const navigate = useNavigate()
-
   const logoutMutation = useLogoutMutation()
-  const logout = async () => {
+  const socketCL = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socketCL)
+  const logout = useCallback(async () => {
     if (logoutMutation.isPending) return
     try {
       const refreshToken = getRefreshTokenFromLS()
@@ -42,7 +47,25 @@ export default function OptionsMenu({ anchorEl }: Props) {
     } catch (error) {
       handleErrorApi({ error })
     }
-  }
+  }, [logoutMutation, setAuth, setAccount, navigate])
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/logout-user', (data) => {
+        console.log('OK')
+        const payload = JSON.parse(data.body)
+        if (payload.accountId === account?.id) {
+          logout()
+          toast('Tài khoản của bạn bị ban')
+        }
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [logout, account, client])
 
   return (
     <>
