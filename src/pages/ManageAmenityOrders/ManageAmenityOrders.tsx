@@ -14,10 +14,7 @@ import CreateAmenityOrderModal from './CreateAmenityOrderModal'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
 
 const ManageAmenityOrders = () => {
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 5,
-    page: 0
-  })
+  const [paginationModel, setPaginationModel] = useState({ pageSize: 5, page: 0 })
   const [paginationFilter, setPaginationFilter] = useState({
     page: paginationModel.page + 1,
     take: paginationModel.pageSize,
@@ -28,7 +25,7 @@ const ManageAmenityOrders = () => {
   const [row, setRow] = useState<OrderDetailAmenityType>()
   const [totalRowCount, setTotalRowCount] = useState<number>()
   const [startDate, setStartDate] = useState<Moment | null>(moment())
-  const [endDate, setEndDate] = useState<Moment | null>(moment().add(7, 'days'))
+  const [endDate, setEndDate] = useState<Moment | null>(moment())
   const { clearAll } = useBookingAmenityContext()
 
   const {
@@ -37,9 +34,9 @@ const ManageAmenityOrders = () => {
     isFetching: isFetchingList
   } = useGetListAmenityOrders({
     startDate: startDate?.format('YYYY-MM-DDT00:01') || moment().format('YYYY-MM-DDT00:00'),
-    endDate: endDate?.format('YYYY-MM-DDT23:59') || moment().add(7, 'days').format('YYYY-MM-DDT23:59'),
-    page: paginationFilter.page,
-    take: paginationFilter.take,
+    endDate: endDate?.format('YYYY-MM-DDT23:59') || moment().format('YYYY-MM-DDT23:59'),
+    page: paginationModel.page,
+    take: paginationModel.pageSize,
     searchParams: ''
   })
 
@@ -50,14 +47,10 @@ const ManageAmenityOrders = () => {
   } = useSearchAmenityInOrderDetailAmenity({
     searchParams: paginationFilter.searchParams,
     startDate: startDate?.format('YYYY-MM-DDT00:01') || moment().format('YYYY-MM-DDT00:00'),
-    endDate: endDate?.format('YYYY-MM-DDT23:59') || moment().add(7, 'days').format('YYYY-MM-DDT23:59'),
+    endDate: endDate?.format('YYYY-MM-DDT23:59') || moment().format('YYYY-MM-DDT23:59'),
     page: paginationFilter.page,
     take: paginationFilter.take
   })
-
-  useEffect(() => {
-    console.log('Current searchParams:', paginationFilter.searchParams)
-  }, [paginationFilter.searchParams])
 
   // Conditionally choose data from the correct hook
   const data = paginationFilter.searchParams ? searchData : listData
@@ -105,6 +98,22 @@ const ManageAmenityOrders = () => {
     { field: 'roomName', headerName: 'Tên Phòng', width: 150 },
     { field: 'buildingAddress', headerName: 'Chi nhánh' },
     { field: 'customerName', headerName: 'Khách hàng', width: 200 },
+    {
+      field: 'startTime',
+      headerName: 'Thời gian bắt đầu',
+      width: 150,
+      valueFormatter: (params) => {
+        return params && moment(params).format('DD/MM/YYYY HH:mm')
+      }
+    },
+    {
+      field: 'endTime',
+      headerName: 'Thời gian kết thúc',
+      width: 150,
+      valueFormatter: (params) => {
+        return params && moment(params).format('DD/MM/YYYY HH:mm')
+      }
+    },
     {
       field: 'createdAt',
       headerName: 'Thời gian tạo',
