@@ -78,7 +78,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
 
   const handleAddAmentity = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     }
     if (quantity === 0) {
@@ -108,11 +108,11 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
 
   const handleIncrement = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
       if (detailAmenity.quantity < quantity) {
-        setErrorState('Số lượng tiện ích không đủ')
+        setErrorState('Số lượng dịch vụ không đủ')
         return
       }
       setErrorState(null)
@@ -231,11 +231,11 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   </FormControl>
                 )}
                 <FormControl fullWidth>
-                  <InputLabel id='amenities-label'>Chọn loại tiện ích</InputLabel>
+                  <InputLabel id='amenities-label'>Chọn loại dịch vụ</InputLabel>
                   <Select
                     labelId='amenities-label'
                     value={selectedAmenityType}
-                    label='Chọn loại tiện ích'
+                    label='Chọn loại dịch vụ'
                     onChange={handleAmenityTypeChange}
                   >
                     <MenuItem value=''>Tất cả</MenuItem>
@@ -247,7 +247,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
 
               <Box sx={{ padding: '49px 0px 29px 0px' }}>
                 <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
-                  Danh sách tiện ích
+                  Danh sách dịch vụ
                 </Typography>
                 <Grid container spacing={isMobile ? 1 : 2} sx={{ padding: '10px 0' }}>
                   {filteredAmenities.length > 0 ? (
@@ -275,7 +275,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   ) : (
                     <Grid size={12}>
                       <Typography variant='body1' sx={{ textAlign: 'center', color: colors.grey[500] }}>
-                        Không có tiện ích cho chi nhánh này
+                        Không có dịch vụ cho chi nhánh này
                       </Typography>
                     </Grid>
                   )}
@@ -389,7 +389,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   }}
                   onClick={() => handleAddAmentity()}
                 >
-                  Thêm tiện ích
+                  Thêm dịch vụ
                 </Button>
               </Box>
             </Box>
@@ -413,7 +413,7 @@ export const AmenityPage: React.FC<CommonProps> = (props) => {
                   }}
                   disabled={selectedAmenities.length === 0}
                 >
-                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Vui lòng chọn tiện ích'}
+                  {selectedAmenities.length > 0 ? 'Hoàn tất' : 'Vui lòng chọn dịch vụ'}
                 </Button>
               </Box>
             </Box>

@@ -130,8 +130,8 @@ export const Confirmed: React.FC = () => {
   return (
     <Box sx={{ marginX: '104px' }}>
       <Helmet>
-        <title>Xác nhận đặt tiện ích | POD System</title>
-        <meta name='description' content='Xác nhận đặt tiện ích: Chi tiết đặt phòng của bạn' />
+        <title>Xác nhận đặt dịch vụ | POD System</title>
+        <meta name='description' content='Xác nhận đặt dịch vụ: Chi tiết đặt phòng của bạn' />
       </Helmet>
       <Box>
         <Box
@@ -150,14 +150,14 @@ export const Confirmed: React.FC = () => {
                 <Box textAlign='center'>
                   <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.success.main }} />
                   <Typography variant='h3' fontWeight='bold' gutterBottom>
-                    Đặt tiện ích thành công
+                    Đặt dịch vụ thành công
                   </Typography>
                 </Box>
               ) : (
                 <Box textAlign='center'>
                   <CheckCircleIcon sx={{ fontSize: 50, color: theme.palette.error.main }} />
                   <Typography variant='h3' fontWeight='bold' gutterBottom>
-                    Đặt tiện ích thất bại
+                    Đặt dịch vụ thất bại
                   </Typography>
                 </Box>
               )}
@@ -239,7 +239,7 @@ export const Confirmed: React.FC = () => {
                     </Box>
                     <Box display='flex' gap='3px'>
                       <Typography variant='body2' fontWeight='bold'>
-                        Tiện ích:
+                        dịch vụ:
                       </Typography>
                       <Typography variant='body2'>{bookingInfo.amenities}</Typography>
                     </Box>
