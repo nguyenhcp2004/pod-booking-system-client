@@ -39,3 +39,10 @@ export const useCreateOrderDetailAmenityStaff = () => {
     }
   })
 }
+
+export const useSearchAmenityInOrderDetailAmenity = (query: OrderDetailAmenityReqType) => {
+  return useQuery({
+    queryKey: ['search-amenity-in-order-detail-amenity', query],
+    queryFn: () => amenityOrderApiRequest.searchAmenityInOrderDetailAmenity(query)
+  })
+}

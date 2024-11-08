@@ -29,7 +29,7 @@ export default function BuildingModal({ row, action }: { row?: Amenity; action: 
   const [type, setType] = useState(row?.type || AmenityTypeEnum.Food)
   const [formErrors, setFormErrors] = useState({ name: '', price: '', quantity: '' })
   const [buildings, setBuildings] = useState<{ id: number; address: string }[]>([])
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('') // New state for buildingId
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('')
   const createAmenity = useCreateAmenityMutation()
   const editAmenityMutation = useEditAmenityMutation()
   const { account: account } = useAppContext()

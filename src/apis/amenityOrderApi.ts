@@ -8,6 +8,7 @@ import {
 
 import http from '~/utils/http'
 
+//For manage
 const amenityOrderApiRequest = {
   getListAmenityOrders: (query: OrderDetailAmenityReqType) => {
     const stringified = queryString.stringify(query)
@@ -15,6 +16,12 @@ const amenityOrderApiRequest = {
   },
   updateAmenityOrder: (body: EditAmenityOrderBodyType) => {
     return http.put(`/order-detail-amenity`, body)
+  },
+
+  searchAmenityInOrderDetailAmenity: (query: OrderDetailAmenityReqType) => {
+    const stringified = queryString.stringify(query)
+    console.log(stringified)
+    return http.get<GetListAmenityOrderResType>(`/order-detail-amenity/search?${stringified}`)
   }
 }
 

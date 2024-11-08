@@ -18,6 +18,7 @@ export default function ManageBuilding() {
     take: paginationModel.pageSize,
     address: ''
   })
+
   const { data, isLoading } = useGetFilterBuilding(paginationFilter as GetFilteredBuildingQueryType)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
