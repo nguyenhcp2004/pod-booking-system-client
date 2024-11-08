@@ -217,6 +217,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             size='small'
             variant='outlined'
             label='Địa chỉ'
+            required
             value={showBuildingList ? searchBuilding : building?.address || searchBuilding}
             onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
@@ -271,6 +272,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               labelId='staff-select-label'
               label='Loại phòng'
               value={roomTypeID || ''}
+              required
               onChange={(e) => handleSelectRoomType(e)}
               fullWidth
               renderValue={(selected) => {
@@ -349,7 +351,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   </li>
                 )
               }}
-              renderInput={(params) => <TextField {...params} label='Khung giờ' size='small' />}
+              renderInput={(params) => <TextField {...params} label='Khung giờ' size='small' required />}
             />
           </FormControl>
         </Box>
@@ -390,6 +392,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   {...params}
                   label='Chọn phòng'
                   size='small'
+                  required
                   InputLabelProps={{
                     sx: {
                       display: 'flex',
@@ -421,6 +424,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   {...params}
                   label='Chọn gói'
                   size='small'
+                  required
                   InputLabelProps={{
                     sx: {
                       display: 'flex',

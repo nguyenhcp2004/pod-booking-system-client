@@ -77,6 +77,17 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
 
   const handleOfflinePayment = async () => {
     setLoading(true)
+    if (
+      !customer ||
+      !bookingData.roomType ||
+      bookingData.selectedRooms.length === 0 ||
+      !bookingData.date ||
+      bookingData.timeSlots.length === 0
+    ) {
+      toast.error('Vui lòng điền đầy đủ thông tin trước khi tạo đơn hàng.')
+      setLoading(false)
+      return
+    }
     if (!customer) return
     const response = await createOrderAD(bookingData, customer)
     if (response.code === 201) {
@@ -158,7 +169,23 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
           <Button variant='outlined' onClick={handleOfflinePayment}>
             Thanh toán tiền mặt
           </Button>
-          <Button variant='outlined' onClick={() => setOpenPayment(true)}>
+          <Button
+            variant='outlined'
+            onClick={() => {
+              if (
+                !customer ||
+                !bookingData.roomType ||
+                bookingData.selectedRooms.length === 0 ||
+                !bookingData.date ||
+                bookingData.timeSlots.length === 0
+              ) {
+                toast.error('Vui lòng điền đầy đủ thông tin trước khi tạo đơn hàng.')
+                setLoading(false)
+                return
+              }
+              setOpenPayment(true)
+            }}
+          >
             Thanh toán qua thẻ
           </Button>
         </Box>
