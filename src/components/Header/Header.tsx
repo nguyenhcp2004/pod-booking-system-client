@@ -45,13 +45,13 @@ export default function Header() {
 
   const menuItems = [
     { text: 'Trang chủ', link: '/' },
-    { text: 'Dịch vụ', link: '/order-amenity-detail/1' },
     { text: 'Liên hệ', link: '/contact-us' },
     { text: 'Về chúng tôi', link: '/about-us' }
   ]
 
   if (account) {
     menuItems.splice(1, 0, { text: 'Đơn đặt', link: '/history-orders' })
+    menuItems.splice(1, 0, { text: 'Dịch vụ', link: '/order-amenity-detail/1' })
   }
 
   const renderMenuItems = () => (
