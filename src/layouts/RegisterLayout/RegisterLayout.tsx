@@ -1,12 +1,27 @@
-import { Stack } from '@mui/material'
+import { Button, Stack } from '@mui/material'
 import Box from '@mui/material/Box'
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import loginBanner from '~/assets/images/loginBanner.jpg'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 export default function RegisterLayout() {
   return (
     <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ flex: '1 1', overflow: 'auto' }}>
+      <Box sx={{ flex: '1 1', overflow: 'auto', position: 'relative' }}>
+        <Button
+          component={Link}
+          to='/'
+          startIcon={<ArrowBackIcon />}
+          sx={{
+            position: 'absolute',
+            top: { xs: 16, md: 24 },
+            left: { xs: 16, md: 24 },
+            zIndex: 1,
+            backgroundColor: 'white'
+          }}
+        >
+          Back to Home
+        </Button>
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           sx={{
@@ -25,7 +40,7 @@ export default function RegisterLayout() {
               backgroundImage: `url(${loginBanner})`,
               backgroundSize: 'cover'
             }}
-          ></Box>
+          />
           <Outlet />
         </Stack>
       </Box>
