@@ -58,11 +58,13 @@ export default function OrderDetail() {
   }, [vnp_Amount, initialStep])
 
   useEffect(() => {
-    const targetPath = `/order-detail/${activeStep}`
     if (activeStep === 4 && location.pathname !== '/order-detail/4') {
       navigate('/order-detail/4', { state: { transactionData } })
-    } else if (activeStep !== initialStep && location.pathname !== targetPath) {
-      navigate(targetPath)
+    } else if (activeStep !== 4 && location.pathname === '/order-detail/4') {
+      // Ngăn không cho điều hướng ngược về bước 3 khi đã ở bước 4
+      setActiveStep(4)
+    } else if (activeStep !== initialStep && location.pathname !== `/order-detail/${activeStep}`) {
+      navigate(`/order-detail/${activeStep}`)
     }
   }, [activeStep, initialStep, location.pathname, navigate, transactionData])
 

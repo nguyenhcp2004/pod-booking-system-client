@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
 import { PaginationSearchQuery } from '~/constants/type'
-import { CountCustomerReqType, UpdateAccountPhoneNumberType } from '~/schemaValidations/account.schema'
+import { CountCustomerReqType, UpdateAccountPhoneNumberType, UpdateBalanceType } from '~/schemaValidations/account.schema'
 import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 
 export const useGetMe = () => {
@@ -15,6 +15,12 @@ export const useGetManageAccount = (query: PaginationSearchQuery) => {
   return useQuery({
     queryKey: ['accounts', { query }],
     queryFn: () => accountApiRequest.getListAccounts(query)
+  })
+}
+
+export const useUpdateBalance = () => {
+  return useMutation({
+    mutationFn: (query: UpdateBalanceType) => accountApiRequest.updateBalance(query)
   })
 }
 

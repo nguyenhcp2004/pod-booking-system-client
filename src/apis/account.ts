@@ -11,7 +11,8 @@ import {
   SendMailResType,
   UpdateAccountByAdminBodyType,
   UpdateAccountByAdminResType,
-  UpdateAccountPhoneNumberType
+  UpdateAccountPhoneNumberType,
+  UpdateBalanceType
 } from '~/schemaValidations/account.schema'
 import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 import http from '~/utils/http'
@@ -28,6 +29,9 @@ const accountApiRequest = {
   },
   updateAccountPhoneNumber: (body: UpdateAccountPhoneNumberType) => {
     return http.patch<UpdateAccountByAdminResType>(`/accounts/phoneNumber`, body)
+  },
+  updateBalance: (query: UpdateBalanceType) => {
+    return http.patch(`/accounts/balance`, query)
   },
   createAccount: (body: CreateAccountBodyType) => {
     return http.post<UpdateAccountByAdminResType>('/accounts', body)

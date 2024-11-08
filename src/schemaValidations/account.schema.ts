@@ -69,6 +69,13 @@ export const UpdateAccountByAdminBody = z.object({
 
 export type UpdateAccountByAdminBodyType = z.TypeOf<typeof UpdateAccountByAdminBody>
 
+export const UpdateBalance = z.object({
+  accountId: z.string(),
+  usedBalance: z.number(),
+})
+
+export type UpdateBalanceType = z.TypeOf<typeof UpdateBalance>
+
 export const UpdateAccountPhoneNumber = z.object({
   id: z.string(),
   phoneNumber: z

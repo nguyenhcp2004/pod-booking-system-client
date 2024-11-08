@@ -9,7 +9,7 @@ import { createOrder } from '~/apis/orderApi'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
-import { useSendMailMutation } from '~/queries/useAccount'
+import { useSendMailMutation, useUpdateBalance } from '~/queries/useAccount'
 import { calTotalPrice } from '~/utils/order'
 import { formatDateAndSlot } from '~/utils/utils'
 import { useAppContext } from '~/contexts/AppProvider'
@@ -27,6 +27,13 @@ export const Confirmed: React.FC = () => {
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
+
+  const totalAmount = calTotalPrice(bookingContext!.bookingData).total
+  const paidAmount = parseInt(vnp_Amount || '0', 10) / 100
+  const balanceToUse = totalAmount - paidAmount
+
+  const { mutateAsync: updateBalance } = useUpdateBalance()
+
   const hanldeSendMail = useCallback(() => {
     bookingContext!.bookingData.timeSlots.forEach(async (timeSlot) => {
       await sendMailMutation.mutateAsync({
@@ -48,10 +55,15 @@ export const Confirmed: React.FC = () => {
       if (response.status === 'OK' && orderCreated === 0) {
         setOrderCreated(1)
         setStatus(true)
+        console.log('Balance to use:', paidAmount, totalAmount, balanceToUse)
+
+        if (paidAmount < totalAmount) {
+          await updateBalance({ accountId: userData?.id || '', usedBalance: balanceToUse })
+        }
         if (!bookingContext) throw new Error('Booking context is undefined')
         // await createOrder(bookingContext.bookingData)
         // await hanldeSendMail()
-        await Promise.all([createOrder(bookingContext.bookingData), hanldeSendMail()])
+        await Promise.all([createOrder(bookingContext!.bookingData), hanldeSendMail()])
         return response
       } else {
         setStatus(false)
