@@ -105,6 +105,25 @@ export type Amenity = {
   buildingId: number
 }
 
+export type AmenityConfig = {
+  id: number
+  name: string
+  price: number
+  quantity: number
+  type: string
+  imageUrl: string
+  isDeleted: number
+  building: {
+    id: number
+    address: string
+    createdAt: string
+    description: string
+    hotlineNumber: string
+    status: string
+    updatedAt: string
+  }
+}
+
 export type Image = {
   id: number
   imageUrl: string

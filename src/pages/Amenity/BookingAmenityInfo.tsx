@@ -137,7 +137,7 @@ export const BookingAmenityInfo: React.FC<CommonProps> = (props) => {
                 fullWidth
                 sx={{ background: colors.primary[500], color: '#FFF', borderRadius: 'var(--12, 96px)' }}
               >
-                Đặt tiện ích
+                Đặt dịch vụ
               </Button>
             </Box>
           </Grid>
