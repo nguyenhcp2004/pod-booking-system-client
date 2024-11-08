@@ -260,7 +260,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
             <></>
           )}
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
-            {row.role !== ACOUNT_ROLE.ADMIN && ACTION.UPDATE === action ? (
+            {(row.role !== ACOUNT_ROLE.ADMIN && ACTION.UPDATE === action) || ACTION.CREATE === action ? (
               <>
                 <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography>Vai trò</Typography>
