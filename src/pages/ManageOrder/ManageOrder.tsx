@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import {
   Chip,
   Select,
@@ -12,7 +12,8 @@ import {
   SelectChangeEvent,
   FormControl,
   InputLabel,
-  Stack
+  Stack,
+  InputAdornment
 } from '@mui/material'
 import Table from '~/components/Table/Table'
 import { DatePicker } from '@mui/x-date-pickers'
@@ -33,6 +34,7 @@ import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
 import { Add } from '@mui/icons-material'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import SearchIcon from '@mui/icons-material/Search'
 
 export default function ManageOrder() {
   const [paginationModel, setPaginationModel] = useState({
@@ -161,8 +163,30 @@ export default function ManageOrder() {
   if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 250 },
-    { field: 'customer', headerName: 'Khách hàng', width: 200 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 250,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'customer',
+      headerName: 'Khách hàng',
+      width: 200,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'address',
+      headerName: 'Chi nhánh',
+      width: 100,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'servicePackage',
+      headerName: 'Gói dịch vụ',
+      width: 150,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
     {
       field: 'roomName',
       headerName: 'Danh sách phòng',
@@ -202,7 +226,6 @@ export default function ManageOrder() {
         </Stack>
       )
     },
-    { field: 'address', headerName: 'Chi nhánh', width: 100 },
     {
       field: 'status',
       headerName: 'Trạng thái',
@@ -266,7 +289,6 @@ export default function ManageOrder() {
         )
       }
     },
-    { field: 'servicePackage', headerName: 'Gói dịch vụ', width: 150 },
     {
       field: 'updatedAt',
       headerName: 'Thời gian cập nhật',
@@ -375,51 +397,47 @@ export default function ManageOrder() {
 
   const Toolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+      <Button variant='text' color='primary' onClick={() => setCreateMode(true)} startIcon={<Add />}>
+        Thêm đơn hàng
+      </Button>
       <Box display='flex' gap={2} sx={{ marginTop: '5px' }}>
-        <DatePicker
-          label='Từ'
-          value={selectedStartDate}
-          format={DEFAULT_DATE_FORMAT}
-          onChange={(newValue) => setSelectedStartDate(newValue)}
-          slotProps={{ textField: { fullWidth: true } }}
-        />
-        <DatePicker
-          label='Đến'
-          value={selectedEndDate}
-          format={DEFAULT_DATE_FORMAT}
-          onChange={(newValue) => setSelectedEndDate(newValue)}
-          slotProps={{ textField: { fullWidth: true } }}
-        />
-        <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
-          <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
-          <Select
-            labelId='order-status-label'
-            value={status ?? 'all'}
-            onChange={handleChange}
-            label='Trạng thái đơn hàng'
-            sx={{
-              height: 52,
-              '.MuiSelect-select': {
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%'
-              }
-            }}
-          >
-            <MenuItem value='all'>All</MenuItem>
-            {Object.values(OrderStatus).map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box display='flex' gap={2}>
-        <GridToolbarQuickFilter value={searchProcess} onChange={(event) => handleSearchChange(event)} />
-        <Button variant='text' color='primary' onClick={() => setCreateMode(true)} startIcon={<Add />}>
-          Thêm đơn hàng
-        </Button>
+        <Box sx={{ width: '200px' }}>
+          <DatePicker
+            label='Từ'
+            value={selectedStartDate}
+            format={DEFAULT_DATE_FORMAT}
+            onChange={(newValue) => setSelectedStartDate(newValue)}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+        </Box>
+        <Box sx={{ width: '200px' }}>
+          <DatePicker
+            label='Đến'
+            value={selectedEndDate}
+            format={DEFAULT_DATE_FORMAT}
+            onChange={(newValue) => setSelectedEndDate(newValue)}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+        </Box>
+        <Box sx={{ width: '200px' }}>
+          <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
+            <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
+            <Select
+              labelId='order-status-label'
+              value={status ?? 'all'}
+              onChange={handleChange}
+              label='Trạng thái đơn hàng'
+            >
+              <MenuItem value='all'>All</MenuItem>
+              {Object.values(OrderStatus).map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ width: '250px' }}></Box>
       </Box>
     </GridToolbarContainer>
   )
@@ -430,36 +448,31 @@ export default function ManageOrder() {
         Quản lý đơn hàng
       </Typography>
       <Box display='flex' justifyContent='flex-end' sx={{ width: '100%' }}>
-        <Box sx={{ position: 'relative', width: '250px' }}>
+        <Box sx={{ position: 'relative', width: '300px' }}>
           <TextField
-            label=''
             size='small'
+            placeholder='Tìm kiếm...'
             onKeyDown={(event) =>
               handleSearchKeyDown(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
             }
             value={searchProcess}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                value: searchProcess
+              }
+            }}
             onChange={(event) => handleSearchChange(event)}
             sx={{
-              backgroundColor: searchProcess.length == 0 ? 'transparent' : 'white',
               position: 'absolute',
-              top: '40px',
-              right: '180px',
-              width: '180px',
-              zIndex: 2,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  border: 'none'
-                },
-                '&:hover fieldset': {
-                  border: 'none'
-                },
-                '&.Mui-focused fieldset': {
-                  border: 'none'
-                },
-                '& .MuiInputBase-input': {
-                  padding: '2px 2px'
-                }
-              }
+              top: '30px',
+              right: '30px',
+              width: '220px',
+              zIndex: 1
             }}
           />
         </Box>
@@ -482,6 +495,7 @@ export default function ManageOrder() {
         order={selectedOrder}
         staffList={staffList}
         refetch={refetch}
+        setRows={setRows}
       />
       <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>

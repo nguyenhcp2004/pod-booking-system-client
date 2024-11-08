@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   FormControl,
   Modal,
@@ -15,7 +15,8 @@ import {
   Button,
   Backdrop,
   CircularProgress,
-  Divider
+  Divider,
+  SelectChangeEvent
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
@@ -36,6 +37,8 @@ import Calendar from '../Calendar/Calendar'
 import { Room } from '~/constants/type'
 import { toast } from 'react-toastify'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import { mapOrderToRow } from '~/utils/order'
+import { GridValidRowModel } from '@mui/x-data-grid'
 
 interface EditOrderModalProps {
   open: boolean
@@ -43,9 +46,10 @@ interface EditOrderModalProps {
   order: Order | null
   staffList: Account[]
   refetch: () => void
+  setRows: React.Dispatch<React.SetStateAction<GridValidRowModel[]>>
 }
 
-const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, staffList, refetch }) => {
+const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, staffList, refetch, setRows }) => {
   const theme = useTheme()
   const date = moment(order?.orderDetails[0].startTime)
   const [selectedDate, setSelectedDate] = useState<Moment>(moment(date))
@@ -57,6 +61,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
   const [updateStaffList, setUpdateStaffList] = useState<OrderUpdateStaffRequest[]>([])
   const [allStatus, setAllStatus] = useState<OrderStatus | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>('all')
 
   const { mutate: updateStaff } = useUpdateStaff()
   const { data: allRoom } = useRoomSameType(order?.orderDetails[0].roomId?.toString() || '0')
@@ -68,17 +73,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
     if (order) {
       setUpdateOrder(order)
     }
-  }, [order])
+  }, [order, open])
 
-  useEffect(() => {
-    genderRoomList()
-  }, [order])
-
-  useEffect(() => {
-    genderDateList()
-  }, [selectedDate, order])
-
-  const genderRoomList = () => {
+  const genderRoomList = useCallback(() => {
     order?.orderDetails.map((od) => {
       const temp: Room = {
         id: od.roomId,
@@ -92,35 +89,30 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
       }
       setSelectedRooms((prev) => [...prev, temp])
     })
-  }
+  }, [order])
 
-  const genderDateList = () => {
-    const dateList = []
-    if (selectedDate) {
-      dateList.push(selectedDate)
-      if (order?.orderDetails[0].servicePackage) {
-        if (order?.orderDetails[0].servicePackage.id == '2') {
-          for (let i = 0; i < 7; i++) {
-            dateList.push(moment(selectedDate).add(i, 'days'))
-          }
-        } else if (order?.orderDetails[0].servicePackage.id == '3') {
-          dateList.push(moment(selectedDate).add(1, 'week'))
-          dateList.push(moment(selectedDate).add(2, 'week'))
-          dateList.push(moment(selectedDate).add(3, 'week'))
-        } else if (order?.orderDetails[0].servicePackage.id == '4') {
-          for (let i = 1; i < 30; i++) {
-            dateList.push(moment(selectedDate).add(i, 'days'))
-          }
-        }
+  const genderDateList = useCallback(() => {
+    const dateList: Moment[] = []
+    order?.orderDetails.forEach((od) => {
+      if (od.status == 'Rejected' || od.status == 'Pending') {
+        dateList.push(moment(od.startTime))
       }
-    }
+    })
     setSelectedDates(dateList)
-  }
+  }, [selectedDate, order])
 
   const resertCalendar = () => {
     genderRoomList()
     genderDateList()
   }
+
+  useEffect(() => {
+    genderRoomList()
+  }, [order, open, genderRoomList])
+
+  useEffect(() => {
+    genderDateList()
+  }, [selectedDate, order, open, genderDateList])
 
   useEffect(() => {
     if (order) {
@@ -139,6 +131,14 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
     }
   }, [order, selectedDate])
 
+  const handleStatusFilterChange = (event: SelectChangeEvent) => {
+    setSelectedStatus(event.target.value)
+  }
+
+  const filteredOrderDetails = updateOrder?.orderDetails.filter(
+    (od) => selectedStatus === 'all' || od.status === selectedStatus
+  )
+
   const mergeAmenities = (amenities: { name: string; price: number; quantity: number }[]) => {
     return amenities.reduce(
       (acc, amenity) => {
@@ -156,7 +156,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
 
   const getUniqueStartTimes = (order: Order) => {
     const uniqueStartTimes = new Set(order?.orderDetails.map((od) => moment(od.startTime).format('DD-MM-YYYY')))
-    return Array.from(uniqueStartTimes)
+    return Array.from(uniqueStartTimes).sort((a, b) => moment(a, 'DD-MM-YYYY').diff(moment(b, 'DD-MM-YYYY')))
   }
 
   const listSlotFull: slotType[] = []
@@ -225,20 +225,22 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
 
   const handleUpdateOrder = async () => {
     setLoading(true)
-    const response = await updateOrderApi(order, updateOrder, allStatus)
-    updateStaffList.map((item) => {
+    await updateStaffList.map((item) => {
       updateStaff({ request: item })
       toast.success('Cập nhật staff thành công')
     })
+    const response = await updateOrderApi(order, updateOrder, allStatus)
     if (response.code === 200) {
       toast.success('Cập nhật đơn hàng thành công')
-      setLoading(false)
-      onClose()
-      refetch()
-    } else {
-      setLoading(false)
-      onClose()
     }
+    setLoading(false)
+    setRows((prevRows) => {
+      console.log(prevRows)
+      const updatedRows = prevRows.map((row) => (row.id === order.id && updateOrder ? mapOrderToRow(updateOrder) : row))
+      return updatedRows
+    })
+    onClose()
+    refetch()
   }
 
   const handleRoomChange = (room: Room, orderDetail: OrderDetail) => {
@@ -448,7 +450,10 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
         <Grid container sx={{ width: '100%' }}>
           <Grid item lg={5} md={5} xs={12} sx={{ paddingRight: '12px', marginTop: '10px' }}>
             <Box sx={{ bgcolor: 'white', padding: 2, borderRadius: '5px' }}>
-              <Box display='flex' sx={{ width: '100%' }} justifyContent='flex-end'>
+              <Box display='flex' sx={{ width: '100%' }} justifyContent='space-between'>
+                <Typography variant='h6' sx={{ marginBottom: 2, color: theme.palette.primary.main }}>
+                  Các lịch cần xử lý
+                </Typography>
                 <Button variant='text' onClick={() => resertCalendar()}>
                   <RestartAltIcon />
                 </Button>
@@ -476,17 +481,43 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                 }
               }}
             >
-              <Typography variant='h6' sx={{ marginBottom: 3, color: theme.palette.primary.main }}>
-                Chi tiết đơn hàng
-              </Typography>
-              {updateOrder?.orderDetails &&
-                getUniqueStartTimes(order).map((uniqueDate, index) => (
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+                sx={{ marginRight: 3, marginBottom: 2 }}
+              >
+                <Typography variant='h6' sx={{ color: theme.palette.primary.main }}>
+                  Chi tiết đơn hàng
+                </Typography>
+                <Box sx={{ width: '200px' }}>
+                  <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
+                    <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
+                    <Select
+                      labelId='order-status-label'
+                      value={selectedStatus ?? 'all'}
+                      onChange={handleStatusFilterChange}
+                      label='Trạng thái đơn hàng'
+                    >
+                      <MenuItem value='all'>All</MenuItem>
+                      {Object.values(OrderStatus).map((status) => (
+                        <MenuItem key={status} value={status}>
+                          {status}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Box>
+
+              {filteredOrderDetails &&
+                getUniqueStartTimes({ ...order, orderDetails: filteredOrderDetails }).map((uniqueDate, index) => (
                   <Box key={uniqueDate} sx={{ marginBottom: 4 }}>
                     <Typography variant='subtitle2' sx={{ marginBottom: 3 }}>
                       Ngày: {moment(uniqueDate, 'DD-MM-YYYY').format('DD/MM/YYYY')}
                     </Typography>
 
-                    {updateOrder.orderDetails
+                    {filteredOrderDetails
                       .filter((item) => moment(item.startTime).format('DD-MM-YYYY') === uniqueDate)
                       .map((item, index) => {
                         const mergedAmenities = mergeAmenities(item.amenities)
@@ -564,13 +595,14 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                                   Không có dịch vụ
                                 </Typography>
                               )}
+                              {mergedAmenities.length > 0 && (
+                                <Typography variant='body1' sx={{ marginBottom: 1 }}>
+                                  Dịch vụ:
+                                </Typography>
+                              )}
                               {mergedAmenities.map((amenity, idx) => (
-                                <Box>
-                                  <Typography variant='body1' sx={{ marginBottom: 1 }}>
-                                    Dịch vụ:
-                                  </Typography>
+                                <Box key={idx}>
                                   <Box
-                                    key={idx}
                                     sx={{
                                       display: 'flex',
                                       marginLeft: '30px',
@@ -590,7 +622,9 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                           </Box>
                         )
                       })}
-                    {index != getUniqueStartTimes(order).length - 1 && <Divider />}
+                    {index !== getUniqueStartTimes({ ...order, orderDetails: filteredOrderDetails }).length - 1 && (
+                      <Divider />
+                    )}
                   </Box>
                 ))}
             </Box>
