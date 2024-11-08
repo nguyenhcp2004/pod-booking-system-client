@@ -39,6 +39,7 @@ import { toast } from 'react-toastify'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { mapOrderToRow } from '~/utils/order'
 import { GridValidRowModel } from '@mui/x-data-grid'
+import { useAppContext } from '~/contexts/AppProvider'
 
 interface EditOrderModalProps {
   open: boolean
@@ -62,7 +63,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
   const [updateStaffList, setUpdateStaffList] = useState<OrderUpdateStaffRequest[]>([])
   const [allStatus, setAllStatus] = useState<OrderStatus | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string | null>('all')
-
+  const { account: account } = useAppContext()
   const { mutate: updateStaff } = useUpdateStaff()
   const { data: allRoom } = useRoomSameType(order?.orderDetails[0].roomId?.toString() || '0')
   useEffect(() => {
@@ -561,6 +562,7 @@ const EditOrderModal: React.FC<EditOrderModalProps> = ({ open, onClose, order, s
                                       return selectedStaff ? selectedStaff.name : ''
                                     }}
                                     sx={{ color: 'black' }}
+                                    disabled={account?.role == 'Staff'}
                                   >
                                     <MenuItem value='' disabled>
                                       Chọn nhân viên
