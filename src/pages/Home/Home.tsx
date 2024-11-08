@@ -79,7 +79,7 @@ export default function Component() {
   const handleLocationChange = (event: SelectChangeEvent<string>) => {
     const newLocation = event.target.value
     setLocation(newLocation)
-    setFilterQuery((prev) => ({ ...prev, address: newLocation }))
+    setFilterQuery((prev) => ({ ...prev, address: newLocation === 'Tất cả' ? '' : newLocation }))
     setRoomType('')
   }
 
@@ -186,7 +186,7 @@ export default function Component() {
                   label='Địa chỉ'
                   onChange={handleLocationChange}
                 >
-                  <MenuItem value={''}>Tất cả</MenuItem>
+                  <MenuItem value='Tất cả'>Tất cả</MenuItem>
                   {allBuilding?.map((building) => (
                     <MenuItem key={building.id} value={building.address}>
                       {building.address}
