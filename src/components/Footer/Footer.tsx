@@ -1,4 +1,6 @@
-import { Button, Typography, Box } from '@mui/material'
+import { Typography, Box } from '@mui/material'
+import Button from '@mui/material/Button'
+import { Link } from 'react-router-dom'
 import { tokens } from '~/themes/theme'
 
 export default function Footer() {
@@ -64,6 +66,8 @@ export default function Footer() {
             fontSize: { xs: '12px', sm: '14px' },
             whiteSpace: 'nowrap'
           }}
+          component={Link}
+          to={'/terms-and-conditions'}
         >
           Điều khoản và điều kiện
         </Button>
@@ -77,6 +81,8 @@ export default function Footer() {
             fontSize: { xs: '12px', sm: '14px' },
             whiteSpace: 'nowrap'
           }}
+          component={Link}
+          to={'/privacy-policy'}
         >
           Thông báo về bảo mật
         </Button>
