@@ -25,6 +25,7 @@ import ManageRoomType from '~/pages/ManageRoomType'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
+import PrivacyPolicy from '~/pages/Politics/Privacy'
 import TermsAndConditions from '~/pages/Politics/TermsAndConditions'
 import RefreshToken from '~/pages/RefreshToken/RefreshToken'
 import Register from '~/pages/Register'
@@ -78,6 +79,10 @@ export default function useRouteElements() {
         {
           path: '/terms-and-conditions',
           element: <TermsAndConditions />
+        },
+        {
+          path: '/privacy-policy',
+          element: <PrivacyPolicy />
         }
       ]
     },
