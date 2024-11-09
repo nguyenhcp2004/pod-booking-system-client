@@ -13,7 +13,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import { useLogoutMutation } from '~/queries/useAuth'
 import { clearLS, getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
 import { useCallback, useEffect } from 'react'
 import SockJS from 'sockjs-client'
@@ -96,16 +96,18 @@ export default function OptionsMenu({ anchorEl }: Props) {
           }
         }}
       >
-        <MenuItem>
-          <ListItemIcon>
-            <PersonIcon fontSize='small' sx={{ color: '#000' }} />
-          </ListItemIcon>
-          <ListItemText
-            sx={{ color: '#000', fontSize: '16px', fontWeight: 400, lineHeight: '150%', letterSpacing: '0.15px' }}
-          >
-            Tài khoản
-          </ListItemText>
-        </MenuItem>
+        <Link to='/profile' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <MenuItem>
+            <ListItemIcon>
+              <PersonIcon fontSize='small' sx={{ color: '#000' }} />
+            </ListItemIcon>
+            <ListItemText
+              sx={{ color: '#000', fontSize: '16px', fontWeight: 400, lineHeight: '150%', letterSpacing: '0.15px' }}
+            >
+              Tài khoản
+            </ListItemText>
+          </MenuItem>
+        </Link>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize='small' sx={{ color: '#000' }} />
