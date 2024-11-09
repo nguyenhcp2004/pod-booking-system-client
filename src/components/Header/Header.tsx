@@ -10,7 +10,7 @@ import accountApiRequest from '~/apis/account'
 import { setAccountToLS } from '~/utils/auth'
 import MenuIcon from '@mui/icons-material/Menu'
 
-export default function Component() {
+export default function Header() {
   const { account, setAccount, isAuth } = useAppContext()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
