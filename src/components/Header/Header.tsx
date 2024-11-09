@@ -10,7 +10,7 @@ import accountApiRequest from '~/apis/account'
 import { setAccountToLS } from '~/utils/auth'
 import MenuIcon from '@mui/icons-material/Menu'
 
-export default function Header() {
+export default function Component() {
   const { account, setAccount, isAuth } = useAppContext()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -32,11 +32,7 @@ export default function Header() {
   }, [account, setAccount, isAuth])
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (anchorEl) {
-      setAnchorEl(null)
-    } else {
-      setAnchorEl(event.currentTarget)
-    }
+    setAnchorEl(anchorEl ? null : event.currentTarget)
   }
 
   const toggleMobileMenu = () => {
@@ -74,6 +70,39 @@ export default function Header() {
     </>
   )
 
+  const renderAuthButtons = () => (
+    <>
+      <Button
+        variant='contained'
+        sx={{
+          textTransform: 'uppercase',
+          paddingX: { xs: '16px', md: '22px' },
+          paddingY: '8px',
+          borderRadius: '96px',
+          fontSize: { xs: '12px', md: '14px' }
+        }}
+        component={Link}
+        to='/login'
+      >
+        Đăng nhập
+      </Button>
+      <Button
+        variant='outlined'
+        sx={{
+          textTransform: 'uppercase',
+          paddingX: { xs: '16px', md: '22px' },
+          paddingY: '8px',
+          borderRadius: '96px',
+          fontSize: { xs: '12px', md: '14px' }
+        }}
+        component={Link}
+        to='/register'
+      >
+        Đăng ký
+      </Button>
+    </>
+  )
+
   const renderMobileMenu = () => (
     <Drawer anchor='right' open={mobileMenuOpen} onClose={toggleMobileMenu}>
       <List sx={{ width: 250 }}>
@@ -82,6 +111,16 @@ export default function Header() {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
+        {!account && (
+          <>
+            <ListItem component={Link} to='/login' onClick={toggleMobileMenu}>
+              <ListItemText primary='Đăng nhập' />
+            </ListItem>
+            <ListItem component={Link} to='/register' onClick={toggleMobileMenu}>
+              <ListItemText primary='Đăng ký' />
+            </ListItem>
+          </>
+        )}
       </List>
     </Drawer>
   )
@@ -157,38 +196,7 @@ export default function Header() {
             <OptionsMenu anchorEl={anchorEl} />
           </Stack>
         ) : (
-          <>
-            {!isMobile && (
-              <>
-                <Button
-                  variant='contained'
-                  sx={{
-                    textTransform: 'uppercase',
-                    paddingX: { xs: '16px', md: '22px' },
-                    paddingY: '8px',
-                    borderRadius: '96px',
-                    fontSize: { xs: '12px', md: '14px' }
-                  }}
-                  href='/login'
-                >
-                  Đăng nhập
-                </Button>
-                <Button
-                  variant='outlined'
-                  sx={{
-                    textTransform: 'uppercase',
-                    paddingX: { xs: '16px', md: '22px' },
-                    paddingY: '8px',
-                    borderRadius: '96px',
-                    fontSize: { xs: '12px', md: '14px' }
-                  }}
-                  href='/register'
-                >
-                  Đăng ký
-                </Button>
-              </>
-            )}
-          </>
+          <>{!isMobile && renderAuthButtons()}</>
         )}
         {isMobile && (
           <IconButton edge='end' color='inherit' aria-label='menu' onClick={toggleMobileMenu}>
