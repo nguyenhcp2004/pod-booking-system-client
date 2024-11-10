@@ -75,17 +75,17 @@ export default function BuildingModal({ row, action }: { row?: AmenityConfig; ac
     let isValid = true
 
     if (!data.name || typeof data.name !== 'string' || data.name.trim() === '') {
-      errors.name = 'Name is required and must be a valid string'
+      errors.name = 'Tên là bắt buộc và phải là chuỗi hợp lệ'
       isValid = false
     }
 
     if (!data.price || isNaN(data.price) || data.price <= 0) {
-      errors.price = 'Price must be a valid number greater than 0'
+      errors.price = 'Giá phải là một số hợp lệ lớn hơn 0'
       isValid = false
     }
 
     if (data.quantity == null || isNaN(data.quantity) || data.quantity < 0) {
-      errors.quantity = 'Quantity must be a valid number and cannot be negative'
+      errors.quantity = 'Số lượng phải là một số hợp lệ và không thể là số âm'
       isValid = false
     }
 
