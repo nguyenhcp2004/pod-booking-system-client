@@ -71,7 +71,7 @@ const menuItems = [
     title: 'Giao Việc',
     to: '/admin/assignments',
     icon: <CalendarMonthIcon sx={iconSx} />,
-    role: ['Admin', 'Manager']
+    role: ['Manager', 'Staff']
   }
 ]
 

@@ -31,8 +31,8 @@ import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
 
 const timeSlots = [
-  '7:00 - 9:00',
-  '9:00 - 11:00',
+  '07:00 - 09:00',
+  '09:00 - 11:00',
   '11:00 - 13:00',
   '13:00 - 15:00',
   '15:00 - 17:00',
@@ -74,6 +74,7 @@ export default function TaskAssignment() {
       weekDate: ''
     }
   })
+  console.log(data)
   const { data: staffs } = useGetListStaff({ slot: watch('slot'), weekDate: watch('weekDate') })
   const createAssignmentMutation = useCreateAssignment()
   const [events, setEvents] = useState<Shift>({})
@@ -116,6 +117,7 @@ export default function TaskAssignment() {
       setEvents(shift)
     }
   }, [data])
+  console.log(events)
   const handleAddEvent = (day: string, timeSlot: string) => {
     setValue('slot', timeSlot || '')
     setValue('weekDate', day || '')
@@ -230,15 +232,15 @@ export default function TaskAssignment() {
             </StyledDayHeader>
             {timeSlots.map((slot) => (
               <StyledPaper key={`${day}-${slot}`}>
-                {events[`${day}-${slot}`]?.map((event, index) => (
+                {events[`${day}-${slot}`]?.map((event) => (
                   <div
-                    key={index}
+                    key={event.id}
                     onMouseEnter={() => setHoveredChip(event.id)}
                     onMouseLeave={() => setHoveredChip(null)}
                     style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}
                   >
                     <Chip
-                      key={index}
+                      key={event.id}
                       label={event.name}
                       size='small'
                       style={{
