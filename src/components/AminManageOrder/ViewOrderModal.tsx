@@ -43,8 +43,7 @@ const ViewOrderModal: React.FC<ViewOrderModalProps> = ({ open, onClose, order })
     order.orderDetails.reduce((acc, detail) => {
       return (
         acc +
-        (detail.roomPrice * order.orderDetails.length +
-          detail.amenities.reduce((acc, amenity) => acc + amenity.price * amenity.quantity, 0)) *
+        (detail.roomPrice + detail.amenities.reduce((acc, amenity) => acc + amenity.price * amenity.quantity, 0)) *
           (1 - (order.orderDetails[0].servicePackage?.discountPercentage ?? 0) / 100)
       )
     }, 0)

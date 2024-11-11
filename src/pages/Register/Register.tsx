@@ -9,12 +9,15 @@ import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { toast } from 'react-toastify'
-import { useLoginMutation } from '~/queries/useAuth'
+import { useRegisterMutation } from '~/queries/useAuth'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
+import { RegisterBody, RegisterBodyType } from '~/schemaValidations/auth.schema'
 import Link from '@mui/material/Link'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
+import { useAppContext } from '~/contexts/AppProvider'
+import { handleErrorApi } from '~/utils/utils'
+import envConfig from '~/constants/config'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,30 +36,36 @@ const Card = styled(MuiCard)(({ theme }) => ({
   })
 }))
 export default function Register() {
+  const { setAuth, setAccount } = useAppContext()
   const {
     control,
     formState: { errors },
-    handleSubmit
-  } = useForm<LoginBodyType>({
-    resolver: zodResolver(LoginBody),
+    handleSubmit,
+    setError
+  } = useForm<RegisterBodyType>({
+    resolver: zodResolver(RegisterBody),
     defaultValues: {
+      name: '',
       email: '',
-      password: ''
+      password: '',
+      confirmPassword: ''
     }
   })
   const navigate = useNavigate()
-  const loginMutation = useLoginMutation()
+  const registerMutation = useRegisterMutation()
 
   const onSubmit = handleSubmit(async (data) => {
-    if (loginMutation.isPending) return
+    if (registerMutation.isPending) return
     try {
-      const result = await loginMutation.mutateAsync(data)
-      toast.success(result.data.message, {
+      const result = await registerMutation.mutateAsync(data)
+      setAuth(true)
+      setAccount(result.data.data.account)
+      toast.success('Chào mừng đến với FlexiPod', {
         autoClose: 3000
       })
       navigate('/')
     } catch (error) {
-      console.log(error)
+      handleErrorApi({ error, setError })
     }
   })
   return (
@@ -71,16 +80,16 @@ export default function Register() {
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
         <FormControl>
-          <FormLabel htmlFor='email' sx={{ lineHeight: 1.5 }}>
+          <FormLabel htmlFor='name' sx={{ lineHeight: 1.5 }}>
             Tên
           </FormLabel>
           <Controller
-            name='email'
+            name='name'
             control={control}
             render={({ field }) => (
               <TextField
-                error={Boolean(errors.email)}
-                helperText={errors.email?.message}
+                error={Boolean(errors.name)}
+                helperText={errors.name?.message}
                 id='name'
                 placeholder='Nguyen Van A'
                 autoComplete='name'
@@ -88,7 +97,7 @@ export default function Register() {
                 required
                 fullWidth
                 variant='outlined'
-                color={errors.email ? 'error' : 'primary'}
+                color={errors.name ? 'error' : 'primary'}
                 sx={{ ariaLabel: 'name' }}
                 size='small'
                 {...field}
@@ -155,18 +164,18 @@ export default function Register() {
         </FormControl>
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor='password' sx={{ lineHeight: 1.5 }}>
+            <FormLabel htmlFor='confirmPassword' sx={{ lineHeight: 1.5 }}>
               Nhập lại mật khẩu
             </FormLabel>
           </Box>
 
           <Controller
-            name='password'
+            name='confirmPassword'
             control={control}
             render={({ field }) => (
               <TextField
-                error={Boolean(errors.password)}
-                helperText={errors.password?.message}
+                error={Boolean(errors.confirmPassword)}
+                helperText={errors.confirmPassword?.message}
                 placeholder='••••••'
                 type='password'
                 id='password'
@@ -200,7 +209,7 @@ export default function Register() {
           type='submit'
           fullWidth
           variant='outlined'
-          href='http://localhost:8080/oauth2/authorization/google'
+          href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

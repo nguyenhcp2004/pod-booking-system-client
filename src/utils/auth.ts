@@ -7,6 +7,10 @@ export const setAccessTokenToLS = (accessToken: string) => {
   localStorage.setItem('accessToken', accessToken)
 }
 
+export const setRedirectPath = (path: string) => {
+  localStorage.setItem('redirectPath', path)
+}
+
 export const setRefreshTokenToLS = (refreshToken: string) => {
   localStorage.setItem('refreshToken', refreshToken)
 }
@@ -23,6 +27,7 @@ export const clearLS = () => {
   localStorage.removeItem('bookedRoom')
   localStorage.removeItem('bookingAmenities')
   localStorage.removeItem('roomTypeFilterStateLandingPage')
+  localStorage.removeItem('redirectPath')
   const clearLSEvent = new Event('clearLS')
   LocalStorageEventTarget.dispatchEvent(clearLSEvent)
 }
@@ -36,6 +41,10 @@ export const getRefreshTokenFromLS = () => localStorage.getItem('refreshToken') 
 export const getAccountFromLS = () => {
   const result = localStorage.getItem('account')
   return result ? JSON.parse(result) : null
+}
+
+export const getRedirectPath = () => {
+  return localStorage.getItem('redirectPath') || '/'
 }
 
 export const decodeToken = (token: string) => {

@@ -118,7 +118,7 @@ const AddAmenity = () => {
 
   const handleAddAmentity = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     }
     if (quantity === 0) {
@@ -148,11 +148,11 @@ const AddAmenity = () => {
   }
   const handleIncrement = () => {
     if (!detailAmenity) {
-      setErrorState('Vui lòng chọn tiện ích')
+      setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
       if (detailAmenity.quantity < quantity) {
-        setErrorState('Số lượng tiện ích không đủ')
+        setErrorState('Số lượng dịch vụ không đủ')
         return
       }
       setErrorState(null)
@@ -255,11 +255,11 @@ const AddAmenity = () => {
           </Grid>
           <Grid size={6}>
             <FormControl fullWidth>
-              <InputLabel size='small'>Chọn loại tiện ích</InputLabel>
+              <InputLabel size='small'>Chọn loại dịch vụ</InputLabel>
               <Select
                 size='small'
                 value={selectedAmenityType}
-                label='Chọn loại tiện ích'
+                label='Chọn loại dịch vụ'
                 onChange={handleAmenityTypeChange}
               >
                 <MenuItem value='Food'>Food</MenuItem>
@@ -271,7 +271,7 @@ const AddAmenity = () => {
 
         <Box sx={{ paddingY: '20px' }}>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
-            Danh sách tiện ích
+            Danh sách dịch vụ
           </Typography>
           <Grid container spacing={4} sx={{ padding: '10px 0' }}>
             {selectedAmenityType !== ''
@@ -414,7 +414,7 @@ const AddAmenity = () => {
               handleAddAmentity()
             }}
           >
-            Thêm tiện ích
+            Thêm dịch vụ
           </Button>
         </Box>
       </Box>

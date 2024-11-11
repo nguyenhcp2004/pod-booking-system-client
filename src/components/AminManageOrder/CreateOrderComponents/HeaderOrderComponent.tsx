@@ -60,6 +60,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
   const { data: allBuilding } = useBuilding()
   const { data: roomType } = useRoomType(building?.address || '')
 
+  const now = new Date()
+  const currentHour = now.getHours()
+
+  const availableSlots = useMemo(() => {
+    if (selectedDate && selectedDate.isAfter(moment(), 'day')) {
+      return SLOT
+    } else {
+      return SLOT.filter((slot) => {
+        const startHour = parseInt(slot.split(':')[0], 10)
+        return startHour > currentHour
+      })
+    }
+  }, [selectedDate, currentHour])
+
   useEffect(() => {
     if (searchBuilding.trim()) {
       setListBuilding(searchBuildingData || [])
@@ -76,21 +90,24 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
     const dateList = []
     if (selectedDate) {
       dateList.push(selectedDate)
-
       if (selectedPackage) {
-        if (selectedPackage.id == '1') {
+        if (selectedPackage.id == '2') {
+          for (let i = 0; i < 7; i++) {
+            dateList.push(moment(selectedDate).add(i, 'days'))
+          }
+        } else if (selectedPackage.id == '3') {
           dateList.push(moment(selectedDate).add(1, 'week'))
           dateList.push(moment(selectedDate).add(2, 'week'))
           dateList.push(moment(selectedDate).add(3, 'week'))
-        } else if (selectedPackage.id == '2') {
-          for (let i = 0; i < 30; i++) {
+        } else if (selectedPackage.id == '4') {
+          for (let i = 1; i < 30; i++) {
             dateList.push(moment(selectedDate).add(i, 'days'))
           }
         }
       }
     }
     setSelectedDates(dateList)
-  }, [selectedDate, setSelectedDates, selectedPackage])
+  }, [selectedDate, selectedPackage, setSelectedDates])
 
   const slotsFormmated = useMemo(() => {
     return selectedSlots.map((slot) => {
@@ -200,6 +217,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
             size='small'
             variant='outlined'
             label='Địa chỉ'
+            required
             value={showBuildingList ? searchBuilding : building?.address || searchBuilding}
             onChange={(e) => handleBuildingSearch(e.target.value)}
             onFocus={() => setShowBuildingList(true)}
@@ -254,6 +272,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
               labelId='staff-select-label'
               label='Loại phòng'
               value={roomTypeID || ''}
+              required
               onChange={(e) => handleSelectRoomType(e)}
               fullWidth
               renderValue={(selected) => {
@@ -276,8 +295,11 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <DatePicker
             label='Ngày đặt'
             value={selectedDate || moment()}
-            onChange={(date) => handleSelectDate(date)}
+            onChange={(date) => {
+              handleSelectDate(date)
+            }}
             format={DEFAULT_DATE_FORMAT}
+            disablePast
             slotProps={{
               textField: {
                 size: 'small',
@@ -300,17 +322,20 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
           <FormControl fullWidth size='small'>
             <Autocomplete
               multiple
-              options={SLOT}
+              options={availableSlots}
               value={selectedSlots}
               onChange={(_, slots) => {
                 handleSelectSlots(slots as slotType[])
               }}
               sx={{
-                '.MuiAutocomplete-inputRoot': {
+                '& .MuiOutlinedInput-root': {
                   minHeight: '52px'
+                },
+                '& .MuiInputLabel-root': {
+                  lineHeight: '52px',
+                  top: '-10px'
                 }
               }}
-              disableCloseOnSelect
               renderOption={(props, option, { selected }) => {
                 const { key, ...optionProps } = props
                 return (
@@ -326,20 +351,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   </li>
                 )
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label='Khung giờ'
-                  size='small'
-                  InputLabelProps={{
-                    sx: {
-                      display: 'flex',
-                      alignItems: 'center',
-                      height: '70%'
-                    }
-                  }}
-                />
-              )}
+              renderInput={(params) => <TextField {...params} label='Khung giờ' size='small' required />}
             />
           </FormControl>
         </Box>
@@ -380,6 +392,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   {...params}
                   label='Chọn phòng'
                   size='small'
+                  required
                   InputLabelProps={{
                     sx: {
                       display: 'flex',
@@ -411,6 +424,7 @@ const HeaderOrderComponent: React.FC<HeaderOrderComponentProps> = ({
                   {...params}
                   label='Chọn gói'
                   size='small'
+                  required
                   InputLabelProps={{
                     sx: {
                       display: 'flex',

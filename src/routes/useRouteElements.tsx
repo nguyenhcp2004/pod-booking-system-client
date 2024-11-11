@@ -25,9 +25,13 @@ import ManageRoomType from '~/pages/ManageRoomType'
 import ManageUser from '~/pages/ManageUser'
 import Oauth from '~/pages/OAuth/Oauth'
 import OrderDetail from '~/pages/OrderDetail'
+import PrivacyPolicy from '~/pages/Politics/Privacy'
+import TermsAndConditions from '~/pages/Politics/TermsAndConditions'
+import UserProfile from '~/pages/Profile'
 import RefreshToken from '~/pages/RefreshToken/RefreshToken'
 import Register from '~/pages/Register'
 import RoomDetails from '~/pages/RoomDetails/RoomDetails'
+import TaskAssignment from '~/pages/TaskAssignment'
 
 // eslint-disable-next-line react-refresh/only-export-components
 function ProtectedRoute() {
@@ -72,6 +76,18 @@ export default function useRouteElements() {
         {
           path: '/contact-us',
           element: <HelpCenter />
+        },
+        {
+          path: '/terms-and-conditions',
+          element: <TermsAndConditions />
+        },
+        {
+          path: '/privacy-policy',
+          element: <PrivacyPolicy />
+        },
+        {
+          path: '/profile',
+          element: <UserProfile />
         }
       ]
     },
@@ -118,6 +134,10 @@ export default function useRouteElements() {
             {
               path: '/admin/amenity-orders/payment',
               element: <Confirmed />
+            },
+            {
+              path: '/admin/assignments',
+              element: <TaskAssignment />
             }
           ]
         }

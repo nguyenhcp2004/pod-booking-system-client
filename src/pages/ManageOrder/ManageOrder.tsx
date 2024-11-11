@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridValidRowModel } from '@mui/x-data-grid'
+import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import {
   Chip,
   Select,
@@ -11,12 +11,15 @@ import {
   TextField,
   SelectChangeEvent,
   FormControl,
-  InputLabel
+  InputLabel,
+  Stack,
+  InputAdornment
 } from '@mui/material'
+import Table from '~/components/Table/Table'
 import { DatePicker } from '@mui/x-date-pickers'
 import moment, { Moment } from 'moment'
 import { Account, Order, OrderStatus } from '~/apis/orderApi'
-import { useOrders, useSearchOrder, useStaffAccounts, useUpdateStaff, useDeleteOrder } from '~/queries/useOrder'
+import { useOrders, useSearchOrder, useStaffAccounts, useDeleteOrder } from '~/queries/useOrder'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditNoteIcon from '@mui/icons-material/EditNote'
@@ -29,8 +32,16 @@ import { toast } from 'react-toastify'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
+import { Add } from '@mui/icons-material'
+import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import SearchIcon from '@mui/icons-material/Search'
+import envConfig from '~/constants/config'
 
 export default function ManageOrder() {
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0
+  })
   const { account } = useAppContext()
   const today = moment()
   const [selectedEndDate, setSelectedEndDate] = useState<Moment | null>(today)
@@ -39,9 +50,7 @@ export default function ManageOrder() {
   const formattedEndDate = selectedEndDate?.endOf('day').format('YYYY-MM-DDTHH:mm') || ''
   const [status, setStatus] = useState<OrderStatus | null>(null)
 
-  const [currentPage, setCurrentPage] = useState<number>(0)
-  const [pageSize, setPageSize] = useState<number>(10)
-  const [rowCount, setRowCount] = useState<number>(0)
+  const [rowCount, setRowCount] = useState<number>()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [staffList, setStaffList] = useState<Account[]>([])
   const [searchKeyword, setSearchKeyword] = useState<string>('')
@@ -55,7 +64,7 @@ export default function ManageOrder() {
   const [viewMode, setViewMode] = useState<boolean>(false)
   const [deleteMode, setDeleteMode] = useState<boolean>(false)
 
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   const handleSelectedOrder = (order: Order) => {
@@ -90,17 +99,16 @@ export default function ManageOrder() {
   } = useOrders({
     startDate: formattedStartDate,
     endDate: formattedEndDate,
-    page: currentPage,
-    size: pageSize,
+    page: paginationModel.page,
+    size: paginationModel.pageSize,
     status: status !== null ? status : undefined
   })
   const { data: searchData, isFetching: isSearchFetching } = useSearchOrder({
     keyword: searchKeyword,
-    page: currentPage,
-    size: pageSize
+    page: paginationModel.page,
+    size: paginationModel.pageSize
   })
   const { data: staffData, error: staffError, isFetching: isStaffFetching } = useStaffAccounts()
-  const { mutate: updateStaff } = useUpdateStaff()
 
   //client của thằng stomp khá dở nên mình sẽ chỉ run 1 lần thôi
   useEffect(() => {
@@ -127,24 +135,24 @@ export default function ManageOrder() {
 
   useEffect(() => {
     if (orderData) {
-      const rowsData = orderData.data.data.map(mapOrderToRow)
+      const rowsData = orderData.data.map(mapOrderToRow)
       setRows([...rowsData])
-      setRowCount(orderData.data.totalRecord)
+      setRowCount(orderData.totalRecord)
     }
   }, [orderData])
 
   useEffect(() => {
     if (searchKeyword.trim().length > 0) {
       if (searchData) {
-        const searchRowsData = searchData.data.data.map(mapOrderToRow)
+        const searchRowsData = searchData.data.map(mapOrderToRow)
         setRows([...searchRowsData])
-        setRowCount(searchData?.data?.totalRecord || 0)
+        setRowCount(searchData?.totalRecord || 0)
       }
     } else {
       if (orderData) {
-        const rowsData = orderData.data.data.map(mapOrderToRow)
+        const rowsData = orderData.data.map(mapOrderToRow)
         setRows([...rowsData])
-        setRowCount(orderData.data.totalRecord)
+        setRowCount(orderData.totalRecord)
       }
     }
   }, [searchKeyword, orderData, searchData])
@@ -155,27 +163,70 @@ export default function ManageOrder() {
 
   if (orderError || staffError) return <div>Error: {orderError?.message || staffError?.message}</div>
 
-  const handleStaffChange = (orderId: string, newStaffId: string) => {
-    const selectedStaff = staffList.find((s) => s.id === newStaffId)
-    const request = {
-      id: orderId,
-      orderHandler: {
-        id: newStaffId,
-        name: selectedStaff?.name || '',
-        orderHandler: selectedStaff
-      }
-    }
-    updateStaff({ request })
-    setRows((prevRows) => prevRows.map((row) => (row.id === orderId ? { ...row, staffId: newStaffId } : row)))
-    toast.success('Cập nhật nhân viên thành công')
-  }
-
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 250 },
-    { field: 'customer', headerName: 'Khách hàng', width: 200 },
-    { field: 'roomName', headerName: 'Danh sách phòng', width: 200 },
-    { field: 'slots', headerName: 'Khung giờ', width: 200 },
-    { field: 'address', headerName: 'Chi nhánh', width: 100 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 250,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'customer',
+      headerName: 'Khách hàng',
+      width: 200,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'address',
+      headerName: 'Chi nhánh',
+      width: 100,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'servicePackage',
+      headerName: 'Gói dịch vụ',
+      width: 150,
+      renderCell: (params) => <div style={{ paddingTop: '10px' }}>{params.value}</div>
+    },
+    {
+      field: 'roomName',
+      headerName: 'Danh sách phòng',
+      width: 200,
+      renderCell: (params) => {
+        const rooms = params.value ? params.value.split(',') : []
+
+        return rooms.length > 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 80,
+              overflow: 'hidden',
+              width: '200px'
+            }}
+          >
+            {rooms.map((room: string, index: number) => (
+              <Chip color='default' variant='outlined' key={index} label={room.trim()} />
+            ))}
+          </Box>
+        ) : (
+          'N/A'
+        )
+      }
+    },
+    {
+      field: 'slots',
+      headerName: 'Khung giờ',
+      width: 200,
+      renderCell: (params) => (
+        <Stack direction='column' spacing={1}>
+          {params.value.split(', ').map((slot: string, index: number) => (
+            <Chip key={index} label={slot.trim()} />
+          ))}
+        </Stack>
+      )
+    },
     {
       field: 'status',
       headerName: 'Trạng thái',
@@ -196,39 +247,49 @@ export default function ManageOrder() {
     {
       field: 'orderHandler',
       headerName: 'Nhân viên',
-      width: 200,
+      width: 100,
       renderCell: (params) => {
-        const staffId = params.row?.staffId || null
-        return (
-          <Select
+        const handlers = params.value ? params.value.split(',') : [] // Tách chuỗi thành mảng
+
+        return handlers.length > 0 ? (
+          <Box
             sx={{
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '.MuiOutlinedInput-notchedOutline': { border: 'none' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' }
-            }}
-            value={staffId || ''}
-            onChange={(e) => handleStaffChange(params.row.id, e.target.value)}
-            fullWidth
-            displayEmpty
-            renderValue={(selected) => {
-              let selectedStaff = staffList.find((staff) => staff.id === selected)
-              if (!selectedStaff) selectedStaff = params.row?.orderHandler
-              return selectedStaff ? selectedStaff.name : 'Chọn nhân viên'
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              maxHeight: 70,
+              overflow: 'hidden',
+              width: '150px'
             }}
           >
-            <MenuItem value='' disabled>
-              Chọn nhân viên
-            </MenuItem>
-            {staffList.map((staff) => (
-              <MenuItem key={staff.id} value={staff.id}>
-                {staff.name}
-              </MenuItem>
+            {handlers.map((handler: string, index: number) => (
+              <Chip
+                key={index}
+                label={handler.trim()}
+                sx={{
+                  borderColor: theme.palette.primary.light,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  color: theme.palette.primary.light,
+                  backgroundColor: 'transparent'
+                }}
+              />
             ))}
-          </Select>
+          </Box>
+        ) : (
+          <Chip
+            label='Chưa có nhân viên'
+            sx={{
+              borderColor: theme.palette.error.light,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              color: theme.palette.error.light,
+              backgroundColor: 'transparent'
+            }}
+          />
         )
       }
     },
-    { field: 'servicePackage', headerName: 'Gói dịch vụ', width: 150 },
     {
       field: 'updatedAt',
       headerName: 'Thời gian cập nhật',
@@ -322,6 +383,7 @@ export default function ManageOrder() {
   ]
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    console.log(event.target.value)
     setSearchProcess(event.target.value)
     if (event.target.value.trim().length === 0) {
       setSearchKeyword('')
@@ -336,57 +398,47 @@ export default function ManageOrder() {
 
   const Toolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+      <Button variant='text' color='primary' onClick={() => setCreateMode(true)} startIcon={<Add />}>
+        Thêm đơn hàng
+      </Button>
       <Box display='flex' gap={2} sx={{ marginTop: '5px' }}>
-        <DatePicker
-          label='Từ'
-          value={selectedStartDate}
-          onChange={(newValue) => setSelectedStartDate(newValue)}
-          slotProps={{ textField: { fullWidth: true } }}
-        />
-        <DatePicker
-          label='Đến'
-          value={selectedEndDate}
-          onChange={(newValue) => setSelectedEndDate(newValue)}
-          slotProps={{ textField: { fullWidth: true } }}
-        />
-        <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
-          <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
-          <Select
-            labelId='order-status-label'
-            value={status ?? 'all'}
-            onChange={handleChange}
-            label='Trạng thái đơn hàng'
-            sx={{
-              height: 52,
-              '.MuiSelect-select': {
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%'
-              }
-            }}
-          >
-            <MenuItem value='all'>All</MenuItem>
-            {Object.values(OrderStatus).map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box display='flex' gap={2}>
-        <GridToolbarQuickFilter
-          value={searchProcess}
-          onChange={(event) => handleSearchChange(event)}
-          sx={{
-            '& .MuiInputBase-input': {
-              color: 'white'
-            }
-          }}
-        />
-        <Button variant='contained' color='primary' onClick={() => setCreateMode(true)}>
-          Thêm đơn hàng
-        </Button>
+        <Box sx={{ width: '200px' }}>
+          <DatePicker
+            label='Từ'
+            value={selectedStartDate}
+            format={DEFAULT_DATE_FORMAT}
+            onChange={(newValue) => setSelectedStartDate(newValue)}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+        </Box>
+        <Box sx={{ width: '200px' }}>
+          <DatePicker
+            label='Đến'
+            value={selectedEndDate}
+            format={DEFAULT_DATE_FORMAT}
+            onChange={(newValue) => setSelectedEndDate(newValue)}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+        </Box>
+        <Box sx={{ width: '200px' }}>
+          <FormControl fullWidth size='small' sx={{ minWidth: 220 }}>
+            <InputLabel id='order-status-label'>Trạng thái đơn hàng</InputLabel>
+            <Select
+              labelId='order-status-label'
+              value={status ?? 'all'}
+              onChange={handleChange}
+              label='Trạng thái đơn hàng'
+            >
+              <MenuItem value='all'>All</MenuItem>
+              {Object.values(OrderStatus).map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ width: '250px' }}></Box>
       </Box>
     </GridToolbarContainer>
   )
@@ -397,50 +449,44 @@ export default function ManageOrder() {
         Quản lý đơn hàng
       </Typography>
       <Box display='flex' justifyContent='flex-end' sx={{ width: '100%' }}>
-        <Box sx={{ position: 'relative', width: '250px' }}>
+        <Box sx={{ position: 'relative', width: '300px' }}>
           <TextField
-            label=''
             size='small'
+            placeholder='Tìm kiếm...'
             onKeyDown={(event) =>
               handleSearchKeyDown(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
             }
             value={searchProcess}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                value: searchProcess
+              }
+            }}
             onChange={(event) => handleSearchChange(event)}
             sx={{
               position: 'absolute',
-              top: '20px',
-              right: '170px',
-              width: '180px',
-              zIndex: 2,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  border: 'none'
-                },
-                '&:hover fieldset': {
-                  border: 'none'
-                },
-                '&.Mui-focused fieldset': {
-                  border: 'none'
-                }
-              }
+              top: '30px',
+              right: '30px',
+              width: '220px',
+              zIndex: 1
             }}
           />
         </Box>
       </Box>
-      <DataGrid
-        rows={rows}
+      <Table
         columns={columns}
-        paginationModel={{ page: currentPage, pageSize: pageSize }}
-        pageSizeOptions={[5, 10]}
-        pagination
-        paginationMode='server'
-        rowCount={rowCount}
-        onPaginationModelChange={(newPaginationModel) => {
-          setCurrentPage(newPaginationModel.page)
-          setPageSize(newPaginationModel.pageSize)
-        }}
-        slots={{ toolbar: Toolbar }}
+        rows={rows}
         loading={isFetching || isSearchFetching || isStaffFetching}
+        setRows={setRows}
+        toolbarComponents={Toolbar}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        totalRowCount={rowCount}
       />
       <CreateOrderModal open={createMode} onClose={() => setCreateMode(false)} refetch={refetch} />
       <ViewOrderModal open={viewMode} onClose={() => setViewMode(false)} order={selectedOrder} />
@@ -448,8 +494,9 @@ export default function ManageOrder() {
         open={editMode}
         onClose={() => setEditMode(false)}
         order={selectedOrder}
-        setOrders={setRows}
         staffList={staffList}
+        refetch={refetch}
+        setRows={setRows}
       />
       <DeleteOrderModal open={deleteMode} onClose={() => setDeleteMode(false)} onDelete={() => handleDeleteOrder()} />
     </Box>

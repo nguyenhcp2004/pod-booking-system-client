@@ -1,15 +1,27 @@
-import { Box, Chip, Typography, Avatar } from '@mui/material'
+import {
+  Box,
+  Chip,
+  Typography,
+  Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
+} from '@mui/material'
 import {
   GridActionsCellItem,
   GridColDef,
   GridRenderCellParams,
   GridRowId,
+  GridRowParams,
   GridToolbarContainer,
   GridValidRowModel
 } from '@mui/x-data-grid'
 import BlockIcon from '@mui/icons-material/Block'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useEffect, useRef, useState } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { formatCurrency } from '~/utils/currency'
 import Table from '~/components/Table/Table'
 import { useGetManageAccount, useUpdateAccountByAdmin } from '~/queries/useAccount'
@@ -20,8 +32,13 @@ import UserModal from './UserModal'
 import { ACTION } from '~/constants/mock'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
 import { PaginationSearchQuery } from '~/constants/type'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+import { useAppContext } from '~/contexts/AppProvider'
+import envConfig from '~/constants/config'
 
 export default function ManageUser() {
+  const { account } = useAppContext()
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0
@@ -36,6 +53,22 @@ export default function ManageUser() {
   const [totalRowCount, setTotalRowCount] = useState<number>()
   const updateAccountByAdminMutation = useUpdateAccountByAdmin()
   const editedRowRef = useRef<{ [id: GridRowId]: GridValidRowModel }>({})
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, id: '', newStatus: '' })
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
+  const client = Stomp.over(socketCL)
+
+  useEffect(() => {
+    client.connect({}, () => {
+      console.log('Connected to socket')
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (data?.data.data) {
@@ -58,10 +91,27 @@ export default function ManageUser() {
     }))
   }, [paginationModel])
 
-  const handleToggleStatus = (id: GridRowId) => async () => {
+  const sendSocketLogoutMessage = () => {
+    const payload = {
+      accountId: confirmDialog.id
+    }
+    if (confirmDialog.newStatus === 'Không hoạt động') {
+      client.send('/app/logout-user', {}, JSON.stringify(payload))
+    }
+  }
+
+  const handleToggleStatus = (id: GridRowId) => () => {
     const rowToToggle = rows.find((row) => row.id === id)
     if (rowToToggle) {
       const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
+      setConfirmDialog({ open: true, id: id as string, newStatus })
+    }
+  }
+
+  const handleConfirmToggle = async () => {
+    const { id, newStatus } = confirmDialog
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
       try {
         const body: UpdateAccountByAdminBodyType = {
           id: rowToToggle.id,
@@ -73,10 +123,14 @@ export default function ManageUser() {
         await updateAccountByAdminMutation.mutateAsync(body)
         toast.success(`Trạng thái của người dùng ${rowToToggle.name} đã được cập nhật thành ${newStatus}`)
         setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
+        if (newStatus === 'Không hoạt động') {
+          sendSocketLogoutMessage()
+        }
       } catch (error) {
         handleErrorApi({ error })
       }
     }
+    setConfirmDialog({ open: false, id: '', newStatus: '' })
   }
 
   const columns: GridColDef[] = [
@@ -198,21 +252,30 @@ export default function ManageUser() {
       headerName: 'Hành động',
       width: 100,
       cellClassName: 'actions',
-      getActions: ({ row }) => {
+      getActions: ({ row }: GridRowParams): ReactElement[] => {
         const propRow = {
           ...row,
           buildingNumber: row?.building?.id || 0,
           status: row.status === 'Hoạt động' ? 1 : 0
         }
-        return [
-          <UserModal row={propRow} refetch={refetch} action={ACTION.UPDATE} />,
+        const actions: ReactElement[] = []
+
+        if (account?.role === 'Admin') {
+          actions.push(<UserModal key='edit' row={propRow} refetch={refetch} action={ACTION.UPDATE} />)
+        }
+
+        actions.push(
           <GridActionsCellItem
+            key='toggle'
             icon={row.status === 'Hoạt động' ? <BlockIcon /> : <CheckCircleIcon />}
             label={row.status === 'Hoạt động' ? 'Ban' : 'Unban'}
             onClick={handleToggleStatus(row.id)}
             color={row.status === 'Hoạt động' ? 'error' : 'success'}
+            disabled={account?.role !== 'Admin'}
           />
-        ]
+        )
+
+        return actions
       }
     }
   ]
@@ -260,6 +323,28 @@ export default function ManageUser() {
         setPaginationModel={setPaginationModel}
         totalRowCount={totalRowCount}
       />
+
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ open: false, id: '', newStatus: '' })}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{'Xác nhận thay đổi trạng thái'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            Bạn có chắc chắn muốn thay đổi trạng thái của người dùng này thành {confirmDialog.newStatus}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialog({ open: false, id: '', newStatus: '' })} color='primary'>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmToggle} color='primary' autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

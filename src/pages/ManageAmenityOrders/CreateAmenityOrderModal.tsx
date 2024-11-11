@@ -23,7 +23,6 @@ const CreateAmenityOrderModal = ({
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const { clearAll, selectedAmenities, bookedRoom } = useBookingAmenityContext()
-  console.log('selectedAmenities', selectedAmenities)
   const [openPayment, setOpenPayment] = useState(false)
   const [loading, setLoading] = useState(false)
   const createOrderDetailAmenityMutation = useCreateOrderDetailAmenityStaff()
@@ -79,7 +78,7 @@ const CreateAmenityOrderModal = ({
         <Loading loading={loading} />
         <DialogTitle>
           <Typography variant='h5' fontWeight='500'>
-            Tạo đơn tiện ích
+            Tạo đơn dịch vụ
           </Typography>
         </DialogTitle>
         <DialogContent>

@@ -18,6 +18,7 @@ export default function ManageBuilding() {
     take: paginationModel.pageSize,
     address: ''
   })
+
   const { data, isLoading } = useGetFilterBuilding(paginationFilter as GetFilteredBuildingQueryType)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
@@ -46,16 +47,16 @@ export default function ManageBuilding() {
       headerName: 'STT',
       width: 50
     },
-    { field: 'address', headerName: 'Chi nhánh', width: 350, editable: true },
+    { field: 'address', headerName: 'Chi nhánh', width: 350, editable: false },
     {
       field: 'description',
       headerName: 'Mô tả',
       width: 350,
-      editable: true
+      editable: false
     },
-    { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: true },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: true },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: true },
+    { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: false },
+    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: false },
+    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: false },
     {
       field: 'status',
       headerName: 'Trạng thái',
@@ -74,7 +75,7 @@ export default function ManageBuilding() {
           }
         />
       ),
-      editable: true
+      editable: false
     },
     {
       field: 'actions',

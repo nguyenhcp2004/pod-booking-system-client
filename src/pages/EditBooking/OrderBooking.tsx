@@ -57,7 +57,11 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
     const startTime = moment(orderDetail.orderDetails[0].startTime)
     const today = moment()
 
-    if (!today.isBefore(startTime.clone().subtract(1, 'days')) || orderDetail.orderDetails[0].servicePackage.id === 2) {
+    if (
+      !today.isBefore(startTime.clone().subtract(1, 'days')) ||
+      orderDetail.orderDetails[0].servicePackage.id === 4 ||
+      orderDetail.orderDetails[0].status === 'Rejected'
+    ) {
       toast.error('Bạn không thể hủy đơn này')
       return
     }
@@ -253,7 +257,12 @@ export default function OrderBooking({ orderDetail }: { orderDetail: GetOrderInf
             </Typography>
           </Box>
           <Box sx={{ width: '100%', padding: '20px' }}>
-            <Button onClick={handleClickOpen} fullWidth variant='outlined'>
+            <Button
+              onClick={handleClickOpen}
+              fullWidth
+              variant='outlined'
+              disabled={orderDetail.orderDetails[0].status === 'Rejected'}
+            >
               Hủy đặt phòng
             </Button>
             <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>

@@ -110,7 +110,7 @@ export default function BookingAmenityDetails() {
         {selectedAmenities.length > 0 && (
           <>
             <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Tiện ích bạn đã chọn
+              Dịch vụ bạn đã chọn
             </Typography>
             <Typography variant='subtitle2'>{bookedRoom.name}</Typography>
           </>
@@ -134,7 +134,7 @@ export default function BookingAmenityDetails() {
         </Box>
         <Box display='flex' justifyContent='space-between' flexWrap='wrap'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Tổng giá các tiện ích:
+            Tổng giá các dịch vụ:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
             {amenitiesTotal.toLocaleString()} VND
@@ -142,7 +142,7 @@ export default function BookingAmenityDetails() {
         </Box>
         <Box display='flex' justifyContent='space-between' flexWrap='wrap'>
           <Typography variant='subtitle2' color={theme.palette.grey[500]}>
-            Điscount:
+            Discount:
           </Typography>
           <Typography variant='subtitle2' fontWeight='bold'>
             {discount.toLocaleString()} VND

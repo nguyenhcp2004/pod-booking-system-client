@@ -22,6 +22,7 @@ import AddAmenityOrder from './CreateOrderComponents/AddAmenityOrder'
 import BookingDetailsCustom from './CreateOrderComponents/BookingDetailsCustom'
 import PaymentBox from './CreateOrderComponents/PaymentBox'
 import { toast } from 'react-toastify'
+import { Room } from '~/constants/type'
 
 interface CreateOrderModalProps {
   open: boolean
@@ -29,10 +30,12 @@ interface CreateOrderModalProps {
   refetch: () => void
 }
 
+const today = moment()
+
 const initialBookingData: BookingInfo = {
   roomType: null,
   selectedRooms: [],
-  date: moment().format('DD-MM-YYYY').toString(),
+  date: today.toString(),
   timeSlots: [],
   servicePackage: null
 }
@@ -46,6 +49,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
   const [bookingData, setBookingData] = useState<BookingInfo>(initialBookingData)
   const [openPayment, setOpenPayment] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
 
   useEffect(() => {
     setBookingData(initialBookingData)
@@ -55,8 +59,35 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
     setSelectedSlots([])
   }, [open])
 
+  useEffect(() => {
+    bookingData.selectedRooms.map((bookedRoom) => {
+      const temp: Room = {
+        id: bookedRoom.id,
+        name: bookedRoom.name,
+        description: '',
+        image: '',
+        status: '',
+        createdAt: moment().toISOString(),
+        updatedAt: moment().toISOString(),
+        roomType: null
+      }
+      setSelectedRooms((prev) => [...prev, temp])
+    })
+  }, [bookingData])
+
   const handleOfflinePayment = async () => {
     setLoading(true)
+    if (
+      !customer ||
+      !bookingData.roomType ||
+      bookingData.selectedRooms.length === 0 ||
+      !bookingData.date ||
+      bookingData.timeSlots.length === 0
+    ) {
+      toast.error('Vui lòng điền đầy đủ thông tin trước khi tạo đơn hàng.')
+      setLoading(false)
+      return
+    }
     if (!customer) return
     const response = await createOrderAD(bookingData, customer)
     if (response.code === 201) {
@@ -109,7 +140,7 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
 
         <Grid container spacing={2}>
           <Grid item lg={6} md={6}>
-            <Calendar selected={selectedDates} slots={selectedSlots} />
+            <Calendar rooms={selectedRooms} selected={selectedDates} slots={selectedSlots} />
           </Grid>
 
           <Grid item lg={6} md={6} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -138,7 +169,23 @@ const CreateOrderModal: React.FC<CreateOrderModalProps> = ({ open, onClose, refe
           <Button variant='outlined' onClick={handleOfflinePayment}>
             Thanh toán tiền mặt
           </Button>
-          <Button variant='outlined' onClick={() => setOpenPayment(true)}>
+          <Button
+            variant='outlined'
+            onClick={() => {
+              if (
+                !customer ||
+                !bookingData.roomType ||
+                bookingData.selectedRooms.length === 0 ||
+                !bookingData.date ||
+                bookingData.timeSlots.length === 0
+              ) {
+                toast.error('Vui lòng điền đầy đủ thông tin trước khi tạo đơn hàng.')
+                setLoading(false)
+                return
+              }
+              setOpenPayment(true)
+            }}
+          >
             Thanh toán qua thẻ
           </Button>
         </Box>

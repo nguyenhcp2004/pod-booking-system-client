@@ -6,6 +6,7 @@ import { calTotalPrice } from '~/utils/order'
 import { formatCurrency } from '~/utils/currency'
 import moment from 'moment'
 import { DEFAULT_DATE_FORMAT } from '~/utils/timeUtils'
+import { tokens } from '~/themes/theme'
 
 interface BookingDetailsCustomProps {
   bookingData: BookingInfo
@@ -14,8 +15,10 @@ interface BookingDetailsCustomProps {
 
 const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData, setBookingData }) => {
   const theme = useTheme()
+  const colors = tokens(theme.palette.mode)
   if (!bookingData) return null
   const today = moment()
+
   const roomHaveAmenities = bookingData.selectedRooms.filter((room) => room.amenities.length > 0).length
   const removeAmenity = (amenity: string) => {
     setBookingData?.((prev) => {
@@ -93,16 +96,21 @@ const BookingDetailsCustom: React.FC<BookingDetailsCustomProps> = ({ bookingData
                 <Typography variant='body2' fontWeight='bold'>
                   Gói dịch vụ:
                 </Typography>
-                <Typography variant='body2'>({calTotalPrice(bookingData).packageRepeat} ngày)</Typography>
+                <Typography variant='body2'>{calTotalPrice(bookingData).packageRepeat} ngày</Typography>
               </Box>
             </Box>
           </Box>
         </Box>
         <Box sx={{ marginTop: '24px', paddingY: '20px' }}>
           {roomHaveAmenities > 0 && (
-            <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
-              Dịch vụ bạn đã chọn
-            </Typography>
+            <Box sx={{ paddingBottom: '20px' }}>
+              <Typography variant='subtitle1' gutterBottom color={theme.palette.primary.main}>
+                Dịch vụ bạn đã chọn
+              </Typography>
+              <Typography variant='body1' sx={{ color: colors.grey[500], fontStyle: 'italic', fontSize: '12px' }}>
+                (Lưu ý: các dịch vụ sẽ áp dụng cho tất cả các ngày trong gói dịch vụ)
+              </Typography>
+            </Box>
           )}
           {bookingData.selectedRooms.map((room, index) => {
             if (room.amenities.length === 0) return null

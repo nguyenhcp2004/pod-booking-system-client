@@ -9,11 +9,13 @@ import { createOrder } from '~/apis/orderApi'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { Helmet } from 'react-helmet-async'
-import { useSendMailMutation } from '~/queries/useAccount'
+import { useSendMailMutation, useUpdateBalance } from '~/queries/useAccount'
 import { calTotalPrice } from '~/utils/order'
 import { formatDateAndSlot } from '~/utils/utils'
 import { useAppContext } from '~/contexts/AppProvider'
 import { toast } from 'react-toastify'
+import { formatCurrency } from '~/utils/currency'
+import envConfig from '~/constants/config'
 
 export const Confirmed: React.FC = () => {
   const theme = useTheme()
@@ -26,6 +28,13 @@ export const Confirmed: React.FC = () => {
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
   const { vnp_Amount, vnp_BankCode, vnp_OrderInfo, vnp_ResponseCode } = transactionData || {}
+
+  const totalAmount = calTotalPrice(bookingContext!.bookingData).total
+  const paidAmount = parseInt(vnp_Amount || '0', 10) / 100
+  const balanceToUse = totalAmount - paidAmount
+
+  const { mutateAsync: updateBalance } = useUpdateBalance()
+
   const hanldeSendMail = useCallback(() => {
     bookingContext!.bookingData.timeSlots.forEach(async (timeSlot) => {
       await sendMailMutation.mutateAsync({
@@ -47,10 +56,15 @@ export const Confirmed: React.FC = () => {
       if (response.status === 'OK' && orderCreated === 0) {
         setOrderCreated(1)
         setStatus(true)
+        console.log('Balance to use:', paidAmount, totalAmount, balanceToUse)
+
+        if (paidAmount < totalAmount) {
+          await updateBalance({ accountId: userData?.id || '', usedBalance: balanceToUse })
+        }
         if (!bookingContext) throw new Error('Booking context is undefined')
         // await createOrder(bookingContext.bookingData)
         // await hanldeSendMail()
-        await Promise.all([createOrder(bookingContext.bookingData), hanldeSendMail()])
+        await Promise.all([createOrder(bookingContext!.bookingData), hanldeSendMail()])
         return response
       } else {
         setStatus(false)
@@ -60,7 +74,7 @@ export const Confirmed: React.FC = () => {
     enabled: !!vnp_BankCode && !!vnp_ResponseCode
   })
 
-  const socketCL = new SockJS('http://localhost:8080/ws')
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
   const client = Stomp.over(socketCL)
 
   useEffect(() => {
@@ -142,7 +156,7 @@ export const Confirmed: React.FC = () => {
                     Tổng đơn
                   </Typography>
                   <Typography variant='subtitle2' fontWeight='bold'>
-                    {calTotalPrice(bookingData).total.toLocaleString()} VND
+                    {formatCurrency(calTotalPrice(bookingData).total)}
                   </Typography>
                 </Box>
                 <Divider />
@@ -162,7 +176,7 @@ export const Confirmed: React.FC = () => {
                 </Typography>
                 <Box display='flex' sx={{ mt: '4px' }}>
                   <Typography variant='subtitle2' color={theme.palette.primary.main}>
-                    {bookingData.roomType?.price.toLocaleString()} VND
+                    {formatCurrency(bookingData.roomType?.price || 0)}
                   </Typography>
                   <Typography variant='subtitle2'>/tiếng</Typography>
                 </Box>

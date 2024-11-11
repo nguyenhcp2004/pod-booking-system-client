@@ -137,7 +137,7 @@ export default function AdminLogin() {
                 background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`
               }}
             >
-              Sign In
+              Đăng nhập
             </Button>
           </Box>
         </Card>

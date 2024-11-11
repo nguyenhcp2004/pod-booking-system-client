@@ -13,8 +13,13 @@ import PersonIcon from '@mui/icons-material/Person'
 import { useLogoutMutation } from '~/queries/useAuth'
 import { clearLS, getRefreshTokenFromLS } from '~/utils/auth'
 import { useAppContext } from '~/contexts/AppProvider'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { handleErrorApi } from '~/utils/utils'
+import { useCallback, useEffect } from 'react'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+import { toast } from 'react-toastify'
+import envConfig from '~/constants/config'
 
 interface Props {
   anchorEl: HTMLElement | null
@@ -26,11 +31,12 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function OptionsMenu({ anchorEl }: Props) {
   const open = Boolean(anchorEl)
-  const { setAuth, setAccount } = useAppContext()
+  const { setAuth, setAccount, account } = useAppContext()
   const navigate = useNavigate()
-
   const logoutMutation = useLogoutMutation()
-  const logout = async () => {
+  const socketCL = new SockJS(envConfig.VITE_SOCKET_URL)
+  const client = Stomp.over(socketCL)
+  const logout = useCallback(async () => {
     if (logoutMutation.isPending) return
     try {
       const refreshToken = getRefreshTokenFromLS()
@@ -42,7 +48,25 @@ export default function OptionsMenu({ anchorEl }: Props) {
     } catch (error) {
       handleErrorApi({ error })
     }
-  }
+  }, [logoutMutation, setAuth, setAccount, navigate])
+  useEffect(() => {
+    client.connect({}, () => {
+      client.subscribe('/topic/logout-user', (data) => {
+        console.log('OK')
+        const payload = JSON.parse(data.body)
+        if (payload.accountId === account?.id) {
+          logout()
+          toast('Tài khoản của bạn bị cấm')
+        }
+      })
+    })
+
+    return () => {
+      if (client.connected) {
+        client.disconnect(() => {})
+      }
+    }
+  }, [logout, account, client])
 
   return (
     <>
@@ -72,16 +96,18 @@ export default function OptionsMenu({ anchorEl }: Props) {
           }
         }}
       >
-        <MenuItem>
-          <ListItemIcon>
-            <PersonIcon fontSize='small' sx={{ color: '#000' }} />
-          </ListItemIcon>
-          <ListItemText
-            sx={{ color: '#000', fontSize: '16px', fontWeight: 400, lineHeight: '150%', letterSpacing: '0.15px' }}
-          >
-            Tài khoản
-          </ListItemText>
-        </MenuItem>
+        <Link to='/profile' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <MenuItem>
+            <ListItemIcon>
+              <PersonIcon fontSize='small' sx={{ color: '#000' }} />
+            </ListItemIcon>
+            <ListItemText
+              sx={{ color: '#000', fontSize: '16px', fontWeight: 400, lineHeight: '150%', letterSpacing: '0.15px' }}
+            >
+              Tài khoản
+            </ListItemText>
+          </MenuItem>
+        </Link>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize='small' sx={{ color: '#000' }} />

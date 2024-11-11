@@ -5,6 +5,7 @@ import {
   OrderDetailAmenityStaffBodyType
 } from '~/schemaValidations/orderDetailAmenity.schema'
 
+//For Customer
 const orderDetailAmenityApi = {
   createOrderDetailAmenity: (body: OrderDetailAmenityBodyType) =>
     http.post<CreateOrderDetailAmenityResType>('/order-detail-amenity', body),

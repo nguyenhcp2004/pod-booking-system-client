@@ -1,10 +1,11 @@
 import { Box, IconButton, Modal } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import { ImageRoomTypeType } from '~/schemaValidations/roomImage.schema'
 
-const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
+const ImageView: React.FC<{ images: ImageRoomTypeType[] }> = ({ images }) => {
   const [currentImage, setCurrentImage] = useState(0)
   const [sliderPosition, setSliderPosition] = useState(0)
   const [openModal, setOpenModal] = useState(false)
@@ -38,13 +39,16 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
   const handleCloseModal = () => {
     setOpenModal(false)
   }
-
+  useEffect(() => {
+    setCurrentImage(0)
+    setSliderPosition(0)
+  }, [images])
   return (
-    <>
+    <Box>
       <img
-        src={images[0]}
+        src={images[0]?.imageUrl}
         style={{ width: '100%', height: '400px', objectFit: 'cover', cursor: 'pointer', borderRadius: '4px' }}
-        onClick={() => handleImageClick(images[0])}
+        onClick={() => handleImageClick(images[0]?.imageUrl)}
       />
 
       <Grid
@@ -54,6 +58,7 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
         sx={{ position: 'relative', display: 'flex', alignItems: 'center', borderRadius: '4px' }}
       >
         <IconButton
+          disabled={currentImage === 0}
           sx={{
             position: 'absolute',
             height: '100%',
@@ -68,20 +73,21 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
         <Box sx={{ display: 'flex', gap: `${gap / 2}px`, width: '100%', overflow: 'hidden' }}>
           {images.slice(sliderPosition, sliderPosition + size).map((image, index) => (
             <img
-              src={image}
+              src={image?.imageUrl}
               key={index}
               style={{
                 minWidth: `calc(100% / ${size} - ${gap / 3}px)`,
-                height: '100px',
+                height: '200px',
                 objectFit: 'cover',
                 cursor: 'pointer',
                 borderRadius: '4px'
               }}
-              onClick={() => handleImageClick(image)}
+              onClick={() => handleImageClick(image?.imageUrl)}
             />
           ))}
         </Box>
         <IconButton
+          disabled={currentImage === images.length - 1}
           sx={{
             position: 'absolute',
             right: 0,
@@ -101,7 +107,7 @@ const ImageView: React.FC<{ images: string[] }> = ({ images }) => {
           <img src={imageModal} style={{ maxWidth: '100%', maxHeight: '100%' }} />
         </Box>
       </Modal>
-    </>
+    </Box>
   )
 }
 

@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountApiRequest from '~/apis/account'
 import { PaginationSearchQuery } from '~/constants/type'
-import { CountCustomerReqType } from '~/schemaValidations/account.schema'
+import { CountCustomerReqType, UpdateAccountPhoneNumberType, UpdateBalanceType } from '~/schemaValidations/account.schema'
+import { GetAssignmentsQueryType } from '~/schemaValidations/assignment.schema'
 
 export const useGetMe = () => {
   return useQuery({
@@ -17,12 +18,28 @@ export const useGetManageAccount = (query: PaginationSearchQuery) => {
   })
 }
 
+export const useUpdateBalance = () => {
+  return useMutation({
+    mutationFn: (query: UpdateBalanceType) => accountApiRequest.updateBalance(query)
+  })
+}
+
 export const useUpdateAccountByAdmin = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: accountApiRequest.updateAccountByAdmin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['update-accounts'] })
+    }
+  })
+}
+
+export const useUpdateAccountPhoneNumber = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (update: UpdateAccountPhoneNumberType) => accountApiRequest.updateAccountPhoneNumber(update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['update-accounts-phone'] })
     }
   })
 }
@@ -67,5 +84,12 @@ export const useCountCustomer = (query: CountCustomerReqType) => {
     queryKey: ['count-customers', query],
     queryFn: () => accountApiRequest.countCustomer(query),
     enabled: !!query.startTime && !!query.endTime
+  })
+}
+
+export const useGetListStaff = (query: GetAssignmentsQueryType) => {
+  return useQuery({
+    queryKey: ['staffs', { query }],
+    queryFn: () => accountApiRequest.getListStaff(query)
   })
 }

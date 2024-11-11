@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCreateAccountMutation, useUpdateAccountByAdmin } from '~/queries/useAccount'
 import AddIcon from '@mui/icons-material/Add'
 import {
@@ -28,6 +28,7 @@ import { ACOUNT_ROLE, ACTION } from '~/constants/mock'
 import BackdropCustom from '~/components/Progress/Backdrop'
 import { z } from 'zod'
 import { useGetAllBuilding } from '~/queries/useBuilding'
+import { useAppContext } from '~/contexts/AppProvider'
 
 export const AccountRole = {
   Customer: 'Customer',
@@ -36,6 +37,7 @@ export const AccountRole = {
 } as const
 
 const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: () => void; action: string }) => {
+  const { account } = useAppContext()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(ACTION.CREATE === action ? '' : row.name)
   const [role, setRole] = useState(
@@ -50,6 +52,26 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const createAccount = useCreateAccountMutation()
   const updateAccount = useUpdateAccountByAdmin()
+
+  const [availableRoles, setAvailableRoles] = useState<string[]>([])
+
+  useEffect(() => {
+    if (account) {
+      switch (account.role) {
+        case AccountRole.Staff:
+          setAvailableRoles([AccountRole.Customer])
+          break
+        case AccountRole.Manager:
+          setAvailableRoles([AccountRole.Customer, AccountRole.Staff])
+          break
+        case 'Admin':
+          setAvailableRoles([AccountRole.Customer, AccountRole.Staff, AccountRole.Manager])
+          break
+        default:
+          setAvailableRoles([])
+      }
+    }
+  }, [account])
 
   const { data: allBuildingRes } = useGetAllBuilding()
   const allBuilding = allBuildingRes?.data.data
@@ -260,7 +282,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
             <></>
           )}
           <Grid container spacing={2} sx={{ my: 2 }} alignContent={'center'} justifyContent={'center'}>
-            {row.role !== ACOUNT_ROLE.ADMIN && ACTION.UPDATE === action ? (
+            {(row.role !== ACOUNT_ROLE.ADMIN && ACTION.UPDATE === action) || ACTION.CREATE === action ? (
               <>
                 <Grid size={3} sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography>Vai trò</Typography>
@@ -274,7 +296,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                     onChange={handleRoleChange}
                     error={!!errors.role}
                   >
-                    {Object.values(AccountRole).map((role) => (
+                    {availableRoles.map((role) => (
                       <MenuItem key={role} value={role}>
                         {role}
                       </MenuItem>

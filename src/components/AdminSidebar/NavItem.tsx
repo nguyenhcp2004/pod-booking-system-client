@@ -9,8 +9,9 @@ import FastfoodIcon from '@mui/icons-material/Fastfood'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout'
-// import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences'
 import { useAppContext } from '~/contexts/AppProvider'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 
 const iconSx = {
   width: '24px',
@@ -31,7 +32,7 @@ const menuItems = [
     role: ['Admin', 'Staff', 'Manager']
   },
   {
-    title: 'Hóa đơn tiện ích',
+    title: 'Hóa đơn dịch vụ',
     to: '/admin/amenity-orders',
     icon: <ShoppingCartCheckoutIcon sx={iconSx} />,
     role: ['Admin', 'Staff', 'Manager']
@@ -42,12 +43,12 @@ const menuItems = [
     icon: <MeetingRoomIcon sx={iconSx} />,
     role: ['Admin', 'Manager']
   },
-  // {
-  //   title: 'Loại phòng',
-  //   to: '/admin/room-types',
-  //   icon: <RoomPreferencesIcon sx={iconSx} />,
-  //   role: ['Admin', 'Manager']
-  // },
+  {
+    title: 'Loại phòng',
+    to: '/admin/room-types',
+    icon: <RoomPreferencesIcon sx={iconSx} />,
+    role: ['Admin']
+  },
   {
     title: 'Chi nhánh',
     to: '/admin/buildings',
@@ -55,7 +56,7 @@ const menuItems = [
     role: ['Admin']
   },
   {
-    title: 'Tiện ích',
+    title: 'Dịch vụ',
     to: '/admin/amenities',
     icon: <FastfoodIcon sx={iconSx} />,
     role: ['Admin', 'Manager']
@@ -64,7 +65,13 @@ const menuItems = [
     title: 'Tài khoản',
     to: '/admin/users',
     icon: <PeopleAltIcon sx={iconSx} />,
-    role: ['Admin']
+    role: ['Admin', 'Manager', 'Staff']
+  },
+  {
+    title: 'Giao Việc',
+    to: '/admin/assignments',
+    icon: <CalendarMonthIcon sx={iconSx} />,
+    role: ['Manager', 'Staff']
   }
 ]
 

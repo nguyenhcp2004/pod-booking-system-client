@@ -1,25 +1,9 @@
-import {
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button
-} from '@mui/material'
+import { Container, Typography, Box, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Grid from '@mui/material/Grid2'
+import { Link } from 'react-router-dom'
 
 export default function AboutUs() {
-  const teamMembers = [
-    { name: 'Jane Doe', role: 'CEO', image: '/placeholder.svg?height=200&width=200' },
-    { name: 'John Smith', role: 'CTO', image: '/placeholder.svg?height=200&width=200' },
-    { name: 'Alice Johnson', role: 'Head of Design', image: '/placeholder.svg?height=200&width=200' }
-  ]
-
   const faqs = [
     {
       question: 'Các loại phòng làm việc nào có sẵn để thuê?',
@@ -59,7 +43,7 @@ export default function AboutUs() {
         </Typography>
 
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant='subtitle1' color='neutral' sx={{ mb: 4 }}>
               Được thành lập vào tháng 6 năm nay. FlexiPod.com đã phát triển từ một nhóm khởi nghiệp nhỏ để trở thành
               một trong các công ty chuyên cung cấp các dịch vụ đặt phòng dựa trên nền tảng số hóa. Với đội ngũ đầy
@@ -71,7 +55,7 @@ export default function AboutUs() {
               khách hàng đều có trải nghiệm làm việc thoải mái và hiệu quả nhất tại FlexiPod.
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box
               component='img'
               sx={{
@@ -92,47 +76,6 @@ export default function AboutUs() {
             />
           </Grid>
         </Grid>
-
-        <Box sx={{ my: 8 }}>
-          <Typography
-            variant='h4'
-            sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '2rem', md: '3rem' }, mb: 4 }}
-            color='primary'
-          >
-            Đội ngũ
-          </Typography>
-          <Grid container spacing={4} justifyContent='center'>
-            {teamMembers.map((member) => (
-              <Grid item key={member.name} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    boxShadow: 3,
-                    transition: 'transform 0.3s',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: 6
-                    }
-                  }}
-                >
-                  <CardMedia
-                    component='img'
-                    height='200'
-                    image='https://i.pinimg.com/736x/97/92/cf/9792cf7e99d1927846f81f6258b586cc.jpg'
-                    alt={member.name}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant='h5' component='div'>
-                      {member.name}
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      {member.role}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
 
         <Box sx={{ my: 8 }}>
           <Typography variant='h4' component='h2' gutterBottom align='center' sx={{ mb: 4 }}>
@@ -158,9 +101,11 @@ export default function AboutUs() {
           <Typography variant='h4' component='h2' gutterBottom>
             Sẵn sàng đặt phòng?
           </Typography>
-          <Button variant='contained' size='large' sx={{ mt: 2 }}>
-            Đặt phòng
-          </Button>
+          <Link to={'/'}>
+            <Button variant='contained' size='large' sx={{ mt: 2 }}>
+              Đặt phòng
+            </Button>
+          </Link>
         </Box>
       </Box>
     </Container>
