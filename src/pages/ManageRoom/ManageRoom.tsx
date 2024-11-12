@@ -1,4 +1,4 @@
-import { Box, Chip, Link, Typography } from '@mui/material'
+import { Box, Chip, Link, Typography, useTheme } from '@mui/material'
 import { ACTION, ROOM_STATUS } from '~/constants/mock'
 import { useGetListRooms } from '~/queries/useRoom'
 import Table from '~/components/Table/Table'
@@ -8,6 +8,7 @@ import RoomModal from './RoomModal'
 import { GridColDef, GridRenderCellParams, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
 import { useAppContext } from '~/contexts/AppProvider'
+import moment from 'moment'
 
 export default function ManageRoom() {
   const { account } = useAppContext()
@@ -27,6 +28,7 @@ export default function ManageRoom() {
     ...paginationFilter,
     buildingId: account?.buildingNumber
   } as PaginationSearchQuery)
+  const theme = useTheme()
 
   useEffect(() => {
     if (data) {
@@ -106,16 +108,71 @@ export default function ManageRoom() {
         <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
       )
     },
-    { field: 'createdAt', headerName: 'Thời gian tạo' },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật' },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
+      width: 150,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Hành động',
-      width: 100,
-      cellClassName: 'actions',
-      getActions: ({ row }) => {
-        return [<RoomModal row={row} refetch={refetch} action={ACTION.UPDATE} />]
+      width: 150,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
       }
     }
   ]
