@@ -203,12 +203,12 @@ const ManageAmenityOrders = () => {
   const Toolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
       <Box>
-        <FilterToolbar />
-      </Box>
-      <Box sx={{ display: 'flex', gap: 5 }}>
         <Button color='primary' startIcon={<Add />} onClick={handleClickCreate}>
           Tạo đơn dịch vụ
         </Button>
+      </Box>
+      <Box sx={{ display: 'flex', gap: '8px' }}>
+        <FilterToolbar />
         <SearchForManage setPaginationModel={setPaginationFilter} />
       </Box>
     </GridToolbarContainer>
