@@ -231,7 +231,7 @@ export default function ManageUser() {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
