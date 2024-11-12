@@ -138,11 +138,7 @@ export const mapOrderToRow = (order: Order) => {
   ]
 
   const orderHandler = [
-    ...new Set(
-      order.orderDetails
-        .map((orderDetail) => orderDetail?.orderHandler?.name) // Lấy name hoặc undefined nếu không có
-        .filter((name) => name) // Lọc bỏ các giá trị undefined hoặc null
-    )
+    ...new Set(order.orderDetails.map((orderDetail) => orderDetail?.orderHandler?.name).filter((name) => name))
   ]
 
   const sortedSlots = slots.sort((a, b) => {
@@ -261,7 +257,9 @@ export const calTotalPrice = (bookingData: BookingInfo) => {
           return amenityAcc + amenity.price * amenity.quantity * packageRepeat
         }, 0)
       )
-    }, 0) * bookingData?.timeSlots.length || 0
+    }, 0) *
+      bookingData?.timeSlots.length *
+      bookingData?.selectedRooms.length || 0
   )
 
   const discount = Math.round(
