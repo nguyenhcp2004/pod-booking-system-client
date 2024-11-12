@@ -1,4 +1,4 @@
-import { Container, Paper, Typography, Avatar, Box, Chip, LinearProgress } from '@mui/material'
+import { Container, Paper, Typography, Avatar, Box, Chip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import {
   Email as EmailIcon,
@@ -16,12 +16,6 @@ interface InfoItemProps {
 
 export default function UserProfile() {
   const { account } = useAppContext()
-
-  // Calculate progress for the next rank (assuming 1000 points per rank)
-  let progressToNextRank = 0
-  if (account) {
-    progressToNextRank = (account.point % 1000) / 10
-  }
 
   const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => (
     <Box display='flex' alignItems='center' mb={2}>
@@ -68,27 +62,6 @@ export default function UserProfile() {
                 label='Số dư tài khoản'
                 value={`${account.balance.toLocaleString()} VND`}
               />
-
-              <Box mt={4}>
-                <Typography variant='h6' gutterBottom>
-                  Điểm tích lũy
-                </Typography>
-                <Box display='flex' alignItems='center'>
-                  <Typography variant='body1' mr={2}>
-                    {account.point} điểm
-                  </Typography>
-                  <Box flexGrow={1}>
-                    <LinearProgress
-                      variant='determinate'
-                      value={progressToNextRank}
-                      sx={{ height: 10, borderRadius: 5 }}
-                    />
-                  </Box>
-                </Box>
-                <Typography variant='body2' color='textSecondary' mt={1}>
-                  {1000 - (account.point % 1000)} điểm nữa để lên hạng tiếp theo
-                </Typography>
-              </Box>
             </Grid>
           </Grid>
         </Paper>
