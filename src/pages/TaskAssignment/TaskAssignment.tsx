@@ -332,8 +332,8 @@ export default function TaskAssignment() {
                 render={({ field }) => (
                   <>
                     <Select size='small' labelId='time-slot-label' {...field} label='Khung giờ'>
-                      <MenuItem value='7:00 - 9:00'>7h - 9h</MenuItem>
-                      <MenuItem value='9:00 - 11:00'>9h - 11h</MenuItem>
+                      <MenuItem value='07:00 - 09:00'>7h - 9h</MenuItem>
+                      <MenuItem value='09:00 - 11:00'>9h - 11h</MenuItem>
                       <MenuItem value='11:00 - 13:00'>11h - 13h</MenuItem>
                       <MenuItem value='13:00 - 15:00'>13h - 15h</MenuItem>
                       <MenuItem value='15:00 - 17:00'>15h - 17h</MenuItem>
