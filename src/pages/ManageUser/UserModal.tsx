@@ -55,23 +55,41 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
 
   const [availableRoles, setAvailableRoles] = useState<string[]>([])
 
+  console.log(role)
+
   useEffect(() => {
-    if (account) {
-      switch (account.role) {
+    if (action === ACTION.UPDATE) {
+      switch (row.role) {
         case AccountRole.Staff:
-          setAvailableRoles([AccountRole.Customer])
+          setAvailableRoles([AccountRole.Manager, AccountRole.Staff])
           break
         case AccountRole.Manager:
-          setAvailableRoles([AccountRole.Customer, AccountRole.Staff])
+          setAvailableRoles([AccountRole.Manager, AccountRole.Staff])
           break
-        case 'Admin':
-          setAvailableRoles([AccountRole.Customer, AccountRole.Staff, AccountRole.Manager])
+        case AccountRole.Customer:
+          setAvailableRoles([AccountRole.Customer]) // Customer can't be updated
           break
         default:
           setAvailableRoles([])
       }
+    } else if (action === ACTION.CREATE) {
+      if (account) {
+        switch (account.role) {
+          case AccountRole.Staff:
+            setAvailableRoles([AccountRole.Customer])
+            break
+          case AccountRole.Manager:
+            setAvailableRoles([AccountRole.Customer, AccountRole.Staff])
+            break
+          case 'Admin':
+            setAvailableRoles([AccountRole.Customer, AccountRole.Staff, AccountRole.Manager])
+            break
+          default:
+            setAvailableRoles([])
+        }
+      }
     }
-  }, [account])
+  }, [action, row.role, account])
 
   const { data: allBuildingRes } = useGetAllBuilding()
   const allBuilding = allBuildingRes?.data.data
@@ -305,6 +323,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                     value={role}
                     onChange={handleRoleChange}
                     error={!!errors.role}
+                    disabled={row.role === AccountRole.Customer && ACTION.UPDATE === action}
                   >
                     {availableRoles.map((role) => (
                       <MenuItem key={role} value={role}>
