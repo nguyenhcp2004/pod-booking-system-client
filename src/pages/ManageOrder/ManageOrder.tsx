@@ -409,6 +409,7 @@ export default function ManageOrder() {
             format={DEFAULT_DATE_FORMAT}
             onChange={(newValue) => setSelectedStartDate(newValue)}
             slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            maxDate={selectedEndDate || today}
           />
         </Box>
         <Box sx={{ width: '200px' }}>
@@ -418,6 +419,7 @@ export default function ManageOrder() {
             format={DEFAULT_DATE_FORMAT}
             onChange={(newValue) => setSelectedEndDate(newValue)}
             slotProps={{ textField: { size: 'small', fullWidth: true } }}
+            minDate={selectedStartDate || today}
           />
         </Box>
         <Box sx={{ width: '200px' }}>

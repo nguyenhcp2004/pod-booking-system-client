@@ -1,11 +1,6 @@
-import { Container, Paper, Typography, Avatar, Box, Chip } from '@mui/material'
+import { Container, Paper, Typography, Avatar, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import {
-  Email as EmailIcon,
-  Phone as PhoneIcon,
-  AccountBalance as AccountBalanceIcon,
-  EmojiEvents as EmojiEventsIcon
-} from '@mui/icons-material'
+import { Email as EmailIcon, Phone as PhoneIcon, AccountBalance as AccountBalanceIcon } from '@mui/icons-material'
 import { useAppContext } from '~/contexts/AppProvider'
 
 interface InfoItemProps {
@@ -50,7 +45,6 @@ export default function UserProfile() {
                 <Typography variant='h5' gutterBottom>
                   {account.name}
                 </Typography>
-                <Chip icon={<EmojiEventsIcon />} label={account.rankingName} color='primary' sx={{ mt: 1 }} />
               </Box>
             </Grid>
 
