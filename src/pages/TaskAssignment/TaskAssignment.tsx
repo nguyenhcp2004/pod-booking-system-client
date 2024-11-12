@@ -276,6 +276,7 @@ export default function TaskAssignment() {
                 <IconButton
                   size='small'
                   className='add-event'
+                  disabled={account?.role !== 'Manager' || events[`${day}-${slot}`]?.length > 0}
                   onClick={() => handleAddEvent(day, slot)}
                   sx={{
                     position: 'absolute',
