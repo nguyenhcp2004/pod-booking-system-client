@@ -55,29 +55,7 @@ export default function ManageBuilding() {
       width: 350,
       editable: false
     },
-    {
-      field: 'hotlineNumber',
-      headerName: 'Hotline',
-      width: 150,
-      editable: false,
-      renderCell: (params) => {
-        const dateValue = moment(params.value)
-
-        const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
-
-        return (
-          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
-            <Typography variant='body2' color={theme.palette.grey[700]}>
-              {time}
-            </Typography>
-            <Typography variant='body2' color={theme.palette.grey[500]}>
-              | {date}
-            </Typography>
-          </Box>
-        )
-      }
-    },
+    { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: false },
     {
       field: 'createdAt',
       headerName: 'Thời gian tạo',
