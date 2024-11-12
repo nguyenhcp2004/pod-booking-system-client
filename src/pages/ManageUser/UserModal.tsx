@@ -56,22 +56,38 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
   const [availableRoles, setAvailableRoles] = useState<string[]>([])
 
   useEffect(() => {
-    if (account) {
-      switch (account.role) {
+    if (action === ACTION.UPDATE) {
+      switch (row.role) {
         case AccountRole.Staff:
-          setAvailableRoles([AccountRole.Customer])
+          setAvailableRoles([AccountRole.Manager, AccountRole.Staff])
           break
         case AccountRole.Manager:
-          setAvailableRoles([AccountRole.Customer, AccountRole.Staff])
+          setAvailableRoles([AccountRole.Manager, AccountRole.Staff])
           break
-        case 'Admin':
-          setAvailableRoles([AccountRole.Customer, AccountRole.Staff, AccountRole.Manager])
+        case AccountRole.Customer:
+          setAvailableRoles([AccountRole.Customer]) // Customer can't be updated
           break
         default:
           setAvailableRoles([])
       }
+    } else if (action === ACTION.CREATE) {
+      if (account) {
+        switch (account.role) {
+          case AccountRole.Staff:
+            setAvailableRoles([AccountRole.Customer])
+            break
+          case AccountRole.Manager:
+            setAvailableRoles([AccountRole.Customer, AccountRole.Staff])
+            break
+          case 'Admin':
+            setAvailableRoles([AccountRole.Customer, AccountRole.Staff, AccountRole.Manager])
+            break
+          default:
+            setAvailableRoles([])
+        }
+      }
     }
-  }, [account])
+  }, [action, row.role, account])
 
   const { data: allBuildingRes } = useGetAllBuilding()
   const allBuilding = allBuildingRes?.data.data
@@ -144,7 +160,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
       name: name,
       role: role,
       status: status,
-      buildingNumber: buildingNumber
+      buildingNumber: role === AccountRole.Manager || role === AccountRole.Staff ? buildingNumber : 0
     }
 
     try {
@@ -160,14 +176,24 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
         }
         result = await createAccount.mutateAsync(payLoadCreate)
       }
-      toast.success(result?.data.message, {
-        autoClose: 3000
-      })
-      refetch()
+      if (
+        result?.data.message === 'Cập nhật tài khoản thành công' ||
+        result?.data.message === 'Thêm tài khoản mới thành công'
+      ) {
+        toast.success(result?.data.message, {
+          autoClose: 3000
+        })
+        refetch()
+        handleClose()
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          email: 'Email đã tồn tại'
+        }))
+      }
     } catch (error) {
       handleErrorApi({ error })
     }
-    handleClose()
   }
 
   return (
@@ -295,6 +321,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
                     value={role}
                     onChange={handleRoleChange}
                     error={!!errors.role}
+                    disabled={row.role === AccountRole.Customer && ACTION.UPDATE === action}
                   >
                     {availableRoles.map((role) => (
                       <MenuItem key={role} value={role}>

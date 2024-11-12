@@ -124,13 +124,12 @@ export default function ManageBuilding() {
       headerName: 'Giá',
       width: 350,
       editable: false,
-      renderCell: (params) => {
-        const priceInVND = parseFloat(params.value).toFixed(2)
-        return (
-          <Typography variant='body2' color={theme.palette.text.primary}>
-            {priceInVND.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ
-          </Typography>
-        )
+      valueGetter: (params: number) => {
+        if (params == 0) {
+          const price = 0
+          return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+        }
+        return params ? params.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'N/A'
       }
     },
     { field: 'quantity', headerName: 'Số lượng', width: 150, editable: false },
@@ -143,7 +142,7 @@ export default function ManageBuilding() {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
@@ -166,7 +165,7 @@ export default function ManageBuilding() {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>

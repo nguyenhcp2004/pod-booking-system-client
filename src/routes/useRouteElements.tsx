@@ -84,10 +84,6 @@ export default function useRouteElements() {
         {
           path: '/privacy-policy',
           element: <PrivacyPolicy />
-        },
-        {
-          path: '/profile',
-          element: <UserProfile />
         }
       ]
     },
@@ -244,6 +240,10 @@ export default function useRouteElements() {
             {
               path: 'cancel-booking-success',
               element: <CancelBookingSuccess />
+            },
+            {
+              path: '/profile',
+              element: <UserProfile />
             }
           ]
         }

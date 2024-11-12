@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography } from '@mui/material'
+import { Box, Button, IconButton, Typography, useTheme } from '@mui/material'
 import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
@@ -27,6 +27,7 @@ const ManageAmenityOrders = () => {
   const [startDate, setStartDate] = useState<Moment | null>(moment())
   const [endDate, setEndDate] = useState<Moment | null>(moment())
   const { clearAll } = useBookingAmenityContext()
+  const theme = useTheme()
 
   const {
     data: listData,
@@ -102,24 +103,66 @@ const ManageAmenityOrders = () => {
       field: 'startTime',
       headerName: 'Thời gian bắt đầu',
       width: 150,
-      valueFormatter: (params) => {
-        return params && moment(params).format('DD/MM/YYYY HH:mm')
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
       }
     },
     {
       field: 'endTime',
       headerName: 'Thời gian kết thúc',
       width: 150,
-      valueFormatter: (params) => {
-        return params && moment(params).format('DD/MM/YYYY HH:mm')
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
       }
     },
     {
       field: 'createdAt',
       headerName: 'Thời gian tạo',
       width: 150,
-      valueFormatter: (params) => {
-        return params && moment(params).format('DD/MM/YYYY HH:mm')
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
       }
     },
     {
@@ -144,6 +187,7 @@ const ManageAmenityOrders = () => {
         value={startDate}
         onChange={(date) => setStartDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        maxDate={endDate || moment()}
       />
       <DatePicker
         label='Đến ngày'
@@ -151,6 +195,7 @@ const ManageAmenityOrders = () => {
         value={endDate}
         onChange={(date) => setEndDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        minDate={startDate || moment()}
       />
     </Box>
   )
@@ -158,12 +203,12 @@ const ManageAmenityOrders = () => {
   const Toolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
       <Box>
-        <FilterToolbar />
-      </Box>
-      <Box sx={{ display: 'flex', gap: 5 }}>
         <Button color='primary' startIcon={<Add />} onClick={handleClickCreate}>
           Tạo đơn dịch vụ
         </Button>
+      </Box>
+      <Box sx={{ display: 'flex', gap: '8px' }}>
+        <FilterToolbar />
         <SearchForManage setPaginationModel={setPaginationFilter} />
       </Box>
     </GridToolbarContainer>

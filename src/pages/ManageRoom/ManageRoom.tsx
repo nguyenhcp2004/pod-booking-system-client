@@ -1,4 +1,4 @@
-import { Box, Chip, Link, Typography } from '@mui/material'
+import { Box, Chip, Link, Typography, useTheme } from '@mui/material'
 import { ACTION, ROOM_STATUS } from '~/constants/mock'
 import { useGetListRooms } from '~/queries/useRoom'
 import Table from '~/components/Table/Table'
@@ -8,6 +8,7 @@ import RoomModal from './RoomModal'
 import { GridColDef, GridRenderCellParams, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import SearchForManage from '~/components/SearchInput/SearchForManage'
 import { useAppContext } from '~/contexts/AppProvider'
+import moment from 'moment'
 
 export default function ManageRoom() {
   const { account } = useAppContext()
@@ -16,7 +17,6 @@ export default function ManageRoom() {
     page: 0
   })
   const [paginationFilter, setPaginationFilter] = useState({
-    buildingId: account?.buildingNumber,
     page: paginationModel.page + 1,
     take: paginationModel.pageSize,
     searchParams: ''
@@ -24,11 +24,21 @@ export default function ManageRoom() {
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
 
-  const { data, refetch, isFetching } = useGetListRooms(paginationFilter as PaginationSearchQuery)
+  const { data, refetch, isFetching } = useGetListRooms({
+    ...paginationFilter,
+    buildingId: account?.buildingNumber
+  } as PaginationSearchQuery)
+  const theme = useTheme()
 
   useEffect(() => {
     if (data) {
-      setRows(data.data.data.map((room) => ({ ...room, building: room.roomType.building.address })))
+      setRows(
+        data.data.data.map((room, index) => ({
+          ...room,
+          building: room.roomType.building.address,
+          index: index + (paginationFilter.page - 1) * paginationFilter.take + 1
+        }))
+      )
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
@@ -62,8 +72,13 @@ export default function ManageRoom() {
   }
   const columns: GridColDef[] = [
     {
+      field: 'index',
+      headerName: '#',
+      width: 50
+    },
+    {
       field: 'id',
-      headerName: 'ID',
+      headerName: 'ID phòng',
       width: 50
     },
     { field: 'name', headerName: 'Tên' },
@@ -73,19 +88,6 @@ export default function ManageRoom() {
       width: 250,
       renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
     },
-    // {
-    //   field: 'image',
-    //   headerName: 'Ảnh',
-    //   width: 150,
-    //   maxWidth: 150,
-    //   renderCell: (params: GridRenderCellParams) => (
-    //     <img
-    //       src={params.value as string}
-    //       alt='room-img'
-    //       style={{ width: '100%', height: '100%', borderRadius: '4px' }}
-    //     />
-    //   )
-    // },
     {
       field: 'roomType',
       headerName: 'Loại phòng',
@@ -103,11 +105,56 @@ export default function ManageRoom() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
-        <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
+        <Chip
+          label={params.value === ROOM_STATUS.AVAILABLE ? 'Hoạt động' : 'Ngừng hoạt động'}
+          color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'error'}
+        />
       )
     },
-    { field: 'createdAt', headerName: 'Thời gian tạo' },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật' },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
+      width: 150,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'actions',
       type: 'actions',
