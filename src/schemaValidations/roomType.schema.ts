@@ -49,7 +49,8 @@ export const RoomTypeRequest = z.object({
   price: z.number().min(1000),
   quantity: z.number(),
   capacity: z.number().min(1),
-  buildingId: z.number()
+  buildingId: z.number(),
+  image: z.string()
 })
 
 export type RoomTypeRequest = z.TypeOf<typeof RoomTypeRequest>
