@@ -31,6 +31,7 @@ import { CountCustomerReqType } from '~/schemaValidations/account.schema'
 import { useGetRevenue, useGetRevenueCurrentDay } from '~/queries/useOrderDetail'
 import { GetRevenueReqType } from '~/schemaValidations/orderDetail.schema'
 import { DatePicker } from '@mui/x-date-pickers'
+import { formatCurrencyAmenityPage } from '~/utils/currency'
 
 export default function DashboardMain() {
   const [startTime, setStartTime] = useState<Moment>(moment().startOf('day'))
@@ -71,6 +72,7 @@ export default function DashboardMain() {
       setStartTime(start.startOf('quarter'))
       setEndTime(end.endOf('quarter'))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectTime, selectMode, quarter])
 
   // useEffect(() => {
@@ -271,7 +273,7 @@ export default function DashboardMain() {
               />
               <CardContent>
                 <Typography variant='h5' sx={{ color: 'inherit', fontWeight: 'bold' }}>
-                  {revenue?.toLocaleString('vi-VN')} VNĐ
+                  {formatCurrencyAmenityPage(revenue)} VND
                 </Typography>
               </CardContent>
             </Card>
