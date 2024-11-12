@@ -13,7 +13,11 @@ import {
   MenuItem,
   Select,
   TextField,
-  Grid
+  Grid,
+  Box,
+  Typography,
+  Card,
+  CardMedia
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import Edit from '@mui/icons-material/Edit'
@@ -23,6 +27,7 @@ import { RoomTypeSchemaType } from '~/schemaValidations/roomType.schema'
 import { useCreateRoomType, useUpdateRoomType } from '~/queries/useRoomType'
 import { useBuilding } from '~/queries/useOrder'
 import { Building } from '~/constants/type'
+import { useUploadMedia } from '~/utils/uploadCloudnary'
 
 const formatNumberWithThousandSeparators = (value) => {
   return new Intl.NumberFormat('en-US').format(value)
@@ -36,11 +41,24 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
   const [capacity, setCapacity] = useState(row?.capacity || 1)
   const [building, setBuilding] = useState<Building | null>(row?.building || null)
   const [buildingId, setBuildingId] = useState<number>(row?.building.id || 0)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const { mutate, status, isError, isSuccess, data, error } = useUploadMedia()
 
   const { data: allBuilding } = useBuilding()
   const createRoomMutation = useCreateRoomType()
   const updateRoomMutation = useUpdateRoomType()
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0])
+    }
+  }
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      mutate(selectedFile)
+    }
+  }
   const handleClickOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
@@ -48,8 +66,11 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
     event.preventDefault()
     setLoading(true)
     const quantity = row?.quantity || 0
-    if (price < 1000 && price > 1_000_000 && capacity < 1) {
-      const payload = { name, price, quantity, capacity, buildingId }
+    console.log('price', price)
+    console.log('capacity', capacity)
+    if (price >= 1000 && price <= 1000000 && capacity >= 1) {
+      const image = data || row?.image || ''
+      const payload = { name, price, quantity, capacity, buildingId, image }
       try {
         if (action === ACTION.UPDATE) {
           await updateRoomMutation.mutateAsync({ updateData: payload, roomTypeId: row.id })
@@ -81,7 +102,7 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
     if (price < 1000 || price > 1_000_000) {
       toast.error('Giá phòng phải nằm trong khoảng từ 1000 đến 1,000,000 VND.')
     } else {
-      setPrice(formatNumberWithThousandSeparators(price))
+      setPrice(price)
     }
   }
 
@@ -100,6 +121,45 @@ const RoomTypeModal = ({ row, refetch, action }: { row: RoomTypeSchemaType; refe
         <DialogTitle>{action === ACTION.CREATE ? 'Tạo phòng' : 'Chỉnh sửa: ' + row?.name}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ my: 2 }}>
+            <Grid>
+              <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button variant='contained' component='label'>
+                  Select File
+                  <input type='file' hidden onChange={handleFileChange} />
+                </Button>
+
+                {selectedFile && (
+                  <Typography variant='body1' gutterBottom>
+                    {selectedFile.name}
+                  </Typography>
+                )}
+
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handleUpload}
+                  disabled={status === 'pending' || !selectedFile}
+                  style={{ marginTop: 16 }}
+                >
+                  Upload
+                </Button>
+
+                {isError && <Typography color='error'>Error uploading image: {error?.message}</Typography>}
+                {isSuccess && data && (
+                  <>
+                    <Typography variant='body2' color='textSecondary' style={{ marginTop: 16 }}>
+                      Image uploaded successfully: {data}
+                    </Typography>
+                    <Card style={{ maxWidth: 400, marginTop: 16 }}>
+                      <CardMedia component='img' height='300' image={data} alt='Uploaded Image' />
+                    </Card>
+                  </>
+                )}
+                <Backdrop open={status === 'pending'} style={{ zIndex: 1300, color: '#fff' }}>
+                  <CircularProgress color='inherit' />
+                </Backdrop>
+              </Box>
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
