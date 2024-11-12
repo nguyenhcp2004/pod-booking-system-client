@@ -160,14 +160,24 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
         }
         result = await createAccount.mutateAsync(payLoadCreate)
       }
-      toast.success(result?.data.message, {
-        autoClose: 3000
-      })
-      refetch()
+      if (
+        result?.data.message === 'Cập nhật tài khoản thành công' ||
+        result?.data.message === 'Thêm tài khoản mới thành công'
+      ) {
+        toast.success(result?.data.message, {
+          autoClose: 3000
+        })
+        refetch()
+        handleClose()
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          email: 'Email đã tồn tại'
+        }))
+      }
     } catch (error) {
       handleErrorApi({ error })
     }
-    handleClose()
   }
 
   return (
