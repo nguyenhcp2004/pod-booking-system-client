@@ -151,9 +151,15 @@ const AddAmenity = () => {
       setErrorState('Vui lòng chọn dịch vụ')
       return
     } else {
-      if (detailAmenity.quantity < quantity) {
+      if (detailAmenity.quantity < quantity + 1) {
         setErrorState('Số lượng dịch vụ không đủ')
         return
+      }
+      if (detailAmenity.type === 'Office') {
+        if (quantity + 1 >= 3) {
+          setErrorState('Chỉ được đặt tối đa 2 dịch vụ thiết bị')
+          return
+        }
       }
       setErrorState(null)
       setQuantity((prevQuantity) => prevQuantity + 1)
