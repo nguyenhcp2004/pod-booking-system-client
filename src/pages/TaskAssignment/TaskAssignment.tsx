@@ -31,8 +31,8 @@ import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
 
 const timeSlots = [
-  '7:00 - 9:00',
-  '9:00 - 11:00',
+  '07:00 - 09:00',
+  '09:00 - 11:00',
   '11:00 - 13:00',
   '13:00 - 15:00',
   '15:00 - 17:00',

@@ -19,13 +19,14 @@ export const GetListBuidlingRes = z.object({
   )
 })
 
+const vietnamPhoneNumberRegex = /^(03|05|07|08|09)[0-9]{8}$/
 export type GetListBuidlingResType = z.TypeOf<typeof GetListBuidlingRes>
 
 export const CreateBuildingBody = z
   .object({
     address: z.string().min(5, 'Địa chỉ từ 5 - 100 kí tự').max(100, 'Địa chỉ từ 5 - 100 kí tự'),
     description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự').max(150, 'Mô tả tối đa ký tự'),
-    hotlineNumber: z.string().regex(/^(0[1-9]{1}[0-9]{8})$/, 'Số điện thoại không hợp lệ'),
+    hotlineNumber: z.string().regex(vietnamPhoneNumberRegex, 'Số điện thoại không hợp lệ'),
     status: z.string()
   })
   .strict()
@@ -59,7 +60,7 @@ export const EditBuildingBody = z
     id: z.number(),
     address: z.string().min(5, 'Địa chỉ từ 5 - 100 kí tự').max(100, 'Địa chỉ từ 5 - 100 kí tự'),
     description: z.string().min(10, 'Mô tả phải có ít nhất 10 ký tự').max(150, 'Mô tả tối đa ký tự'),
-    hotlineNumber: z.string().regex(/^(0[1-9]{1}[0-9]{8})$/, 'Số điện thoại không hợp lệ'),
+    hotlineNumber: z.string().regex(vietnamPhoneNumberRegex, 'Số điện thoại không hợp lệ'),
     status: z.string()
   })
   .strict()
