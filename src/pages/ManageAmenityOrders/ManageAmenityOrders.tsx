@@ -187,6 +187,7 @@ const ManageAmenityOrders = () => {
         value={startDate}
         onChange={(date) => setStartDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        maxDate={endDate || moment()}
       />
       <DatePicker
         label='Đến ngày'
@@ -194,6 +195,7 @@ const ManageAmenityOrders = () => {
         value={endDate}
         onChange={(date) => setEndDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        minDate={startDate || moment()}
       />
     </Box>
   )
