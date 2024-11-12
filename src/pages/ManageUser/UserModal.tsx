@@ -144,7 +144,7 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
       name: name,
       role: role,
       status: status,
-      buildingNumber: buildingNumber
+      buildingNumber: role === AccountRole.Manager || role === AccountRole.Staff ? buildingNumber : 0
     }
 
     try {
