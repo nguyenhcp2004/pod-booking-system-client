@@ -55,8 +55,6 @@ const UserModal = ({ row, refetch, action }: { row: AccountSchemaType; refetch: 
 
   const [availableRoles, setAvailableRoles] = useState<string[]>([])
 
-  console.log(role)
-
   useEffect(() => {
     if (action === ACTION.UPDATE) {
       switch (row.role) {
