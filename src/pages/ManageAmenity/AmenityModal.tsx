@@ -69,23 +69,25 @@ export default function BuildingModal({ row, action }: { row?: AmenityConfig; ac
     }
   }, [open])
 
+  const MAX_PRICE = 1_000_000
+  const MAX_QUANTITY = 1_000_000
   // Validation helper
   const validateForm = (data: AmenityFormData) => {
     const errors = { name: '', price: '', quantity: '' }
     let isValid = true
 
     if (!data.name || typeof data.name !== 'string' || data.name.trim() === '') {
-      errors.name = 'Name is required and must be a valid string'
+      errors.name = 'Tên là bắt buộc và phải là chuỗi hợp lệ'
       isValid = false
     }
 
-    if (!data.price || isNaN(data.price) || data.price <= 0) {
-      errors.price = 'Price must be a valid number greater than 0'
+    if (!data.price || isNaN(data.price) || data.price <= 0 || data.price > MAX_PRICE) {
+      errors.price = `Giá phải là một số hợp lệ lớn hơn 0 và không vượt quá ${MAX_PRICE}`
       isValid = false
     }
 
-    if (data.quantity == null || isNaN(data.quantity) || data.quantity < 0) {
-      errors.quantity = 'Quantity must be a valid number and cannot be negative'
+    if (data.quantity == null || isNaN(data.quantity) || data.quantity <= 0 || data.quantity > MAX_QUANTITY) {
+      errors.quantity = `Số lượng phải là một số hợp lệ lớn hơn 0 và không vượt quá ${MAX_QUANTITY}`
       isValid = false
     }
 

@@ -1,6 +1,17 @@
 import { useGetListAmenity } from '~/queries/useAmenity'
 import { AmenityTypeEnum } from '~/schemaValidations/amenity.schema'
-import { Box, Chip, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  useTheme,
+  DialogActions,
+  DialogContentText,
+  Dialog
+} from '@mui/material'
 import { GridActionsCellItem, GridColDef, GridRowId, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useRef, useState } from 'react'
 import Table from '~/components/Table/Table'
@@ -30,6 +41,8 @@ export default function ManageBuilding() {
   const theme = useTheme()
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, id: '', newStatus: '' })
+
   useEffect(() => {
     if (data) {
       setRows([...data.data.data])
@@ -65,6 +78,20 @@ export default function ManageBuilding() {
     if (rowToToggle) {
       const newStatus = rowToToggle.status === 'Hoạt động' ? 'Không hoạt động' : 'Hoạt động'
       try {
+        setConfirmDialog({ open: true, id: id as string, newStatus })
+      } catch (error) {
+        handleErrorApi({ error })
+        toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
+          autoClose: 3000
+        })
+      }
+    }
+  }
+  const handleConfirmToggle = async () => {
+    const { id, newStatus } = confirmDialog
+    const rowToToggle = rows.find((row) => row.id === id)
+    if (rowToToggle) {
+      try {
         await deleteAmenityMutation.mutateAsync(rowToToggle.id)
 
         toast.success(`Trạng thái của dịch vụ ${rowToToggle.name} đã được cập nhật thành ${newStatus}`, {
@@ -73,11 +100,9 @@ export default function ManageBuilding() {
         setRows((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, status: newStatus } : row)))
       } catch (error) {
         handleErrorApi({ error })
-        toast.error('Có lỗi xảy ra khi xóa dịch vụ', {
-          autoClose: 3000
-        })
       }
     }
+    setConfirmDialog({ open: false, id: '', newStatus: '' })
   }
 
   const columns: GridColDef[] = [
@@ -99,13 +124,12 @@ export default function ManageBuilding() {
       headerName: 'Giá',
       width: 350,
       editable: false,
-      renderCell: (params) => {
-        const priceInVND = parseFloat(params.value).toFixed(2)
-        return (
-          <Typography variant='body2' color={theme.palette.text.primary}>
-            {priceInVND.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VNĐ
-          </Typography>
-        )
+      valueGetter: (params: number) => {
+        if (params == 0) {
+          const price = 0
+          return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+        }
+        return params ? params.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : 'N/A'
       }
     },
     { field: 'quantity', headerName: 'Số lượng', width: 150, editable: false },
@@ -230,6 +254,27 @@ export default function ManageBuilding() {
         setPaginationModel={setPaginationModel}
         totalRowCount={totalRowCount}
       />
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ open: false, id: '', newStatus: '' })}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{'Xác nhận thay đổi trạng thái'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            Bạn có chắc chắn muốn thay đổi trạng thái của dịch vụ này thành {confirmDialog.newStatus}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialog({ open: false, id: '', newStatus: '' })} color='primary'>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmToggle} color='primary' autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
