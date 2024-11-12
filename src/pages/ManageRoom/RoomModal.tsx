@@ -117,9 +117,10 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
   }
 
   const handleClickOpen = () => {
+    imagesRefetch()
     roomTypeRefetch().then(() => {
-      setOpen(true)
       setValue('roomTypeId', row?.roomType?.id === 0 ? '' : row?.roomType?.id.toString())
+      setOpen(true)
     })
   }
 
@@ -152,17 +153,17 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
         action === ACTION.UPDATE
           ? await editRoomMutation.mutateAsync(payload).then((data) => {
               handleUpload({ roomId: row.id }).then(() => {
-                imagesRefetch()
+                refetch()
               })
               return data
             })
           : await createRoomMutation.mutateAsync(payload).then((data) => {
               handleUpload({ roomId: data.data.data.id }).then(() => {
-                imagesRefetch()
+                refetch()
               })
               return data
             })
-      refetch()
+
       toast.success(result.data.message, { autoClose: 3000 })
       handleClose()
     } catch (error) {
