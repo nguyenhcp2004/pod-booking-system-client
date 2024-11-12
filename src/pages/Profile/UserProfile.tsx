@@ -1,4 +1,4 @@
-import { Container, Paper, Typography, Avatar, Box, LinearProgress } from '@mui/material'
+import { Container, Paper, Typography, Avatar, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { Email as EmailIcon, Phone as PhoneIcon, AccountBalance as AccountBalanceIcon } from '@mui/icons-material'
 import { useAppContext } from '~/contexts/AppProvider'
