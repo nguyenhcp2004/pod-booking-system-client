@@ -16,7 +16,6 @@ export default function ManageRoom() {
     page: 0
   })
   const [paginationFilter, setPaginationFilter] = useState({
-    buildingId: account?.buildingNumber,
     page: paginationModel.page + 1,
     take: paginationModel.pageSize,
     searchParams: ''
@@ -24,11 +23,20 @@ export default function ManageRoom() {
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
 
-  const { data, refetch, isFetching } = useGetListRooms(paginationFilter as PaginationSearchQuery)
+  const { data, refetch, isFetching } = useGetListRooms({
+    ...paginationFilter,
+    buildingId: account?.buildingNumber
+  } as PaginationSearchQuery)
 
   useEffect(() => {
     if (data) {
-      setRows(data.data.data.map((room) => ({ ...room, building: room.roomType.building.address })))
+      setRows(
+        data.data.data.map((room, index) => ({
+          ...room,
+          building: room.roomType.building.address,
+          index: index + (paginationFilter.page - 1) * paginationFilter.take + 1
+        }))
+      )
       setTotalRowCount(data.data.totalRecord)
     }
   }, [data])
@@ -62,8 +70,13 @@ export default function ManageRoom() {
   }
   const columns: GridColDef[] = [
     {
+      field: 'index',
+      headerName: '#',
+      width: 50
+    },
+    {
       field: 'id',
-      headerName: 'ID',
+      headerName: 'ID phòng',
       width: 50
     },
     { field: 'name', headerName: 'Tên' },
@@ -73,19 +86,6 @@ export default function ManageRoom() {
       width: 250,
       renderCell: (params: GridRenderCellParams) => <ExpandableCell {...params} />
     },
-    // {
-    //   field: 'image',
-    //   headerName: 'Ảnh',
-    //   width: 150,
-    //   maxWidth: 150,
-    //   renderCell: (params: GridRenderCellParams) => (
-    //     <img
-    //       src={params.value as string}
-    //       alt='room-img'
-    //       style={{ width: '100%', height: '100%', borderRadius: '4px' }}
-    //     />
-    //   )
-    // },
     {
       field: 'roomType',
       headerName: 'Loại phòng',
