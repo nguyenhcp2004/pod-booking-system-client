@@ -36,7 +36,10 @@ const roomSchema = z.object({
     .string()
     .min(5, 'Tên phòng phải có ít nhất 5 ký tự')
     .max(50, 'Tên phòng không được quá 50 ký tự')
-    .regex(/^[a-zA-Z0-9\s]*$/, 'Tên phòng không được sử dụng kí tự đặc biệt')
+    .regex(
+      /^[a-zA-Z0-9\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂĐĨŨƠàảãáạâấầẩẫậăắằẳẵặđêếềểễệìỉịòỏõóọôồốổỗộơờớởỡợùủũúụưừứửữựỳỷỹýỵ]*$/,
+      'Tên phòng không được sử dụng kí tự đặc biệt'
+    )
     .trim(),
   description: z
     .string()
