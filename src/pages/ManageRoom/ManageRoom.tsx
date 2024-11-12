@@ -138,7 +138,7 @@ export default function ManageRoom() {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
@@ -156,23 +156,10 @@ export default function ManageRoom() {
       field: 'actions',
       type: 'actions',
       headerName: 'Hành động',
-      width: 150,
-      renderCell: (params) => {
-        const dateValue = moment(params.value)
-
-        const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
-
-        return (
-          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
-            <Typography variant='body2' color={theme.palette.grey[700]}>
-              {time}
-            </Typography>
-            <Typography variant='body2' color={theme.palette.grey[500]}>
-              | {date}
-            </Typography>
-          </Box>
-        )
+      width: 100,
+      cellClassName: 'actions',
+      getActions: ({ row }) => {
+        return [<RoomModal row={row} refetch={refetch} action={ACTION.UPDATE} />]
       }
     }
   ]
