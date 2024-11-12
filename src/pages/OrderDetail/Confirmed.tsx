@@ -169,7 +169,7 @@ export const Confirmed: React.FC = () => {
                 sx={{ width: '200px', height: '193px', borderRadius: '16px' }}
                 variant='rounded'
               />
-              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '193px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '193px', alignItems: 'flex-start' }}>
                 <Typography variant='h5' fontWeight='bold'>
                   {bookingData.roomType?.name}
                 </Typography>
@@ -194,8 +194,8 @@ export const Confirmed: React.FC = () => {
                   <Typography variant='body2'>
                     <b>Ngày:</b> {bookingData.date}
                   </Typography>
-                  <Typography variant='body2'>
-                    <b>Slot:</b> {bookingData.timeSlots}
+                  <Typography variant='body2' sx={{ textAlign: 'start' }}>
+                    <b>Khung giờ:</b> {bookingData.timeSlots.map((slot) => slot).join(', ')}
                   </Typography>
                   <Typography variant='body2'>
                     <b>Phòng:</b> {bookingData.selectedRooms.map((room) => room.name).join(', ')}
