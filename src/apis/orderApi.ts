@@ -59,7 +59,6 @@ export interface Account {
   avatar: string | null
   role: Role
   buildingNumber: number | 0
-  rankingName: string | null
 }
 
 interface ServicePackage {

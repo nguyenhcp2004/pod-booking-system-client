@@ -169,12 +169,6 @@ export default function ManageUser() {
       )
     },
     {
-      field: 'point',
-      headerName: 'Điểm',
-      width: 100,
-      editable: false
-    },
-    {
       field: 'role',
       headerName: 'Vai trò',
       width: 120,
