@@ -8,7 +8,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
+  Button,
+  useTheme
 } from '@mui/material'
 import {
   GridActionsCellItem,
@@ -36,7 +37,7 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useAppContext } from '~/contexts/AppProvider'
 import envConfig from '~/constants/config'
-
+import moment from 'moment'
 export default function ManageUser() {
   const { account } = useAppContext()
   const [paginationModel, setPaginationModel] = useState({
@@ -48,6 +49,7 @@ export default function ManageUser() {
     take: paginationModel.pageSize,
     searchParams: ''
   })
+  const theme = useTheme()
   const { data, refetch, isLoading } = useGetManageAccount(paginationFilter as PaginationSearchQuery)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
@@ -167,13 +169,6 @@ export default function ManageUser() {
       )
     },
     {
-      field: 'point',
-      headerName: 'Điểm',
-      width: 100,
-      type: 'number',
-      editable: false
-    },
-    {
       field: 'role',
       headerName: 'Vai trò',
       width: 120,
@@ -207,14 +202,12 @@ export default function ManageUser() {
       valueFormatter: (params) => {
         return formatCurrency(params as number)
       },
-      type: 'number',
       editable: false
     },
     {
       field: 'building',
       headerName: 'Địa chỉ tòa nhà',
       width: 120,
-      type: 'number',
       editable: false,
       renderCell: (params) => <>{params.value?.address || '--'}</>,
       preProcessEditCellProps: (params) => {
@@ -223,7 +216,29 @@ export default function ManageUser() {
         return { ...props }
       }
     },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 180, editable: false },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 180,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'rankingName',
       headerName: 'Xếp hạng',

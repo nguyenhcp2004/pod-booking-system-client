@@ -8,17 +8,19 @@ import Link from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-import { LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
+import { FirebaseTokenType, LoginBody, LoginBodyType } from '~/schemaValidations/auth.schema'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLoginMutation } from '~/queries/useAuth'
+import { useLoginGoogleMutation, useLoginMutation } from '~/queries/useAuth'
 import { toast } from 'react-toastify'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleIcon } from '~/components/CustomIcons/CustomIcon'
 import { handleErrorApi } from '~/utils/utils'
 import { AppContext } from '~/contexts/AppProvider'
 import { useContext } from 'react'
-import envConfig from '~/constants/config'
+// import envConfig from '~/constants/config'
+import { signInWithPopup } from 'firebase/auth'
+import { auth, provider } from '~/utils/firebase'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -55,6 +57,7 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const loginMutation = useLoginMutation()
+  const loginGoogleMutation = useLoginGoogleMutation()
 
   const onSubmit = handleSubmit(async (data) => {
     if (loginMutation.isPending) return
@@ -71,6 +74,31 @@ export default function Login() {
       handleErrorApi({ error, setError })
     }
   })
+
+  const handleCLick = async () => {
+    try {
+      // Mở popup đăng nhập Google
+      const result = await signInWithPopup(auth, provider)
+
+      // Kiểm tra và lấy thông tin người dùng từ Firebase
+      const user = result.user
+      console.log(user)
+
+      const googleData = {
+        email: user.email,
+        name: user.displayName,
+        avatar: user.photoURL
+      }
+
+      console.log(googleData)
+
+      const response = await loginGoogleMutation.mutateAsync(googleData as FirebaseTokenType)
+      window.location.href = response.data.data.url
+    } catch (error) {
+      console.error('Google login error:', error)
+      toast.error('Đăng nhập với Google thất bại. Vui lòng thử lại.')
+    }
+  }
 
   return (
     <Card variant='outlined'>
@@ -161,7 +189,8 @@ export default function Login() {
           type='submit'
           fullWidth
           variant='outlined'
-          href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
+          onClick={handleCLick}
+          // href={envConfig.VITE_GOOGLE_AUTHORIZED_REDIRECT_URI}
           startIcon={<GoogleIcon />}
         >
           Đăng nhập với Google

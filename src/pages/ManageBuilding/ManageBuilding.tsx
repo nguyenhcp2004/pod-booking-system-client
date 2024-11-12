@@ -1,12 +1,13 @@
 import { useGetFilterBuilding } from '~/queries/useBuilding'
 import { BuildingStatus, GetFilteredBuildingQueryType } from '~/schemaValidations/building.schema'
-import { Box, Chip, Typography } from '@mui/material'
+import { Box, Chip, Typography, useTheme } from '@mui/material'
 import { GridColDef, GridToolbarContainer, GridValidRowModel } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 import Table from '~/components/Table/Table'
 import BuildingModal from '~/pages/ManageBuilding/BuildingModal'
 import { ACTION } from '~/constants/mock'
 import SearchInput from '~/components/SearchInput/SearchInput'
+import moment from 'moment'
 
 export default function ManageBuilding() {
   const [paginationModel, setPaginationModel] = useState({
@@ -18,7 +19,7 @@ export default function ManageBuilding() {
     take: paginationModel.pageSize,
     address: ''
   })
-
+  const theme = useTheme()
   const { data, isLoading } = useGetFilterBuilding(paginationFilter as GetFilteredBuildingQueryType)
   const [rows, setRows] = useState<GridValidRowModel[]>([])
   const [totalRowCount, setTotalRowCount] = useState<number>()
@@ -55,8 +56,52 @@ export default function ManageBuilding() {
       editable: false
     },
     { field: 'hotlineNumber', headerName: 'Hotline', width: 150, editable: false },
-    { field: 'createdAt', headerName: 'Thời gian tạo', width: 150, editable: false },
-    { field: 'updatedAt', headerName: 'Thời gian cập nhật', width: 150, editable: false },
+    {
+      field: 'createdAt',
+      headerName: 'Thời gian tạo',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Thời gian cập nhật',
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        const dateValue = moment(params.value)
+
+        const time = dateValue.format('HH:mm')
+        const date = dateValue.format('DD-MM-YYYY')
+
+        return (
+          <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
+            <Typography variant='body2' color={theme.palette.grey[700]}>
+              {time}
+            </Typography>
+            <Typography variant='body2' color={theme.palette.grey[500]}>
+              | {date}
+            </Typography>
+          </Box>
+        )
+      }
+    },
     {
       field: 'status',
       headerName: 'Trạng thái',

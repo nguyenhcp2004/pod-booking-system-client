@@ -111,6 +111,7 @@ export default function RoomType() {
           price: 0,
           quantity: 0,
           capacity: 0,
+          image: '',
           building: {
             address: '',
             status: '',

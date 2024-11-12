@@ -61,7 +61,7 @@ export type GetManageAccountRes = z.TypeOf<typeof ManageAccountRes>
 
 export const UpdateAccountByAdminBody = z.object({
   id: z.string(),
-  name: z.string().optional(),
+  name: z.string().max(35, { message: 'Tên người dùng tối đa 35 kí tự' }).optional(),
   buildingNumber: z.number().optional(),
   role: z.string().optional(),
   status: z.number().optional()
@@ -71,7 +71,7 @@ export type UpdateAccountByAdminBodyType = z.TypeOf<typeof UpdateAccountByAdminB
 
 export const UpdateBalance = z.object({
   accountId: z.string(),
-  usedBalance: z.number(),
+  usedBalance: z.number()
 })
 
 export type UpdateBalanceType = z.TypeOf<typeof UpdateBalance>
@@ -103,9 +103,19 @@ export const UpdateAccountByAdminRes = z.object({
 export type UpdateAccountByAdminResType = z.TypeOf<typeof UpdateAccountByAdminRes>
 
 export const CreateAccountBody = z.object({
-  name: z.string().min(2, { message: 'Tên người dùng ít nhất phải có 2 kí tự' }),
-  email: z.string().min(1, { message: 'Email không được bỏ trống' }).email('Chỗ này phải là email hợp lệ'),
-  password: z.string().min(6, { message: 'Mật khẩu phải có ít nhất 6 kí tự' }),
+  name: z
+    .string()
+    .min(2, { message: 'Tên người dùng ít nhất phải có 2 kí tự' })
+    .max(35, { message: 'Tên người dùng tối đa 35 kí tự' }),
+  email: z
+    .string()
+    .min(1, { message: 'Email không được bỏ trống' })
+    .email('Chỗ này phải là email hợp lệ')
+    .max(320, { message: 'Email có tối đa 320 kí tự' }),
+  password: z
+    .string()
+    .min(6, { message: 'Mật khẩu phải có ít nhất 6 kí tự' })
+    .max(30, { message: 'Mật khẩu có tối đa 30 kí tự' }),
   buildingNumber: z.number().gte(0, { message: 'Số tòa nhà không được âm' }).optional(),
   role: z.string(),
   status: z.number()
