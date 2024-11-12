@@ -249,7 +249,9 @@ export const calTotalPrice = (bookingData: BookingInfo) => {
   }
 
   const roomPrice = bookingData?.roomType?.price ?? 0
-  const totalRoomPrice = Math.round(roomPrice * bookingData?.selectedRooms.length * packageRepeat)
+  const totalRoomPrice = Math.round(
+    roomPrice * bookingData?.selectedRooms.length * packageRepeat * bookingData?.timeSlots.length
+  )
 
   const totalAmenitiesPrice = Math.round(
     bookingData?.selectedRooms.reduce((acc, room) => {
@@ -259,7 +261,7 @@ export const calTotalPrice = (bookingData: BookingInfo) => {
           return amenityAcc + amenity.price * amenity.quantity * packageRepeat
         }, 0)
       )
-    }, 0) || 0
+    }, 0) * bookingData?.timeSlots.length || 0
   )
 
   const discount = Math.round(
