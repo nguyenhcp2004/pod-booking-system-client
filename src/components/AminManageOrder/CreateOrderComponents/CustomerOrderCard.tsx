@@ -79,9 +79,6 @@ const CustomerOrderCard = ({ customer, setCustomer, bookingData }: CustomerOrder
           <Typography variant='body1' sx={{ marginBottom: 1 }}>
             Email: {customer?.email || 'Chưa có'}
           </Typography>
-          <Typography variant='body1' sx={{ marginBottom: 1 }}>
-            Hạng: {customer?.rankingName || 'Chưa có'}
-          </Typography>
         </Box>
       </Box>
       <Box

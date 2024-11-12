@@ -1,5 +1,7 @@
 import {
+  FirebaseTokenType,
   LoginBodyType,
+  LoginGoogleResType,
   LoginResType,
   LogoutBodyType,
   LogoutResType,
@@ -26,7 +28,12 @@ const authApiRequest = {
     return result
   },
   logout: (body: LogoutBodyType) => http.post<LogoutResType>('/auth/logout', body),
-  register: (body: { email: string; name: string; password: string }) => http.post<LoginResType>('/auth/register', body)
+  register: (body: { email: string; name: string; password: string }) =>
+    http.post<LoginResType>('/auth/register', body),
+  loginGoogle: (body: FirebaseTokenType) => {
+    console.log(body)
+    return http.post<LoginGoogleResType>(`/auth/login/google`, body)
+  }
 }
 
 export default authApiRequest
