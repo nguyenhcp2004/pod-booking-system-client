@@ -29,6 +29,7 @@ import { CreateAssignmentBody, CreateAssignmentBodyType } from '~/schemaValidati
 import { zodResolver } from '@hookform/resolvers/zod'
 import { handleErrorApi } from '~/utils/utils'
 import { toast } from 'react-toastify'
+import { useAppContext } from '~/contexts/AppProvider'
 
 const timeSlots = [
   '07:00 - 09:00',
@@ -74,7 +75,6 @@ export default function TaskAssignment() {
       weekDate: ''
     }
   })
-  console.log(data)
   const { data: staffs } = useGetListStaff({ slot: watch('slot'), weekDate: watch('weekDate') })
   const createAssignmentMutation = useCreateAssignment()
   const [events, setEvents] = useState<Shift>({})
@@ -99,6 +99,7 @@ export default function TaskAssignment() {
     return colorMap
   }, [events])
   const [hoveredChip, setHoveredChip] = useState<string | null>(null)
+  const { account } = useAppContext()
 
   useEffect(() => {
     if (data) {
@@ -213,7 +214,7 @@ export default function TaskAssignment() {
         </Dialog>
         <Grid size={{ xs: 1.5 }}>
           <Box sx={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)}>
+            <Button startIcon={<Add />} onClick={() => setIsAddEventOpen(true)} disabled={account?.role !== 'Manager'}>
               Thêm nhân viên
             </Button>
           </Box>
