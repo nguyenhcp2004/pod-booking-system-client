@@ -1,8 +1,21 @@
 import { AttachMoney, Cancel, CheckCircle } from '@mui/icons-material'
-import { Box, Chip, Dialog, IconButton, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Typography,
+  useTheme
+} from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { GridColDef } from '@mui/x-data-grid'
 import moment from 'moment'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import Table from '~/components/Table/Table'
 import { AMENITY_ORDER_STATUS } from '~/constants/mock'
@@ -25,6 +38,7 @@ const EditAmenityOrderModal = ({
   const theme = useTheme()
   const colors = tokens(theme.palette.mode)
   const editAmenityOrder = useUpdateAmenityOrder()
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   const handleUpdate = ({
     row,
@@ -42,6 +56,10 @@ const EditAmenityOrderModal = ({
       refetch()
     })
     handleClose()
+  }
+  const handleDelete = ({ row }: { row: AmenityOrderType }) => {
+    handleUpdate({ row, status: 'Canceled' })
+    setOpenConfirm(false)
   }
 
   const columns: GridColDef[] = [
@@ -124,6 +142,11 @@ const EditAmenityOrderModal = ({
         return [
           <Box sx={{ display: 'flex' }}>
             <IconButton
+              disabled={
+                row.status === AMENITY_ORDER_STATUS.CANCELED ||
+                row.status === AMENITY_ORDER_STATUS.DELIVERED ||
+                row.status === AMENITY_ORDER_STATUS.PAID
+              }
               onClick={() => {
                 handleUpdate({ row, status: 'Paid' })
               }}
@@ -132,6 +155,7 @@ const EditAmenityOrderModal = ({
               <AttachMoney />
             </IconButton>
             <IconButton
+              disabled={row.status === AMENITY_ORDER_STATUS.CANCELED || row.status === AMENITY_ORDER_STATUS.DELIVERED}
               onClick={() => {
                 handleUpdate({ row, status: 'Delivered' })
               }}
@@ -141,13 +165,30 @@ const EditAmenityOrderModal = ({
             </IconButton>
 
             <IconButton
+              disabled={row.status === AMENITY_ORDER_STATUS.CANCELED}
               onClick={() => {
-                handleUpdate({ row, status: 'Canceled' })
+                setOpenConfirm(true)
               }}
               color='error'
             >
               <Cancel />
             </IconButton>
+            <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+              <DialogTitle>Xác nhận hủy</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Bạn có chắc chắn muốn hủy đơn này không? Hành động này không thể hoàn tác.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenConfirm(false)} color='primary'>
+                  Hủy
+                </Button>
+                <Button onClick={() => handleDelete({ row })} color='error' autoFocus>
+                  Xóa
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         ]
       }

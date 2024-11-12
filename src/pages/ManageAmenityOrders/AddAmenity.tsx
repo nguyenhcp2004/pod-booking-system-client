@@ -273,51 +273,69 @@ const AddAmenity = () => {
           <Typography variant='subtitle2' sx={{ fontWeight: 700, fontSize: '16px' }}>
             Danh sách dịch vụ
           </Typography>
-          <Grid container spacing={4} sx={{ padding: '10px 0' }}>
-            {selectedAmenityType !== ''
-              ? amenities.map((item) => (
-                  <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
-                    <Button
-                      variant='outlined'
-                      fullWidth
-                      sx={{
-                        padding: '10px 0px',
-                        minHeight: '50px',
-                        borderRadius: '4px',
-                        textAlign: 'center',
-                        color: 'black',
-                        borderColor: 'black',
-                        fontSize: '14px',
-                        backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                      }}
-                      onClick={() => handleSelectAmenity(item)}
-                    >
-                      {item.name}
-                    </Button>
-                  </Grid>
-                ))
-              : allAmenities.map((item) => (
-                  <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
-                    <Button
-                      variant='outlined'
-                      fullWidth
-                      sx={{
-                        padding: '10px 0px',
-                        minHeight: '50px',
-                        borderRadius: '4px',
-                        textAlign: 'center',
-                        color: 'black',
-                        borderColor: 'black',
-                        fontSize: '14px',
-                        backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
-                      }}
-                      onClick={() => handleSelectAmenity(item)}
-                    >
-                      {item.name}
-                    </Button>
-                  </Grid>
-                ))}
-          </Grid>
+          <Box
+            sx={{
+              height: '300px',
+              overflowY: 'scroll',
+              '&::-webkit-scrollbar': {
+                width: '4px'
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: '#a9a9b1',
+                borderRadius: '4px'
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: 'transparent'
+              },
+              paddingRight: '10px'
+            }}
+          >
+            <Grid container spacing={4} sx={{ padding: '10px 0' }}>
+              {selectedAmenityType !== ''
+                ? amenities.map((item) => (
+                    <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                      <Button
+                        variant='outlined'
+                        fullWidth
+                        sx={{
+                          padding: '10px 0px',
+                          minHeight: '50px',
+                          borderRadius: '4px',
+                          textAlign: 'center',
+                          color: 'black',
+                          borderColor: 'black',
+                          fontSize: '14px',
+                          backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                        }}
+                        onClick={() => handleSelectAmenity(item)}
+                      >
+                        {item.name}
+                      </Button>
+                    </Grid>
+                  ))
+                : allAmenities.map((item) => (
+                    <Grid size={{ lg: 4, md: 6, xs: 12 }} key={item.id}>
+                      <Button
+                        variant='outlined'
+                        fullWidth
+                        sx={{
+                          padding: '10px 0px',
+                          minHeight: '50px',
+                          borderRadius: '4px',
+                          textAlign: 'center',
+                          color: 'black',
+                          borderColor: 'black',
+                          fontSize: '14px',
+                          backgroundColor: detailAmenity?.id === item.id ? colors.grey[100] : 'transparent'
+                        }}
+                        onClick={() => handleSelectAmenity(item)}
+                      >
+                        {item.name}
+                      </Button>
+                    </Grid>
+                  ))}
+            </Grid>
+          </Box>
         </Box>
         <Box
           sx={{
