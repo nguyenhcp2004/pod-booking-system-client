@@ -350,12 +350,6 @@ export default function RoomDetail() {
           </Box>
         </Grid>
       </Grid>
-      <Box sx={{ padding: '24px 40px', borderRadius: '16px', border: '1px solid ', minHeight: '200px' }}>
-        <Typography variant='h4' color='primary' fontWeight={'bold'}>
-          Chi tiết
-        </Typography>
-        <Typography variant='subtitle2'>{bookingData?.roomType?.building?.address}</Typography>
-      </Box>
     </Box>
   )
 }
