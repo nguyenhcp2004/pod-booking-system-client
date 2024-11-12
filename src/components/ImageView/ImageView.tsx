@@ -46,61 +46,69 @@ const ImageView: React.FC<{ images: ImageRoomTypeType[] }> = ({ images }) => {
   return (
     <Box>
       <img
-        src={images[0]?.imageUrl}
+        src={
+          images[0]?.imageUrl ||
+          'https://component.gallery/static/7f4dabad1abbb0bdbfdb537ab45c013d/Skeleton%20icon..svg'
+        }
         style={{ width: '100%', height: '400px', objectFit: 'cover', cursor: 'pointer', borderRadius: '4px' }}
         onClick={() => handleImageClick(images[0]?.imageUrl)}
       />
 
-      <Grid
-        container
-        size={12}
-        columnSpacing={2}
-        sx={{ position: 'relative', display: 'flex', alignItems: 'center', borderRadius: '4px' }}
-      >
-        <IconButton
-          disabled={currentImage === 0}
-          sx={{
-            position: 'absolute',
-            height: '100%',
-            borderRadius: '0',
-            ':hover': { backgroundColor: 'rgba(0,0,0,0.1)' }
-          }}
-          onClick={handlePrevImage}
-          color='secondary'
+      {images.length > 0 && (
+        <Grid
+          container
+          size={12}
+          columnSpacing={2}
+          sx={{ position: 'relative', display: 'flex', alignItems: 'center', borderRadius: '4px' }}
         >
-          <ArrowBackIosIcon />
-        </IconButton>
-        <Box sx={{ display: 'flex', gap: `${gap / 2}px`, width: '100%', overflow: 'hidden' }}>
-          {images.slice(sliderPosition, sliderPosition + size).map((image, index) => (
-            <img
-              src={image?.imageUrl}
-              key={index}
-              style={{
-                minWidth: `calc(100% / ${size} - ${gap / 3}px)`,
-                height: '200px',
-                objectFit: 'cover',
-                cursor: 'pointer',
-                borderRadius: '4px'
-              }}
-              onClick={() => handleImageClick(image?.imageUrl)}
-            />
-          ))}
-        </Box>
-        <IconButton
-          disabled={currentImage === images.length - 1}
-          sx={{
-            position: 'absolute',
-            right: 0,
-            height: '100%',
-            borderRadius: '0',
-            ':hover': { backgroundColor: 'rgba(0,0,0,0.1)' }
-          }}
-          onClick={handleNextImage}
-          color='secondary'
-        >
-          <ArrowForwardIosIcon />
-        </IconButton>
-      </Grid>
+          <IconButton
+            disabled={currentImage === 0}
+            sx={{
+              position: 'absolute',
+              height: '100%',
+              borderRadius: '0',
+              ':hover': { backgroundColor: 'rgba(0,0,0,0.1)' }
+            }}
+            onClick={handlePrevImage}
+            color='secondary'
+          >
+            <ArrowBackIosIcon />
+          </IconButton>
+          <Box sx={{ display: 'flex', gap: `${gap / 2}px`, width: '100%', overflow: 'hidden' }}>
+            {images.slice(sliderPosition, sliderPosition + size).map((image, index) => (
+              <img
+                src={
+                  image?.imageUrl ||
+                  'https://component.gallery/static/7f4dabad1abbb0bdbfdb537ab45c013d/Skeleton%20icon..svg'
+                }
+                key={index}
+                style={{
+                  minWidth: `calc(100% / ${size} - ${gap / 3}px)`,
+                  height: '200px',
+                  objectFit: 'cover',
+                  cursor: 'pointer',
+                  borderRadius: '4px'
+                }}
+                onClick={() => handleImageClick(image?.imageUrl)}
+              />
+            ))}
+          </Box>
+          <IconButton
+            disabled={currentImage === images.length - 1}
+            sx={{
+              position: 'absolute',
+              right: 0,
+              height: '100%',
+              borderRadius: '0',
+              ':hover': { backgroundColor: 'rgba(0,0,0,0.1)' }
+            }}
+            onClick={handleNextImage}
+            color='secondary'
+          >
+            <ArrowForwardIosIcon />
+          </IconButton>
+        </Grid>
+      )}
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>

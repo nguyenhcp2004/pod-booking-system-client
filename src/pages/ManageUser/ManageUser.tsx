@@ -240,12 +240,6 @@ export default function ManageUser() {
       }
     },
     {
-      field: 'rankingName',
-      headerName: 'Xếp hạng',
-      width: 120,
-      editable: false
-    },
-    {
       field: 'status',
       headerName: 'Trạng thái',
       width: 150,

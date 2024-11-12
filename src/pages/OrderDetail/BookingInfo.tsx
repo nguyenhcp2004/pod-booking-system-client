@@ -103,24 +103,25 @@ export const BookingInfo: React.FC<CommonProps> = (props) => {
     setPhoneNumber(event.target.value)
   }
   const handleNext = async () => {
-    if (!isValidVietnamPhoneNumber(phoneNumber)) {
-      setPhoneError('Số điện thoại không hợp lệ')
-      return
-    }
-    const updateAccountPhoneNumber: UpdateAccountPhoneNumberType = {
-      id: account?.id as string,
-      phoneNumber: phoneNumber
-    }
+    if (!account?.phoneNumber) {
+      if (!isValidVietnamPhoneNumber(phoneNumber)) {
+        setPhoneError('Số điện thoại không hợp lệ')
+        return
+      }
+      const updateAccountPhoneNumber: UpdateAccountPhoneNumberType = {
+        id: account?.id as string,
+        phoneNumber: phoneNumber
+      }
 
-    try {
-      await updateAccountPhoneNumberMutation.mutateAsync(updateAccountPhoneNumber)
-      setAccount({ ...account, phoneNumber: phoneNumber } as typeof account)
-      console.log(account)
-      setPhoneError(null)
-      props.onNext()
-    } catch {
-      toast.error('Cập nhật số điện thoại thất bại')
+      try {
+        await updateAccountPhoneNumberMutation.mutateAsync(updateAccountPhoneNumber)
+        setAccount((prev) => (prev ? { ...prev, phoneNumber: phoneNumber } : prev))
+        setPhoneError(null)
+      } catch {
+        toast.error('Cập nhật số điện thoại thất bại')
+      }
     }
+    props.onNext()
   }
 
   return (
