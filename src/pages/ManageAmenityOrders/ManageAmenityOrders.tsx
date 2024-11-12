@@ -107,7 +107,7 @@ const ManageAmenityOrders = () => {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
@@ -129,7 +129,7 @@ const ManageAmenityOrders = () => {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
@@ -151,7 +151,7 @@ const ManageAmenityOrders = () => {
         const dateValue = moment(params.value)
 
         const time = dateValue.format('HH:mm')
-        const date = dateValue.format('DD-MM-YY')
+        const date = dateValue.format('DD-MM-YYYY')
 
         return (
           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center', height: '100%' }}>
@@ -187,6 +187,7 @@ const ManageAmenityOrders = () => {
         value={startDate}
         onChange={(date) => setStartDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        maxDate={endDate || moment()}
       />
       <DatePicker
         label='Đến ngày'
@@ -194,6 +195,7 @@ const ManageAmenityOrders = () => {
         value={endDate}
         onChange={(date) => setEndDate(date)}
         format={DEFAULT_DATE_FORMAT}
+        minDate={startDate || moment()}
       />
     </Box>
   )
@@ -201,12 +203,12 @@ const ManageAmenityOrders = () => {
   const Toolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
       <Box>
-        <FilterToolbar />
-      </Box>
-      <Box sx={{ display: 'flex', gap: 5 }}>
         <Button color='primary' startIcon={<Add />} onClick={handleClickCreate}>
           Tạo đơn dịch vụ
         </Button>
+      </Box>
+      <Box sx={{ display: 'flex', gap: '8px' }}>
+        <FilterToolbar />
         <SearchForManage setPaginationModel={setPaginationFilter} />
       </Box>
     </GridToolbarContainer>

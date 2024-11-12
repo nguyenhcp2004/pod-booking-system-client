@@ -18,3 +18,9 @@ export const useRegisterMutation = () => {
     mutationFn: authApiRequest.register
   })
 }
+
+export const useLoginGoogleMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.loginGoogle
+  })
+}
