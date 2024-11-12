@@ -23,7 +23,7 @@ export const Confirmed: React.FC = () => {
   const location = useLocation()
   const bookingContext = useBookingContext()
   const transactionData = location.state?.transactionData
-  const { account: userData } = useAppContext()
+  const { account: userData, setAccount } = useAppContext()
   const sendMailMutation = useSendMailMutation()
   const [status, setStatus] = useState<boolean | null>(null)
   const [orderCreated, setOrderCreated] = useState(0)
@@ -56,9 +56,8 @@ export const Confirmed: React.FC = () => {
       if (response.status === 'OK' && orderCreated === 0) {
         setOrderCreated(1)
         setStatus(true)
-        console.log('Balance to use:', paidAmount, totalAmount, balanceToUse)
-
         if (paidAmount < totalAmount) {
+          setAccount((pre) => (pre ? { ...pre, balance: pre.balance - balanceToUse } : pre))
           await updateBalance({ accountId: userData?.id || '', usedBalance: balanceToUse })
         }
         if (!bookingContext) throw new Error('Booking context is undefined')
