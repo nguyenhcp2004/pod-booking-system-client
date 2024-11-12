@@ -37,7 +37,6 @@ export const createRoomTypeApi = async (createData: RoomTypeRequest) => {
   try {
     const parsedRequest = RoomTypeRequest.parse(createData)
     const response = await http.post(`/room-types`, parsedRequest)
-    console.log('response', response)
     return response.data
   } catch (error) {
     console.error('Error create room type:', error)
