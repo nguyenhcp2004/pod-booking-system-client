@@ -262,8 +262,8 @@ const AddAmenity = () => {
                 label='Chọn loại dịch vụ'
                 onChange={handleAmenityTypeChange}
               >
-                <MenuItem value='Food'>Food</MenuItem>
-                <MenuItem value='Office'>Office</MenuItem>
+                <MenuItem value='Food'>Đồ ăn</MenuItem>
+                <MenuItem value='Office'>Văn phòng phẩm</MenuItem>
               </Select>
             </FormControl>
           </Grid>

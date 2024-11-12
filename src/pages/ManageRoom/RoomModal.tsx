@@ -278,7 +278,7 @@ const RoomModal = ({ row, refetch, action }: { row: RoomSchemaType; refetch: () 
                     >
                       {Object.entries(ROOM_STATUS).map(([key, value]) => (
                         <MenuItem key={key} value={value}>
-                          {value}
+                          {value === ROOM_STATUS.AVAILABLE ? 'Hoạt động' : 'Ngừng hoạt động'}
                         </MenuItem>
                       ))}
                     </Select>

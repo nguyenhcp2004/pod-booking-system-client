@@ -105,7 +105,10 @@ export default function ManageRoom() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueOptions: Object.entries(ROOM_STATUS).map(([_, value]) => value),
       renderCell: (params) => (
-        <Chip label={params.value} color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'warning'} />
+        <Chip
+          label={params.value === ROOM_STATUS.AVAILABLE ? 'Hoạt động' : 'Ngừng hoạt động'}
+          color={params.value === ROOM_STATUS.AVAILABLE ? 'success' : 'error'}
+        />
       )
     },
     {
