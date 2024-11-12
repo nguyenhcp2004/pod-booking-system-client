@@ -56,6 +56,26 @@ export const Account = z.object({
 
 export type AccountType = z.TypeOf<typeof Account>
 
+export const FirebaseToken = z
+  .object({
+    email: z.string(),
+    name: z.string(),
+    avatar: z.string()
+  })
+  .strict()
+
+export type FirebaseTokenType = z.TypeOf<typeof FirebaseToken>
+
+export const LoginGoogleRes = z.object({
+  code: z.number(),
+  data: z.object({
+    url: z.string()
+  }),
+  message: z.string()
+})
+
+export type LoginGoogleResType = z.TypeOf<typeof LoginGoogleRes>
+
 export const LoginRes = z.object({
   data: z.object({
     accessToken: z.string(),
