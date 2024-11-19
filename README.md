@@ -36,50 +36,50 @@ Built with React to handle the user interface, Google Calendar to sync booked sc
 
 FlexiPod was developed by a talented team of five passionate individuals:
 
-<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+<div align="center" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px;">
 
   <!-- Member 1 -->
-  <div>
+  <div style="text-align: center;">
     <a href="https://github.com/HuyDiCode" target="_blank" title="Nguyễn Bùi Quốc Huy">
-      <img src="https://avatars.githubusercontent.com/u/153421231?v=4" alt="Nguyễn Bùi Quốc Huy" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <img src="https://avatars.githubusercontent.com/u/153421231?v=4" alt="Nguyễn Bùi Quốc Huy" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
       <div>Nguyễn Bùi Quốc Huy</div>
     </a>
   </div>
 
   <!-- Member 2 -->
-  <div>
+  <div style="text-align: center;">
     <a href="https://github.com/Hoang-Nguyen-Huy" target="_blank" title="Nguyễn Huy Hoàng">
-      <img src="https://avatars.githubusercontent.com/u/121879570?v=4" alt="Nguyễn Huy Hoàng" style="border-radius: 50%; width: 100px; height: 100px;" />
-      <div style="font-weight: bold;">Nguyễn Huy Hoàng</div>
+      <img src="https://avatars.githubusercontent.com/u/121879570?v=4" alt="Nguyễn Huy Hoàng" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
+      <div><strong>Nguyễn Huy Hoàng</strong></div>
     </a>
   </div>
 
   <!-- Member 3 -->
-  <div>
+  <div style="text-align: center;">
     <a href="https://github.com/nguyenhcp2004" target="_blank" title="Huỳnh Chiếm Phương Nguyên">
-      <img src="https://avatars.githubusercontent.com/u/140372018?v=4" alt="Huỳnh Chiếm Phương Nguyên" style="border-radius: 50%; width: 120px; height: 120px; border: 3px solid gold;" />
+      <img src="https://avatars.githubusercontent.com/u/140372018?v=4" alt="Huỳnh Chiếm Phương Nguyên" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
       <div>Huỳnh Chiếm Phương Nguyên (Leader)</div>
     </a>
   </div>
-  
-  
 
   <!-- Member 4 -->
-  <div>
+  <div style="text-align: center;">
     <a href="https://github.com/toki-ai" target="_blank" title="Phạm Thị Anh Đào">
-      <img src="https://avatars.githubusercontent.com/u/127603666?v=4" alt="Phạm Thị Anh Đào" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <img src="https://avatars.githubusercontent.com/u/127603666?v=4" alt="Phạm Thị Anh Đào" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
       <div>Phạm Thị Anh Đào</div>
     </a>
   </div>
 
   <!-- Member 5 -->
-  <div>
+  <div style="text-align: center;">
     <a href="https://github.com/ThanhTriIsCoding" target="_blank" title="Nguyễn Thanh Trí">
-      <img src="https://avatars.githubusercontent.com/u/86301855?v=4" alt="Nguyễn Thanh Trí" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <img src="https://avatars.githubusercontent.com/u/86301855?v=4" alt="Nguyễn Thanh Trí" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;" />
       <div>Nguyễn Thanh Trí</div>
     </a>
   </div>
+
 </div>
+
 
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
