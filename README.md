@@ -17,7 +17,7 @@
 <h3 align="center">FlexiPod</h3>
 
    <div align="center">
-     This project was built for the Pod Booking System.!
+     This project was built for the Pod Booking System.
     </div>
 </div>
 
