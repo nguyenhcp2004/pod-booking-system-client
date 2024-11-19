@@ -34,15 +34,52 @@ Built with React to handle the user interface, Google Calendar to sync booked sc
 
 ## <a name="meet-the-team">👥 Meet the Team</a>
 
-FlexiPod was developed by a talented team of five passionate individuals who contributed their unique expertise to the success of the project:
+FlexiPod was developed by a talented team of five passionate individuals:
 
-- **[Huỳnh Chiếm Phương Nguyên](https://github.com/nguyenhcp2004)**: Backend Developer, responsible for creating secure APIs, implementing role-based access control, and managing database operations.
-- **[Nguyễn Huy Hoàng](https://github.com/Hoang-Nguyen-Huy)**: Frontend Developer, specialized in building dynamic and responsive UI components using React and MUI.
-- **[Nguyễn Bùi Quốc Huy](https://github.com/HuyDiCode)**: Full-Stack Developer, ensured smooth integration between the backend and frontend layers while enhancing the app's performance.
-- **[Phạm Thị Anh Đào](https://github.com/toki-ai)**: DevOps Engineer, handled deployment, CI/CD pipelines, and cloud environment management for scalable performance.
-- **[Nguyễn Thanh Trí](https://github.com/ThanhTriIsCoding)**: QA Engineer, conducted thorough testing to maintain the system's stability and reliability.
+<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
 
-Our combined efforts have resulted in a user-friendly platform tailored to streamline workspace booking processes for both customers and administrators.
+  <!-- Member 1 -->
+  <div>
+    <a href="https://github.com/HuyDiCode" target="_blank" title="Nguyễn Bùi Quốc Huy">
+      <img src="https://avatars.githubusercontent.com/u/153421231?v=4" alt="Nguyễn Bùi Quốc Huy" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <div>Nguyễn Bùi Quốc Huy</div>
+    </a>
+  </div>
+
+  <!-- Member 2 -->
+  <div>
+    <a href="https://github.com/Hoang-Nguyen-Huy" target="_blank" title="Nguyễn Huy Hoàng">
+      <img src="https://avatars.githubusercontent.com/u/121879570?v=4" alt="Nguyễn Huy Hoàng" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <div style="font-weight: bold;">Nguyễn Huy Hoàng</div>
+    </a>
+  </div>
+
+  <!-- Member 3 -->
+  <div>
+    <a href="https://github.com/nguyenhcp2004" target="_blank" title="Huỳnh Chiếm Phương Nguyên">
+      <img src="https://avatars.githubusercontent.com/u/140372018?v=4" alt="Huỳnh Chiếm Phương Nguyên" style="border-radius: 50%; width: 120px; height: 120px; border: 3px solid gold;" />
+      <div>Huỳnh Chiếm Phương Nguyên (Leader)</div>
+    </a>
+  </div>
+  
+  
+
+  <!-- Member 4 -->
+  <div>
+    <a href="https://github.com/toki-ai" target="_blank" title="Phạm Thị Anh Đào">
+      <img src="https://avatars.githubusercontent.com/u/127603666?v=4" alt="Phạm Thị Anh Đào" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <div>Phạm Thị Anh Đào</div>
+    </a>
+  </div>
+
+  <!-- Member 5 -->
+  <div>
+    <a href="https://github.com/ThanhTriIsCoding" target="_blank" title="Nguyễn Thanh Trí">
+      <img src="https://avatars.githubusercontent.com/u/86301855?v=4" alt="Nguyễn Thanh Trí" style="border-radius: 50%; width: 100px; height: 100px;" />
+      <div>Nguyễn Thanh Trí</div>
+    </a>
+  </div>
+</div>
 
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
