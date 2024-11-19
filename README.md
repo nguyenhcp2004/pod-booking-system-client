@@ -32,6 +32,18 @@
 
 Built with React to handle the user interface, Google Calendar to sync booked schedules, VnPay to process payments, MySQL (serverless) to manage databases, and styled with MUI, FlexiPod is a perfect web app. Its main goal is to provide customers with a more convenient way to book spaces.
 
+## <a name="meet-the-team">👥 Meet the Team</a>
+
+FlexiPod was developed by a talented team of five passionate individuals who contributed their unique expertise to the success of the project:
+
+- **[Huỳnh Chiếm Phương Nguyên](https://github.com/nguyenhcp2004)**: Backend Developer, responsible for creating secure APIs, implementing role-based access control, and managing database operations.
+- **[Nguyễn Huy Hoàng](https://github.com/Hoang-Nguyen-Huy)**: Frontend Developer, specialized in building dynamic and responsive UI components using React and MUI.
+- **[Nguyễn Bùi Quốc Huy](https://github.com/HuyDiCode)**: Full-Stack Developer, ensured smooth integration between the backend and frontend layers while enhancing the app's performance.
+- **[Phạm Thị Anh Đào](https://github.com/toki-ai)**: DevOps Engineer, handled deployment, CI/CD pipelines, and cloud environment management for scalable performance.
+- **[Nguyễn Thanh Trí](https://github.com/ThanhTriIsCoding)**: QA Engineer, conducted thorough testing to maintain the system's stability and reliability.
+
+Our combined efforts have resulted in a user-friendly platform tailored to streamline workspace booking processes for both customers and administrators.
+
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
 - React 
